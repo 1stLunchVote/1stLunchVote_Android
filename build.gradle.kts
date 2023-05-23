@@ -6,3 +6,9 @@ plugins {
     id("com.google.dagger.hilt.android") version Versions.Hilt apply false
     id("org.jetbrains.kotlin.jvm") version Versions.Kotlin apply false
 }
+
+buildscript {
+    dependencies{
+        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${Versions.Navigation}")
+    }
+}
