@@ -144,4 +144,9 @@
         <item name="android:textSize">11sp</item>
         <item name="android:lineSpacingExtra">5sp</item>
     </style>
+
+    <!-- Widget Style-->
+    <style name="Widget.LunchVote.TextInput" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="android:textColorHint">@color/colorOutline</item>
+    </style>
 </resources>

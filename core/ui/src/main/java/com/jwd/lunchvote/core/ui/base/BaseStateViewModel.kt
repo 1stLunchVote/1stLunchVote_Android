@@ -60,7 +60,7 @@ abstract class BaseStateViewModel<S : ViewModelContract.State, E : ViewModelCont
         }
     }
 
-    fun setEvent(event: E) {
+    fun sendEvent(event: E) {
         viewModelScope.launch {
             _events.emit(event)
         }

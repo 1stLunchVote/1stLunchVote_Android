@@ -15,7 +15,16 @@
             app:destination="@id/nav_main"
             app:popUpTo="@id/nav_login"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_dest_login_to_dest_register_email"
+            app:destination="@id/dest_register_email" />
     </fragment>
+
+    <fragment
+        android:id="@+id/dest_register_email"
+        android:name="com.jwd.lunchvote.ui.login.register.RegisterEmailFragment"
+        android:label="RegisterEmailFragment"
+        tools:layout="@layout/fragment_register_email"/>
 
     <include app:graph="@navigation/nav_main" />
 </navigation>

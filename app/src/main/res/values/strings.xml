@@ -1,3 +1,11 @@
 <resources>
-    <string name="app_name">LunchVote</string>
+    <string name="app_name">제1회점심메뉴총선거</string>
+
+    <!-- LoginFragment-->
+    <string name="login_email_hint">이메일</string>
+    <string name="login_password_hint">비밀번호</string>
+    <string name="login_btn">로그인</string>
+    <string name="login_register_guide">계정이 없으신가요?</string>
+    <string name="login_register_btn"><u>회원가입</u></string>
+
 </resources>

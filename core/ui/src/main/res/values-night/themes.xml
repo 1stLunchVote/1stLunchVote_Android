@@ -18,5 +18,11 @@
         <item name="colorOnError">@color/colorOnError</item>
         <item name="android:colorBackground">@color/colorBackground</item>
         <item name="colorOnBackground">@color/colorOnBackground</item>
+        <item name="android:textColor">@color/colorOnBackground</item>
+        <item name="colorOutline">@color/colorOutline</item>
+        <item name="android:textColorHint">@color/colorDisabled</item>
+
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 </resources>

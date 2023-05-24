@@ -21,7 +21,9 @@
         <item name="colorOnBackground">@color/colorOnBackground</item>
         <item name="android:textColor">@color/colorOnBackground</item>
         <item name="textOutlineColor">@color/colorOutline</item>
-        <item name="hintTextColor">@color/colorDisabled</item>
+
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 
     <style name="Theme.LunchVote" parent="Base.Theme.LunchVote">
@@ -44,5 +46,7 @@
         <item name="textAppearanceLabelLarge">@style/TextAppearance.LunchVote.LabelLarge</item>
         <item name="textAppearanceLabelMedium">@style/TextAppearance.LunchVote.LabelMedium</item>
         <item name="textAppearanceLabelSmall">@style/TextAppearance.LunchVote.LabelSmall</item>
+
+        <item name="textInputStyle">@style/Widget.LunchVote.TextInput</item>
     </style>
 </resources>
