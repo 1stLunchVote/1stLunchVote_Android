@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.base
+package com.jwd.lunchvote.core.ui.base
 
 import android.os.Parcelable
 

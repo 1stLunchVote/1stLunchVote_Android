@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.base
+package com.jwd.lunchvote.core.ui.base
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
@@ -15,7 +15,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 abstract class BaseStateViewModel<S : ViewModelContract.State, E : ViewModelContract.Event,
-        R: ViewModelContract.Reduce, SE : ViewModelContract.SideEffect>(
+        R: ViewModelContract.Reduce, SE : ViewModelContract.SideEffect
+        >(
     private val stateHandler: SavedStateHandle
 ) : ViewModel()
 {

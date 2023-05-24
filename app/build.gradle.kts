@@ -39,6 +39,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:ui"))
     implementationAndroidX()
     implementationCoroutine()
     implementationHilt()

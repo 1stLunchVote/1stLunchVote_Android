@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.util
+package com.jwd.lunchvote.core.ui.util
 
 import android.view.LayoutInflater
 import android.view.View

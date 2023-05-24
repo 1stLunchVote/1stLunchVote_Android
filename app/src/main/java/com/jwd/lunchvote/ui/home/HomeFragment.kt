@@ -1,8 +1,8 @@
 package com.jwd.lunchvote.ui.home
 
-import com.jwd.lunchvote.base.BaseFragment
+import com.jwd.lunchvote.core.ui.base.BaseFragment
+import com.jwd.lunchvote.core.ui.util.viewBindings
 import com.jwd.lunchvote.databinding.FragmentHomeBinding
-import com.jwd.lunchvote.util.viewBindings
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
