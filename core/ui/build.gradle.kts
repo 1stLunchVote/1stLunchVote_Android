@@ -27,6 +27,11 @@ android {
 
     buildFeatures{
         dataBinding = true
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.4.4"
     }
 
     compileOptions {
@@ -41,4 +46,6 @@ android {
 dependencies {
     implementationAndroidX()
     implementationCoroutine()
+    implementationTest()
+    implementationCompose()
 }

@@ -29,6 +29,10 @@ android {
     }
     buildFeatures {
         dataBinding = true
+        compose = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.4.4"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -42,6 +46,7 @@ android {
 dependencies {
     implementation(project(":core:ui"))
     implementationAndroidX()
+    implementationCompose()
     implementationCoroutine()
     implementationHilt()
     implementationTest()

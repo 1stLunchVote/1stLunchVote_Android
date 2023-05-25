@@ -24,7 +24,7 @@ object Versions{
     const val AndroidHilt = "1.0.0"
 
     // Kotlin, Coroutine
-    const val Kotlin = "1.8.0"
+    const val Kotlin = "1.8.10"
     const val Coroutine = "1.6.4"
 
     // JavaX
@@ -36,6 +36,13 @@ object Versions{
     // Retrofit
     const val Retrofit = "2.9.0"
     const val OkHttp = "4.9.1"
+
+    // Compose
+    const val Compose = "2023.01.00"
+    const val Material3 = "1.0.1"
+    const val ComposeNavigation = "2.5.1"
+    const val ComposeHilt = "1.0.0"
+    const val ComposeLifecycle = "2.6.1"
 
     // Test
     const val JUnit = "4.13.2"
@@ -83,6 +90,18 @@ object Libraries{
     object JavaX{
         const val Inject = "javax.inject:javax.inject:${Versions.JavaX}"
     }
+
+    object Compose{
+        const val ComposeBom = "androidx.compose:compose-bom:${Versions.Compose}"
+        const val Material3 = "androidx.compose.material3:material3:${Versions.Material3}"
+        const val Foundation = "androidx.compose.foundation:foundation"
+        const val UI = "androidx.compose.ui:ui"
+        const val Tooling = "androidx.compose.ui:ui-tooling"
+        const val Preview = "androidx.compose.ui:ui-tooling-preview"
+        const val Navigation = "androidx.navigation:navigation-compose:${Versions.ComposeNavigation}"
+        const val Hilt = "androidx.hilt:hilt-navigation-compose:${Versions.ComposeHilt}"
+        const val Lifecycle = "androidx.lifecycle:lifecycle-runtime-compose:${Versions.ComposeLifecycle}"
+    }
 }
 
 fun DependencyHandlerScope.implementationAndroidX(){
@@ -121,6 +140,20 @@ fun DependencyHandlerScope.implementationRetrofit(){
     implementations(
         Libraries.Retrofit.Retrofit,
         Libraries.Retrofit.OkHttp
+    )
+}
+
+fun DependencyHandlerScope.implementationCompose(){
+    implementations(
+        platform(Libraries.Compose.ComposeBom),
+        Libraries.Compose.Material3,
+        Libraries.Compose.Foundation,
+        Libraries.Compose.Preview,
+        Libraries.Compose.Tooling,
+        Libraries.Compose.UI,
+        Libraries.Compose.Navigation,
+        Libraries.Compose.Hilt,
+        Libraries.Compose.Lifecycle
     )
 }
 
