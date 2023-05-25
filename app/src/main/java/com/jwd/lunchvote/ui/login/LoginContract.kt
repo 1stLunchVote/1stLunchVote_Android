@@ -1,6 +1,7 @@
 package com.jwd.lunchvote.ui.login
 
 import android.os.Parcelable
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.jwd.lunchvote.core.ui.base.ViewModelContract
 import kotlinx.parcelize.Parcelize
 
@@ -16,7 +17,10 @@ class LoginContract {
     sealed interface LoginEvent : ViewModelContract.Event {
         class SetEmail(val email: String) : LoginEvent
         class SetPwd(val pwd: String) : LoginEvent
-        object OnClickLogin : LoginEvent
+        object OnClickEmailLogin : LoginEvent
+        object OnClickGoogleLogin : LoginEvent
+        class ProcessGoogleLogin(val account: GoogleSignInAccount) : LoginEvent
+
     }
 
     sealed interface LoginReduce : ViewModelContract.Reduce {
@@ -26,5 +30,7 @@ class LoginContract {
 
     sealed interface LoginSideEffect : ViewModelContract.SideEffect {
         object NavigateToHome : LoginSideEffect
+        object LaunchGoogleLogin : LoginSideEffect
+        class ShowSnackbar(val message: String) : LoginSideEffect
     }
 }

@@ -28,25 +28,25 @@
 
     <style name="Theme.LunchVote" parent="Base.Theme.LunchVote">
         <!-- Custom TextAppearance -->
-        <item name="textAppearanceButton">@style/TextAppearance.LunchVote.Button</item>
+<!--        <item name="textAppearanceButton">@style/TextAppearance.LunchVote.Button</item>-->
         <item name="textAppearanceCaption">@style/TextAppearance.LunchVote.Caption</item>
         <item name="textAppearanceOverline">@style/TextAppearance.LunchVote.Overline</item>
-        <item name="textAppearanceDisplayLarge">@style/TextAppearance.LunchVote.DisplayLarge</item>
-        <item name="textAppearanceDisplayMedium">@style/TextAppearance.LunchVote.DisplayMedium</item>
-        <item name="textAppearanceDisplaySmall">@style/TextAppearance.LunchVote.DisplaySmall</item>
-        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.LunchVote.HeadlineLarge</item>
-        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.LunchVote.HeadlineMedium</item>
-        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.LunchVote.HeadlineSmall</item>
-        <item name="textAppearanceTitleLarge">@style/TextAppearance.LunchVote.TitleLarge</item>
-        <item name="textAppearanceTitleMedium">@style/TextAppearance.LunchVote.TitleMedium</item>
-        <item name="textAppearanceTitleSmall">@style/TextAppearance.LunchVote.TitleSmall</item>
-        <item name="textAppearanceBodyLarge">@style/TextAppearance.LunchVote.BodyLarge</item>
-        <item name="textAppearanceBodyMedium">@style/TextAppearance.LunchVote.BodyMedium</item>
-        <item name="textAppearanceBodySmall">@style/TextAppearance.LunchVote.BodySmall</item>
-        <item name="textAppearanceLabelLarge">@style/TextAppearance.LunchVote.LabelLarge</item>
-        <item name="textAppearanceLabelMedium">@style/TextAppearance.LunchVote.LabelMedium</item>
-        <item name="textAppearanceLabelSmall">@style/TextAppearance.LunchVote.LabelSmall</item>
+<!--        <item name="textAppearanceDisplayLarge">@style/TextAppearance.LunchVote.DisplayLarge</item>-->
+<!--        <item name="textAppearanceDisplayMedium">@style/TextAppearance.LunchVote.DisplayMedium</item>-->
+<!--        <item name="textAppearanceDisplaySmall">@style/TextAppearance.LunchVote.DisplaySmall</item>-->
+<!--        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.LunchVote.HeadlineLarge</item>-->
+<!--        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.LunchVote.HeadlineMedium</item>-->
+<!--        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.LunchVote.HeadlineSmall</item>-->
+<!--        <item name="textAppearanceTitleLarge">@style/TextAppearance.LunchVote.TitleLarge</item>-->
+<!--        <item name="textAppearanceTitleMedium">@style/TextAppearance.LunchVote.TitleMedium</item>-->
+<!--        <item name="textAppearanceTitleSmall">@style/TextAppearance.LunchVote.TitleSmall</item>-->
+<!--        <item name="textAppearanceBodyLarge">@style/TextAppearance.LunchVote.BodyLarge</item>-->
+<!--        <item name="textAppearanceBodyMedium">@style/TextAppearance.LunchVote.BodyMedium</item>-->
+<!--        <item name="textAppearanceBodySmall">@style/TextAppearance.LunchVote.BodySmall</item>-->
+<!--        <item name="textAppearanceLabelLarge">@style/TextAppearance.LunchVote.LabelLarge</item>-->
+<!--        <item name="textAppearanceLabelMedium">@style/TextAppearance.LunchVote.LabelMedium</item>-->
+<!--        <item name="textAppearanceLabelSmall">@style/TextAppearance.LunchVote.LabelSmall</item>-->
 
-        <item name="textInputStyle">@style/Widget.LunchVote.TextInput</item>
+<!--        <item name="textInputStyle">@style/Widget.LunchVote.TextInput</item>-->
     </style>
 </resources>

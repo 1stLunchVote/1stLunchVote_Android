@@ -32,6 +32,8 @@ object Versions{
 
     // Firebase
     const val Firebase = "32.0.0"
+    const val Gms = "4.3.15"
+    const val GmsAuth = "20.4.0"
 
     // Retrofit
     const val Retrofit = "2.9.0"
@@ -91,6 +93,13 @@ object Libraries{
         const val Inject = "javax.inject:javax.inject:${Versions.JavaX}"
     }
 
+    object Firebase{
+        const val Firebase = "com.google.firebase:firebase-bom:${Versions.Firebase}"
+        const val Auth = "com.google.firebase:firebase-auth-ktx"
+        const val DataBase = "com.google.firebase:firebase-database-ktx"
+        const val GmsAuth = "com.google.android.gms:play-services-auth:${Versions.GmsAuth}"
+    }
+
     object Compose{
         const val ComposeBom = "androidx.compose:compose-bom:${Versions.Compose}"
         const val Material3 = "androidx.compose.material3:material3:${Versions.Material3}"
@@ -133,6 +142,12 @@ fun DependencyHandlerScope.implementationHilt(){
     )
     kapts(
         Libraries.Hilt.HiltCompiler
+    )
+}
+
+fun DependencyHandlerScope.implementationFirebase(){
+    implementations(
+        platform(Libraries.Firebase.Firebase)
     )
 }
 

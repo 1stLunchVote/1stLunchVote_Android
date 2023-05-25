@@ -10,5 +10,6 @@ plugins {
 buildscript {
     dependencies{
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${Versions.Navigation}")
+        classpath("com.google.gms:google-services:${Versions.Gms}")
     }
 }

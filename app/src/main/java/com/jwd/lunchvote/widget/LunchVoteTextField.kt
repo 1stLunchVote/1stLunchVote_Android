@@ -9,11 +9,17 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun LunchVoteTextField(
     modifier: Modifier = Modifier,
@@ -23,6 +29,9 @@ fun LunchVoteTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     onTextChanged: (String) -> Unit,
     keyboardEnterNext: Boolean = false,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    focusManager : FocusManager = LocalFocusManager.current,
+    keyboardController: SoftwareKeyboardController? = LocalSoftwareKeyboardController.current
 ){
     OutlinedTextField(
         modifier = modifier,
@@ -40,12 +49,16 @@ fun LunchVoteTextField(
                     KeyboardActions.Default.onNext
                 } else {
                     KeyboardActions.Default.onDone
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
                 }
             }
-        )
+        ),
+        visualTransformation = visualTransformation
     )
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Preview(showBackground = true)
 @Composable
 fun LunchVoteTextFieldPreview() {

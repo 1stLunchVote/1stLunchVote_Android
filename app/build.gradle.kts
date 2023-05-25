@@ -45,9 +45,19 @@ android {
 
 dependencies {
     implementation(project(":core:ui"))
+    implementation(project(":domain"))
+
     implementationAndroidX()
     implementationCompose()
     implementationCoroutine()
     implementationHilt()
     implementationTest()
+    implementationFirebase()
+
+    implementations(
+        Libraries.Firebase.Auth,
+        Libraries.Firebase.GmsAuth
+    )
 }
+
+apply(plugin = "com.google.gms.google-services")

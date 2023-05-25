@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.jwd.lunchvote.ui.login.LoginRoute
+import com.jwd.lunchvote.ui.login.register.RegisterEmailRoute
 
 @Composable
 fun LunchVoteNavHost(
@@ -30,7 +31,18 @@ fun LunchVoteNavHost(
             startDestination = LunchVoteNavRoute.Login.name
         ) {
             composable(LunchVoteNavRoute.Login.name) {
-                LoginRoute(navigateToHome = { /*TODO*/ })
+                LoginRoute(
+                    navigateToHome = { /*TODO*/ },
+                    navigateToRegisterEmail = {
+                        navHostController.navigate(LunchVoteNavRoute.RegisterEmail.name)
+                    }
+                )
+            }
+
+            composable(LunchVoteNavRoute.RegisterEmail.name) {
+                RegisterEmailRoute(
+
+                )
             }
         }
 
@@ -43,5 +55,6 @@ enum class LunchVoteNavRoute {
 
     Login,
     Home,
+    RegisterEmail,
     Profile,
 }

@@ -16,6 +16,14 @@ val nanumSquareFontFamily = FontFamily(
     Font(R.font.nanumsquareneo_heavy, weight = FontWeight.W900),
 )
 
+val buttonTextStyle = TextStyle(
+    fontSize = 14.sp,
+    fontWeight = FontWeight.ExtraBold,
+    fontFamily = nanumSquareFontFamily,
+    lineHeight = 16.sp,
+    letterSpacing = 1.25.sp
+)
+
 val nanumSquareTypography = Typography(
     displayLarge = TextStyle(
         fontSize = 57.sp,

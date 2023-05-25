@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.NavHostFragment
+import com.google.firebase.auth.FirebaseAuth
 import com.jwd.lunchvote.R
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.databinding.ActivityMainBinding
@@ -20,7 +21,7 @@ class MainActivity : ComponentActivity(){
         setContent {
             LunchVoteTheme {
                 // Todo : 나중에 로그인 여부 처리할거임
-                LunchVoteNavHost(beforeLogin = true)
+                LunchVoteNavHost(beforeLogin = FirebaseAuth.getInstance().currentUser == null)
             }
         }
     }
