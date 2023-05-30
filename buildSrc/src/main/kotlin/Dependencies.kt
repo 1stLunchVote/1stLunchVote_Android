@@ -48,6 +48,7 @@ object Versions{
     const val ComposeNavigation = "2.5.1"
     const val ComposeHilt = "1.0.0"
     const val ComposeLifecycle = "2.6.1"
+    const val ComposeConstraint = "1.0.1"
 
     // Test
     const val JUnit = "4.13.2"
@@ -114,6 +115,7 @@ object Libraries{
         const val Navigation = "androidx.navigation:navigation-compose:${Versions.ComposeNavigation}"
         const val Hilt = "androidx.hilt:hilt-navigation-compose:${Versions.ComposeHilt}"
         const val Lifecycle = "androidx.lifecycle:lifecycle-runtime-compose:${Versions.ComposeLifecycle}"
+        const val ConstraintLayout = "androidx.constraintlayout:constraintlayout-compose:${Versions.ComposeConstraint}"
     }
 
     const val Kakao = "com.kakao.sdk:v2-all-rx:${Versions.kakao}"
@@ -175,7 +177,8 @@ fun DependencyHandlerScope.implementationCompose(){
         Libraries.Compose.UI,
         Libraries.Compose.Navigation,
         Libraries.Compose.Hilt,
-        Libraries.Compose.Lifecycle
+        Libraries.Compose.Lifecycle,
+        Libraries.Compose.ConstraintLayout
     )
 }
 

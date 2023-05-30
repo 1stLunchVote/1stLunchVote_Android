@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity(){
         setContent {
             LunchVoteTheme {
                 // Todo : 나중에 로그인 여부 처리할거임
-                LunchVoteNavHost(beforeLogin = firebaseAuth.currentUser == null)
+                LunchVoteNavHost(beforeLogin = true)
             }
         }
     }

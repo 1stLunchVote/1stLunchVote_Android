@@ -18,9 +18,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -36,6 +38,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -45,6 +48,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -69,7 +73,6 @@ fun LoginRoute(
     navigateToRegisterEmail: () -> Unit,
     viewModel: LoginViewModel = hiltViewModel(),
     context: Context = LocalContext.current,
-    scope: CoroutineScope = rememberCoroutineScope(),
 ){
     val loginState by viewModel.viewState.collectAsStateWithLifecycle()
 
@@ -86,7 +89,11 @@ fun LoginRoute(
     val kakaoCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
         if (error != null) {
             Timber.e(error, "카카오계정으로 로그인 실패")
-            viewModel.sendEvent(LoginEvent.OnLoginFailure("카카오 로그인 실패"))
+            viewModel.sendEvent(
+                LoginEvent.OnLoginFailure(
+                    error is ClientError && error.reason == ClientErrorCause.Cancelled
+                )
+            )
         } else if (token != null) {
             Timber.i("카카오계정으로 로그인 성공 %s", token.accessToken)
 
@@ -100,7 +107,9 @@ fun LoginRoute(
             account.result?.let { res ->
                 viewModel.sendEvent(LoginEvent.ProcessGoogleLogin(res)) }
         } else {
-            scope.launch { snackBarHostState.showSnackbar("로그인 오류") }
+            viewModel.sendEvent(
+                LoginEvent.OnLoginFailure(it.resultCode == Activity.RESULT_CANCELED)
+            )
         }
     }
 
@@ -208,6 +217,7 @@ private fun LoginScreen(
                 }
 
                 LoginButtonList(
+                    isLoading = loginState.isLoading,
                     onKakaoLogin = onKakaoLogin,
                     onGoogleLogin = onGoogleLogin,
                 )
@@ -252,12 +262,36 @@ private fun LoginFields(
 
 @Composable
 private fun LoginButtonList(
+    isLoading : Boolean = false,
     onEmailLogin: () -> Unit = {},
     onKakaoLogin: () -> Unit = {},
     onGoogleLogin: () -> Unit = {},
 ){
     Button(onClick = onEmailLogin, modifier = Modifier.fillMaxWidth()) {
-        Text(text = stringResource(id = R.string.login_btn), style = buttonTextStyle)
+        ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
+            val (text, icon) = createRefs()
+            Text(text = stringResource(id = R.string.login_btn), style = buttonTextStyle,
+                modifier = Modifier.constrainAs(text){
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                }
+            )
+            if (isLoading){
+                CircularProgressIndicator(
+                    color = Color.White,
+                    strokeWidth = 2.dp,
+                    modifier = Modifier
+                        .size(20.dp)
+                        .constrainAs(icon) {
+                            end.linkTo(parent.end)
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
+                        },
+                )
+            }
+        }
     }
 
     Spacer(modifier = Modifier.height(84.dp))

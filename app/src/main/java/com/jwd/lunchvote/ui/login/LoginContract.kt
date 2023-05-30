@@ -10,6 +10,7 @@ class LoginContract {
     data class LoginState(
         val email: String = "",
         val password: String = "",
+        val isLoading: Boolean = false
     ) : ViewModelContract.State, Parcelable{
         override fun toParcelable(): Parcelable = this
     }
@@ -22,13 +23,14 @@ class LoginContract {
         object OnClickKakaoLogin : LoginEvent
         class ProcessGoogleLogin(val account: GoogleSignInAccount) : LoginEvent
         class ProcessKakaoLogin(val accessToken: String) : LoginEvent
-        class OnLoginFailure(val message: String) : LoginEvent
+        class OnLoginFailure(val canceled: Boolean = false) : LoginEvent
 
     }
 
     sealed interface LoginReduce : ViewModelContract.Reduce {
         class UpdateEmail(val email: String) : LoginReduce
         class UpdatePwd(val pwd: String) : LoginReduce
+        class UpdateLoading(val isLoading: Boolean) : LoginReduce
     }
 
     sealed interface LoginSideEffect : ViewModelContract.SideEffect {
