@@ -12,16 +12,18 @@ import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.databinding.ActivityMainBinding
 import com.jwd.lunchvote.navigation.LunchVoteNavHost
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity(){
+    @Inject lateinit var firebaseAuth: FirebaseAuth
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
             LunchVoteTheme {
                 // Todo : 나중에 로그인 여부 처리할거임
-                LunchVoteNavHost(beforeLogin = FirebaseAuth.getInstance().currentUser == null)
+                LunchVoteNavHost(beforeLogin = firebaseAuth.currentUser == null)
             }
         }
     }

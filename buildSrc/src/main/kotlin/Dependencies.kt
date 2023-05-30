@@ -18,6 +18,8 @@ object Versions{
     const val Navigation = "2.5.3"
     const val Work = "2.8.1"
     const val RecyclerView = "1.3.0"
+    const val Secret = "2.0.1"
+    const val Timber = "4.7.1"
 
     // Hilt
     const val Hilt = "2.44"
@@ -34,6 +36,7 @@ object Versions{
     const val Firebase = "32.0.0"
     const val Gms = "4.3.15"
     const val GmsAuth = "20.4.0"
+    const val kakao = "2.13.0"
 
     // Retrofit
     const val Retrofit = "2.9.0"
@@ -98,6 +101,7 @@ object Libraries{
         const val Auth = "com.google.firebase:firebase-auth-ktx"
         const val DataBase = "com.google.firebase:firebase-database-ktx"
         const val GmsAuth = "com.google.android.gms:play-services-auth:${Versions.GmsAuth}"
+        const val Function = "com.google.firebase:firebase-functions-ktx"
     }
 
     object Compose{
@@ -111,6 +115,9 @@ object Libraries{
         const val Hilt = "androidx.hilt:hilt-navigation-compose:${Versions.ComposeHilt}"
         const val Lifecycle = "androidx.lifecycle:lifecycle-runtime-compose:${Versions.ComposeLifecycle}"
     }
+
+    const val Kakao = "com.kakao.sdk:v2-all-rx:${Versions.kakao}"
+    const val Timber = "com.jakewharton.timber:timber:${Versions.Timber}"
 }
 
 fun DependencyHandlerScope.implementationAndroidX(){

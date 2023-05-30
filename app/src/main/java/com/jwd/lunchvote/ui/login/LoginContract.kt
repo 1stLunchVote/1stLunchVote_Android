@@ -19,7 +19,10 @@ class LoginContract {
         class SetPwd(val pwd: String) : LoginEvent
         object OnClickEmailLogin : LoginEvent
         object OnClickGoogleLogin : LoginEvent
+        object OnClickKakaoLogin : LoginEvent
         class ProcessGoogleLogin(val account: GoogleSignInAccount) : LoginEvent
+        class ProcessKakaoLogin(val accessToken: String) : LoginEvent
+        class OnLoginFailure(val message: String) : LoginEvent
 
     }
 
@@ -31,6 +34,7 @@ class LoginContract {
     sealed interface LoginSideEffect : ViewModelContract.SideEffect {
         object NavigateToHome : LoginSideEffect
         object LaunchGoogleLogin : LoginSideEffect
-        class ShowSnackbar(val message: String) : LoginSideEffect
+        object LaunchKakaoLogin : LoginSideEffect
+        class ShowSnackBar(val message: String) : LoginSideEffect
     }
 }

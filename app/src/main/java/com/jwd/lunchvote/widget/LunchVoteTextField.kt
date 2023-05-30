@@ -1,6 +1,5 @@
 package com.jwd.lunchvote.widget
 
-import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -15,6 +14,7 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
@@ -26,7 +26,7 @@ fun LunchVoteTextField(
     text: String,
     hintText: String,
     maxLines: Int = 1,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
     onTextChanged: (String) -> Unit,
     keyboardEnterNext: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,

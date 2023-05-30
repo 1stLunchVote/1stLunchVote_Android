@@ -8,4 +8,8 @@
     <string name="login_register_guide">계정이 없으신가요?</string>
     <string name="login_register_btn"><u>회원가입</u></string>
 
+    <!-- RegisterEmailScreen -->
+    <string name="register_email_title">먼저 이메일을 확인할게요.</string>
+    <string name="register_email_content">가입된 이메일인지 확인해볼게요!</string>
+    <string name="register_email_confirm_btn">이메일 확인하기</string>
 </resources>

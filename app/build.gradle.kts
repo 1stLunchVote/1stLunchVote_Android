@@ -5,6 +5,7 @@ plugins {
     kotlin("plugin.parcelize")
     id("dagger.hilt.android.plugin")
     id("androidx.navigation.safeargs.kotlin")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -30,6 +31,7 @@ android {
     buildFeatures {
         dataBinding = true
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.4"
@@ -55,8 +57,11 @@ dependencies {
     implementationFirebase()
 
     implementations(
+        Libraries.Timber,
         Libraries.Firebase.Auth,
-        Libraries.Firebase.GmsAuth
+        Libraries.Firebase.GmsAuth,
+        Libraries.Firebase.Function,
+        Libraries.Kakao
     )
 }
 
