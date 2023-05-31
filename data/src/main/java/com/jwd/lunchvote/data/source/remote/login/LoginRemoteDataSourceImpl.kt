@@ -21,7 +21,7 @@ class LoginRemoteDataSourceImpl @Inject constructor(
     private val db: FirebaseDatabase,
     @Dispatcher(IO) private val dispatcher: CoroutineDispatcher
 ): LoginRemoteDataSource{
-    override fun getCustomToken(accessToken: String): Flow<String> = callbackFlow {
+    override fun getCustomToken(accessToken: String): Flow<String?> = callbackFlow {
         val data = JSONObject()
         data.put("accessToken", accessToken)
         functions.getHttpsCallable("kakaoToken")
@@ -30,7 +30,7 @@ class LoginRemoteDataSourceImpl @Inject constructor(
                 trySend(it.data as String)
             }
             .addOnFailureListener {
-                throw it
+                trySend(null)
             }
 
         awaitClose()

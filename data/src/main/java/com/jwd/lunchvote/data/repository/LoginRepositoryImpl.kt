@@ -14,6 +14,7 @@ class LoginRepositoryImpl @Inject constructor(
     override fun onKakaoLogin(accessToken: String): Flow<Unit> {
         return loginRemoteDataSource.getCustomToken(accessToken)
             .flatMapConcat {
+                if (it == null) throw Exception("Failed to get custom token")
                 loginRemoteDataSource.signInWithCustomToken(it)
             }
     }

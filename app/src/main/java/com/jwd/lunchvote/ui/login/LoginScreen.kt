@@ -58,6 +58,7 @@ import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.core.ui.theme.buttonTextStyle
 import kotlinx.coroutines.flow.collectLatest
 import com.jwd.lunchvote.ui.login.LoginContract.*
+import com.jwd.lunchvote.util.loginWithKakao
 import com.jwd.lunchvote.widget.LunchVoteTextField
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
@@ -86,21 +87,6 @@ fun LoginRoute(
         GoogleSignIn.getClient(context, gso)
     }
 
-    val kakaoCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
-        if (error != null) {
-            Timber.e(error, "카카오계정으로 로그인 실패")
-            viewModel.sendEvent(
-                LoginEvent.OnLoginFailure(
-                    error is ClientError && error.reason == ClientErrorCause.Cancelled
-                )
-            )
-        } else if (token != null) {
-            Timber.i("카카오계정으로 로그인 성공 %s", token.accessToken)
-
-            viewModel.sendEvent(LoginEvent.ProcessKakaoLogin(token.accessToken))
-        }
-    }
-
     val googleLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()){
         if (it.resultCode == Activity.RESULT_OK){
             val account = GoogleSignIn.getSignedInAccountFromIntent(it.data)
@@ -113,9 +99,6 @@ fun LoginRoute(
         }
     }
 
-    // Todo : 카카오 로그인
-    // Kakao Sdk 실행 -> Firebase Functions 호출
-
     LaunchedEffect(viewModel.sideEffect){
         viewModel.sideEffect.collectLatest {
             when(it){
@@ -127,12 +110,12 @@ fun LoginRoute(
                     googleLauncher.launch(googleSignInClient.signInIntent)
                 }
                 is LoginSideEffect.LaunchKakaoLogin -> {
-                    kakaoLogin(
-                        context = context, kakaoCallback = kakaoCallback,
-                        onKakaoLogin = { token ->
-                            viewModel.sendEvent(LoginEvent.ProcessKakaoLogin(token))
-                        }
-                    )
+                    try{
+                        val oAuthToken = UserApiClient.loginWithKakao(context)
+                        viewModel.sendEvent(LoginEvent.ProcessKakaoLogin(oAuthToken.accessToken))
+                    } catch (error: Exception){
+                        viewModel.sendEvent(LoginEvent.OnLoginFailure(error is ClientError && error.reason == ClientErrorCause.Cancelled))
+                    }
                 }
                 is LoginSideEffect.ShowSnackBar -> {
                     snackBarHostState.showSnackbar(it.message)
@@ -315,36 +298,6 @@ private fun LoginButtonList(
     )
 }
 
-private fun kakaoLogin(
-    context: Context,
-    kakaoCallback: (OAuthToken?, Throwable?) -> Unit,
-    onKakaoLogin: (String) -> Unit
-) {
-    val kakaoClient = UserApiClient.instance
-
-    // 카카오톡이 설치되어 있으면 카카오톡으로 로그인, 아니면 카카오계정으로 로그인
-    if (kakaoClient.isKakaoTalkLoginAvailable(context)) {
-        kakaoClient.loginWithKakaoTalk(context) { token, error ->
-            if (error != null) {
-                Timber.e(error, "카카오톡으로 로그인 실패")
-
-                // 사용자가 카카오톡 설치 후 디바이스 권한 요청 화면에서 로그인을 취소한 경우,
-                // 의도적인 로그인 취소로 보고 카카오계정으로 로그인 시도 없이 로그인 취소로 처리 (예: 뒤로 가기)
-                if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
-                    return@loginWithKakaoTalk
-                }
-
-                // 카카오톡에 연결된 카카오계정이 없는 경우, 카카오계정으로 로그인 시도
-                kakaoClient.loginWithKakaoAccount(context, callback = kakaoCallback)
-            } else if (token != null) {
-                Timber.i("카카오톡으로 로그인 성공 %s", token.accessToken)
-                onKakaoLogin(token.accessToken)
-            }
-        }
-    } else {
-        kakaoClient.loginWithKakaoAccount(context, callback = kakaoCallback)
-    }
-}
 
 @Preview(showBackground = true)
 @Composable

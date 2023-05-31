@@ -3,6 +3,7 @@ package com.jwd.lunchvote
 import android.app.Application
 import com.google.firebase.FirebaseApp
 import com.kakao.sdk.common.KakaoSdk
+import com.kakao.sdk.common.util.Utility
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
@@ -18,5 +19,7 @@ class LunchVoteApplication : Application(){
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
+
+        Timber.tag("keyHash").e(Utility.getKeyHash(applicationContext))
     }
 }

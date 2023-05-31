@@ -42,11 +42,12 @@ class LoginViewModel @Inject constructor(
 
     private fun kakaoLogin(accessToken: String){
         kakaoLoginUseCase(accessToken)
-            .catch {
-                onLoginFailure("로그인에 실패하였습니다.")
-            }
             .onEach {
                 sendSideEffect(LoginSideEffect.NavigateToHome)
+            }
+            .catch {
+                Timber.e("login error : $it")
+                onLoginFailure("로그인에 실패하였습니다.")
             }
             .launchIn(viewModelScope)
     }
