@@ -1,13 +1,16 @@
 package com.jwd.lunchvote.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.jwd.lunchvote.ui.home.HomeRoute
 import com.jwd.lunchvote.ui.login.LoginRoute
 import com.jwd.lunchvote.ui.login.register.RegisterEmailRoute
+import com.jwd.lunchvote.ui.lounge.LoungeRoute
 
 @Composable
 fun LunchVoteNavHost(
@@ -24,7 +27,23 @@ fun LunchVoteNavHost(
         ) {
             composable(LunchVoteNavRoute.Home.name) {
                 HomeRoute(
+                    navigateToLounge = { id ->
+                        val query = if (id != null) "?id=$id" else ""
+                        navHostController.navigate(LunchVoteNavRoute.Lounge.name + query)
+                    }
+                )
+            }
 
+            composable(LunchVoteNavRoute.Lounge.name +"?id={id}",
+                arguments = listOf(
+                    navArgument("id") {
+                        type = NavType.StringType
+                        nullable = true
+                    }
+                )
+            ) {
+                LoungeRoute(
+                    popBackStack = { navHostController.popBackStack() }
                 )
             }
         }
@@ -36,7 +55,9 @@ fun LunchVoteNavHost(
             composable(LunchVoteNavRoute.Login.name) {
                 LoginRoute(
                     navigateToHome = {
-                        navHostController.navigate(LunchVoteNavRoute.HomeNavigation.name)
+                        navHostController.navigate(LunchVoteNavRoute.HomeNavigation.name){
+                            popUpTo(0)
+                        }
                     },
                     navigateToRegisterEmail = {
                         navHostController.navigate(LunchVoteNavRoute.RegisterEmail.name)
@@ -60,6 +81,7 @@ enum class LunchVoteNavRoute {
 
     Login,
     Home,
+    Lounge,
     RegisterEmail,
     Profile,
 }

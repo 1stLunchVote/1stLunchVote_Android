@@ -22,6 +22,7 @@ val colorOnError = Color.White
 val colorBackground = Color.White
 val colorOnBackground = Color(0xFF201A19)
 val colorOutline = Color(0xFF7D7D7D)
+val colorOutlineVariant = Color(0xFFC8C8C8)
 val colorDisabled = Color(0xFFC8C8C8)
 
 @Composable
@@ -43,4 +44,5 @@ fun lunchVoteColorScheme() = MaterialTheme.colorScheme.copy(
     background = colorBackground,
     onBackground = colorOnBackground,
     outline = colorOutline,
+    outlineVariant = colorOutlineVariant
 )

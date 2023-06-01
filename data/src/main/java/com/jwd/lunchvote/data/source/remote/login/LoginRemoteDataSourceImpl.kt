@@ -1,7 +1,6 @@
 package com.jwd.lunchvote.data.source.remote.login
 
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.functions.FirebaseFunctions
 import com.jwd.lunchvote.data.di.Dispatcher
 import com.jwd.lunchvote.data.di.LunchVoteDispatcher.IO
@@ -10,15 +9,12 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.tasks.await
 import org.json.JSONObject
-import timber.log.Timber
 import javax.inject.Inject
 
 class LoginRemoteDataSourceImpl @Inject constructor(
     private val functions: FirebaseFunctions,
     private val auth: FirebaseAuth,
-    private val db: FirebaseDatabase,
     @Dispatcher(IO) private val dispatcher: CoroutineDispatcher
 ): LoginRemoteDataSource{
     override fun getCustomToken(accessToken: String): Flow<String?> = callbackFlow {

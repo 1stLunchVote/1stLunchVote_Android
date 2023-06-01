@@ -37,7 +37,7 @@ object Versions{
     const val Firebase = "32.0.0"
     const val Gms = "4.3.15"
     const val GmsAuth = "20.4.0"
-    const val kakao = "2.13.0"
+    const val Kakao = "2.13.0"
 
     // Retrofit
     const val Retrofit = "2.9.0"
@@ -55,6 +55,8 @@ object Versions{
     const val JUnit = "4.13.2"
     const val Ext = "1.1.5"
     const val Espresso = "3.5.1"
+
+    const val Coil = "2.4.0"
 }
 
 object Libraries{
@@ -120,8 +122,9 @@ object Libraries{
         const val ConstraintLayout = "androidx.constraintlayout:constraintlayout-compose:${Versions.ComposeConstraint}"
     }
 
-    const val Kakao = "com.kakao.sdk:v2-all-rx:${Versions.kakao}"
+    const val Kakao = "com.kakao.sdk:v2-all-rx:${Versions.Kakao}"
     const val Timber = "com.jakewharton.timber:timber:${Versions.Timber}"
+    const val Coil = "io.coil-kt:coil-compose:${Versions.Coil}"
 }
 
 fun DependencyHandlerScope.implementationAndroidX(){

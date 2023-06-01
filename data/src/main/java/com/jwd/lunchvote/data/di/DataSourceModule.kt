@@ -1,5 +1,7 @@
 package com.jwd.lunchvote.data.di
 
+import com.jwd.lunchvote.data.source.remote.lounge.LoungeRemoteDataSource
+import com.jwd.lunchvote.data.source.remote.lounge.LoungeRemoteDataSourceImpl
 import com.jwd.lunchvote.data.source.remote.login.LoginRemoteDataSource
 import com.jwd.lunchvote.data.source.remote.login.LoginRemoteDataSourceImpl
 import dagger.Binds
@@ -16,4 +18,10 @@ abstract class DataSourceModule {
     abstract fun bindsLoginRemoteDataSource(
         loginRemoteDataSourceImpl: LoginRemoteDataSourceImpl
     ): LoginRemoteDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindsHomeRemoteDataSource(
+        homeRemoteDataSourceImpl: LoungeRemoteDataSourceImpl
+    ): LoungeRemoteDataSource
 }

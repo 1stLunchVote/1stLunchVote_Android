@@ -16,7 +16,11 @@ class HomeViewModel @Inject constructor(
     }
 
     override fun handleEvents(event: HomeEvent) {
-        TODO("Not yet implemented")
+        when(event){
+            is HomeEvent.OnCreateLounge -> {
+                sendSideEffect(HomeSideEffect.NavigateToLounge(null))
+            }
+        }
     }
 
     override fun reduceState(state: HomeState, reduce: HomeReduce): HomeState {

@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.domain.usecase
+package com.jwd.lunchvote.domain.usecase.login
 
 import com.jwd.lunchvote.domain.repository.LoginRepository
 import javax.inject.Inject
