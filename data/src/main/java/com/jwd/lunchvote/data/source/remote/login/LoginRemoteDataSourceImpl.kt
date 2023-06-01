@@ -48,24 +48,24 @@ class LoginRemoteDataSourceImpl @Inject constructor(
         awaitClose()
     }.flowOn(dispatcher)
 
-    override fun createUserData(): Flow<Unit> = callbackFlow {
-        val user = auth.currentUser ?: throw Exception("User is not signed in")
-
-        if (!db.getReference("users/${user.uid}").get().await().exists()){
-            db.getReference("users/${user.uid}")
-                .setValue(mapOf("nickName" to user.displayName, "email" to user.email,
-                    "profileImage" to user.photoUrl.toString()))
-                .addOnSuccessListener {
-                    Timber.e("User created")
-                    trySend(Unit)
-                }
-                .addOnFailureListener {
-                    throw it
-                }
-        } else {
-            Timber.e("User already exists")
-            trySend(Unit)
-        }
-        awaitClose()
-    }.flowOn(dispatcher)
+//    override fun createUserData(): Flow<Unit> = callbackFlow {
+//        val user = auth.currentUser ?: throw Exception("User is not signed in")
+//
+//        if (!db.getReference("users/${user.uid}").get().await().exists()){
+//            db.getReference("users/${user.uid}")
+//                .setValue(mapOf("nickName" to user.displayName, "email" to user.email,
+//                    "profileImage" to user.photoUrl.toString()))
+//                .addOnSuccessListener {
+//                    Timber.e("User created")
+//                    trySend(Unit)
+//                }
+//                .addOnFailureListener {
+//                    throw it
+//                }
+//        } else {
+//            Timber.e("User already exists")
+//            trySend(Unit)
+//        }
+//        awaitClose()
+//    }.flowOn(dispatcher)
 }

@@ -62,7 +62,7 @@ dependencies {
         Libraries.Firebase.Auth,
         Libraries.Firebase.GmsAuth,
         Libraries.Firebase.Function,
-        Libraries.Kakao
+        Libraries.Kakao,
     )
 }
 

@@ -20,6 +20,7 @@ object Versions{
     const val RecyclerView = "1.3.0"
     const val Secret = "2.0.1"
     const val Timber = "4.7.1"
+    const val SplashScreen = "1.0.0"
 
     // Hilt
     const val Hilt = "2.44"
@@ -68,6 +69,7 @@ object Libraries{
         const val NavigationUI = "androidx.navigation:navigation-ui-ktx:${Versions.Navigation}"
         const val Work = "androidx.work:work-runtime-ktx:${Versions.Work}"
         const val RecyclerView = "androidx.recyclerview:recyclerview:${Versions.RecyclerView}"
+        const val SplashScreen = "androidx.core:core-splashscreen:${Versions.SplashScreen}"
     }
 
     object Coroutine {
@@ -133,7 +135,8 @@ fun DependencyHandlerScope.implementationAndroidX(){
         Libraries.AndroidX.Navigation,
         Libraries.AndroidX.NavigationUI,
         Libraries.AndroidX.Work,
-        Libraries.AndroidX.RecyclerView
+        Libraries.AndroidX.RecyclerView,
+        Libraries.AndroidX.SplashScreen
     )
 }
 

@@ -2,6 +2,7 @@ package com.jwd.lunchvote.ui.login
 
 import android.app.Activity
 import android.content.Context
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -34,7 +35,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -60,13 +60,9 @@ import kotlinx.coroutines.flow.collectLatest
 import com.jwd.lunchvote.ui.login.LoginContract.*
 import com.jwd.lunchvote.util.loginWithKakao
 import com.jwd.lunchvote.widget.LunchVoteTextField
-import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @Composable
 fun LoginRoute(
@@ -103,8 +99,8 @@ fun LoginRoute(
         viewModel.sideEffect.collectLatest {
             when(it){
                 is LoginSideEffect.NavigateToHome -> {
-                    // Todo : 홈화면으로 이동해야함
-                    snackBarHostState.showSnackbar("로그인 성공")
+                    Toast.makeText(context, "로그인 성공", Toast.LENGTH_SHORT).show()
+                    navigateToHome()
                 }
                 is LoginSideEffect.LaunchGoogleLogin -> {
                     googleLauncher.launch(googleSignInClient.signInIntent)
