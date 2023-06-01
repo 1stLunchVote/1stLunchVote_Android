@@ -39,7 +39,7 @@ fun LunchVoteTextField(
         value = text,
         maxLines = maxLines,
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            unfocusedLabelColor = MaterialTheme.colorScheme.outline
+            unfocusedLabelColor = MaterialTheme.colorScheme.outlineVariant
         ),
         onValueChange = onTextChanged,
         keyboardOptions = keyboardOptions,
@@ -54,7 +54,8 @@ fun LunchVoteTextField(
                 }
             }
         ),
-        visualTransformation = visualTransformation
+        visualTransformation = visualTransformation,
+        singleLine = maxLines == 1
     )
 }
 
