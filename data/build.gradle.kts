@@ -1,5 +1,5 @@
 plugins {
-    id("com.android.application")
+    id("com.android.library")
     kotlin("android")
     kotlin("kapt")
     id("dagger.hilt.android.plugin")
@@ -34,8 +34,19 @@ android {
 }
 
 dependencies {
+    implementation(project(":domain"))
+
     implementationAndroidX()
     implementationCoroutine()
     implementationHilt()
     implementationTest()
+
+    implementationFirebase()
+    implementations(
+        Libraries.Timber,
+        Libraries.Firebase.Auth,
+        Libraries.Firebase.GmsAuth,
+        Libraries.Firebase.Function,
+        Libraries.Firebase.DataBase
+    )
 }

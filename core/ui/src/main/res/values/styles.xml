@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TextAppearance.LunchVote.Button" parent="TextAppearance.MaterialComponents.Button">
+        <item name="android:fontFamily">@font/nanumsquareneo_extrabold</item>
+        <item name="fontFamily">@font/nanumsquareneo_extrabold</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineSpacingExtra">2sp</item>
+        <item name="android:letterSpacing">0.09</item>
+    </style>
+
+    <style name="TextAppearance.LunchVote.Caption" parent="TextAppearance.MaterialComponents.Button">
+        <item name="android:fontFamily">@font/nanumsquareneo_bold</item>
+        <item name="fontFamily">@font/nanumsquareneo_bold</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+    </style>
+
+    <style name="TextAppearance.LunchVote.Overline" parent="TextAppearance.MaterialComponents.Overline">
+        <item name="android:fontFamily">@font/nanumsquareneo_bold</item>
+        <item name="fontFamily">@font/nanumsquareneo_bold</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:lineSpacingExtra">6sp</item>
+    </style>
+
+    <style name="TextAppearance.LunchVote.DisplayLarge" parent="TextAppearance.Material3.DisplayLarge">
+        <item name="android:fontFamily">@font/nanumsquareneo_bold</item>
+        <item name="fontFamily">@font/nanumsquareneo_bold</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textSize">57sp</item>
+        <item name="android:lineSpacingExtra">7sp</item>
+    </style>
+
+    <style name="TextAppearance.LunchVote.DisplayMedium" parent="TextAppearance.Material3.DisplayMedium">
+        <item name="android:fontFamily">@font/nanumsquareneo_bold</item>
+        <item name="fontFamily">@font/nanumsquareneo_bold</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textSize">45sp</item>
+        <item name="android:lineSpacingExtra">7sp</item>
+    </style>
+
+    <style name="TextAppearance.LunchVote.DisplaySmall" parent="TextAppearance.Material3.DisplaySmall">
+        <item name="android:fontFamily">@font/nanumsquareneo_bold</item>
+        <item name="fontFamily">@font/nanumsquareneo_bold</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textSize">36sp</item>
+        <item name="android:lineSpacingExtra">8sp</item>
+    </style>
+
+    <style name="TextAppearance.LunchVote.HeadlineLarge" parent="TextAppearance.Material3.HeadlineLarge">
+        <item name="android:fontFamily">@font/nanumsquareneo_bold</item>
+        <item name="fontFamily">@font/nanumsquareneo_bold</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textSize">32sp</item>
+        <item name="android:lineSpacingExtra">8sp</item>
+    </style>
+
+    <style name="TextAppearance.LunchVote.HeadlineMedium" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="android:fontFamily">@font/nanumsquareneo_bold</item>
+        <item name="fontFamily">@font/nanumsquareneo_bold</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:lineSpacingExtra">8sp</item>
+    </style>
+
+    <style name="TextAppearance.LunchVote.HeadlineSmall" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="android:fontFamily">@font/nanumsquareneo_bold</item>
+        <item name="fontFamily">@font/nanumsquareneo_bold</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:lineSpacingExtra">8sp</item>
+    </style>
+
+    <style name="TextAppearance.LunchVote.TitleLarge" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:fontFamily">@font/nanumsquareneo_extrabold</item>
+        <item name="fontFamily">@font/nanumsquareneo_extrabold</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:lineSpacingExtra">6sp</item>
+    </style>
+
+    <style name="TextAppearance.LunchVote.TitleMedium" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:fontFamily">@font/nanumsquareneo_extrabold</item>
+        <item name="fontFamily">@font/nanumsquareneo_extrabold</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:lineSpacingExtra">8sp</item>
+    </style>
+
+    <style name="TextAppearance.LunchVote.TitleSmall" parent="TextAppearance.Material3.TitleSmall">
+        <item name="android:fontFamily">@font/nanumsquareneo_extrabold</item>
+        <item name="fontFamily">@font/nanumsquareneo_extrabold</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineSpacingExtra">6sp</item>
+    </style>
+
+    <style name="TextAppearance.LunchVote.BodyLarge" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:fontFamily">@font/nanumsquareneo_bold</item>
+        <item name="fontFamily">@font/nanumsquareneo_bold</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:lineSpacingExtra">8sp</item>
+    </style>
+
+    <style name="TextAppearance.LunchVote.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:fontFamily">@font/nanumsquareneo_bold</item>
+        <item name="fontFamily">@font/nanumsquareneo_bold</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineSpacingExtra">6sp</item>
+    </style>
+
+    <style name="TextAppearance.LunchVote.BodySmall" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:fontFamily">@font/nanumsquareneo_bold</item>
+        <item name="fontFamily">@font/nanumsquareneo_bold</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+    </style>
+
+    <style name="TextAppearance.LunchVote.LabelLarge" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:fontFamily">@font/nanumsquareneo_extrabold</item>
+        <item name="fontFamily">@font/nanumsquareneo_extrabold</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineSpacingExtra">6sp</item>
+    </style>
+
+    <style name="TextAppearance.LunchVote.LabelMedium" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:fontFamily">@font/nanumsquareneo_extrabold</item>
+        <item name="fontFamily">@font/nanumsquareneo_extrabold</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+    </style>
+
+    <style name="TextAppearance.LunchVote.LabelSmall" parent="TextAppearance.Material3.LabelSmall">
+        <item name="android:fontFamily">@font/nanumsquareneo_extrabold</item>
+        <item name="fontFamily">@font/nanumsquareneo_extrabold</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:lineSpacingExtra">5sp</item>
+    </style>
+
+    <!-- Widget Style-->
+    <style name="Widget.LunchVote.TextInput" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="android:textColorHint">@color/colorOutline</item>
+    </style>
+</resources>

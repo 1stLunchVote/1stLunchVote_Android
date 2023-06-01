@@ -18,13 +18,16 @@ object Versions{
     const val Navigation = "2.5.3"
     const val Work = "2.8.1"
     const val RecyclerView = "1.3.0"
+    const val Secret = "2.0.1"
+    const val Timber = "4.7.1"
+    const val SplashScreen = "1.0.0"
 
     // Hilt
     const val Hilt = "2.44"
     const val AndroidHilt = "1.0.0"
 
     // Kotlin, Coroutine
-    const val Kotlin = "1.8.0"
+    const val Kotlin = "1.8.10"
     const val Coroutine = "1.6.4"
 
     // JavaX
@@ -32,10 +35,21 @@ object Versions{
 
     // Firebase
     const val Firebase = "32.0.0"
+    const val Gms = "4.3.15"
+    const val GmsAuth = "20.4.0"
+    const val kakao = "2.13.0"
 
     // Retrofit
     const val Retrofit = "2.9.0"
     const val OkHttp = "4.9.1"
+
+    // Compose
+    const val Compose = "2023.01.00"
+    const val Material3 = "1.0.1"
+    const val ComposeNavigation = "2.5.1"
+    const val ComposeHilt = "1.0.0"
+    const val ComposeLifecycle = "2.6.1"
+    const val ComposeConstraint = "1.0.1"
 
     // Test
     const val JUnit = "4.13.2"
@@ -55,6 +69,7 @@ object Libraries{
         const val NavigationUI = "androidx.navigation:navigation-ui-ktx:${Versions.Navigation}"
         const val Work = "androidx.work:work-runtime-ktx:${Versions.Work}"
         const val RecyclerView = "androidx.recyclerview:recyclerview:${Versions.RecyclerView}"
+        const val SplashScreen = "androidx.core:core-splashscreen:${Versions.SplashScreen}"
     }
 
     object Coroutine {
@@ -83,6 +98,30 @@ object Libraries{
     object JavaX{
         const val Inject = "javax.inject:javax.inject:${Versions.JavaX}"
     }
+
+    object Firebase{
+        const val Firebase = "com.google.firebase:firebase-bom:${Versions.Firebase}"
+        const val Auth = "com.google.firebase:firebase-auth-ktx"
+        const val DataBase = "com.google.firebase:firebase-database-ktx"
+        const val GmsAuth = "com.google.android.gms:play-services-auth:${Versions.GmsAuth}"
+        const val Function = "com.google.firebase:firebase-functions-ktx"
+    }
+
+    object Compose{
+        const val ComposeBom = "androidx.compose:compose-bom:${Versions.Compose}"
+        const val Material3 = "androidx.compose.material3:material3:${Versions.Material3}"
+        const val Foundation = "androidx.compose.foundation:foundation"
+        const val UI = "androidx.compose.ui:ui"
+        const val Tooling = "androidx.compose.ui:ui-tooling"
+        const val Preview = "androidx.compose.ui:ui-tooling-preview"
+        const val Navigation = "androidx.navigation:navigation-compose:${Versions.ComposeNavigation}"
+        const val Hilt = "androidx.hilt:hilt-navigation-compose:${Versions.ComposeHilt}"
+        const val Lifecycle = "androidx.lifecycle:lifecycle-runtime-compose:${Versions.ComposeLifecycle}"
+        const val ConstraintLayout = "androidx.constraintlayout:constraintlayout-compose:${Versions.ComposeConstraint}"
+    }
+
+    const val Kakao = "com.kakao.sdk:v2-all-rx:${Versions.kakao}"
+    const val Timber = "com.jakewharton.timber:timber:${Versions.Timber}"
 }
 
 fun DependencyHandlerScope.implementationAndroidX(){
@@ -96,7 +135,8 @@ fun DependencyHandlerScope.implementationAndroidX(){
         Libraries.AndroidX.Navigation,
         Libraries.AndroidX.NavigationUI,
         Libraries.AndroidX.Work,
-        Libraries.AndroidX.RecyclerView
+        Libraries.AndroidX.RecyclerView,
+        Libraries.AndroidX.SplashScreen
     )
 }
 
@@ -117,10 +157,31 @@ fun DependencyHandlerScope.implementationHilt(){
     )
 }
 
+fun DependencyHandlerScope.implementationFirebase(){
+    implementations(
+        platform(Libraries.Firebase.Firebase)
+    )
+}
+
 fun DependencyHandlerScope.implementationRetrofit(){
     implementations(
         Libraries.Retrofit.Retrofit,
         Libraries.Retrofit.OkHttp
+    )
+}
+
+fun DependencyHandlerScope.implementationCompose(){
+    implementations(
+        platform(Libraries.Compose.ComposeBom),
+        Libraries.Compose.Material3,
+        Libraries.Compose.Foundation,
+        Libraries.Compose.Preview,
+        Libraries.Compose.Tooling,
+        Libraries.Compose.UI,
+        Libraries.Compose.Navigation,
+        Libraries.Compose.Hilt,
+        Libraries.Compose.Lifecycle,
+        Libraries.Compose.ConstraintLayout
     )
 }
 

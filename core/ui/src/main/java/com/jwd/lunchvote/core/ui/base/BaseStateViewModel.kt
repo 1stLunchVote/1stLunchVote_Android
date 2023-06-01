@@ -15,8 +15,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 abstract class BaseStateViewModel<S : ViewModelContract.State, E : ViewModelContract.Event,
-        R: ViewModelContract.Reduce, SE : ViewModelContract.SideEffect
-        >(
+        R: ViewModelContract.Reduce, SE : ViewModelContract.SideEffect>(
     private val stateHandler: SavedStateHandle
 ) : ViewModel()
 {
@@ -28,8 +27,7 @@ abstract class BaseStateViewModel<S : ViewModelContract.State, E : ViewModelCont
 
     private val _viewState = MutableStateFlow(initialState)
     val viewState : StateFlow<S> = _viewState.asStateFlow()
-
-    private val currentState : S get() = _viewState.value
+    protected val currentState : S get() = _viewState.value
 
     private val _events = MutableSharedFlow<E>()
     private val _reduce = MutableSharedFlow<R>()
@@ -60,7 +58,7 @@ abstract class BaseStateViewModel<S : ViewModelContract.State, E : ViewModelCont
         }
     }
 
-    fun setEvent(event: E) {
+    fun sendEvent(event: E) {
         viewModelScope.launch {
             _events.emit(event)
         }
