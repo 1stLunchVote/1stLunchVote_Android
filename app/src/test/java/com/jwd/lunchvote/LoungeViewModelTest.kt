@@ -1,52 +1,38 @@
 package com.jwd.lunchvote
 
-import androidx.lifecycle.SavedStateHandle
-import com.jwd.lunchvote.core.test.util.MainDispatcherRule
+import android.os.Parcelable
+import com.jwd.lunchvote.core.test.base.BaseStateViewModelTest
 import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.usecase.lounge.CreateLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.GetMemberListUseCase
 import com.jwd.lunchvote.model.LoungeMember
-import com.jwd.lunchvote.ui.lounge.LoungeContract
 import com.jwd.lunchvote.ui.lounge.LoungeViewModel
-import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.spyk
+import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
-import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class LoungeViewModelTest {
-    @get:Rule
-    val mainDispatcherRule = MainDispatcherRule()
+class LoungeViewModelTest : BaseStateViewModelTest() {
+    override val initialState: Parcelable? = null
 
     @MockK private lateinit var createLoungeUseCase: CreateLoungeUseCase
     @MockK private lateinit var getMemberListUseCase: GetMemberListUseCase
-    @MockK private lateinit var savedStateHandle: SavedStateHandle
 
-    private lateinit var viewModel: LoungeViewModel
-
-    @Before
-    fun setup() {
-        MockKAnnotations.init(this, relaxed = true)
-
-        every { savedStateHandle.get<LoungeContract.LoungeState>("viewState") } returns null
+    override fun initSetup() {
         every { savedStateHandle.get<String?>("id") } returns "test3"
-
-        viewModel = LoungeViewModel(
-                createLoungeUseCase,
-                getMemberListUseCase,
-                savedStateHandle
-            )
     }
 
     @Test
-    fun `멤버 리스트 제대로 업데이트 되는지 확인`() = runTest {
+    fun state_initial_memberListLoad() = runTest {
         // Given
         val memberList = listOf(
             Member(
@@ -56,14 +42,19 @@ class LoungeViewModelTest {
                 joinedTime = "2023-06-02 00:00:00"
             ),
         )
+        every { createLoungeUseCase.invoke() } returns flowOf("test1")
         every { getMemberListUseCase.invoke(any())} returns flowOf(memberList)
 
         // When
         // viewModel 초기에 설정될 때 이루어지는지 체크
-        viewModel.initialize()
+
+        // lateinit var로 viewModel 선언 시 생성자 호출 Test에서 이루어지지 않음
+        val viewModel = spyk(
+            LoungeViewModel(createLoungeUseCase, getMemberListUseCase, savedStateHandle),
+            recordPrivateCalls = true
+        )
         advanceUntilIdle()
 
-        // Then
         Assert.assertEquals(
             listOf(
                 LoungeMember(

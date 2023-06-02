@@ -27,10 +27,10 @@ class LoungeViewModel @Inject constructor(
     }
 
     init {
-        initialize()
+        initLounge()
     }
 
-    fun initialize(){
+    private fun initLounge(){
         loungeId?.let {
             updateState(LoungeReduce.SetLoungeId(it))
             getMemberList(it)
