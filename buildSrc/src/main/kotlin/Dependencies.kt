@@ -55,6 +55,9 @@ object Versions{
     const val JUnit = "4.13.2"
     const val Ext = "1.1.5"
     const val Espresso = "3.5.1"
+    const val Mockk ="1.13.5"
+    const val TestCore = "1.5.0"
+    const val Slf4j = "2.0.7"
 
     const val Coil = "2.4.0"
 }
@@ -95,6 +98,11 @@ object Libraries{
         const val JUnit = "junit:junit:${Versions.JUnit}"
         const val Ext = "androidx.test.ext:junit:${Versions.Ext}"
         const val Espresso = "androidx.test.espresso:espresso-core:${Versions.Espresso}"
+        const val Mockk = "io.mockk:mockk:${Versions.Mockk}"
+        const val AndroidMockk = "io.mockk:mockk-android:${Versions.Mockk}"
+        const val TestCore = "androidx.test:core-ktx:${Versions.TestCore}"
+        const val CoroutineTest = "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.Coroutine}"
+        const val Slf4j = "org.slf4j:slf4j-simple:${Versions.Slf4j}"
     }
 
     object JavaX{
@@ -192,6 +200,20 @@ fun DependencyHandlerScope.implementationTest(){
     add("testImplementation", Libraries.Test.JUnit)
     add("androidTestImplementation", Libraries.Test.Ext)
     add("androidTestImplementation", Libraries.Test.Espresso)
+    add("testImplementation", Libraries.Test.TestCore)
+    add("testImplementation", Libraries.Test.CoroutineTest)
+    add("testImplementation", Libraries.Test.Mockk)
+    add("androidTestImplementation", Libraries.Test.AndroidMockk)
+    add("testImplementation", Libraries.Test.Slf4j)
+}
+
+fun DependencyHandlerScope.apiTest(){
+    add("api", Libraries.Test.JUnit)
+    add("api", Libraries.Test.Ext)
+    add("api", Libraries.Test.Espresso)
+    add("api", Libraries.Test.TestCore)
+    add("api", Libraries.Test.CoroutineTest)
+    add("api", Libraries.Test.Mockk)
 }
 
 fun DependencyHandlerScope.implementations(vararg notations: Any) {

@@ -11,6 +11,7 @@ import com.jwd.lunchvote.ui.lounge.LoungeContract.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import org.jetbrains.annotations.VisibleForTesting
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,6 +27,10 @@ class LoungeViewModel @Inject constructor(
     }
 
     init {
+        initialize()
+    }
+
+    fun initialize(){
         loungeId?.let {
             updateState(LoungeReduce.SetLoungeId(it))
             getMemberList(it)

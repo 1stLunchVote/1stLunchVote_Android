@@ -1,4 +1,4 @@
-package com.jwd.lunchvote
+package com.jwd.lunchvote.core.test
 
 import org.junit.Test
 
