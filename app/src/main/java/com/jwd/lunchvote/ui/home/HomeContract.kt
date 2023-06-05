@@ -12,6 +12,7 @@ class HomeContract {
 
     sealed interface HomeEvent: ViewModelContract.Event {
         object OnCreateLounge: HomeEvent
+        object OnJoinLounge: HomeEvent
     }
 
     sealed interface HomeReduce : ViewModelContract.Reduce {

@@ -1,7 +1,9 @@
 package com.jwd.lunchvote.ui.home
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -11,8 +13,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
@@ -38,7 +42,8 @@ fun HomeRoute(
 
     HomeScreen(
         homeState = homeState,
-        onCreateLounge = { viewModel.sendEvent(HomeEvent.OnCreateLounge) }
+        onCreateLounge = { viewModel.sendEvent(HomeEvent.OnCreateLounge) },
+        onJoinLounge = { viewModel.sendEvent(HomeEvent.OnJoinLounge) }
     )
 }
 
@@ -47,20 +52,26 @@ fun HomeRoute(
 private fun HomeScreen(
     homeState: HomeState,
     onCreateLounge: () -> Unit = {},
+    onJoinLounge: () -> Unit = {},
 ){
     Scaffold(
         floatingActionButton = {
             Button(onClick = onCreateLounge) {
-                Text(text = "대기방으로 가기")
+                Text(text = "대기방 생성")
             }
         },
         floatingActionButtonPosition = FabPosition.Center
     ) { padding ->
         Column(modifier = Modifier
             .fillMaxSize()
-            .padding(padding)
+            .padding(padding),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.height(100.dp))
 
+            Button(onClick = onJoinLounge) {
+                Text(text = "대기방 참여")
+            }
         }
     }
 }

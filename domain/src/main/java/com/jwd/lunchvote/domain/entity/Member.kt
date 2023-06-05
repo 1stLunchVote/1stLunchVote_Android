@@ -1,8 +1,9 @@
 package com.jwd.lunchvote.domain.entity
 
 data class Member(
+    val uid: String? = null,
     val nickname: String? = null,
     val profileImage: String? = null,
-    val isReady: Boolean = false,
+    val ready: Boolean = false,
     val joinedTime: String? = null
 )

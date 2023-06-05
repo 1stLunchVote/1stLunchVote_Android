@@ -25,6 +25,8 @@ val colorOutline = Color(0xFF7D7D7D)
 val colorOutlineVariant = Color(0xFFC8C8C8)
 val colorDisabled = Color(0xFFC8C8C8)
 
+val colorNeutral90 = Color(0xFFE1E1E1)
+
 @Composable
 fun lunchVoteColorScheme() = MaterialTheme.colorScheme.copy(
     primary = colorPrimary,

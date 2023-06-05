@@ -4,7 +4,8 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class LoungeMember(
+data class MemberUIModel(
+    val uid: String,
     val profileImage: String?,
     val isReady: Boolean = false
 ) : Parcelable

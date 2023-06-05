@@ -20,6 +20,10 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.OnCreateLounge -> {
                 sendSideEffect(HomeSideEffect.NavigateToLounge(null))
             }
+            is HomeEvent.OnJoinLounge -> {
+                // Todo : Test용 방 번호임
+                sendSideEffect(HomeSideEffect.NavigateToLounge("KqND4zmJ59"))
+            }
         }
     }
 

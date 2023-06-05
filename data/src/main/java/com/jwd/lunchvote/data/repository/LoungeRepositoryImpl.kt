@@ -1,6 +1,7 @@
 package com.jwd.lunchvote.data.repository
 
 import com.jwd.lunchvote.data.source.remote.lounge.LoungeRemoteDataSource
+import com.jwd.lunchvote.domain.entity.LoungeChat
 import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import kotlinx.coroutines.flow.Flow
@@ -16,7 +17,15 @@ class LoungeRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun joinLounge(loungeId: String): Flow<Unit> {
+        return loungeRemoteDataSource.joinLounge(loungeId)
+    }
+
     override fun getMemberList(loungeId: String): Flow<List<Member>> {
         return loungeRemoteDataSource.getMemberList(loungeId)
+    }
+
+    override fun getChatList(loungeId: String): Flow<List<LoungeChat>> {
+        return loungeRemoteDataSource.getChatList(loungeId)
     }
 }
