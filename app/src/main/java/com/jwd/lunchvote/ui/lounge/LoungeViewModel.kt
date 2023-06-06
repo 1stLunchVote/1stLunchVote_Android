@@ -23,10 +23,10 @@ class LoungeViewModel @Inject constructor(
     private val joinLoungeUseCase: JoinLoungeUseCase,
     private val getMemberListUseCase: GetMemberListUseCase,
     private val getChatListUseCase: GetChatListUseCase,
+    private val auth: FirebaseAuth,
     savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<LoungeState, LoungeEvent, LoungeReduce, LoungeSideEffect>(savedStateHandle) {
     private val loungeId = savedStateHandle.get<String?>("id")
-    private val userId = FirebaseAuth.getInstance().currentUser?.uid
 
     override fun createInitialState(savedState: Parcelable?): LoungeState {
         return savedState as? LoungeState ?: LoungeState()
@@ -38,7 +38,7 @@ class LoungeViewModel @Inject constructor(
 
     private fun initLounge(){
         loungeId?.let {
-            updateState(LoungeReduce.SetLoungeId(it))
+            updateState(LoungeReduce.SetLoungeId(it, false))
             joinLounge(it)
         } ?: run {
             createLounge()
@@ -56,7 +56,7 @@ class LoungeViewModel @Inject constructor(
     private fun createLounge(){
         createLoungeUseCase()
             .onEach {
-                updateState(LoungeReduce.SetLoungeId(it))
+                updateState(LoungeReduce.SetLoungeId(it, true))
                 getLoungeData(it)
             }
             .launchIn(viewModelScope)
@@ -66,7 +66,7 @@ class LoungeViewModel @Inject constructor(
         getMemberListUseCase(loungeId)
             .onEach {
                 updateState(LoungeReduce.SetMemberList(it.map { m ->
-                    MemberUIModel(m.uid.orEmpty(), m.profileImage, m.ready) }
+                    MemberUIModel(m.uid.orEmpty(), m.profileImage, m.ready, m.owner) }
                 ))
             }
             .launchIn(viewModelScope)
@@ -76,7 +76,7 @@ class LoungeViewModel @Inject constructor(
                 updateState(
                     LoungeReduce.SetChatList(it.map { chat ->
                         ChatUIModel(
-                            chat.content.orEmpty(), chat.messageType, chat.sender == userId,
+                            chat.content.orEmpty(), chat.messageType, chat.sender == auth.currentUser?.uid,
                             chat.sender.orEmpty(), chat.createdAt.orEmpty(), chat.senderProfile
                         )
                         }
@@ -87,14 +87,20 @@ class LoungeViewModel @Inject constructor(
     }
 
     override fun handleEvents(event: LoungeEvent) {
-        TODO("Not yet implemented")
+        when(event){
+            is LoungeEvent.OnEditChat -> updateState(LoungeReduce.SetCurrentChat(event.chat))
+            is LoungeEvent.OnSendChat -> {
+                // Todo : 채팅 보내기
+            }
+        }
     }
 
     override fun reduceState(state: LoungeState, reduce: LoungeReduce): LoungeState {
         return when(reduce){
-            is LoungeReduce.SetLoungeId -> state.copy(loungeId = reduce.loungeId)
+            is LoungeReduce.SetLoungeId -> state.copy(loungeId = reduce.loungeId, isOwner = reduce.isOwner)
             is LoungeReduce.SetMemberList -> state.copy(memberList = reduce.memberList)
             is LoungeReduce.SetChatList -> state.copy(chatList = reduce.chatList)
+            is LoungeReduce.SetCurrentChat -> state.copy(currentChat = reduce.chat)
         }
     }
 }

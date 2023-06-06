@@ -2,11 +2,17 @@ package com.jwd.lunchvote.ui.lounge
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,19 +20,23 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -39,11 +49,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.jwd.lunchvote.R
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
+import com.jwd.lunchvote.core.ui.theme.buttonTextStyle
 import com.jwd.lunchvote.core.ui.theme.colorNeutral90
 import com.jwd.lunchvote.core.ui.theme.colorOutlineVariant
 import com.jwd.lunchvote.model.ChatUIModel
@@ -64,7 +76,8 @@ fun LoungeRoute(
     LoungeScreen(
         loungeState = loungeState,
         snackBarHostState = snackBarHostState,
-        popBackStack = popBackStack
+        popBackStack = popBackStack,
+        onEditChat = { viewModel.sendEvent(LoungeEvent.OnEditChat(it)) }
     )
 }
 
@@ -73,7 +86,8 @@ fun LoungeRoute(
 private fun LoungeScreen(
     loungeState: LoungeState,
     snackBarHostState: SnackbarHostState,
-    popBackStack: () -> Unit = {}
+    popBackStack: () -> Unit = {},
+    onEditChat: (String) -> Unit = {},
 ){
     Scaffold(
         topBar = {
@@ -83,6 +97,11 @@ private fun LoungeScreen(
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
+        bottomBar = {
+            if (loungeState.memberList.isNotEmpty()){
+                LoungeBottomBar(loungeState = loungeState, onEditChat = onEditChat)
+            }
+        }
     ) { padding ->
         if (loungeState.loungeId == null){
             LoungeLoadingScreen(
@@ -161,34 +180,7 @@ private fun LoungeChatList(
 
 @Preview(showBackground = true)
 @Composable
-private fun LoungeChatListPreview(
-    chatList: List<ChatUIModel> = listOf(
-        ChatUIModel(
-            messageType = 0,
-            content = "채팅방이 생성되었습니다.",
-            isMine = true,
-            sender = "sender",
-            createdAt = "",
-            profileImage = ""
-        ),
-        ChatUIModel(
-            messageType = 1,
-            content = "안녕하세요",
-            isMine = false,
-            sender = "sender",
-            createdAt = "",
-            profileImage = ""
-        ),
-        ChatUIModel(
-            messageType = 1,
-            content = "안녕하세요",
-            isMine = true,
-            sender = "sender",
-            createdAt = "",
-            profileImage = ""
-        ),
-    )
-){
+private fun LoungeChatListPreview(){
     LunchVoteTheme {
         LoungeChatList(chatList = chatList)
     }
@@ -287,6 +279,84 @@ private fun LoungeLoadingScreen(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun LoungeBottomBar(
+    loungeState: LoungeState,
+    onEditChat: (String) -> Unit = {}
+){
+    val isTyping by rememberUpdatedState(newValue = WindowInsets.isImeVisible && loungeState.currentChat.isNotBlank())
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Divider(
+            thickness = 2.dp, color = Color.Black,
+            modifier = Modifier
+                .fillMaxWidth()
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Surface(
+                shape = RoundedCornerShape(100.dp),
+                contentColor = if (loungeState.allReady) MaterialTheme.colorScheme.onPrimaryContainer
+                    else MaterialTheme.colorScheme.onBackground,
+                color = if (loungeState.allReady) MaterialTheme.colorScheme.primaryContainer
+                    else MaterialTheme.colorScheme.background,
+                border = BorderStroke(width = 2.dp, color = Color.Black),
+            ) {
+                Text(
+                    text = stringResource(id = if (loungeState.isOwner) R.string.lounge_start_btn else R.string.lounge_ready_btn),
+                    style = buttonTextStyle,
+                    modifier = Modifier
+                        .clickable { }
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                )
+            }
+
+            // 키보드 포커스드 상태일 때 border 색상 변경
+            Surface(
+                shape = RoundedCornerShape(24.dp),
+                contentColor = MaterialTheme.colorScheme.onBackground,
+                color = MaterialTheme.colorScheme.background,
+                border = BorderStroke(width = 2.dp, color = if (isTyping) MaterialTheme.colorScheme.primary else Color.Black),
+                modifier = Modifier.weight(1f),
+            ) {
+                BasicTextField(
+                    value = loungeState.currentChat,
+                    onValueChange = onEditChat,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
+                    maxLines = 2,
+                )
+            }
+
+
+            OutlinedIconButton(
+                onClick = { /*TODO*/ },
+                border = BorderStroke(width = 2.dp,
+                    color = if (loungeState.currentChat.isNotBlank()) Color.Black else colorNeutral90
+                ),
+                enabled = loungeState.currentChat.isNotBlank(),
+                modifier = Modifier
+                    .size(40.dp)
+                    .padding(5.dp),
+                colors = IconButtonDefaults.outlinedIconButtonColors(
+                    disabledContentColor = colorNeutral90,
+                )
+            ) {
+                Icon(
+                    painterResource(id = R.drawable.ic_arrow_up),
+                    contentDescription = "send"
+                )
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun LoungeMemberListPreview(){
@@ -303,33 +373,37 @@ private fun LoungeMemberListPreview(){
 private fun LoungeScreenPreview(){
     LunchVoteTheme {
         LoungeScreen(
-            loungeState = LoungeState(loungeId = "1234", chatList = listOf(
-                ChatUIModel(
-                    messageType = 0,
-                    content = "채팅방이 생성되었습니다.",
-                    isMine = true,
-                    sender = "sender",
-                    createdAt = "",
-                    profileImage = ""
-                ),
-                ChatUIModel(
-                    messageType = 1,
-                    content = "안녕하세요",
-                    isMine = false,
-                    sender = "sender",
-                    createdAt = "",
-                    profileImage = ""
-                ),
-                ChatUIModel(
-                    messageType = 1,
-                    content = "안녕하세요",
-                    isMine = true,
-                    sender = "sender",
-                    createdAt = "",
-                    profileImage = ""
-                ),
+            loungeState = LoungeState(loungeId = "1234", chatList = chatList, memberList = listOf(
+                MemberUIModel("test", "http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg", false),
             )),
             snackBarHostState = remember { SnackbarHostState() },
         )
     }
 }
+
+private val chatList = listOf(
+    ChatUIModel(
+        messageType = 1,
+        content = "채팅방이 생성되었습니다.",
+        isMine = true,
+        sender = "sender",
+        createdAt = "",
+        profileImage = ""
+    ),
+    ChatUIModel(
+        messageType = 0,
+        content = "안녕하세요",
+        isMine = false,
+        sender = "sender",
+        createdAt = "",
+        profileImage = ""
+    ),
+    ChatUIModel(
+        messageType = 0,
+        content = "안녕하세요",
+        isMine = true,
+        sender = "sender",
+        createdAt = "",
+        profileImage = ""
+    ),
+)

@@ -10,20 +10,30 @@ class LoungeContract {
     @Parcelize
     data class LoungeState(
         val loungeId: String? = null,
+        val isOwner: Boolean = false,
         val memberList: List<MemberUIModel> = emptyList(),
-        val chatList: List<ChatUIModel> = emptyList()
+        val chatList: List<ChatUIModel> = emptyList(),
+        val currentChat: String = "",
+        val isReady: Boolean = false,
     ): ViewModelContract.State, Parcelable {
         override fun toParcelable(): Parcelable = this
+
+        // 대기방 주인을 제외하고 전부 다 레디 or 주인 아닌 경우 레디 한 경우
+        val allReady : Boolean = memberList.filter { !it.isOwner }.all { it.isReady }
+                || (!isOwner && isReady)
     }
 
     sealed interface LoungeEvent: ViewModelContract.Event {
+        data class OnEditChat(val chat: String) : LoungeEvent
+        object OnSendChat : LoungeEvent
     }
 
     sealed interface LoungeReduce: ViewModelContract.Reduce {
-        data class SetLoungeId(val loungeId: String?) : LoungeReduce
+        data class SetLoungeId(val loungeId: String?, val isOwner: Boolean) : LoungeReduce
         data class SetMemberList(val memberList: List<MemberUIModel>) : LoungeReduce
         // Todo : 채팅 데이터 어떻게 업데이트 할지 논의 필요
         data class SetChatList(val chatList: List<ChatUIModel>) : LoungeReduce
+        data class SetCurrentChat(val chat: String) : LoungeReduce
     }
 
     sealed interface LoungeSideEffect: ViewModelContract.SideEffect {

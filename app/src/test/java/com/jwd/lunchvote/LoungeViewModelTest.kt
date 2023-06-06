@@ -1,6 +1,7 @@
 package com.jwd.lunchvote
 
 import android.os.Parcelable
+import com.google.firebase.auth.FirebaseAuth
 import com.jwd.lunchvote.core.test.base.BaseStateViewModelTest
 import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.usecase.lounge.CreateLoungeUseCase
@@ -29,9 +30,13 @@ class LoungeViewModelTest : BaseStateViewModelTest() {
     @MockK private lateinit var getMemberListUseCase: GetMemberListUseCase
     @MockK private lateinit var joinLoungeUseCase: JoinLoungeUseCase
     @MockK private lateinit var getChatListUseCase: GetChatListUseCase
+    @MockK private lateinit var auth: FirebaseAuth
 
     override fun initSetup() {
-        every { savedStateHandle.get<String?>("id") } returns "test3"
+        every { savedStateHandle.get<String?>("id") } returns "test1"
+
+        every { joinLoungeUseCase(any()) } returns flowOf(Unit)
+        every { getChatListUseCase(any()) } returns flowOf()
     }
 
     @Test
@@ -39,6 +44,7 @@ class LoungeViewModelTest : BaseStateViewModelTest() {
         // Given
         val memberList = listOf(
             Member(
+                uid = "uid1",
                 nickname = "test",
                 profileImage = "testImage",
                 ready = true,
@@ -53,7 +59,7 @@ class LoungeViewModelTest : BaseStateViewModelTest() {
 
         // lateinit var로 viewModel 선언 시 생성자 호출 Test에서 이루어지지 않음
         val viewModel = spyk(
-            LoungeViewModel(createLoungeUseCase, joinLoungeUseCase, getMemberListUseCase, getChatListUseCase, savedStateHandle),
+            LoungeViewModel(createLoungeUseCase, joinLoungeUseCase, getMemberListUseCase, getChatListUseCase, auth, savedStateHandle),
             recordPrivateCalls = true
         )
         advanceUntilIdle()
@@ -61,6 +67,7 @@ class LoungeViewModelTest : BaseStateViewModelTest() {
         Assert.assertEquals(
             listOf(
                 MemberUIModel(
+                    uid = "uid1",
                     profileImage = "testImage",
                     isReady = true
                 )
@@ -75,6 +82,7 @@ class LoungeViewModelTest : BaseStateViewModelTest() {
         every { getMemberListUseCase.invoke(any())} returns flow {
             emit(listOf(
                 Member(
+                    uid = "uid1",
                     nickname = "test",
                     profileImage = "testImage",
                     ready = true,
@@ -86,12 +94,14 @@ class LoungeViewModelTest : BaseStateViewModelTest() {
 
             emit(listOf(
                 Member(
+                    uid = "uid1",
                     nickname = "test",
                     profileImage = "testImage",
                     ready = true,
                     joinedTime = "2023-06-02 00:00:00"
                 ),
                 Member(
+                    uid = "uid2",
                     nickname = "test2",
                     profileImage = "testImage2",
                     ready = true,
@@ -102,7 +112,7 @@ class LoungeViewModelTest : BaseStateViewModelTest() {
 
         // when
         val viewModel = spyk(
-            LoungeViewModel(createLoungeUseCase, joinLoungeUseCase, getMemberListUseCase, getChatListUseCase, savedStateHandle),
+            LoungeViewModel(createLoungeUseCase, joinLoungeUseCase, getMemberListUseCase, getChatListUseCase, auth, savedStateHandle),
             recordPrivateCalls = true
         )
 
@@ -111,6 +121,7 @@ class LoungeViewModelTest : BaseStateViewModelTest() {
         Assert.assertEquals(
             listOf(
                 MemberUIModel(
+                    uid = "uid1",
                     profileImage = "testImage",
                     isReady = true
                 )
@@ -124,10 +135,12 @@ class LoungeViewModelTest : BaseStateViewModelTest() {
         Assert.assertEquals(
             listOf(
                 MemberUIModel(
+                    uid = "uid1",
                     profileImage = "testImage",
                     isReady = true
                 ),
                 MemberUIModel(
+                    uid = "uid2",
                     profileImage = "testImage2",
                     isReady = true
                 )

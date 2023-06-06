@@ -7,5 +7,6 @@ import kotlinx.parcelize.Parcelize
 data class MemberUIModel(
     val uid: String,
     val profileImage: String?,
-    val isReady: Boolean = false
+    val isReady: Boolean = false,
+    val isOwner: Boolean = false
 ) : Parcelable

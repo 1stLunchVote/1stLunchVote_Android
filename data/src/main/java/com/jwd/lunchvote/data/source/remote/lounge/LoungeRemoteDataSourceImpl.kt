@@ -117,7 +117,7 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
         val currentTime = LocalDateTime.now().toString()
 
         roomRef.child(Member).child(uid).setValue(
-            Member(uid, displayName, photoUrl, false, currentTime)
+            Member(uid, displayName, photoUrl, false, create, currentTime)
         )
         val chatId = roomRef.child(Chat).get().await().childrenCount
         roomRef.child(Chat).child(chatId.toString()).setValue(

@@ -5,5 +5,6 @@ data class Member(
     val nickname: String? = null,
     val profileImage: String? = null,
     val ready: Boolean = false,
+    val owner: Boolean = false,
     val joinedTime: String? = null
 )
