@@ -122,9 +122,9 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
         val chatId = roomRef.child(Chat).get().await().childrenCount
         roomRef.child(Chat).child(chatId.toString()).setValue(
             if (create)
-                LoungeChat(uid, photoUrl, Chat_Create, 1, currentTime)
+                LoungeChat(chatId, uid, photoUrl, Chat_Create, 1, currentTime)
             else
-                LoungeChat(uid, photoUrl, "$displayName $Chat_Join", 1, currentTime)
+                LoungeChat(chatId, uid, photoUrl, "$displayName $Chat_Join", 1, currentTime)
         )
     }
 

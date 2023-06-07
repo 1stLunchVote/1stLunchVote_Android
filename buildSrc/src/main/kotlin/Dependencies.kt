@@ -90,6 +90,7 @@ object Libraries{
         const val Hilt = "com.google.dagger:hilt-android:${Versions.Hilt}"
         const val HiltCompiler = "com.google.dagger:hilt-android-compiler:${Versions.Hilt}"
         const val AndroidHilt = "androidx.hilt:hilt-common:${Versions.AndroidHilt}"
+        const val HiltWork = "androidx.hilt:hilt-work:${Versions.AndroidHilt}"
     }
 
     object Retrofit{
@@ -171,7 +172,8 @@ fun DependencyHandlerScope.implementationCoroutine(){
 fun DependencyHandlerScope.implementationHilt(){
     implementations(
         Libraries.Hilt.Hilt,
-        Libraries.Hilt.AndroidHilt
+        Libraries.Hilt.AndroidHilt,
+        Libraries.Hilt.HiltWork
     )
     kapts(
         Libraries.Hilt.HiltCompiler

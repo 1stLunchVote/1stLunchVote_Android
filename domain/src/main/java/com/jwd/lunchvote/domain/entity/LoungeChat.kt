@@ -1,6 +1,7 @@
 package com.jwd.lunchvote.domain.entity
 
 data class LoungeChat(
+    val chatId: Long = 0,
     val sender: String? = null,
     val senderProfile: String? = null,
     val content: String? = null,

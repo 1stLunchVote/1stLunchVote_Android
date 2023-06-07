@@ -24,7 +24,7 @@ object DispatcherModule {
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Dispatcher(val niaDispatcher: LunchVoteDispatcher)
+annotation class Dispatcher(val dispatcher: LunchVoteDispatcher)
 
 enum class LunchVoteDispatcher {
     Default,

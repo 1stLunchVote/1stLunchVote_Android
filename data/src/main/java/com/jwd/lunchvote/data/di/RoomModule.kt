@@ -22,4 +22,12 @@ object RoomModule {
     @Singleton
     @Provides
     fun provideChatDao(lunchVoteDataBase: LunchVoteDataBase) = lunchVoteDataBase.chatDao()
+
+    @Singleton
+    @Provides
+    fun provideLoungeDao(lunchVoteDataBase: LunchVoteDataBase) = lunchVoteDataBase.loungeDao()
+
+    @Singleton
+    @Provides
+    fun provideMemberDao(lunchVoteDataBase: LunchVoteDataBase) = lunchVoteDataBase.memberDao()
 }

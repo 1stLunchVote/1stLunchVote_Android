@@ -1,10 +1,14 @@
-package com.jwd.lunchvote.data.room
+package com.jwd.lunchvote.data.room.dao
 
+import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.jwd.lunchvote.data.room.entity.ChatEntity
+import kotlinx.coroutines.flow.Flow
 
+@Dao
 interface ChatDao {
     // 채팅 메시지 삽입
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -15,7 +19,8 @@ interface ChatDao {
     fun insertAllChat(chatList: List<ChatEntity>)
 
     // 채팅 메시지 리스트 조회
-    fun getAllChat(): List<ChatEntity>
+    @Query("SELECT * FROM ChatTable WHERE loungeId = :loungeId")
+    fun getAllChat(loungeId: String): Flow<List<ChatEntity>>
 
     // Todo : 페이징으로 채팅 메시지 리스트 조회
 
@@ -24,6 +29,6 @@ interface ChatDao {
     fun deleteChat(chat: ChatEntity)
 
     // 채팅 메시지 전부 삭제
-    @Query("DELETE FROM ChatTable")
-    fun deleteAllChat()
+    @Query("DELETE FROM ChatTable WHERE loungeId = :loungeId")
+    fun deleteAllChat(loungeId: String)
 }

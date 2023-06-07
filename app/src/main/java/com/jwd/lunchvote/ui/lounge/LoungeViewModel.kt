@@ -15,6 +15,7 @@ import com.jwd.lunchvote.ui.lounge.LoungeContract.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -63,6 +64,21 @@ class LoungeViewModel @Inject constructor(
     }
 
     private fun getLoungeData(loungeId: String){
+        getChatListUseCase(loungeId)
+            .onEach {
+                Timber.e("collect 도착 : $it")
+                updateState(
+                    LoungeReduce.SetChatList(it.map { chat ->
+                        ChatUIModel(
+                            chat.content.orEmpty(), chat.messageType, chat.sender == auth.currentUser?.uid,
+                            chat.sender.orEmpty(), chat.createdAt.orEmpty(), chat.senderProfile
+                        )
+                    }
+                    )
+                )
+            }
+            .launchIn(viewModelScope)
+
         getMemberListUseCase(loungeId)
             .onEach {
                 updateState(LoungeReduce.SetMemberList(it.map { m ->
@@ -71,19 +87,6 @@ class LoungeViewModel @Inject constructor(
             }
             .launchIn(viewModelScope)
 
-        getChatListUseCase(loungeId)
-            .onEach {
-                updateState(
-                    LoungeReduce.SetChatList(it.map { chat ->
-                        ChatUIModel(
-                            chat.content.orEmpty(), chat.messageType, chat.sender == auth.currentUser?.uid,
-                            chat.sender.orEmpty(), chat.createdAt.orEmpty(), chat.senderProfile
-                        )
-                        }
-                    )
-                )
-            }
-            .launchIn(viewModelScope)
     }
 
     override fun handleEvents(event: LoungeEvent) {
