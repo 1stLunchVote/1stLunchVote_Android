@@ -9,6 +9,7 @@ import com.jwd.lunchvote.domain.usecase.lounge.CreateLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.GetChatListUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.GetMemberListUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.JoinLoungeUseCase
+import com.jwd.lunchvote.domain.usecase.lounge.SendChatUseCase
 import com.jwd.lunchvote.model.ChatUIModel
 import com.jwd.lunchvote.model.MemberUIModel
 import com.jwd.lunchvote.ui.lounge.LoungeContract.*
@@ -24,6 +25,7 @@ class LoungeViewModel @Inject constructor(
     private val joinLoungeUseCase: JoinLoungeUseCase,
     private val getMemberListUseCase: GetMemberListUseCase,
     private val getChatListUseCase: GetChatListUseCase,
+    private val sendChatUseCase: SendChatUseCase,
     private val auth: FirebaseAuth,
     savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<LoungeState, LoungeEvent, LoungeReduce, LoungeSideEffect>(savedStateHandle) {
@@ -63,6 +65,12 @@ class LoungeViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
+    // Todo : 임시로 간단하게만 만듦
+    private fun sendChat(){
+        sendChatUseCase(currentState.loungeId ?: return, currentState.currentChat)
+            .launchIn(viewModelScope)
+    }
+
     private fun getLoungeData(loungeId: String){
         getChatListUseCase(loungeId)
             .onEach {
@@ -93,7 +101,8 @@ class LoungeViewModel @Inject constructor(
         when(event){
             is LoungeEvent.OnEditChat -> updateState(LoungeReduce.SetCurrentChat(event.chat))
             is LoungeEvent.OnSendChat -> {
-                // Todo : 채팅 보내기
+                updateState(LoungeReduce.SetCurrentChat(""))
+                sendChat()
             }
         }
     }

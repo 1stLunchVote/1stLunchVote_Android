@@ -29,6 +29,7 @@ class LoungeLocalDataSourceImpl @Inject constructor(
     override suspend fun putChatList(
         chatList: List<LoungeChat>, loungeId: String
     ) = withContext(dispatcher){
+        loungeDao.insertLounge(LoungeEntity(loungeId))
         chatDao.insertAllChat(chatList.map {
             ChatEntity(
                 it.chatId,

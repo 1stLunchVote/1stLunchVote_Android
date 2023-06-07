@@ -16,8 +16,10 @@ import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -34,6 +36,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -77,7 +80,8 @@ fun LoungeRoute(
         loungeState = loungeState,
         snackBarHostState = snackBarHostState,
         popBackStack = popBackStack,
-        onEditChat = { viewModel.sendEvent(LoungeEvent.OnEditChat(it)) }
+        onEditChat = { viewModel.sendEvent(LoungeEvent.OnEditChat(it)) },
+        onSendChat = { viewModel.sendEvent(LoungeEvent.OnSendChat) }
     )
 }
 
@@ -88,6 +92,7 @@ private fun LoungeScreen(
     snackBarHostState: SnackbarHostState,
     popBackStack: () -> Unit = {},
     onEditChat: (String) -> Unit = {},
+    onSendChat: () -> Unit = {}
 ){
     Scaffold(
         topBar = {
@@ -99,7 +104,7 @@ private fun LoungeScreen(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         bottomBar = {
             if (loungeState.memberList.isNotEmpty()){
-                LoungeBottomBar(loungeState = loungeState, onEditChat = onEditChat)
+                LoungeBottomBar(loungeState = loungeState, onEditChat = onEditChat, onSendChat = onSendChat)
             }
         }
     ) { padding ->
@@ -137,19 +142,26 @@ private fun LoungeContent(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun LoungeChatList(
     chatList: List<ChatUIModel> = emptyList(),
-    memberList: List<MemberUIModel> = emptyList()
+    memberList: List<MemberUIModel> = emptyList(),
+    listState: LazyListState = rememberLazyListState(),
 ) {
+    LaunchedEffect(chatList.isNotEmpty(), WindowInsets.isImeVisible){
+        if (chatList.isNotEmpty()) listState.scrollToItem(chatList.size - 1)
+    }
+
     LazyColumn(
+        state = listState,
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(horizontal = 24.dp)
+        modifier = Modifier.padding(horizontal = 24.dp),
     ) {
         items(chatList) { chat ->
             // 채팅방 생성, 참가 메시지
-            if (chat.messageType == 1) {
+            if (chat.messageType != 0) {
                 Surface(
                     shape = RoundedCornerShape(24.dp),
                     color = colorNeutral90,
@@ -173,6 +185,8 @@ private fun LoungeChatList(
                 )
             }
         }
+
+        item {Spacer(modifier = Modifier.height(0.dp)) }
     }
 }
 
@@ -283,7 +297,8 @@ private fun LoungeLoadingScreen(
 @Composable
 private fun LoungeBottomBar(
     loungeState: LoungeState,
-    onEditChat: (String) -> Unit = {}
+    onEditChat: (String) -> Unit = {},
+    onSendChat: () -> Unit
 ){
     val isTyping by rememberUpdatedState(newValue = WindowInsets.isImeVisible && loungeState.currentChat.isNotBlank())
 
@@ -336,7 +351,7 @@ private fun LoungeBottomBar(
 
 
             OutlinedIconButton(
-                onClick = { /*TODO*/ },
+                onClick = onSendChat,
                 border = BorderStroke(width = 2.dp,
                     color = if (loungeState.currentChat.isNotBlank()) Color.Black else colorNeutral90
                 ),

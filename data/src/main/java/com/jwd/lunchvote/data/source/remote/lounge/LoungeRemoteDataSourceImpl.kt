@@ -7,6 +7,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.getValue
+import com.google.firebase.functions.FirebaseFunctions
 import com.jwd.lunchvote.data.di.Dispatcher
 import com.jwd.lunchvote.data.di.LunchVoteDispatcher.IO
 import com.jwd.lunchvote.data.util.createRandomString
@@ -16,14 +17,19 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.tasks.await
+import org.json.JSONObject
 import timber.log.Timber
 import java.time.LocalDateTime
 import javax.inject.Inject
 
 class LoungeRemoteDataSourceImpl @Inject constructor(
+    private val functions: FirebaseFunctions,
     private val auth: FirebaseAuth,
     private val db: FirebaseDatabase,
     @Dispatcher(IO) private val dispatcher: CoroutineDispatcher
@@ -47,12 +53,12 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
         awaitClose()
     }.flowOn(dispatcher)
 
-    override fun joinLounge(loungeId: String): Flow<Unit> = flow {
+    override fun joinLounge(loungeId: String): Flow<Unit?> = flow {
         val roomRef = db.getReference("${Room}/${loungeId}")
 
         auth.currentUser?.let {user ->
             val userExist = roomRef.child(Member).child(user.uid).get().await().exists()
-            if (userExist) emit(Unit)
+            if (userExist) emit(null)
             else {
                 emit(
                     addMember(roomRef, user.uid, user.displayName.toString(), user.photoUrl.toString(), false)
@@ -110,6 +116,33 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
         awaitClose { chatRef.removeEventListener(listener) }
     }.flowOn(dispatcher)
 
+    override fun sendChat(
+        loungeId: String, content: String?, messageType: Int
+    ): Flow<Unit> = callbackFlow {
+        val chatContent = content ?: if (messageType == 1) Chat_Create else "${auth.currentUser?.displayName} $Chat_Join"
+
+        val data = JSONObject().apply {
+            put("loungeId", loungeId)
+            put("sender", auth.currentUser?.uid)
+            put("senderProfile", auth.currentUser?.photoUrl)
+            put("content", chatContent)
+            put("createdAt", LocalDateTime.now().toString())
+            put("messageType", messageType)
+        }
+
+        functions.getHttpsCallable("sendChat")
+            .call(data)
+            .addOnSuccessListener {
+                trySend(Unit)
+            }
+            .addOnFailureListener {
+                Timber.e(it)
+                close(Throwable(it.message))
+            }
+
+        awaitClose()
+    }.flowOn(dispatcher)
+
     private suspend fun addMember(
         roomRef: DatabaseReference, uid: String, displayName: String,
         photoUrl: String?, create: Boolean,
@@ -119,13 +152,13 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
         roomRef.child(Member).child(uid).setValue(
             Member(uid, displayName, photoUrl, false, create, currentTime)
         )
-        val chatId = roomRef.child(Chat).get().await().childrenCount
-        roomRef.child(Chat).child(chatId.toString()).setValue(
-            if (create)
-                LoungeChat(chatId, uid, photoUrl, Chat_Create, 1, currentTime)
-            else
-                LoungeChat(chatId, uid, photoUrl, "$displayName $Chat_Join", 1, currentTime)
-        )
+//        val chatId = roomRef.child(Chat).get().await().childrenCount
+//        roomRef.child(Chat).child(chatId.toString()).setValue(
+//            if (create)
+//                LoungeChat(chatId, uid, photoUrl, Chat_Create, 1, currentTime)
+//            else
+//                LoungeChat(chatId, uid, photoUrl, "$displayName $Chat_Join", 1, currentTime)
+//        )
     }
 
     companion object{

@@ -9,4 +9,5 @@ interface LoungeRepository {
     fun joinLounge(loungeId: String) : Flow<Unit>
     fun getMemberList(loungeId: String) : Flow<List<Member>>
     fun getChatList(loungeId: String) : Flow<List<LoungeChat>>
+    fun sendChat(loungeId: String, content: String) : Flow<Unit>
 }
