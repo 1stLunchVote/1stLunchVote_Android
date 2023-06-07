@@ -43,6 +43,9 @@ object Versions{
     const val Retrofit = "2.9.0"
     const val OkHttp = "4.9.1"
 
+    // Room
+    const val Room = "2.5.1"
+
     // Compose
     const val Compose = "2023.01.00"
     const val Material3 = "1.0.1"
@@ -130,6 +133,13 @@ object Libraries{
         const val ConstraintLayout = "androidx.constraintlayout:constraintlayout-compose:${Versions.ComposeConstraint}"
     }
 
+    object Room{
+        const val Room = "androidx.room:room-ktx:${Versions.Room}"
+        const val RoomCompiler = "androidx.room:room-compiler:${Versions.Room}"
+        const val RoomRuntime = "androidx.room:room-runtime:${Versions.Room}"
+        const val RoomPaging = "androidx.room:room-paging:${Versions.Room}"
+    }
+
     const val Kakao = "com.kakao.sdk:v2-all-rx:${Versions.Kakao}"
     const val Timber = "com.jakewharton.timber:timber:${Versions.Timber}"
     const val Coil = "io.coil-kt:coil-compose:${Versions.Coil}"
@@ -178,6 +188,17 @@ fun DependencyHandlerScope.implementationRetrofit(){
     implementations(
         Libraries.Retrofit.Retrofit,
         Libraries.Retrofit.OkHttp
+    )
+}
+
+fun DependencyHandlerScope.implementationRoom(){
+    implementations(
+        Libraries.Room.Room,
+        Libraries.Room.RoomRuntime,
+        Libraries.Room.RoomPaging
+    )
+    kapts(
+        Libraries.Room.RoomCompiler
     )
 }
 
