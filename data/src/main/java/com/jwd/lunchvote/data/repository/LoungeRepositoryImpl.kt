@@ -1,27 +1,32 @@
 package com.jwd.lunchvote.data.repository
 
+import android.content.Context
 import com.jwd.lunchvote.data.room.entity.ChatEntity
 import com.jwd.lunchvote.data.room.entity.MemberEntity
 import com.jwd.lunchvote.data.source.local.lounge.LoungeLocalDataSource
 import com.jwd.lunchvote.data.source.remote.lounge.LoungeRemoteDataSource
+import com.jwd.lunchvote.data.worker.SendChatWorker
+import com.jwd.lunchvote.data.worker.SendWorkerManager
 import com.jwd.lunchvote.domain.entity.LoungeChat
 import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.repository.LoungeRepository
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import timber.log.Timber
 import javax.inject.Inject
 
 class LoungeRepositoryImpl @Inject constructor(
+    private val sendWorkerManager: SendWorkerManager,
     private val loungeLocalDataSource: LoungeLocalDataSource,
     private val loungeRemoteDataSource: LoungeRemoteDataSource
 ): LoungeRepository {
@@ -47,18 +52,24 @@ class LoungeRepositoryImpl @Inject constructor(
 
     override fun getMemberList(loungeId: String): Flow<List<Member>> {
         return loungeLocalDataSource.getMemberList(loungeId)
+            .filter { it.isNotEmpty() }
             .map { it.map(MemberEntity::toDomain) }
             .onStart { syncMemberList(loungeId) }
     }
 
     override fun getChatList(loungeId: String): Flow<List<LoungeChat>> {
         return loungeLocalDataSource.getChatList(loungeId)
+            .filter { it.isNotEmpty() }
             .map { it.map(ChatEntity::toDomain) }
             .onStart { syncChatList(loungeId) }
     }
 
     override fun sendChat(loungeId: String, content: String): Flow<Unit> {
-        return loungeRemoteDataSource.sendChat(loungeId, content)
+        return loungeLocalDataSource.insertChat(loungeId, content, 0)
+            .onEach {
+                sendWorkerManager.startSendWork(it, loungeId, content)
+            }
+            .map {  }
     }
 
     private suspend fun syncMemberList(loungeId: String){

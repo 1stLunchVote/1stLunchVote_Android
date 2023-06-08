@@ -23,18 +23,22 @@ data class ChatEntity(
     val sender: String,
     val senderProfile: String,
     val content: String,
-    // messageType: 0 = 일반 메시지, 1 = 방 생성 및 참가
+    // messageType: 0 = 일반 메시지, 1 = 방 생성, 2 = 참가
     val messageType: Int = 0,
     val createdAt: String,
-    val loungeId: String
+    val loungeId: String,
+    // sendStatus: 0 = 전송완료, 1 = 전송중, 2 = 전송실패
+    val sendStatus: Int = 0,
 ){
     fun toDomain() : LoungeChat {
         return LoungeChat(
+            chatId = chatId,
             sender = sender,
             senderProfile = senderProfile,
             content = content,
             messageType = messageType,
-            createdAt = createdAt
+            createdAt = createdAt,
+            sendStatus = sendStatus
         )
     }
 }

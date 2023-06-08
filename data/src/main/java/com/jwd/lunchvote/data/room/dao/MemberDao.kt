@@ -15,4 +15,7 @@ interface MemberDao {
 
     @Query("SELECT * FROM MemberTable WHERE loungeId = :loungeId")
     fun getAllMember(loungeId: String): Flow<List<MemberEntity>>
+
+    @Query("DELETE FROM MemberTable WHERE loungeId = :loungeId")
+    fun deleteAllMember(loungeId: String)
 }

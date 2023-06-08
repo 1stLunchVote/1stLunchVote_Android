@@ -74,7 +74,7 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
             override fun onDataChange(snapshot: DataSnapshot) {
                 try {
                     val res = snapshot.getValue<HashMap<String, Member>>()
-                    Timber.e("get Value : $res")
+                    Timber.d("채팅 리스트 조회 : $res")
                     res?.let { trySend(res.values.toList().sortedBy { it.joinedTime }) }
                 } catch (e: Exception){
                     Timber.e("error: ${e.message}")
@@ -118,32 +118,24 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
 
     override fun sendChat(
         loungeId: String, content: String?, messageType: Int
-    ): Flow<Unit> = callbackFlow {
+    ): Flow<Unit> = flow {
         val chatContent = content ?: if (messageType == 1) Chat_Create else "${auth.currentUser?.displayName} $Chat_Join"
 
         val data = JSONObject().apply {
             put("loungeId", loungeId)
             put("sender", auth.currentUser?.uid)
-            put("senderProfile", auth.currentUser?.photoUrl)
+            put("senderProfile", auth.currentUser?.photoUrl.toString())
             put("content", chatContent)
             put("createdAt", LocalDateTime.now().toString())
             put("messageType", messageType)
         }
 
-        functions.getHttpsCallable("sendChat")
-            .call(data)
-            .addOnSuccessListener {
-                trySend(Unit)
-            }
-            .addOnFailureListener {
-                Timber.e(it)
-                close(Throwable(it.message))
-            }
+        functions.getHttpsCallable("sendChat").call(data).await()
+        emit(Unit)
 
-        awaitClose()
     }.flowOn(dispatcher)
 
-    private suspend fun addMember(
+    private fun addMember(
         roomRef: DatabaseReference, uid: String, displayName: String,
         photoUrl: String?, create: Boolean,
     ) {

@@ -89,6 +89,7 @@ object Libraries{
         // Hilt
         const val Hilt = "com.google.dagger:hilt-android:${Versions.Hilt}"
         const val HiltCompiler = "com.google.dagger:hilt-android-compiler:${Versions.Hilt}"
+        const val AndroidHiltCompiler = "androidx.hilt:hilt-compiler:${Versions.AndroidHilt}"
         const val AndroidHilt = "androidx.hilt:hilt-common:${Versions.AndroidHilt}"
         const val HiltWork = "androidx.hilt:hilt-work:${Versions.AndroidHilt}"
     }
@@ -176,7 +177,8 @@ fun DependencyHandlerScope.implementationHilt(){
         Libraries.Hilt.HiltWork
     )
     kapts(
-        Libraries.Hilt.HiltCompiler
+        Libraries.Hilt.HiltCompiler,
+        Libraries.Hilt.AndroidHiltCompiler
     )
 }
 

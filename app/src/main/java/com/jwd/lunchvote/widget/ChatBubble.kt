@@ -29,6 +29,7 @@ fun ChatBubble(
     isMine: Boolean = false,
     profileImage: String?,
     isReady: Boolean = false,
+    sendStatus: Int = 0
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -36,6 +37,12 @@ fun ChatBubble(
     ) {
         if (isMine) {
             Spacer(modifier = Modifier.weight(1f))
+
+            if (sendStatus != 0){
+                Text(text = "전송중", style = MaterialTheme.typography.titleSmall)
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+
             Surface(
                 shape = RoundedCornerShape(20.dp, 0.dp, 20.dp, 20.dp),
                 color = MaterialTheme.colorScheme.background,
@@ -90,8 +97,9 @@ fun ChatBubblePreview(){
     LunchVoteTheme {
         ChatBubble(
             message = "안녕하세요",
-            isMine = false,
-            profileImage = null
+            isMine = true,
+            profileImage = null,
+            sendStatus = 1
         )
     }
 }

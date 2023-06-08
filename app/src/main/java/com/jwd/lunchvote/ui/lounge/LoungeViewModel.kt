@@ -3,8 +3,15 @@ package com.jwd.lunchvote.ui.lounge
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.work.Constraints
+import androidx.work.Data
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
+import androidx.work.WorkManager
 import com.google.firebase.auth.FirebaseAuth
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.data.worker.SendChatWorker
 import com.jwd.lunchvote.domain.usecase.lounge.CreateLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.GetChatListUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.GetMemberListUseCase
@@ -65,7 +72,6 @@ class LoungeViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    // Todo : 임시로 간단하게만 만듦
     private fun sendChat(){
         sendChatUseCase(currentState.loungeId ?: return, currentState.currentChat)
             .launchIn(viewModelScope)
@@ -74,12 +80,11 @@ class LoungeViewModel @Inject constructor(
     private fun getLoungeData(loungeId: String){
         getChatListUseCase(loungeId)
             .onEach {
-                Timber.e("collect 도착 : $it")
                 updateState(
                     LoungeReduce.SetChatList(it.map { chat ->
                         ChatUIModel(
                             chat.content.orEmpty(), chat.messageType, chat.sender == auth.currentUser?.uid,
-                            chat.sender.orEmpty(), chat.createdAt.orEmpty(), chat.senderProfile
+                            chat.sender.orEmpty(), chat.createdAt.orEmpty(), chat.senderProfile, chat.sendStatus
                         )
                     }
                     )

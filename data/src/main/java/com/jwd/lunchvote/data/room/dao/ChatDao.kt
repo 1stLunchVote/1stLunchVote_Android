@@ -25,8 +25,8 @@ interface ChatDao {
     // Todo : 페이징으로 채팅 메시지 리스트 조회
 
     // 채팅 메시지 삭제
-    @Delete
-    fun deleteChat(chat: ChatEntity)
+    @Query("DELETE FROM ChatTable WHERE chatId = :chatId AND loungeId = :loungeId")
+    fun deleteChat(chatId: Long, loungeId: String)
 
     // 채팅 메시지 전부 삭제
     @Query("DELETE FROM ChatTable WHERE loungeId = :loungeId")

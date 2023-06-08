@@ -10,5 +10,7 @@ data class ChatUIModel(
     val isMine: Boolean,
     val sender: String,
     val createdAt: String,
-    val profileImage: String?
+    val profileImage: String?,
+    // 0 = 전송 완료, 1 = 전송 중, 2 = 전송 실패
+    val sendStatus: Int = 0
 ): Parcelable

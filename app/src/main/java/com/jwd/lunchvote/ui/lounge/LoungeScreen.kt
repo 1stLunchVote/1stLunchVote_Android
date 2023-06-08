@@ -149,15 +149,23 @@ private fun LoungeChatList(
     memberList: List<MemberUIModel> = emptyList(),
     listState: LazyListState = rememberLazyListState(),
 ) {
-    LaunchedEffect(chatList.isNotEmpty(), WindowInsets.isImeVisible){
-        if (chatList.isNotEmpty()) listState.scrollToItem(chatList.size - 1)
+    val keyboardShown by rememberUpdatedState(newValue = WindowInsets.isImeVisible)
+
+    LaunchedEffect(chatList.size){
+        // 마지막으로 메시지 온 것이 내 것일 때(내가 직전에 보냈을 때 포함) 스크롤
+        if (chatList.isNotEmpty() && chatList[chatList.size - 1].isMine) listState.scrollToItem(chatList.size - 1)
+    }
+
+    LaunchedEffect(chatList.isNotEmpty(), keyboardShown){
+        // 최초 리스트 로드될 때 && 키보드 보여질 때
+        if (chatList.isNotEmpty() && keyboardShown) listState.scrollToItem(chatList.size - 1)
     }
 
     LazyColumn(
         state = listState,
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(horizontal = 24.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
     ) {
         items(chatList) { chat ->
             // 채팅방 생성, 참가 메시지
@@ -181,7 +189,8 @@ private fun LoungeChatList(
                     message = chat.content,
                     profileImage = chat.profileImage,
                     isMine = chat.isMine,
-                    isReady = memberList.find { it.uid == chat.sender }?.isReady ?: false
+                    isReady = memberList.find { it.uid == chat.sender }?.isReady ?: false,
+                    sendStatus = chat.sendStatus
                 )
             }
         }
@@ -415,10 +424,20 @@ private val chatList = listOf(
     ),
     ChatUIModel(
         messageType = 0,
+        content = "전송완료",
+        isMine = true,
+        sender = "sender",
+        createdAt = "",
+        profileImage = "",
+        sendStatus = 0
+    ),
+    ChatUIModel(
+        messageType = 0,
         content = "안녕하세요",
         isMine = true,
         sender = "sender",
         createdAt = "",
-        profileImage = ""
+        profileImage = "",
+        sendStatus = 1
     ),
 )
