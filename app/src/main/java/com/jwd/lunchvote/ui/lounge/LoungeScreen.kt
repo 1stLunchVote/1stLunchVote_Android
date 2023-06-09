@@ -64,6 +64,7 @@ import com.jwd.lunchvote.core.ui.theme.colorOutlineVariant
 import com.jwd.lunchvote.model.ChatUIModel
 import com.jwd.lunchvote.model.MemberUIModel
 import com.jwd.lunchvote.ui.lounge.LoungeContract.*
+import com.jwd.lunchvote.util.wasLastItemVisible
 import com.jwd.lunchvote.widget.ChatBubble
 import com.jwd.lunchvote.widget.LunchVoteTopBar
 
@@ -152,13 +153,17 @@ private fun LoungeChatList(
     val keyboardShown by rememberUpdatedState(newValue = WindowInsets.isImeVisible)
 
     LaunchedEffect(chatList.size){
+        if (chatList.isEmpty()) return@LaunchedEffect
+
         // 마지막으로 메시지 온 것이 내 것일 때(내가 직전에 보냈을 때 포함) 스크롤
-        if (chatList.isNotEmpty() && chatList[chatList.size - 1].isMine) listState.scrollToItem(chatList.size - 1)
+        if (chatList.last().isMine || listState.wasLastItemVisible){
+            listState.scrollToItem(chatList.size - 1)
+        }
     }
 
     LaunchedEffect(chatList.isNotEmpty(), keyboardShown){
         // 최초 리스트 로드될 때 && 키보드 보여질 때
-        if (chatList.isNotEmpty() && keyboardShown) listState.scrollToItem(chatList.size - 1)
+        if (chatList.isNotEmpty() || keyboardShown) listState.scrollToItem(chatList.size - 1)
     }
 
     LazyColumn(

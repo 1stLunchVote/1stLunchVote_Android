@@ -1,16 +1,13 @@
 package com.jwd.lunchvote.data.repository
 
-import android.content.Context
 import com.jwd.lunchvote.data.room.entity.ChatEntity
 import com.jwd.lunchvote.data.room.entity.MemberEntity
 import com.jwd.lunchvote.data.source.local.lounge.LoungeLocalDataSource
 import com.jwd.lunchvote.data.source.remote.lounge.LoungeRemoteDataSource
-import com.jwd.lunchvote.data.worker.SendChatWorker
 import com.jwd.lunchvote.data.worker.SendWorkerManager
 import com.jwd.lunchvote.domain.entity.LoungeChat
 import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.repository.LoungeRepository
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.currentCoroutineContext
@@ -22,7 +19,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
-import timber.log.Timber
 import javax.inject.Inject
 
 class LoungeRepositoryImpl @Inject constructor(
@@ -65,11 +61,8 @@ class LoungeRepositoryImpl @Inject constructor(
     }
 
     override fun sendChat(loungeId: String, content: String): Flow<Unit> {
+        sendWorkerManager.startSendWork(loungeId, content)
         return loungeLocalDataSource.insertChat(loungeId, content, 0)
-            .onEach {
-                sendWorkerManager.startSendWork(it, loungeId, content)
-            }
-            .map {  }
     }
 
     private suspend fun syncMemberList(loungeId: String){

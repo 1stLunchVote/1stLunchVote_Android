@@ -11,6 +11,6 @@ interface LoungeLocalDataSource {
     suspend fun putChatList(chatList: List<LoungeChat>, loungeId: String)
     fun getMemberList(loungeId: String): Flow<List<MemberEntity>>
     suspend fun putMemberList(memberList: List<Member>, loungeId: String)
-    fun insertChat(loungeId: String, content: String, type: Int): Flow<Long>
-    fun deleteChat(chatId: Long, loungeId: String): Flow<Unit>
+    fun insertChat(loungeId: String, content: String, type: Int): Flow<Unit>
+    fun deleteChat(loungeId: String): Flow<Unit>
 }

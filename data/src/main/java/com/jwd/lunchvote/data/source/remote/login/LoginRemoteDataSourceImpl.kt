@@ -8,7 +8,9 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.tasks.await
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -17,31 +19,22 @@ class LoginRemoteDataSourceImpl @Inject constructor(
     private val auth: FirebaseAuth,
     @Dispatcher(IO) private val dispatcher: CoroutineDispatcher
 ): LoginRemoteDataSource{
-    override fun getCustomToken(accessToken: String): Flow<String?> = callbackFlow {
+    override fun getCustomToken(accessToken: String): Flow<String?> = flow {
         val data = JSONObject()
         data.put("accessToken", accessToken)
-        functions.getHttpsCallable("kakaoToken")
-            .call(data)
-            .addOnSuccessListener {
-                trySend(it.data as String)
-            }
-            .addOnFailureListener {
-                trySend(null)
-            }
 
-        awaitClose()
+        val res = functions.getHttpsCallable("kakaoToken")
+            .call(data)
+            .await()
+
+        emit(res.data as String)
+
     }.flowOn(dispatcher)
 
-    override fun signInWithCustomToken(token: String): Flow<Unit> = callbackFlow {
-        auth.signInWithCustomToken(token)
-            .addOnSuccessListener {
-                trySend(Unit)
-            }
-            .addOnFailureListener {
-                throw it
-            }
+    override fun signInWithCustomToken(token: String): Flow<Unit> = flow {
+        auth.signInWithCustomToken(token).await()
 
-        awaitClose()
+        emit(Unit)
     }.flowOn(dispatcher)
 
 //    override fun createUserData(): Flow<Unit> = callbackFlow {

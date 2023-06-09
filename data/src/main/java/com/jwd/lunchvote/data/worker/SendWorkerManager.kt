@@ -15,13 +15,12 @@ class SendWorkerManager @Inject constructor(
 ) {
     private val workManager = WorkManager.getInstance(context)
 
-    fun startSendWork(chatId: Long, loungeId: String, content: String){
+    fun startSendWork(loungeId: String, content: String){
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
         val inputData = Data.Builder()
-            .putLong("chatId", chatId)
             .putString("loungeId", loungeId)
             .putString("content", content)
             .build()

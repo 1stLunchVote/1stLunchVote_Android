@@ -13,11 +13,9 @@ import com.jwd.lunchvote.domain.entity.LoungeChat
 import com.jwd.lunchvote.domain.entity.Member
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -76,7 +74,7 @@ class LoungeLocalDataSourceImpl @Inject constructor(
 
     override fun insertChat(
         loungeId: String, content: String, type: Int
-    ): Flow<Long> = flow {
+    ): Flow<Unit> = flow {
         auth.currentUser?.let {user ->
             val count = chatDao.getAllChat(loungeId).first().size
 
@@ -92,14 +90,14 @@ class LoungeLocalDataSourceImpl @Inject constructor(
                     sendStatus = 1
                 )
             )
-            emit(count.toLong())
+            emit(Unit)
         }
     }.flowOn(dispatcher)
 
     override fun deleteChat(
-        chatId: Long, loungeId: String
+        loungeId: String
     ): Flow<Unit> = flow {
-        chatDao.deleteChat(chatId, loungeId)
+        chatDao.deleteSendingChat(loungeId)
         emit(Unit)
     }.flowOn(dispatcher)
 }
