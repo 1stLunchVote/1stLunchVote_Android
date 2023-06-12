@@ -12,6 +12,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -39,7 +40,7 @@ class SendChatWorker @AssistedInject constructor(
                 // 시도 횟수 초과 -> 로컬 데이터베이스에서 삭제
                 localDataSource.deleteChat(
                     workerParams.inputData.getString("loungeId") ?: ""
-                ).first()
+                ).firstOrNull()
 
                 Result.failure()
             } else {

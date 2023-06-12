@@ -17,9 +17,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.tasks.await
@@ -57,13 +54,10 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
         val roomRef = db.getReference("${Room}/${loungeId}")
 
         auth.currentUser?.let {user ->
-            val userExist = roomRef.child(Member).child(user.uid).get().await().exists()
-            if (userExist) emit(null)
-            else {
-                emit(
-                    addMember(roomRef, user.uid, user.displayName.toString(), user.photoUrl.toString(), false)
-                )
-            }
+            val userExist = roomRef.child(Member).child(user.uid).get().await().getValue<Member>()
+            addMember(roomRef, user.uid, user.displayName.toString(), user.photoUrl.toString(), false, userExist?.joinedTime)
+
+            emit(if(userExist != null) null else Unit)
         }
     }.flowOn(dispatcher)
 
@@ -137,12 +131,12 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
 
     private fun addMember(
         roomRef: DatabaseReference, uid: String, displayName: String,
-        photoUrl: String?, create: Boolean,
+        photoUrl: String?, isOwner: Boolean, joinedTime: String? = null
     ) {
         val currentTime = LocalDateTime.now().toString()
 
         roomRef.child(Member).child(uid).setValue(
-            Member(uid, displayName, photoUrl, false, create, currentTime)
+            Member(uid, displayName, photoUrl, false, isOwner, joinedTime ?: currentTime)
         )
 //        val chatId = roomRef.child(Chat).get().await().childrenCount
 //        roomRef.child(Chat).child(chatId.toString()).setValue(

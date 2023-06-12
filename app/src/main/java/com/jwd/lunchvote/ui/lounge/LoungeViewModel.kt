@@ -24,6 +24,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -116,7 +117,7 @@ class LoungeViewModel @Inject constructor(
         return when(reduce){
             is LoungeReduce.SetLoungeId -> state.copy(loungeId = reduce.loungeId, isOwner = reduce.isOwner)
             is LoungeReduce.SetMemberList -> state.copy(memberList = reduce.memberList)
-            is LoungeReduce.SetChatList -> state.copy(chatList = reduce.chatList)
+            is LoungeReduce.SetChatList -> state.copy(chatList = reduce.chatList.reversed())
             is LoungeReduce.SetCurrentChat -> state.copy(currentChat = reduce.chat)
         }
     }

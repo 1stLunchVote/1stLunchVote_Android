@@ -19,6 +19,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import timber.log.Timber
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 class LoungeRepositoryImpl @Inject constructor(
@@ -54,6 +56,7 @@ class LoungeRepositoryImpl @Inject constructor(
     }
 
     override fun getChatList(loungeId: String): Flow<List<LoungeChat>> {
+        Timber.e(LocalDateTime.now().toString())
         return loungeLocalDataSource.getChatList(loungeId)
             .filter { it.isNotEmpty() }
             .map { it.map(ChatEntity::toDomain) }

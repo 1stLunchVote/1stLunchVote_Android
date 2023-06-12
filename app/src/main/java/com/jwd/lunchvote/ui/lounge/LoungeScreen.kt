@@ -52,7 +52,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
@@ -64,7 +63,6 @@ import com.jwd.lunchvote.core.ui.theme.colorOutlineVariant
 import com.jwd.lunchvote.model.ChatUIModel
 import com.jwd.lunchvote.model.MemberUIModel
 import com.jwd.lunchvote.ui.lounge.LoungeContract.*
-import com.jwd.lunchvote.util.wasLastItemVisible
 import com.jwd.lunchvote.widget.ChatBubble
 import com.jwd.lunchvote.widget.LunchVoteTopBar
 
@@ -150,20 +148,13 @@ private fun LoungeChatList(
     memberList: List<MemberUIModel> = emptyList(),
     listState: LazyListState = rememberLazyListState(),
 ) {
-    val keyboardShown by rememberUpdatedState(newValue = WindowInsets.isImeVisible)
-
     LaunchedEffect(chatList.size){
         if (chatList.isEmpty()) return@LaunchedEffect
 
         // 마지막으로 메시지 온 것이 내 것일 때(내가 직전에 보냈을 때 포함) 스크롤
-        if (chatList.last().isMine || listState.wasLastItemVisible){
-            listState.scrollToItem(chatList.size - 1)
+        if (chatList.first().isMine){
+            listState.scrollToItem(0)
         }
-    }
-
-    LaunchedEffect(chatList.isNotEmpty(), keyboardShown){
-        // 최초 리스트 로드될 때 && 키보드 보여질 때
-        if (chatList.isNotEmpty() || keyboardShown) listState.scrollToItem(chatList.size - 1)
     }
 
     LazyColumn(
@@ -171,7 +162,10 @@ private fun LoungeChatList(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+        reverseLayout = true
     ) {
+        item {Spacer(modifier = Modifier.height(0.dp)) }
+
         items(chatList) { chat ->
             // 채팅방 생성, 참가 메시지
             if (chat.messageType != 0) {
@@ -200,7 +194,6 @@ private fun LoungeChatList(
             }
         }
 
-        item {Spacer(modifier = Modifier.height(0.dp)) }
     }
 }
 
