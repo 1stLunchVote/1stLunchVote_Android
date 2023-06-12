@@ -68,7 +68,6 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
             override fun onDataChange(snapshot: DataSnapshot) {
                 try {
                     val res = snapshot.getValue<HashMap<String, Member>>()
-                    Timber.d("채팅 리스트 조회 : $res")
                     res?.let { trySend(res.values.toList().sortedBy { it.joinedTime }) }
                 } catch (e: Exception){
                     Timber.e("error: ${e.message}")
@@ -138,13 +137,6 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
         roomRef.child(Member).child(uid).setValue(
             Member(uid, displayName, photoUrl, false, isOwner, joinedTime ?: currentTime)
         )
-//        val chatId = roomRef.child(Chat).get().await().childrenCount
-//        roomRef.child(Chat).child(chatId.toString()).setValue(
-//            if (create)
-//                LoungeChat(chatId, uid, photoUrl, Chat_Create, 1, currentTime)
-//            else
-//                LoungeChat(chatId, uid, photoUrl, "$displayName $Chat_Join", 1, currentTime)
-//        )
     }
 
     companion object{

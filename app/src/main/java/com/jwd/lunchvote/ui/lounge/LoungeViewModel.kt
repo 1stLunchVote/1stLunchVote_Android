@@ -96,7 +96,7 @@ class LoungeViewModel @Inject constructor(
         getMemberListUseCase(loungeId)
             .onEach {
                 updateState(LoungeReduce.SetMemberList(it.map { m ->
-                    MemberUIModel(m.uid.orEmpty(), m.profileImage, m.ready, m.owner) }
+                    MemberUIModel(m.uid.orEmpty(), m.nickname.orEmpty(), m.profileImage, m.ready, m.owner, m.uid == auth.currentUser?.uid) }
                 ))
             }
             .launchIn(viewModelScope)

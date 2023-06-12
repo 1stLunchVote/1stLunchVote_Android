@@ -68,6 +68,7 @@ import com.jwd.lunchvote.widget.LunchVoteTopBar
 
 @Composable
 fun LoungeRoute(
+    navigateToMember: (MemberUIModel) -> Unit,
     viewModel: LoungeViewModel = hiltViewModel(),
     popBackStack: () -> Unit
 ){
@@ -80,7 +81,8 @@ fun LoungeRoute(
         snackBarHostState = snackBarHostState,
         popBackStack = popBackStack,
         onEditChat = { viewModel.sendEvent(LoungeEvent.OnEditChat(it)) },
-        onSendChat = { viewModel.sendEvent(LoungeEvent.OnSendChat) }
+        onSendChat = { viewModel.sendEvent(LoungeEvent.OnSendChat) },
+        navigateToMember = navigateToMember
     )
 }
 
@@ -89,6 +91,7 @@ fun LoungeRoute(
 private fun LoungeScreen(
     loungeState: LoungeState,
     snackBarHostState: SnackbarHostState,
+    navigateToMember: (MemberUIModel) -> Unit = {},
     popBackStack: () -> Unit = {},
     onEditChat: (String) -> Unit = {},
     onSendChat: () -> Unit = {}
@@ -119,7 +122,8 @@ private fun LoungeScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding),
-                loungeState = loungeState
+                loungeState = loungeState,
+                navigateToMember = navigateToMember
             )
         }
     }
@@ -128,12 +132,13 @@ private fun LoungeScreen(
 @Composable
 private fun LoungeContent(
     modifier: Modifier,
-    loungeState: LoungeState
+    loungeState: LoungeState,
+    navigateToMember: (MemberUIModel) -> Unit = {},
 ){
     Column(modifier = modifier) {
         Spacer(modifier = Modifier.height(16.dp))
 
-        LoungeMemberList(memberList = loungeState.memberList)
+        LoungeMemberList(memberList = loungeState.memberList, navigateToMember = navigateToMember)
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -141,7 +146,6 @@ private fun LoungeContent(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun LoungeChatList(
     chatList: List<ChatUIModel> = emptyList(),
@@ -209,7 +213,8 @@ private fun LoungeChatListPreview(){
 
 @Composable
 private fun LoungeMemberList(
-    memberList: List<MemberUIModel> = emptyList()
+    memberList: List<MemberUIModel> = emptyList(),
+    navigateToMember: (MemberUIModel) -> Unit = {}
 ){
     val memberLimit = 6
     // 멤버 최대 6명
@@ -231,7 +236,10 @@ private fun LoungeMemberList(
                 AsyncImage(
                     model = item.profileImage,
                     contentDescription = null,
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.clickable(enabled = !item.isMine){
+                        navigateToMember(item)
+                    },
                 )
             }
         }
@@ -384,7 +392,7 @@ private fun LoungeBottomBar(
 private fun LoungeMemberListPreview(){
     LunchVoteTheme {
         LoungeMemberList(memberList = listOf(
-            MemberUIModel("test", "http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg", false)
+            MemberUIModel("test", "name", "http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg", false)
         ))
     }
 }
@@ -396,7 +404,7 @@ private fun LoungeScreenPreview(){
     LunchVoteTheme {
         LoungeScreen(
             loungeState = LoungeState(loungeId = "1234", chatList = chatList, memberList = listOf(
-                MemberUIModel("test", "http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg", false),
+                MemberUIModel("test", "nick","http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg", false),
             )),
             snackBarHostState = remember { SnackbarHostState() },
         )

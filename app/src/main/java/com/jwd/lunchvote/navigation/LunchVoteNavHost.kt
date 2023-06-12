@@ -11,6 +11,7 @@ import com.jwd.lunchvote.ui.home.HomeRoute
 import com.jwd.lunchvote.ui.login.LoginRoute
 import com.jwd.lunchvote.ui.login.register.RegisterEmailRoute
 import com.jwd.lunchvote.ui.lounge.LoungeRoute
+import com.jwd.lunchvote.ui.lounge.member.LoungeMemberRoute
 
 @Composable
 fun LunchVoteNavHost(
@@ -43,6 +44,35 @@ fun LunchVoteNavHost(
                 )
             ) {
                 LoungeRoute(
+                    navigateToMember = {
+                        navHostController.navigate(LunchVoteNavRoute.LoungeMember.name
+                                + "?id=${it.uid},nickname=${it.nickname},profileUrl=${it.profileImage},isOwner=${it.isOwner}")
+                    },
+                    popBackStack = { navHostController.popBackStack() }
+                )
+            }
+
+            composable(LunchVoteNavRoute.LoungeMember.name + "?id={id},nickname={nickname},profileUrl={profileUrl},isOwner={isOwner}",
+                arguments = listOf(
+                    navArgument("id") {
+                        type = NavType.StringType
+                        nullable = false
+                    },
+                    navArgument("nickname") {
+                        type = NavType.StringType
+                        nullable = false
+                    },
+                    navArgument("profileUrl") {
+                        type = NavType.StringType
+                        nullable = true
+                    },
+                    navArgument("isOwner") {
+                        type = NavType.BoolType
+                        nullable = false
+                    },
+                )
+            ){
+                LoungeMemberRoute(
                     popBackStack = { navHostController.popBackStack() }
                 )
             }
@@ -82,6 +112,7 @@ enum class LunchVoteNavRoute {
     Login,
     Home,
     Lounge,
+    LoungeMember,
     RegisterEmail,
     Profile,
 }

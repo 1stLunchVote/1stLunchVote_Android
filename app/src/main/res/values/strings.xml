@@ -18,4 +18,9 @@
     <string name="lounge_create_loading">방을 생성중입니다\n잠시만 기다려주세요</string>
     <string name="lounge_ready_btn">준비</string>
     <string name="lounge_start_btn">시작</string>
+
+    <!-- LoungeMemberScreen -->
+    <string name="lounge_member_topbar_title">참여자 정보방</string>
+    <string name="lounge_member_exile">추방하기</string>
+    <string name="lounge_member_anonymous_nickname">익명 참가자</string>
 </resources>
