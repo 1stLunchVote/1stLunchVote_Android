@@ -14,6 +14,7 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -58,7 +59,9 @@ class LoungeRepositoryImpl @Inject constructor(
     override fun getChatList(loungeId: String): Flow<List<LoungeChat>> {
         Timber.e(LocalDateTime.now().toString())
         return loungeLocalDataSource.getChatList(loungeId)
-            .filter { it.isNotEmpty() }
+            .filter {
+                it.isNotEmpty()
+            }
             .map { it.map(ChatEntity::toDomain) }
             .onStart { syncChatList(loungeId) }
     }
@@ -66,6 +69,14 @@ class LoungeRepositoryImpl @Inject constructor(
     override fun sendChat(loungeId: String, content: String): Flow<Unit> {
         sendWorkerManager.startSendWork(loungeId, content)
         return loungeLocalDataSource.insertChat(loungeId, content, 0)
+    }
+
+    @OptIn(FlowPreview::class)
+    override fun updateReady(uid: String, loungeId: String): Flow<Unit> {
+        return loungeLocalDataSource.updateMemberReady(uid, loungeId)
+            .flatMapMerge {
+                loungeRemoteDataSource.updateReady(uid, loungeId)
+            }
     }
 
     private suspend fun syncMemberList(loungeId: String){

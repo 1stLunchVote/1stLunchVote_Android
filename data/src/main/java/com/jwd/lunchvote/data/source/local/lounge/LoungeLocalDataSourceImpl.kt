@@ -97,7 +97,12 @@ class LoungeLocalDataSourceImpl @Inject constructor(
     override fun deleteChat(
         loungeId: String
     ): Flow<Unit> = flow {
-        chatDao.deleteSendingChat(loungeId)
-        emit(Unit)
+        emit(chatDao.deleteSendingChat(loungeId))
+    }.flowOn(dispatcher)
+
+    override fun updateMemberReady(
+        uid: String, loungeId: String
+    ): Flow<Unit> = flow {
+        emit(memberDao.updateMemberReady(uid, loungeId))
     }.flowOn(dispatcher)
 }

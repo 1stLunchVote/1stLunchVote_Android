@@ -121,3 +121,14 @@ private fun LoungeMemberScreenPreview(){
         )
     }
 }
+
+
+@Preview(showBackground = true)
+@Composable
+private fun LoungeMemberNotOwnerScreenPreview(){
+    LunchVoteTheme {
+        LoungeMemberScreen(
+            memberState = LoungeMemberState("1234", "이동건", null, false)
+        )
+    }
+}

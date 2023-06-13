@@ -54,6 +54,7 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
         val roomRef = db.getReference("${Room}/${loungeId}")
 
         auth.currentUser?.let {user ->
+            // Todo : Firebase 에러 발생 시 CacellationException 발생 -> 에러 핸들링 불가
             val userExist = roomRef.child(Member).child(user.uid).get().await().getValue<Member>()
             addMember(roomRef, user.uid, user.displayName.toString(), user.photoUrl.toString(), false, userExist?.joinedTime)
 
@@ -128,12 +129,23 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
 
     }.flowOn(dispatcher)
 
+    override fun updateReady(
+        uid: String, loungeId: String
+    ): Flow<Unit> = flow {
+        val readyRef = db.getReference("${Room}/${loungeId}").child(Member).child(uid).child(Ready)
+        val cur = readyRef.get().await().getValue<Boolean>()
+
+        readyRef.setValue(cur?.not())
+        emit(Unit)
+    }.flowOn(dispatcher)
+
     private fun addMember(
         roomRef: DatabaseReference, uid: String, displayName: String,
         photoUrl: String?, isOwner: Boolean, joinedTime: String? = null
     ) {
         val currentTime = LocalDateTime.now().toString()
 
+        // 나갔다 들어오면 무조건 준비 상태 false
         roomRef.child(Member).child(uid).setValue(
             Member(uid, displayName, photoUrl, false, isOwner, joinedTime ?: currentTime)
         )
@@ -143,6 +155,7 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
         const val Room = "rooms"
         const val Room_Length = 10
         const val Member = "members"
+        const val Ready = "ready"
         const val Chat = "chats"
         const val Chat_Create = "투표 방이 생성되었습니다."
         const val Chat_Join = "님이 입장했습니다."

@@ -65,6 +65,7 @@ import com.jwd.lunchvote.model.MemberUIModel
 import com.jwd.lunchvote.ui.lounge.LoungeContract.*
 import com.jwd.lunchvote.widget.ChatBubble
 import com.jwd.lunchvote.widget.LunchVoteTopBar
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun LoungeRoute(
@@ -76,12 +77,23 @@ fun LoungeRoute(
 
     val snackBarHostState = remember { SnackbarHostState() }
 
+    LaunchedEffect(viewModel.sideEffect){
+        viewModel.sideEffect.collectLatest {
+            when(it){
+                is LoungeSideEffect.ShowSnackBar -> {
+                    snackBarHostState.showSnackbar(it.message)
+                }
+            }
+        }
+    }
+
     LoungeScreen(
         loungeState = loungeState,
         snackBarHostState = snackBarHostState,
         popBackStack = popBackStack,
         onEditChat = { viewModel.sendEvent(LoungeEvent.OnEditChat(it)) },
         onSendChat = { viewModel.sendEvent(LoungeEvent.OnSendChat) },
+        onClickReady = { viewModel.sendEvent(LoungeEvent.OnReady) },
         navigateToMember = navigateToMember
     )
 }
@@ -94,7 +106,8 @@ private fun LoungeScreen(
     navigateToMember: (MemberUIModel) -> Unit = {},
     popBackStack: () -> Unit = {},
     onEditChat: (String) -> Unit = {},
-    onSendChat: () -> Unit = {}
+    onSendChat: () -> Unit = {},
+    onClickReady: () -> Unit = {},
 ){
     Scaffold(
         topBar = {
@@ -106,7 +119,8 @@ private fun LoungeScreen(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         bottomBar = {
             if (loungeState.memberList.isNotEmpty()){
-                LoungeBottomBar(loungeState = loungeState, onEditChat = onEditChat, onSendChat = onSendChat)
+                LoungeBottomBar(loungeState = loungeState, onEditChat = onEditChat,
+                    onSendChat = onSendChat, onClickReady = onClickReady)
             }
         }
     ) { padding ->
@@ -165,7 +179,9 @@ private fun LoungeChatList(
         state = listState,
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp),
         reverseLayout = true
     ) {
         item {Spacer(modifier = Modifier.height(0.dp)) }
@@ -313,7 +329,8 @@ private fun LoungeLoadingScreen(
 private fun LoungeBottomBar(
     loungeState: LoungeState,
     onEditChat: (String) -> Unit = {},
-    onSendChat: () -> Unit
+    onSendChat: () -> Unit = {},
+    onClickReady: () -> Unit = {},
 ){
     val isTyping by rememberUpdatedState(newValue = WindowInsets.isImeVisible && loungeState.currentChat.isNotBlank())
 
@@ -332,9 +349,9 @@ private fun LoungeBottomBar(
         ) {
             Surface(
                 shape = RoundedCornerShape(100.dp),
-                contentColor = if (loungeState.allReady) MaterialTheme.colorScheme.onPrimaryContainer
+                contentColor = if (loungeState.isReady || loungeState.allReady) MaterialTheme.colorScheme.onPrimaryContainer
                     else MaterialTheme.colorScheme.onBackground,
-                color = if (loungeState.allReady) MaterialTheme.colorScheme.primaryContainer
+                color = if (loungeState.isReady || loungeState.allReady) MaterialTheme.colorScheme.primaryContainer
                     else MaterialTheme.colorScheme.background,
                 border = BorderStroke(width = 2.dp, color = Color.Black),
             ) {
@@ -342,7 +359,9 @@ private fun LoungeBottomBar(
                     text = stringResource(id = if (loungeState.isOwner) R.string.lounge_start_btn else R.string.lounge_ready_btn),
                     style = buttonTextStyle,
                     modifier = Modifier
-                        .clickable { }
+                        .clickable {
+                            onClickReady()
+                        }
                         .padding(horizontal = 16.dp, vertical = 12.dp)
                 )
             }
@@ -404,7 +423,7 @@ private fun LoungeScreenPreview(){
     LunchVoteTheme {
         LoungeScreen(
             loungeState = LoungeState(loungeId = "1234", chatList = chatList, memberList = listOf(
-                MemberUIModel("test", "nick","http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg", false),
+                MemberUIModel("test", "nick","http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg", true),
             )),
             snackBarHostState = remember { SnackbarHostState() },
         )

@@ -26,16 +26,17 @@ class LoungeContract {
     sealed interface LoungeEvent: ViewModelContract.Event {
         data class OnEditChat(val chat: String) : LoungeEvent
         object OnSendChat : LoungeEvent
+        object OnReady : LoungeEvent
     }
 
     sealed interface LoungeReduce: ViewModelContract.Reduce {
         data class SetLoungeId(val loungeId: String?, val isOwner: Boolean) : LoungeReduce
         data class SetMemberList(val memberList: List<MemberUIModel>) : LoungeReduce
-        // Todo : 채팅 데이터 어떻게 업데이트 할지 논의 필요
         data class SetChatList(val chatList: List<ChatUIModel>) : LoungeReduce
         data class SetCurrentChat(val chat: String) : LoungeReduce
     }
 
     sealed interface LoungeSideEffect: ViewModelContract.SideEffect {
+        data class ShowSnackBar(val message: String) : LoungeSideEffect
     }
 }
