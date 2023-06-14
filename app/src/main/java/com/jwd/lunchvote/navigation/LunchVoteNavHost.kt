@@ -12,6 +12,8 @@ import com.jwd.lunchvote.ui.login.LoginRoute
 import com.jwd.lunchvote.ui.login.register.RegisterEmailRoute
 import com.jwd.lunchvote.ui.lounge.LoungeRoute
 import com.jwd.lunchvote.ui.lounge.member.LoungeMemberRoute
+import kotlinx.coroutines.flow.filter
+import timber.log.Timber
 
 @Composable
 fun LunchVoteNavHost(
@@ -31,7 +33,8 @@ fun LunchVoteNavHost(
                     navigateToLounge = { id ->
                         val query = if (id != null) "?id=$id" else ""
                         navHostController.navigate(LunchVoteNavRoute.Lounge.name + query)
-                    }
+                    },
+                    messageFlow = it.savedStateHandle.getStateFlow(SNACK_BAR_KEY, "")
                 )
             }
 
@@ -48,7 +51,10 @@ fun LunchVoteNavHost(
                         navHostController.navigate(LunchVoteNavRoute.LoungeMember.name
                                 + "?id=${it.uid},nickname=${it.nickname},profileUrl=${it.profileImage},isOwner=${it.isOwner}")
                     },
-                    popBackStack = { navHostController.popBackStack() }
+                    popBackStack = {
+                        navHostController.previousBackStackEntry?.savedStateHandle?.set(SNACK_BAR_KEY, it)
+                        navHostController.popBackStack()
+                    }
                 )
             }
 
@@ -104,6 +110,8 @@ fun LunchVoteNavHost(
 
     }
 }
+
+private const val SNACK_BAR_KEY = "message"
 
 enum class LunchVoteNavRoute {
     LoginNavigation,

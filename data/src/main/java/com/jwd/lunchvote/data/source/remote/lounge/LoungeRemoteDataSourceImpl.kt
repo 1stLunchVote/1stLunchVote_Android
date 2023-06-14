@@ -113,7 +113,12 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
     override fun sendChat(
         loungeId: String, content: String?, messageType: Int
     ): Flow<Unit> = flow {
-        val chatContent = content ?: if (messageType == 1) Chat_Create else "${auth.currentUser?.displayName} $Chat_Join"
+        val name = auth.currentUser?.displayName?.ifBlank { "익명" }
+        val chatContent = content ?: when (messageType) {
+            1 -> Chat_Create
+            2 -> "$name $Chat_Join"
+            else -> "$name $Chat_Exit"
+        }
 
         val data = JSONObject().apply {
             put("loungeId", loungeId)
@@ -133,9 +138,17 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
         uid: String, loungeId: String
     ): Flow<Unit> = flow {
         val readyRef = db.getReference("${Room}/${loungeId}").child(Member).child(uid).child(Ready)
+        // 네트워크 연결이 안되어서 오류가 난 경우, 네트워크 연결되면 바로 자동 요청
         val cur = readyRef.get().await().getValue<Boolean>()
-
         readyRef.setValue(cur?.not())
+        emit(Unit)
+    }.flowOn(dispatcher)
+
+    override fun exitLounge(
+        uid: String, loungeId: String
+    ): Flow<Unit> = flow {
+        val memberRef = db.getReference("${Room}/${loungeId}").child(Member).child(uid)
+        memberRef.setValue(null).await()
         emit(Unit)
     }.flowOn(dispatcher)
 
@@ -159,5 +172,6 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
         const val Chat = "chats"
         const val Chat_Create = "투표 방이 생성되었습니다."
         const val Chat_Join = "님이 입장했습니다."
+        const val Chat_Exit = "님이 퇴장했습니다."
     }
 }

@@ -1,5 +1,6 @@
 package com.jwd.lunchvote.widget
 
+import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -18,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -29,7 +32,8 @@ fun ChatBubble(
     isMine: Boolean = false,
     profileImage: String?,
     isReady: Boolean = false,
-    sendStatus: Int = 0
+    sendStatus: Int = 0,
+    configuration : Configuration = LocalConfiguration.current
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -60,7 +64,8 @@ fun ChatBubble(
             Surface(
                 shape = RoundedCornerShape(0.dp, 20.dp, 20.dp, 20.dp),
                 color = MaterialTheme.colorScheme.background,
-                border = BorderStroke(2.dp, Color.Black)
+                border = BorderStroke(2.dp, Color.Black),
+                modifier = Modifier.widthIn(max = configuration.screenWidthDp.dp - 100.dp)
             ) {
                 Text(
                     text = message,

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.usecase.lounge.CreateLoungeUseCase
+import com.jwd.lunchvote.domain.usecase.lounge.ExitLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.GetChatListUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.GetMemberListUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.JoinLoungeUseCase
@@ -15,7 +16,9 @@ import com.jwd.lunchvote.model.MemberUIModel
 import com.jwd.lunchvote.model.mapper.LoungeMapper
 import com.jwd.lunchvote.ui.lounge.LoungeContract.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -29,6 +32,7 @@ class LoungeViewModel @Inject constructor(
     private val getChatListUseCase: GetChatListUseCase,
     private val updateReadyUseCase: UpdateReadyUseCase,
     private val sendChatUseCase: SendChatUseCase,
+    private val exitLoungeUseCase: ExitLoungeUseCase,
     private val auth: FirebaseAuth,
     savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<LoungeState, LoungeEvent, LoungeReduce, LoungeSideEffect>(savedStateHandle) {
@@ -130,6 +134,25 @@ class LoungeViewModel @Inject constructor(
                 }
                 updateReady()
             }
+            is LoungeEvent.OnTryExit -> {
+                updateState(LoungeReduce.SetExitDialogShown(true))
+            }
+            is LoungeEvent.OnClickExit -> {
+                if (event.exit){
+                    viewModelScope.launch {
+                        exitLoungeUseCase(
+                            auth.currentUser?.uid ?: return@launch,
+                            currentState.loungeId ?: return@launch
+                        ).catch {
+
+                        }.collect()
+                        updateState(LoungeReduce.SetExitDialogShown(false))
+                        sendSideEffect(LoungeSideEffect.PopBackStack("투표 대기방에서 나왔습니다."))
+                    }
+                } else {
+                    updateState(LoungeReduce.SetExitDialogShown(false))
+                }
+            }
         }
     }
 
@@ -144,6 +167,7 @@ class LoungeViewModel @Inject constructor(
             }
             is LoungeReduce.SetChatList -> state.copy(chatList = reduce.chatList.reversed())
             is LoungeReduce.SetCurrentChat -> state.copy(currentChat = reduce.chat)
+            is LoungeReduce.SetExitDialogShown -> state.copy(exitDialogShown = reduce.shown)
         }
     }
 }
