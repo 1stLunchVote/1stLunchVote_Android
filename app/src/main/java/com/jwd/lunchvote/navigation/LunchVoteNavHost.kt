@@ -24,7 +24,18 @@ fun LunchVoteNavHost(
         ) {
             composable(LunchVoteNavRoute.Home.name) {
                 HomeRoute(
-
+                    navigateToLounge = {
+                        navHostController.navigate(LunchVoteNavRoute.Lounge.name)
+                    },
+                    navigateToTemplate = {
+                        navHostController.navigate(LunchVoteNavRoute.Template.name)
+                    },
+                    navigateToSetting = {
+                        navHostController.navigate(LunchVoteNavRoute.Setting.name)
+                    },
+                    navigateToTips = {
+                        navHostController.navigate(LunchVoteNavRoute.Tips.name)
+                    }
                 )
             }
         }
@@ -62,4 +73,9 @@ enum class LunchVoteNavRoute {
     Home,
     RegisterEmail,
     Profile,
+
+    Lounge,
+    Template,
+    Setting,
+    Tips
 }

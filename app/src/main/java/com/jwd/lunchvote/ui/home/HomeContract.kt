@@ -8,14 +8,21 @@ class HomeContract {
     @Parcelize
     data class HomeState(
         val isLoading: Boolean = false,
-    ): ViewModelContract.State, Parcelable
-
-    sealed class HomeEvent: ViewModelContract.Event {
+    ): ViewModelContract.State, Parcelable {
+        override fun toParcelable(): Parcelable = this
     }
 
-    sealed class HomeReduce : ViewModelContract.Reduce {
+    sealed interface HomeEvent: ViewModelContract.Event {
     }
 
-    sealed class HomeSideEffect: ViewModelContract.SideEffect {
+    sealed interface HomeReduce : ViewModelContract.Reduce {
+    }
+
+    sealed interface HomeSideEffect: ViewModelContract.SideEffect {
+        object NavigateToLounge : HomeSideEffect
+        object NavigateToTemplate : HomeSideEffect
+        object NavigateToSetting : HomeSideEffect
+        object NavigateToTips : HomeSideEffect
+        class ShowSnackBar(val message: String) : HomeSideEffect
     }
 }
