@@ -37,11 +37,14 @@ object Versions{
     const val Firebase = "32.0.0"
     const val Gms = "4.3.15"
     const val GmsAuth = "20.4.0"
-    const val kakao = "2.13.0"
+    const val Kakao = "2.13.0"
 
     // Retrofit
     const val Retrofit = "2.9.0"
     const val OkHttp = "4.9.1"
+
+    // Room
+    const val Room = "2.5.1"
 
     // Compose
     const val Compose = "2023.01.00"
@@ -55,6 +58,11 @@ object Versions{
     const val JUnit = "4.13.2"
     const val Ext = "1.1.5"
     const val Espresso = "3.5.1"
+    const val Mockk ="1.13.5"
+    const val TestCore = "1.5.0"
+    const val Slf4j = "2.0.7"
+
+    const val Coil = "2.4.0"
 }
 
 object Libraries{
@@ -81,7 +89,9 @@ object Libraries{
         // Hilt
         const val Hilt = "com.google.dagger:hilt-android:${Versions.Hilt}"
         const val HiltCompiler = "com.google.dagger:hilt-android-compiler:${Versions.Hilt}"
+        const val AndroidHiltCompiler = "androidx.hilt:hilt-compiler:${Versions.AndroidHilt}"
         const val AndroidHilt = "androidx.hilt:hilt-common:${Versions.AndroidHilt}"
+        const val HiltWork = "androidx.hilt:hilt-work:${Versions.AndroidHilt}"
     }
 
     object Retrofit{
@@ -93,6 +103,11 @@ object Libraries{
         const val JUnit = "junit:junit:${Versions.JUnit}"
         const val Ext = "androidx.test.ext:junit:${Versions.Ext}"
         const val Espresso = "androidx.test.espresso:espresso-core:${Versions.Espresso}"
+        const val Mockk = "io.mockk:mockk:${Versions.Mockk}"
+        const val AndroidMockk = "io.mockk:mockk-android:${Versions.Mockk}"
+        const val TestCore = "androidx.test:core-ktx:${Versions.TestCore}"
+        const val CoroutineTest = "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.Coroutine}"
+        const val Slf4j = "org.slf4j:slf4j-simple:${Versions.Slf4j}"
     }
 
     object JavaX{
@@ -120,8 +135,16 @@ object Libraries{
         const val ConstraintLayout = "androidx.constraintlayout:constraintlayout-compose:${Versions.ComposeConstraint}"
     }
 
-    const val Kakao = "com.kakao.sdk:v2-all-rx:${Versions.kakao}"
+    object Room{
+        const val Room = "androidx.room:room-ktx:${Versions.Room}"
+        const val RoomCompiler = "androidx.room:room-compiler:${Versions.Room}"
+        const val RoomRuntime = "androidx.room:room-runtime:${Versions.Room}"
+        const val RoomPaging = "androidx.room:room-paging:${Versions.Room}"
+    }
+
+    const val Kakao = "com.kakao.sdk:v2-all-rx:${Versions.Kakao}"
     const val Timber = "com.jakewharton.timber:timber:${Versions.Timber}"
+    const val Coil = "io.coil-kt:coil-compose:${Versions.Coil}"
 }
 
 fun DependencyHandlerScope.implementationAndroidX(){
@@ -150,10 +173,12 @@ fun DependencyHandlerScope.implementationCoroutine(){
 fun DependencyHandlerScope.implementationHilt(){
     implementations(
         Libraries.Hilt.Hilt,
-        Libraries.Hilt.AndroidHilt
+        Libraries.Hilt.AndroidHilt,
+        Libraries.Hilt.HiltWork
     )
     kapts(
-        Libraries.Hilt.HiltCompiler
+        Libraries.Hilt.HiltCompiler,
+        Libraries.Hilt.AndroidHiltCompiler
     )
 }
 
@@ -167,6 +192,17 @@ fun DependencyHandlerScope.implementationRetrofit(){
     implementations(
         Libraries.Retrofit.Retrofit,
         Libraries.Retrofit.OkHttp
+    )
+}
+
+fun DependencyHandlerScope.implementationRoom(){
+    implementations(
+        Libraries.Room.Room,
+        Libraries.Room.RoomRuntime,
+        Libraries.Room.RoomPaging
+    )
+    kapts(
+        Libraries.Room.RoomCompiler
     )
 }
 
@@ -189,6 +225,20 @@ fun DependencyHandlerScope.implementationTest(){
     add("testImplementation", Libraries.Test.JUnit)
     add("androidTestImplementation", Libraries.Test.Ext)
     add("androidTestImplementation", Libraries.Test.Espresso)
+    add("testImplementation", Libraries.Test.TestCore)
+    add("testImplementation", Libraries.Test.CoroutineTest)
+    add("testImplementation", Libraries.Test.Mockk)
+    add("androidTestImplementation", Libraries.Test.AndroidMockk)
+    add("testImplementation", Libraries.Test.Slf4j)
+}
+
+fun DependencyHandlerScope.apiTest(){
+    add("api", Libraries.Test.JUnit)
+    add("api", Libraries.Test.Ext)
+    add("api", Libraries.Test.Espresso)
+    add("api", Libraries.Test.TestCore)
+    add("api", Libraries.Test.CoroutineTest)
+    add("api", Libraries.Test.Mockk)
 }
 
 fun DependencyHandlerScope.implementations(vararg notations: Any) {

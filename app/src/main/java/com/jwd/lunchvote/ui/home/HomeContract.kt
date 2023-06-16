@@ -10,12 +10,16 @@ class HomeContract {
         val isLoading: Boolean = false,
     ): ViewModelContract.State, Parcelable
 
-    sealed class HomeEvent: ViewModelContract.Event {
+    sealed interface HomeEvent: ViewModelContract.Event {
+        object OnCreateLounge: HomeEvent
+        object OnJoinLounge: HomeEvent
     }
 
-    sealed class HomeReduce : ViewModelContract.Reduce {
+    sealed interface HomeReduce : ViewModelContract.Reduce {
     }
 
-    sealed class HomeSideEffect: ViewModelContract.SideEffect {
+    sealed interface HomeSideEffect: ViewModelContract.SideEffect {
+        data class NavigateToLounge(val loungeId: String?): HomeSideEffect
+        data class ShowSnackBar(val message: String) : HomeSideEffect
     }
 }
