@@ -1,7 +1,6 @@
 package com.jwd.lunchvote.ui.lounge
 
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -45,6 +44,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -54,7 +54,6 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -69,13 +68,17 @@ import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.core.ui.theme.buttonTextStyle
 import com.jwd.lunchvote.core.ui.theme.colorNeutral90
 import com.jwd.lunchvote.core.ui.theme.colorOutlineVariant
+import com.jwd.lunchvote.core.ui.util.circleShadow
+import com.jwd.lunchvote.core.ui.util.modifyIf
 import com.jwd.lunchvote.model.ChatUIModel
 import com.jwd.lunchvote.model.MemberUIModel
 import com.jwd.lunchvote.ui.lounge.LoungeContract.*
 import com.jwd.lunchvote.widget.ChatBubble
 import com.jwd.lunchvote.widget.LunchVoteDialog
 import com.jwd.lunchvote.widget.LunchVoteTopBar
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -125,7 +128,8 @@ fun LoungeRoute(
         onSendChat = { viewModel.sendEvent(LoungeEvent.OnSendChat) },
         onClickReady = { viewModel.sendEvent(LoungeEvent.OnReady) },
         navigateToMember = navigateToMember,
-        onClickInvite = { viewModel.sendEvent(LoungeEvent.OnClickInvite) }
+        onClickInvite = { viewModel.sendEvent(LoungeEvent.OnClickInvite) },
+        onScrolled = { viewModel.sendEvent(LoungeEvent.OnScrolled(it)) }
     )
 }
 
@@ -140,6 +144,7 @@ private fun LoungeScreen(
     onSendChat: () -> Unit = {},
     onClickReady: () -> Unit = {},
     onClickInvite: () -> Unit = {},
+    onScrolled: (Int) -> Unit = {}
 ){
     Scaffold(
         topBar = {
@@ -170,7 +175,8 @@ private fun LoungeScreen(
                     .padding(padding),
                 loungeState = loungeState,
                 navigateToMember = navigateToMember,
-                onClickInvite = onClickInvite
+                onClickInvite = onClickInvite,
+                onScrolled = onScrolled
             )
         }
     }
@@ -182,6 +188,7 @@ private fun LoungeContent(
     loungeState: LoungeState,
     navigateToMember: (MemberUIModel, String, Boolean) -> Unit = {_, _, _ -> },
     onClickInvite: () -> Unit = {},
+    onScrolled: (Int) -> Unit = {}
 ){
     Column(modifier = modifier) {
         Spacer(modifier = Modifier.height(16.dp))
@@ -194,23 +201,43 @@ private fun LoungeContent(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        LoungeChatList(chatList = loungeState.chatList, memberList = loungeState.memberList)
+        LoungeChatList(
+            loungeState = loungeState,
+            navigateToMember = {
+                navigateToMember(it, loungeState.loungeId ?: return@LoungeChatList, loungeState.isOwner)
+            },
+            onScrolled = onScrolled
+        )
     }
 }
 
+@OptIn(FlowPreview::class)
 @Composable
 private fun LoungeChatList(
-    chatList: List<ChatUIModel> = emptyList(),
-    memberList: List<MemberUIModel> = emptyList(),
+    loungeState: LoungeState,
     listState: LazyListState = rememberLazyListState(),
+    navigateToMember: (MemberUIModel) -> Unit = {},
+    onScrolled: (Int) -> Unit = {}
 ) {
-    LaunchedEffect(chatList.size){
-        if (chatList.isEmpty()) return@LaunchedEffect
+    LaunchedEffect(loungeState.chatList.size){
+        if (loungeState.chatList.isEmpty()) return@LaunchedEffect
 
         // 마지막으로 메시지 온 것이 내 것일 때(내가 직전에 보냈을 때 포함) 스크롤
-        if (chatList.first().isMine){
+        if (loungeState.chatList.first().isMine){
             listState.scrollToItem(0)
         }
+    }
+
+    LaunchedEffect(listState){
+        // 스크롤 포지션 복구
+        if (loungeState.scrollIndex > 0) {
+            listState.scrollToItem(loungeState.scrollIndex)
+        }
+
+        // 현재 스크롤 포지션 저장
+        snapshotFlow { listState.firstVisibleItemIndex }
+            .debounce(500L)
+            .collectLatest(onScrolled)
     }
 
     LazyColumn(
@@ -224,7 +251,7 @@ private fun LoungeChatList(
     ) {
         item {Spacer(modifier = Modifier.height(0.dp)) }
 
-        items(chatList) { chat ->
+        items(loungeState.chatList) { chat ->
             // 채팅방 생성, 참가 메시지
             if (chat.messageType != 0) {
                 Surface(
@@ -246,8 +273,13 @@ private fun LoungeChatList(
                     message = chat.content,
                     profileImage = chat.profileImage,
                     isMine = chat.isMine,
-                    isReady = memberList.find { it.uid == chat.sender }?.isReady ?: false,
-                    sendStatus = chat.sendStatus
+                    isReady = loungeState.memberList.find { it.uid == chat.sender }?.isReady ?: false,
+                    sendStatus = chat.sendStatus,
+                    navigateToMember = {
+                        navigateToMember(
+                            loungeState.memberList.find { it.uid == chat.sender } ?: return@ChatBubble,
+                        )
+                    }
                 )
             }
         }
@@ -255,15 +287,6 @@ private fun LoungeChatList(
     }
 }
 
-
-
-@Preview(showBackground = true)
-@Composable
-private fun LoungeChatListPreview(){
-    LunchVoteTheme {
-        LoungeChatList(chatList = chatList)
-    }
-}
 
 @Composable
 private fun LoungeMemberList(
@@ -278,15 +301,21 @@ private fun LoungeMemberList(
     // 6명인 경우 memberList 만
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier.padding(horizontal = 32.dp)
+        modifier = Modifier.padding(horizontal = 28.dp)
     ){
+        item{ Spacer(modifier = Modifier.width(4.dp)) }
+
         items(memberList){ item ->
             Surface(
                 shape = CircleShape,
-                modifier = Modifier.size(48.dp),
+                border = BorderStroke(width = 2.dp, color = if (item.isReady) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.outline),
+                modifier = Modifier
+                    .size(48.dp)
+                    .modifyIf(item.isReady) {
+                        circleShadow(blurRadius = 16.dp)
+                    },
                 color = MaterialTheme.colorScheme.background,
-                // 일단 그림자 효과 안둠
-                border = BorderStroke(width = 2.dp, color = if (item.isReady) Color.Red else MaterialTheme.colorScheme.outline)
             ) {
                 AsyncImage(
                     model = item.profileImage,
@@ -310,7 +339,9 @@ private fun LoungeMemberList(
                     Image(
                         painter = painterResource(id = R.drawable.ic_add),
                         contentDescription = "add_member",
-                        modifier = Modifier.clickable(onClick = onClickInvite).padding(8.dp)
+                        modifier = Modifier
+                            .clickable(onClick = onClickInvite)
+                            .padding(8.dp)
                     )
                 }
             }
@@ -339,6 +370,7 @@ private fun LoungeMemberList(
                 ){}
             }
         }
+        item{ Spacer(modifier = Modifier.width(4.dp)) }
     }
 }
 

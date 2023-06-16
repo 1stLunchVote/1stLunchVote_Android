@@ -29,7 +29,7 @@ class HomeViewModel @Inject constructor(
             }
             is HomeEvent.OnJoinLounge -> {
                 // Todo : Test용 방 번호임
-                joinLoungeUseCase("qLu5O6jEBD")
+                joinLoungeUseCase("KqND4zmJ59")
                     .catch {
                         if (it is NotFoundException){
                             // Todo : 다이얼로그로 띄우기
@@ -37,7 +37,7 @@ class HomeViewModel @Inject constructor(
                         }
                     }
                     .onEach {
-                        sendSideEffect(HomeSideEffect.NavigateToLounge("qLu5O6jEBD"))
+                        sendSideEffect(HomeSideEffect.NavigateToLounge("KqND4zmJ59"))
                     }
                     .launchIn(viewModelScope)
             }

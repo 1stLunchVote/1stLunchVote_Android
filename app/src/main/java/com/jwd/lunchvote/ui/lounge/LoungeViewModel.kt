@@ -164,6 +164,9 @@ class LoungeViewModel @Inject constructor(
             is LoungeEvent.OnClickInvite -> {
                 sendSideEffect(LoungeSideEffect.CopyToClipboard(currentState.loungeId ?: return))
             }
+            is LoungeEvent.OnScrolled -> {
+                updateState(LoungeReduce.SetScrollIndex(event.index))
+            }
         }
     }
 
@@ -179,6 +182,7 @@ class LoungeViewModel @Inject constructor(
             is LoungeReduce.SetChatList -> state.copy(chatList = reduce.chatList.reversed())
             is LoungeReduce.SetCurrentChat -> state.copy(currentChat = reduce.chat)
             is LoungeReduce.SetExitDialogShown -> state.copy(exitDialogShown = reduce.shown)
+            is LoungeReduce.SetScrollIndex -> state.copy(scrollIndex = reduce.index)
         }
     }
 }

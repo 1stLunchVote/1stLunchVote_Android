@@ -16,6 +16,7 @@ class LoungeContract {
         val currentChat: String = "",
         val isReady: Boolean = false,
         val exitDialogShown: Boolean = false,
+        val scrollIndex: Int = 0
     ): ViewModelContract.State, Parcelable {
         override fun toParcelable(): Parcelable = this
 
@@ -31,6 +32,7 @@ class LoungeContract {
         object OnTryExit : LoungeEvent
         data class OnClickExit(val exit: Boolean) : LoungeEvent
         object OnClickInvite : LoungeEvent
+        data class OnScrolled(val index: Int) : LoungeEvent
     }
 
     sealed interface LoungeReduce: ViewModelContract.Reduce {
@@ -39,6 +41,7 @@ class LoungeContract {
         data class SetChatList(val chatList: List<ChatUIModel>) : LoungeReduce
         data class SetCurrentChat(val chat: String) : LoungeReduce
         data class SetExitDialogShown(val shown: Boolean) : LoungeReduce
+        data class SetScrollIndex(val index: Int) : LoungeReduce
     }
 
     sealed interface LoungeSideEffect: ViewModelContract.SideEffect {

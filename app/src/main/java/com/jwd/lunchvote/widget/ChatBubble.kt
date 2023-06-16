@@ -2,6 +2,7 @@ package com.jwd.lunchvote.widget
 
 import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -25,6 +26,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
+import com.jwd.lunchvote.core.ui.util.circleShadow
+import com.jwd.lunchvote.core.ui.util.modifyIf
 
 @Composable
 fun ChatBubble(
@@ -33,6 +36,7 @@ fun ChatBubble(
     profileImage: String?,
     isReady: Boolean = false,
     sendStatus: Int = 0,
+    navigateToMember : () -> Unit = {},
     configuration : Configuration = LocalConfiguration.current
 ) {
     Row(
@@ -80,14 +84,18 @@ fun ChatBubble(
 
             Surface(
                 shape = CircleShape,
-                modifier = Modifier.size(48.dp),
+                modifier = Modifier.size(48.dp).modifyIf(isReady) {
+                    circleShadow(blurRadius = 16.dp)
+                },
                 color = MaterialTheme.colorScheme.background,
-                border = BorderStroke(width = 2.dp, color = if (isReady) Color.Red else MaterialTheme.colorScheme.outline)
+                border = BorderStroke(width = 2.dp, color = if (isReady) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.outline)
             ) {
                 AsyncImage(
                     model = profileImage,
                     contentDescription = "chat_profile",
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.clickable(onClick = navigateToMember)
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
