@@ -161,6 +161,9 @@ class LoungeViewModel @Inject constructor(
                     updateState(LoungeReduce.SetExitDialogShown(false))
                 }
             }
+            is LoungeEvent.OnClickInvite -> {
+                sendSideEffect(LoungeSideEffect.CopyToClipboard(currentState.loungeId ?: return))
+            }
         }
     }
 

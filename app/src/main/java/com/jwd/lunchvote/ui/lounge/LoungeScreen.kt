@@ -52,8 +52,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -79,6 +83,7 @@ fun LoungeRoute(
     navigateToMember: (MemberUIModel, String, Boolean) -> Unit,
     viewModel: LoungeViewModel = hiltViewModel(),
     popBackStack: (String) -> Unit,
+    clipboardManager: ClipboardManager = LocalClipboardManager.current
 ){
     val loungeState : LoungeState by viewModel.viewState.collectAsStateWithLifecycle()
 
@@ -91,6 +96,10 @@ fun LoungeRoute(
                     snackBarHostState.showSnackbar(it.message)
                 }
                 is LoungeSideEffect.PopBackStack -> popBackStack(it.message)
+                is LoungeSideEffect.CopyToClipboard -> {
+                    clipboardManager.setText(AnnotatedString(it.loungeId))
+                    snackBarHostState.showSnackbar("초대 코드가 복사되었습니다.")
+                }
             }
         }
     }
@@ -115,7 +124,8 @@ fun LoungeRoute(
         onEditChat = { viewModel.sendEvent(LoungeEvent.OnEditChat(it)) },
         onSendChat = { viewModel.sendEvent(LoungeEvent.OnSendChat) },
         onClickReady = { viewModel.sendEvent(LoungeEvent.OnReady) },
-        navigateToMember = navigateToMember
+        navigateToMember = navigateToMember,
+        onClickInvite = { viewModel.sendEvent(LoungeEvent.OnClickInvite) }
     )
 }
 
@@ -129,6 +139,7 @@ private fun LoungeScreen(
     onEditChat: (String) -> Unit = {},
     onSendChat: () -> Unit = {},
     onClickReady: () -> Unit = {},
+    onClickInvite: () -> Unit = {},
 ){
     Scaffold(
         topBar = {
@@ -158,7 +169,8 @@ private fun LoungeScreen(
                     .fillMaxSize()
                     .padding(padding),
                 loungeState = loungeState,
-                navigateToMember = navigateToMember
+                navigateToMember = navigateToMember,
+                onClickInvite = onClickInvite
             )
         }
     }
@@ -169,13 +181,15 @@ private fun LoungeContent(
     modifier: Modifier,
     loungeState: LoungeState,
     navigateToMember: (MemberUIModel, String, Boolean) -> Unit = {_, _, _ -> },
+    onClickInvite: () -> Unit = {},
 ){
     Column(modifier = modifier) {
         Spacer(modifier = Modifier.height(16.dp))
 
         LoungeMemberList(
             memberList = loungeState.memberList,
-            navigateToMember = { navigateToMember(it, loungeState.loungeId ?: return@LoungeMemberList, loungeState.isOwner) }
+            navigateToMember = { navigateToMember(it, loungeState.loungeId ?: return@LoungeMemberList, loungeState.isOwner) },
+            onClickInvite = onClickInvite
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -254,7 +268,8 @@ private fun LoungeChatListPreview(){
 @Composable
 private fun LoungeMemberList(
     memberList: List<MemberUIModel> = emptyList(),
-    navigateToMember: (MemberUIModel) -> Unit = {}
+    navigateToMember: (MemberUIModel) -> Unit = {},
+    onClickInvite: () -> Unit = {},
 ){
     val memberLimit = 6
     // 멤버 최대 6명
@@ -295,7 +310,7 @@ private fun LoungeMemberList(
                     Image(
                         painter = painterResource(id = R.drawable.ic_add),
                         contentDescription = "add_member",
-                        modifier = Modifier.padding(8.dp)
+                        modifier = Modifier.clickable(onClick = onClickInvite).padding(8.dp)
                     )
                 }
             }

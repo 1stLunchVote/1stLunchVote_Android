@@ -30,6 +30,7 @@ class LoungeContract {
         object OnReady : LoungeEvent
         object OnTryExit : LoungeEvent
         data class OnClickExit(val exit: Boolean) : LoungeEvent
+        object OnClickInvite : LoungeEvent
     }
 
     sealed interface LoungeReduce: ViewModelContract.Reduce {
@@ -43,5 +44,7 @@ class LoungeContract {
     sealed interface LoungeSideEffect: ViewModelContract.SideEffect {
         data class ShowSnackBar(val message: String) : LoungeSideEffect
         data class PopBackStack(val message: String) : LoungeSideEffect
+
+        data class CopyToClipboard(val loungeId: String) : LoungeSideEffect
     }
 }
