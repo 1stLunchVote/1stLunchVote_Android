@@ -1,6 +1,6 @@
 package com.jwd.lunchvote.data.repository
 
-import com.jwd.lunchvote.data.source.remote.login.LoginRemoteDataSource
+import com.jwd.lunchvote.data.source.remote.LoginRemoteDataSource
 import com.jwd.lunchvote.domain.repository.LoginRepository
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow

@@ -6,8 +6,8 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.jwd.lunchvote.data.di.Dispatcher
 import com.jwd.lunchvote.data.di.LunchVoteDispatcher.IO
-import com.jwd.lunchvote.data.source.local.lounge.LoungeLocalDataSource
-import com.jwd.lunchvote.data.source.remote.lounge.LoungeRemoteDataSource
+import com.jwd.lunchvote.data.source.local.LoungeLocalDataSource
+import com.jwd.lunchvote.data.source.remote.LoungeRemoteDataSource
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher

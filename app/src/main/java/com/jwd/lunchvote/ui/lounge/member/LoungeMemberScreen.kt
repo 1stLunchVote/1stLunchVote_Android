@@ -17,10 +17,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,14 +35,22 @@ import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.core.ui.theme.colorOutline
 import com.jwd.lunchvote.ui.lounge.member.LoungeMemberContract.*
 import com.jwd.lunchvote.widget.LunchVoteTopBar
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun LoungeMemberRoute(
     viewModel: LoungeMemberViewModel = hiltViewModel(),
     popBackStack: () -> Unit
 ){
-    // Todo : 여기서도 게임 시작, 추방 관련 리스너 달고 있어야 함
     val memberState: LoungeMemberState by viewModel.viewState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(viewModel.sideEffect){
+        viewModel.sideEffect.collectLatest {
+            when(it){
+                is LoungeMemberSideEffect.PopBackStack -> popBackStack()
+            }
+        }
+    }
 
     LoungeMemberScreen(
         memberState = memberState,
@@ -77,10 +87,11 @@ fun LoungeMemberScreen(
                 AsyncImage(
                     model = memberState.profileUrl,
                     contentDescription = "profileImage",
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(96.dp)
                         .clip(CircleShape)
-                        .border(2.dp, colorOutline, CircleShape)
+                        .border(2.dp, colorOutline, CircleShape),
                 )
 
                 Spacer(modifier = Modifier.width(32.dp))

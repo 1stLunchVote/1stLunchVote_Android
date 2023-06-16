@@ -1,21 +1,18 @@
 package com.jwd.lunchvote.data.repository
 
-import com.jwd.lunchvote.data.room.entity.ChatEntity
-import com.jwd.lunchvote.data.room.entity.MemberEntity
-import com.jwd.lunchvote.data.source.local.lounge.LoungeLocalDataSource
-import com.jwd.lunchvote.data.source.remote.lounge.LoungeRemoteDataSource
+import com.jwd.lunchvote.data.source.local.LoungeLocalDataSource
+import com.jwd.lunchvote.data.source.remote.LoungeRemoteDataSource
 import com.jwd.lunchvote.data.worker.SendWorkerManager
 import com.jwd.lunchvote.domain.entity.LoungeChat
 import com.jwd.lunchvote.domain.entity.Member
+import com.jwd.lunchvote.domain.entity.MemberStatus
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapMerge
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -41,18 +38,13 @@ class LoungeRepositoryImpl @Inject constructor(
     @OptIn(FlowPreview::class)
     override fun joinLounge(loungeId: String): Flow<Unit> {
         return loungeRemoteDataSource.joinLounge(loungeId).flatMapMerge {
-            if (it != null) {
-                loungeRemoteDataSource.sendChat(loungeId, null, 2)
-            } else {
-                flowOf(Unit)
-            }
+            loungeRemoteDataSource.sendChat(loungeId, null, 2)
         }
     }
 
     override fun getMemberList(loungeId: String): Flow<List<Member>> {
         return loungeLocalDataSource.getMemberList(loungeId)
             .filter { it.isNotEmpty() }
-            .map { it.map(MemberEntity::toDomain) }
             .onStart { syncMemberList(loungeId) }
     }
 
@@ -62,7 +54,6 @@ class LoungeRepositoryImpl @Inject constructor(
             .filter {
                 it.isNotEmpty()
             }
-            .map { it.map(ChatEntity::toDomain) }
             .onStart { syncChatList(loungeId) }
     }
 
@@ -84,6 +75,22 @@ class LoungeRepositoryImpl @Inject constructor(
         return loungeRemoteDataSource.exitLounge(uid, loungeId)
             .flatMapMerge {
                 loungeRemoteDataSource.sendChat(loungeId, null, 3)
+            }
+    }
+
+    override fun getMemberStatus(uid: String, loungeId: String): Flow<MemberStatus>{
+        return loungeRemoteDataSource.getMemberList(loungeId)
+            .map {
+                if (it.isEmpty()){
+                    MemberStatus.EXITED
+                }
+                else if (it.find { member -> member.uid == uid } == null) {
+                    // 추방 당한 것
+                    MemberStatus.EXILED
+                }
+                else {
+                    MemberStatus.NORMAL
+                }
             }
     }
 

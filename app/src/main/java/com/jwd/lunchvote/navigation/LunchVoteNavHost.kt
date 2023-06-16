@@ -47,9 +47,11 @@ fun LunchVoteNavHost(
                 )
             ) {
                 LoungeRoute(
-                    navigateToMember = {
+                    navigateToMember = { m, loungeId, isOwner ->
                         navHostController.navigate(LunchVoteNavRoute.LoungeMember.name
-                                + "?id=${it.uid},nickname=${it.nickname},profileUrl=${it.profileImage},isOwner=${it.isOwner}")
+                                + "?id=${m.uid},loungeId=${loungeId},nickname=${m.nickname},"
+                                + "profileUrl=${m.profileImage},isOwner=${isOwner}"
+                        )
                     },
                     popBackStack = {
                         navHostController.previousBackStackEntry?.savedStateHandle?.set(SNACK_BAR_KEY, it)
@@ -58,9 +60,14 @@ fun LunchVoteNavHost(
                 )
             }
 
-            composable(LunchVoteNavRoute.LoungeMember.name + "?id={id},nickname={nickname},profileUrl={profileUrl},isOwner={isOwner}",
+            composable(LunchVoteNavRoute.LoungeMember.name + "?id={id},loungeId={loungeId}," +
+                    "nickname={nickname},profileUrl={profileUrl},isOwner={isOwner}",
                 arguments = listOf(
                     navArgument("id") {
+                        type = NavType.StringType
+                        nullable = false
+                    },
+                    navArgument("loungeId"){
                         type = NavType.StringType
                         nullable = false
                     },

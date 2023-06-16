@@ -24,6 +24,6 @@ class LoungeMemberContract {
     }
 
     sealed interface LoungeMemberSideEffect : ViewModelContract.SideEffect {
-
+        object PopBackStack : LoungeMemberSideEffect
     }
 }

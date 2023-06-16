@@ -64,6 +64,8 @@ dependencies {
     implementation(project(":core:test"))
     implementation(project(":domain"))
     implementation(project(":data"))
+    implementation(project(":local"))
+    implementation(project(":remote"))
 
     implementationAndroidX()
     implementationCompose()

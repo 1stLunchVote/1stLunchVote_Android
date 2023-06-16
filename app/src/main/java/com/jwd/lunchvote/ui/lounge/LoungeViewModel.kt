@@ -5,18 +5,18 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.domain.entity.MemberStatus
+import com.jwd.lunchvote.domain.usecase.lounge.CheckMemberStatusUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.CreateLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.ExitLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.GetChatListUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.GetMemberListUseCase
-import com.jwd.lunchvote.domain.usecase.lounge.JoinLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.SendChatUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.UpdateReadyUseCase
-import com.jwd.lunchvote.model.MemberUIModel
 import com.jwd.lunchvote.model.mapper.LoungeMapper
 import com.jwd.lunchvote.ui.lounge.LoungeContract.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
@@ -27,16 +27,18 @@ import javax.inject.Inject
 @HiltViewModel
 class LoungeViewModel @Inject constructor(
     private val createLoungeUseCase: CreateLoungeUseCase,
-    private val joinLoungeUseCase: JoinLoungeUseCase,
     private val getMemberListUseCase: GetMemberListUseCase,
     private val getChatListUseCase: GetChatListUseCase,
     private val updateReadyUseCase: UpdateReadyUseCase,
     private val sendChatUseCase: SendChatUseCase,
     private val exitLoungeUseCase: ExitLoungeUseCase,
+    private val checkMemberStatusUseCase: CheckMemberStatusUseCase,
     private val auth: FirebaseAuth,
     savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<LoungeState, LoungeEvent, LoungeReduce, LoungeSideEffect>(savedStateHandle) {
     private val loungeId = savedStateHandle.get<String?>("id")
+
+    private lateinit var checkJob : Job
 
     override fun createInitialState(savedState: Parcelable?): LoungeState {
         return savedState as? LoungeState ?: LoungeState()
@@ -50,16 +52,9 @@ class LoungeViewModel @Inject constructor(
         loungeId?.let {
             updateState(LoungeReduce.SetLoungeId(it, false))
             getLoungeData(it)
-            joinLounge(it)
         } ?: run {
             createLounge()
         }
-    }
-
-    private fun joinLounge(loungeId: String){
-        // Todo : JoinLounge는 Navigation 중으로 변경
-        joinLoungeUseCase(loungeId)
-            .launchIn(viewModelScope)
     }
 
     private fun createLounge(){
@@ -89,14 +84,25 @@ class LoungeViewModel @Inject constructor(
 
         getMemberListUseCase(loungeId)
             .onEach {
-
-                // Todo : Owner가 레디가 되면 다음 화면으로 넘어가기
                 updateState(LoungeReduce.SetMemberList(it.map { m ->
                     LoungeMapper.mapToMember(m, m.uid == auth.currentUser?.uid) }
                 ))
             }
             .launchIn(viewModelScope)
 
+        checkJob = checkMemberStatusUseCase(auth.currentUser?.uid ?: return, loungeId)
+            .onEach {
+                when(it){
+                    MemberStatus.EXITED -> {
+                        sendSideEffect(LoungeSideEffect.PopBackStack("방장이 방을 종료하였습니다."))
+                    }
+                    MemberStatus.EXILED -> {
+                        sendSideEffect(LoungeSideEffect.PopBackStack("방장에 의해 추방되었습니다."))
+                    }
+                    else -> {}
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     private fun updateReady(){
@@ -140,6 +146,8 @@ class LoungeViewModel @Inject constructor(
             is LoungeEvent.OnClickExit -> {
                 if (event.exit){
                     viewModelScope.launch {
+                        checkJob.cancel()
+
                         exitLoungeUseCase(
                             auth.currentUser?.uid ?: return@launch,
                             currentState.loungeId ?: return@launch

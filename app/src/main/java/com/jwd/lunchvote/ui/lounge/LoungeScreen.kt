@@ -76,7 +76,7 @@ import kotlinx.coroutines.flow.collectLatest
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun LoungeRoute(
-    navigateToMember: (MemberUIModel) -> Unit,
+    navigateToMember: (MemberUIModel, String, Boolean) -> Unit,
     viewModel: LoungeViewModel = hiltViewModel(),
     popBackStack: (String) -> Unit,
 ){
@@ -124,7 +124,7 @@ fun LoungeRoute(
 private fun LoungeScreen(
     loungeState: LoungeState,
     snackBarHostState: SnackbarHostState,
-    navigateToMember: (MemberUIModel) -> Unit = {},
+    navigateToMember: (MemberUIModel, String, Boolean) -> Unit = {_, _, _-> },
     onTryExit: () -> Unit = {},
     onEditChat: (String) -> Unit = {},
     onSendChat: () -> Unit = {},
@@ -168,12 +168,15 @@ private fun LoungeScreen(
 private fun LoungeContent(
     modifier: Modifier,
     loungeState: LoungeState,
-    navigateToMember: (MemberUIModel) -> Unit = {},
+    navigateToMember: (MemberUIModel, String, Boolean) -> Unit = {_, _, _ -> },
 ){
     Column(modifier = modifier) {
         Spacer(modifier = Modifier.height(16.dp))
 
-        LoungeMemberList(memberList = loungeState.memberList, navigateToMember = navigateToMember)
+        LoungeMemberList(
+            memberList = loungeState.memberList,
+            navigateToMember = { navigateToMember(it, loungeState.loungeId ?: return@LoungeMemberList, loungeState.isOwner) }
+        )
 
         Spacer(modifier = Modifier.height(24.dp))
 
