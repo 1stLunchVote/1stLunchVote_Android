@@ -31,7 +31,7 @@ class HomeContract {
     }
 
     sealed interface HomeSideEffect: ViewModelContract.SideEffect {
-        object NavigateToLounge : HomeSideEffect
+        class NavigateToLounge(val loungeId: String?) : HomeSideEffect
         object NavigateToTemplate : HomeSideEffect
         object NavigateToSetting : HomeSideEffect
         object NavigateToTips : HomeSideEffect

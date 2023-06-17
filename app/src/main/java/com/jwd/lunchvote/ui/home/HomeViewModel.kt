@@ -1,14 +1,21 @@
 package com.jwd.lunchvote.ui.home
 
+import android.content.res.Resources.NotFoundException
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.domain.usecase.lounge.JoinLoungeUseCase
 import com.jwd.lunchvote.ui.home.HomeContract.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    private val joinLoungeUseCase: JoinLoungeUseCase,
     savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<HomeState, HomeEvent, HomeReduce, HomeSideEffect>(savedStateHandle){
     override fun createInitialState(savedState: Parcelable?): HomeState {
@@ -18,10 +25,20 @@ class HomeViewModel @Inject constructor(
     override fun handleEvents(event: HomeEvent) {
         when(event) {
             is HomeEvent.OnClickLoungeButton -> {
-                sendSideEffect(HomeSideEffect.NavigateToLounge)
+                sendSideEffect(HomeSideEffect.NavigateToLounge(null))
             }
             is HomeEvent.OnClickJoinLoungeButton -> {
-                updateState(HomeReduce.ShowJoinDialog)
+                joinLoungeUseCase("KqND4zmJ59")
+                    .catch {
+                        if (it is NotFoundException){
+                            updateState(HomeReduce.ShowJoinDialog)
+                            sendSideEffect(HomeSideEffect.ShowSnackBar("존재하지 않는 방입니다."))
+                        }
+                    }
+                    .onEach {
+                        sendSideEffect(HomeSideEffect.NavigateToLounge("KqND4zmJ59"))
+                    }
+                    .launchIn(viewModelScope)
             }
             is HomeEvent.OnClickDismissButtonOfJoinDialog -> {
                 updateState(HomeReduce.DismissJoinDialog)
@@ -38,7 +55,6 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.OnClickTipsButton -> {
                 sendSideEffect(HomeSideEffect.NavigateToTips)
             }
-        }
     }
 
     override fun reduceState(state: HomeState, reduce: HomeReduce): HomeState {

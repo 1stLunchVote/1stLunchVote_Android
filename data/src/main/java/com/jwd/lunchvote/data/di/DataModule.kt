@@ -1,21 +1,27 @@
 package com.jwd.lunchvote.data.di
 
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.functions.FirebaseFunctions
+import com.jwd.lunchvote.data.repository.LoungeRepositoryImpl
+import com.jwd.lunchvote.data.repository.LoginRepositoryImpl
+import com.jwd.lunchvote.domain.repository.LoungeRepository
+import com.jwd.lunchvote.domain.repository.LoginRepository
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object DataModule {
-    @Provides
+abstract class DataModule {
+    @Binds
     @Singleton
-    fun provideFirebaseFunctions() = FirebaseFunctions.getInstance("asia-northeast3")
+    abstract fun bindsLoginRepository(
+        loginRepositoryImpl: LoginRepositoryImpl
+    ): LoginRepository
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideFirebaseDatabase() = FirebaseDatabase.getInstance()
+    abstract fun bindsHomeRepository(
+        homeRepositoryImpl: LoungeRepositoryImpl
+    ): LoungeRepository
 }

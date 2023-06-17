@@ -43,12 +43,29 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+
+    packagingOptions {
+        resources.excludes.addAll(
+            listOf(
+                "META-INF/LICENSE",
+                "META-INF/LICENSE.md",
+                "META-INF/NOTICE",
+                "META-INF/NOTICE.txt",
+                "META-INF/LICENSE-notice.md",
+                "META-INF/DEPENDENCIES",
+                "META-INF/AL2.0",
+            )
+        )
+    }
 }
 
 dependencies {
     implementation(project(":core:ui"))
+    implementation(project(":core:test"))
     implementation(project(":domain"))
     implementation(project(":data"))
+    implementation(project(":local"))
+    implementation(project(":remote"))
 
     implementationAndroidX()
     implementationCompose()
@@ -63,6 +80,7 @@ dependencies {
         Libraries.Firebase.GmsAuth,
         Libraries.Firebase.Function,
         Libraries.Kakao,
+        Libraries.Coil
     )
 }
 
