@@ -8,6 +8,15 @@
     <string name="login_register_guide">계정이 없으신가요?</string>
     <string name="login_register_btn"><u>회원가입</u></string>
 
+    <!-- HomeScreen -->
+    <string name="home_banner_title">지금 사람들은 뭘 먹고 싶을까?</string>
+    <string name="home_banner_score">%d%%의 사람들이 선택</string>
+    <string name="home_start_btn">투표 생성하기</string>
+    <string name="home_join_btn">투표 참여하기</string>
+    <string name="home_template_btn">템플릿 사전 설정하기</string>
+    <string name="home_tips_btn">투표 방법이 궁금하신가요?</string>
+    <string name="home_join_code_hint">초대 코드</string>
+
     <!-- RegisterEmailScreen -->
     <string name="register_email_title">먼저 이메일을 확인할게요.</string>
     <string name="register_email_content">가입된 이메일인지 확인해볼게요!</string>

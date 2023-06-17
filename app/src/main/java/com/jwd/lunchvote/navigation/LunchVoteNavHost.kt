@@ -12,8 +12,6 @@ import com.jwd.lunchvote.ui.login.LoginRoute
 import com.jwd.lunchvote.ui.login.register.RegisterEmailRoute
 import com.jwd.lunchvote.ui.lounge.LoungeRoute
 import com.jwd.lunchvote.ui.lounge.member.LoungeMemberRoute
-import kotlinx.coroutines.flow.filter
-import timber.log.Timber
 
 @Composable
 fun LunchVoteNavHost(
@@ -34,11 +32,19 @@ fun LunchVoteNavHost(
                         val query = if (id != null) "?id=$id" else ""
                         navHostController.navigate(LunchVoteNavRoute.Lounge.name + query)
                     },
+                    navigateToTemplate = {
+                        navHostController.navigate(LunchVoteNavRoute.Template.name)
+                    },
+                    navigateToSetting = {
+                        navHostController.navigate(LunchVoteNavRoute.Setting.name)
+                    },
+                    navigateToTips = {
+                        navHostController.navigate(LunchVoteNavRoute.Tips.name)
+                    },
                     messageFlow = it.savedStateHandle.getStateFlow(SNACK_BAR_KEY, "")
                 )
             }
-
-            composable(LunchVoteNavRoute.Lounge.name +"?id={id}",
+            composable(LunchVoteNavRoute.Lounge.name + "?id={id}",
                 arguments = listOf(
                     navArgument("id") {
                         type = NavType.StringType
@@ -48,26 +54,31 @@ fun LunchVoteNavHost(
             ) {
                 LoungeRoute(
                     navigateToMember = { m, loungeId, isOwner ->
-                        navHostController.navigate(LunchVoteNavRoute.LoungeMember.name
-                                + "?id=${m.uid},loungeId=${loungeId},nickname=${m.nickname},"
-                                + "profileUrl=${m.profileImage},isOwner=${isOwner}"
+                        navHostController.navigate(
+                            LunchVoteNavRoute.LoungeMember.name
+                                    + "?id=${m.uid},loungeId=${loungeId},nickname=${m.nickname},"
+                                    + "profileUrl=${m.profileImage},isOwner=${isOwner}"
                         )
                     },
                     popBackStack = {
-                        navHostController.previousBackStackEntry?.savedStateHandle?.set(SNACK_BAR_KEY, it)
+                        navHostController.previousBackStackEntry?.savedStateHandle?.set(
+                            SNACK_BAR_KEY,
+                            it
+                        )
                         navHostController.popBackStack()
                     }
                 )
             }
 
-            composable(LunchVoteNavRoute.LoungeMember.name + "?id={id},loungeId={loungeId}," +
-                    "nickname={nickname},profileUrl={profileUrl},isOwner={isOwner}",
+            composable(
+                LunchVoteNavRoute.LoungeMember.name + "?id={id},loungeId={loungeId}," +
+                        "nickname={nickname},profileUrl={profileUrl},isOwner={isOwner}",
                 arguments = listOf(
                     navArgument("id") {
                         type = NavType.StringType
                         nullable = false
                     },
-                    navArgument("loungeId"){
+                    navArgument("loungeId") {
                         type = NavType.StringType
                         nullable = false
                     },
@@ -84,7 +95,7 @@ fun LunchVoteNavHost(
                         nullable = false
                     },
                 )
-            ){
+            ) {
                 LoungeMemberRoute(
                     popBackStack = { navHostController.popBackStack() }
                 )
@@ -98,9 +109,7 @@ fun LunchVoteNavHost(
             composable(LunchVoteNavRoute.Login.name) {
                 LoginRoute(
                     navigateToHome = {
-                        navHostController.navigate(LunchVoteNavRoute.HomeNavigation.name){
-                            popUpTo(0)
-                        }
+                        navHostController.navigate(LunchVoteNavRoute.HomeNavigation.name)
                     },
                     navigateToRegisterEmail = {
                         navHostController.navigate(LunchVoteNavRoute.RegisterEmail.name)
@@ -126,8 +135,12 @@ enum class LunchVoteNavRoute {
 
     Login,
     Home,
-    Lounge,
     LoungeMember,
     RegisterEmail,
     Profile,
+
+    Lounge,
+    Template,
+    Setting,
+    Tips
 }

@@ -8,18 +8,35 @@ class HomeContract {
     @Parcelize
     data class HomeState(
         val isLoading: Boolean = false,
-    ): ViewModelContract.State, Parcelable
+        val showJoinDialog: Boolean = false,
+        val code: String = "KqND4zmJ59"
+    ): ViewModelContract.State, Parcelable {
+        override fun toParcelable(): Parcelable = this
+    }
 
     sealed interface HomeEvent: ViewModelContract.Event {
-        object OnCreateLounge: HomeEvent
-        object OnJoinLounge: HomeEvent
+        object OnClickLoungeButton : HomeEvent
+        object OnClickJoinLoungeButton : HomeEvent
+        class SetJoinCode(val code: String) : HomeEvent
+        object OnClickDismissButtonOfJoinDialog : HomeEvent
+        class OnClickConfirmButtonOfJoinDialog(val code: String) : HomeEvent
+        object OnClickTemplateButton : HomeEvent
+        object OnClickSettingButton : HomeEvent
+        object OnClickTipsButton : HomeEvent
     }
 
     sealed interface HomeReduce : ViewModelContract.Reduce {
+        object ShowJoinDialog : HomeReduce
+        class UpdateJoinCode(val code: String) : HomeReduce
+        object DismissJoinDialog : HomeReduce
+        class ConfirmJoinDialog(val code: String) : HomeReduce
     }
 
     sealed interface HomeSideEffect: ViewModelContract.SideEffect {
-        data class NavigateToLounge(val loungeId: String?): HomeSideEffect
-        data class ShowSnackBar(val message: String) : HomeSideEffect
+        class NavigateToLounge(val loungeId: String?) : HomeSideEffect
+        object NavigateToTemplate : HomeSideEffect
+        object NavigateToSetting : HomeSideEffect
+        object NavigateToTips : HomeSideEffect
+        class ShowSnackBar(val message: String) : HomeSideEffect
     }
 }
