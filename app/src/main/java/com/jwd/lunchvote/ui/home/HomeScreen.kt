@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -53,6 +54,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.R
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.ui.home.HomeContract.*
+import com.jwd.lunchvote.widget.LunchVoteDialog
 import com.jwd.lunchvote.widget.LunchVoteTextField
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
@@ -144,189 +146,21 @@ private fun HomeScreen(
                     .size(48.dp)
                     .align(CenterHorizontally)
             )
-            Spacer(Modifier.height(40.dp))
-            Text(
-                stringResource(R.string.home_banner_title),
-                style = MaterialTheme.typography.titleMedium
+            FoodTrendChart(
+                Modifier.padding(top = 40.dp, bottom = 40.dp)
             )
-            Spacer(Modifier.height(16.dp))
-            Box(
-                modifier = Modifier.size(192.dp),
-                contentAlignment = Center
-            ) {
-                CircularChart()
-                Image(
-                    painterResource(R.drawable.ic_food_image_temp),
-                    null,
-                    modifier = Modifier
-                        .size(160.dp)
-                        .clip(CircleShape)
-                        .border(4.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape)
-                )
-            }
-            Text(
-                "햄버거",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary
+            HomeDivider(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 24.dp)
             )
-            Spacer(Modifier.height(4.dp))
-            Text(
-                text = stringResource(R.string.home_banner_score, 36),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.outline
+            HomeButtonSet(
+                onClickLoungeButton = onClickLoungeButton,
+                onClickJoinLoungeButton = onClickJoinLoungeButton,
+                onClickTemplateButton = onClickTemplateButton,
+                onClickSettingButton = onClickSettingButton,
+                onClickTipsButton = onClickTipsButton,
             )
-            Spacer(Modifier.height(64.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy((-1).dp)
-            ) {
-                Image(
-                    painterResource(R.drawable.ic_triangle),
-                    null
-                )
-                Divider(
-                    modifier = Modifier.weight(1f),
-                    thickness = 2.dp,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Image(
-                    painterResource(R.drawable.ic_triangle),
-                    null,
-                    modifier = Modifier
-                        .graphicsLayer(rotationZ = 180f)
-                )
-            }
-            Spacer(Modifier.height(24.dp))
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    ConstraintLayout(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(128.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(
-                                MaterialTheme.colorScheme.primary,
-                                RoundedCornerShape(16.dp)
-                            )
-                            .clickable { onClickLoungeButton() }
-                    ) {
-                        val text = createRef()
-                        Text(
-                            stringResource(R.string.home_start_btn),
-                            modifier = Modifier.constrainAs(text) {
-                                top.linkTo(parent.top, margin = 16.dp)
-                                start.linkTo(parent.start, margin = 24.dp)
-                            },
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                    }
-                    ConstraintLayout(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(128.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .border(
-                                2.dp,
-                                MaterialTheme.colorScheme.primary,
-                                RoundedCornerShape(16.dp)
-                            )
-                            .clickable { onClickJoinLoungeButton() }
-                    ) {
-                        val text = createRef()
-                        Text(
-                            stringResource(R.string.home_join_btn),
-                            modifier = Modifier.constrainAs(text) {
-                                top.linkTo(parent.top, margin = 16.dp)
-                                start.linkTo(parent.start, margin = 24.dp)
-                            },
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-                ConstraintLayout(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(64.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .border(
-                            2.dp,
-                            MaterialTheme.colorScheme.primary,
-                            RoundedCornerShape(16.dp)
-                        )
-                        .clickable { onClickTemplateButton() }
-                ) {
-                    val text = createRef()
-                    Text(
-                        stringResource(R.string.home_template_btn),
-                        modifier = Modifier.constrainAs(text) {
-                            top.linkTo(parent.top, margin = 16.dp)
-                            end.linkTo(parent.end, margin = 24.dp)
-                        },
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    ConstraintLayout(
-                        modifier = Modifier
-                            .size(52.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(
-                                MaterialTheme.colorScheme.outline,
-                                RoundedCornerShape(16.dp)
-                            )
-                            .clickable { onClickSettingButton() }
-                    ) {
-                        val setting = createRef()
-                        Image(
-                            painterResource(R.drawable.ic_gear),
-                            null,
-                            modifier = Modifier.constrainAs(setting) {
-                                top.linkTo(parent.top)
-                                bottom.linkTo(parent.bottom)
-                                start.linkTo(parent.start)
-                                end.linkTo(parent.end)
-                            }
-                        )
-                    }
-                    ConstraintLayout(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(52.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .border(
-                                2.dp,
-                                MaterialTheme.colorScheme.outline,
-                                RoundedCornerShape(16.dp)
-                            )
-                            .clickable { onClickTipsButton() }
-                    ) {
-                        val text = createRef()
-                        Text(
-                            stringResource(R.string.home_tips_btn),
-                            modifier = Modifier.constrainAs(text) {
-                                top.linkTo(parent.top)
-                                bottom.linkTo(parent.bottom)
-                                end.linkTo(parent.end, margin = 24.dp)
-                            },
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.outline
-                        )
-                    }
-                }
-            }
         }
         if (homeState.showJoinDialog) {
             JoinDialog(
@@ -336,6 +170,45 @@ private fun HomeScreen(
                 dismiss = onClickDismissButtonOfJoinDialog
             )
         }
+    }
+}
+
+@Composable
+fun FoodTrendChart(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = CenterHorizontally
+    ) {
+        Text(
+            stringResource(R.string.home_banner_title),
+            style = MaterialTheme.typography.titleMedium
+        )
+        Spacer(Modifier.height(16.dp))
+        Box(
+            modifier = Modifier.size(192.dp),
+            contentAlignment = Center
+        ) {
+            CircularChart()
+            Image(
+                painterResource(R.drawable.ic_food_image_temp),
+                null,
+                modifier = Modifier
+                    .size(160.dp)
+                    .clip(CircleShape)
+                    .border(4.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape)
+            )
+        }
+        Text(
+            "햄버거",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = stringResource(R.string.home_banner_score, 36),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.outline
+        )
     }
 }
 
@@ -374,6 +247,155 @@ fun CircularChart(
     }
 }
 
+@Composable
+fun HomeDivider(
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy((-1).dp)
+    ) {
+        Image(
+            painterResource(R.drawable.ic_triangle),
+            null
+        )
+        Divider(
+            modifier = Modifier.weight(1f),
+            thickness = 2.dp,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Image(
+            painterResource(R.drawable.ic_triangle),
+            null,
+            modifier = Modifier
+                .graphicsLayer(rotationZ = 180f)
+        )
+    }
+}
+
+@Composable
+fun HomeButtonSet(
+    onClickLoungeButton: () -> Unit = {},
+    onClickJoinLoungeButton: () -> Unit = {},
+    onClickTemplateButton: () -> Unit = {},
+    onClickSettingButton: () -> Unit = {},
+    onClickTipsButton: () -> Unit = {},
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(128.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(
+                        MaterialTheme.colorScheme.primary,
+                        RoundedCornerShape(16.dp)
+                    )
+                    .clickable { onClickLoungeButton() }
+            ) {
+                Text(
+                    stringResource(R.string.home_start_btn),
+                    modifier = Modifier.padding(top = 16.dp, start = 24.dp),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(128.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .border(
+                        2.dp,
+                        MaterialTheme.colorScheme.primary,
+                        RoundedCornerShape(16.dp)
+                    )
+                    .clickable { onClickJoinLoungeButton() }
+            ) {
+                Text(
+                    stringResource(R.string.home_join_btn),
+                    modifier = Modifier.padding(top = 16.dp, start = 24.dp),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(64.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .border(
+                    2.dp,
+                    MaterialTheme.colorScheme.primary,
+                    RoundedCornerShape(16.dp)
+                )
+                .clickable { onClickTemplateButton() },
+            contentAlignment = Alignment.TopEnd
+        ) {
+            Text(
+                stringResource(R.string.home_template_btn),
+                modifier = Modifier.padding(top = 16.dp, end = 24.dp),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(52.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(
+                        MaterialTheme.colorScheme.outline,
+                        RoundedCornerShape(16.dp)
+                    )
+                    .clickable { onClickSettingButton() },
+                contentAlignment = Center
+            ) {
+                Image(
+                    painterResource(R.drawable.ic_gear),
+                    null
+                )
+            }
+            ConstraintLayout(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(52.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .border(
+                        2.dp,
+                        MaterialTheme.colorScheme.outline,
+                        RoundedCornerShape(16.dp)
+                    )
+                    .clickable { onClickTipsButton() }
+            ) {
+                val text = createRef()
+                Text(
+                    stringResource(R.string.home_tips_btn),
+                    modifier = Modifier.constrainAs(text) {
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                        end.linkTo(parent.end, margin = 24.dp)
+                    },
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+            }
+        }
+    }
+}
+
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun JoinDialog(
@@ -382,22 +404,32 @@ fun JoinDialog(
     onClickConfirmButtonOfJoinDialog: () -> Unit = {},
     dismiss: () -> Unit = {},
 ) {
-    AlertDialog(
-        onDismissRequest = dismiss,
-        confirmButton = {
-            Button(
-                onClick = onClickConfirmButtonOfJoinDialog,
-                enabled = homeState.code.isNotBlank()
-            ) { Text("참여") }
-        },
-        dismissButton = { Button(dismiss) { Text("취소") } },
-        title = { Text(stringResource(R.string.home_join_btn)) },
-        text = {
+    LunchVoteDialog(
+        onDismiss = dismiss,
+        content = {
+            Text(
+                stringResource(R.string.home_join_btn),
+                modifier = Modifier.fillMaxWidth(),
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Start
+            )
             LunchVoteTextField(
+                modifier = Modifier.padding(vertical = 16.dp),
                 text = homeState.code,
                 hintText = stringResource(R.string.home_join_code_hint),
                 onTextChanged = onCodeChanged
             )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Spacer(Modifier.weight(1f))
+                Button(dismiss) { Text("취소") }
+                Button(
+                    onClick = onClickConfirmButtonOfJoinDialog,
+                    enabled = homeState.code.isNotBlank()
+                ) { Text("참여") }
+            }
         }
     )
 }
@@ -413,7 +445,7 @@ fun HomeScreenPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = false)
 @Composable
 fun JoinDialogPreview() {
     LunchVoteTheme {
