@@ -16,10 +16,42 @@ class HomeViewModel @Inject constructor(
     }
 
     override fun handleEvents(event: HomeEvent) {
-        TODO("Not yet implemented")
+        when(event) {
+            is HomeEvent.OnClickLoungeButton -> {
+                sendSideEffect(HomeSideEffect.NavigateToLounge)
+            }
+            is HomeEvent.OnClickJoinLoungeButton -> {
+                updateState(HomeReduce.ShowJoinDialog)
+            }
+            is HomeEvent.OnClickDismissButtonOfJoinDialog -> {
+                updateState(HomeReduce.DismissJoinDialog)
+            }
+            is HomeEvent.SetJoinCode -> {
+                updateState(HomeReduce.UpdateJoinCode(event.code))
+            }
+            is HomeEvent.OnClickTemplateButton -> {
+                sendSideEffect(HomeSideEffect.NavigateToTemplate)
+            }
+            is HomeEvent.OnClickSettingButton -> {
+                sendSideEffect(HomeSideEffect.NavigateToSetting)
+            }
+            is HomeEvent.OnClickTipsButton -> {
+                sendSideEffect(HomeSideEffect.NavigateToTips)
+            }
+        }
     }
 
     override fun reduceState(state: HomeState, reduce: HomeReduce): HomeState {
-        TODO("Not yet implemented")
+        return when (reduce) {
+            is HomeReduce.ShowJoinDialog -> {
+                state.copy(showJoinDialog = true)
+            }
+            is HomeReduce.DismissJoinDialog -> {
+                state.copy(showJoinDialog = false)
+            }
+            is HomeReduce.UpdateJoinCode -> {
+                state.copy(code = reduce.code)
+            }
+        }
     }
 }

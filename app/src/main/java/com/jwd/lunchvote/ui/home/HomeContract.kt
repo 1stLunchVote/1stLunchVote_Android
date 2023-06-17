@@ -8,14 +8,26 @@ class HomeContract {
     @Parcelize
     data class HomeState(
         val isLoading: Boolean = false,
+        val showJoinDialog: Boolean = false,
+        val code: String = ""
     ): ViewModelContract.State, Parcelable {
         override fun toParcelable(): Parcelable = this
     }
 
     sealed interface HomeEvent: ViewModelContract.Event {
+        object OnClickLoungeButton : HomeEvent
+        object OnClickJoinLoungeButton : HomeEvent
+        object OnClickDismissButtonOfJoinDialog : HomeEvent
+        class SetJoinCode(val code: String) : HomeEvent
+        object OnClickTemplateButton : HomeEvent
+        object OnClickSettingButton : HomeEvent
+        object OnClickTipsButton : HomeEvent
     }
 
     sealed interface HomeReduce : ViewModelContract.Reduce {
+        object ShowJoinDialog : HomeReduce
+        object DismissJoinDialog : HomeReduce
+        class UpdateJoinCode(val code: String) : HomeReduce
     }
 
     sealed interface HomeSideEffect: ViewModelContract.SideEffect {

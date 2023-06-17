@@ -1,5 +1,6 @@
 package com.jwd.lunchvote.ui.home
 
+import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -17,6 +18,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -27,10 +30,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -47,12 +52,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.R
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.ui.home.HomeContract.*
+import com.jwd.lunchvote.ui.login.LoginContract
+import com.jwd.lunchvote.util.loginWithKakao
+import com.jwd.lunchvote.widget.LunchVoteTextField
+import com.kakao.sdk.common.model.ClientError
+import com.kakao.sdk.common.model.ClientErrorCause
+import com.kakao.sdk.user.UserApiClient
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 
@@ -70,13 +83,36 @@ fun HomeRoute(
 
     LaunchedEffect(viewModel.sideEffect){
         viewModel.sideEffect.collectLatest {
-
+            when(it){
+                is HomeSideEffect.NavigateToLounge -> {
+                    navigateToLounge()
+                }
+                is HomeSideEffect.NavigateToTemplate -> {
+                    navigateToTemplate()
+                }
+                is HomeSideEffect.NavigateToSetting -> {
+                    navigateToSetting()
+                }
+                is HomeSideEffect.NavigateToTips -> {
+                    navigateToTips()
+                }
+                is HomeSideEffect.ShowSnackBar -> {
+                    snackBarHostState.showSnackbar(it.message)
+                }
+            }
         }
     }
 
     HomeScreen(
         homeState = homeState,
-        snackBarHostState = snackBarHostState
+        snackBarHostState = snackBarHostState,
+        onClickLoungeButton = { viewModel.sendEvent(HomeEvent.OnClickLoungeButton) },
+        onClickJoinLoungeButton = { viewModel.sendEvent(HomeEvent.OnClickJoinLoungeButton) },
+        onClickDismissButtonOfJoinDialog = { viewModel.sendEvent(HomeEvent.OnClickDismissButtonOfJoinDialog) },
+        onCodeChanged = { code -> viewModel.sendEvent(HomeEvent.SetJoinCode(code)) },
+        onClickTemplateButton = { viewModel.sendEvent(HomeEvent.OnClickTemplateButton) },
+        onClickSettingButton = { viewModel.sendEvent(HomeEvent.OnClickSettingButton) },
+        onClickTipsButton = { viewModel.sendEvent(HomeEvent.OnClickTipsButton) },
     )
 }
 
@@ -84,7 +120,14 @@ fun HomeRoute(
 @Composable
 private fun HomeScreen(
     homeState: HomeState,
-    snackBarHostState: SnackbarHostState
+    snackBarHostState: SnackbarHostState,
+    onClickLoungeButton: () -> Unit = {},
+    onClickJoinLoungeButton: () -> Unit = {},
+    onClickDismissButtonOfJoinDialog: () -> Unit = {},
+    onCodeChanged: (String) -> Unit = {},
+    onClickTemplateButton: () -> Unit = {},
+    onClickSettingButton: () -> Unit = {},
+    onClickTipsButton: () -> Unit = {},
 ){
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
@@ -174,7 +217,7 @@ private fun HomeScreen(
                                 MaterialTheme.colorScheme.primary,
                                 RoundedCornerShape(16.dp)
                             )
-                            .clickable { /*TODO: 투표 생성하기*/ }
+                            .clickable { onClickLoungeButton() }
                     ) {
                         val text = createRef()
                         Text(
@@ -197,7 +240,7 @@ private fun HomeScreen(
                                 MaterialTheme.colorScheme.primary,
                                 RoundedCornerShape(16.dp)
                             )
-                            .clickable { /*TODO: 투표 참여하기*/ }
+                            .clickable { onClickJoinLoungeButton() }
                     ) {
                         val text = createRef()
                         Text(
@@ -221,7 +264,7 @@ private fun HomeScreen(
                             MaterialTheme.colorScheme.primary,
                             RoundedCornerShape(16.dp)
                         )
-                        .clickable { /*TODO: 템플릿 사전 설정하기*/ }
+                        .clickable { onClickTemplateButton() }
                 ) {
                     val text = createRef()
                     Text(
@@ -246,7 +289,7 @@ private fun HomeScreen(
                                 MaterialTheme.colorScheme.outline,
                                 RoundedCornerShape(16.dp)
                             )
-                            .clickable { /*TODO: 설정 화면*/ }
+                            .clickable { onClickSettingButton() }
                     ) {
                         val setting = createRef()
                         Image(
@@ -270,7 +313,7 @@ private fun HomeScreen(
                                 MaterialTheme.colorScheme.outline,
                                 RoundedCornerShape(16.dp)
                             )
-                            .clickable { /*TODO: 팁 화면*/ }
+                            .clickable { onClickTipsButton() }
                     ) {
                         val text = createRef()
                         Text(
@@ -286,6 +329,13 @@ private fun HomeScreen(
                     }
                 }
             }
+        }
+        if (homeState.showJoinDialog) {
+            JoinDialog(
+                homeState = homeState,
+                onCodeChanged = onCodeChanged,
+                dismiss = onClickDismissButtonOfJoinDialog
+            )
         }
     }
 }
@@ -325,13 +375,48 @@ fun CircularChart(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun JoinDialog(
+    homeState: HomeState,
+    onCodeChanged: (String) -> Unit = {},
+    dismiss: () -> Unit = {},
+) {
+    AlertDialog(
+        onDismissRequest = dismiss,
+        confirmButton = {
+            Button(
+                onClick = { /*TODO: 초대 코드를 통해 투표 방 참여하기*/ },
+                enabled = false
+            ) { Text("참여") }
+        },
+        dismissButton = { Button(dismiss) { Text("취소") } },
+        title = { Text(stringResource(R.string.home_join_btn)) },
+        text = {
+            LunchVoteTextField(
+                text = homeState.code,
+                hintText = stringResource(R.string.home_join_code_hint),
+                onTextChanged = onCodeChanged
+            )
+        }
+    )
+}
+
 @Preview(showBackground = false)
 @Composable
 fun HomeScreenPreview() {
     LunchVoteTheme {
         HomeScreen(
-            homeState = HomeState(false),
-            snackBarHostState = remember { SnackbarHostState() },
+            homeState = HomeState(),
+            snackBarHostState = remember { SnackbarHostState() }
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun JoinDialogPreview() {
+    LunchVoteTheme {
+        JoinDialog(homeState = HomeState())
     }
 }
