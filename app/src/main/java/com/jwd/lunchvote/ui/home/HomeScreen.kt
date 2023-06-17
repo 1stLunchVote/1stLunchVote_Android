@@ -1,6 +1,5 @@
 package com.jwd.lunchvote.ui.home
 
-import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,7 +29,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
@@ -41,10 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
@@ -52,29 +47,24 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.R
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.ui.home.HomeContract.*
-import com.jwd.lunchvote.ui.login.LoginContract
-import com.jwd.lunchvote.util.loginWithKakao
 import com.jwd.lunchvote.widget.LunchVoteTextField
-import com.kakao.sdk.common.model.ClientError
-import com.kakao.sdk.common.model.ClientErrorCause
-import com.kakao.sdk.user.UserApiClient
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
-import timber.log.Timber
+import kotlinx.coroutines.flow.filter
 
 @Composable
 fun HomeRoute(
-    navigateToLounge: () -> Unit,
+    navigateToLounge: (String?) -> Unit,
     navigateToTemplate: () -> Unit,
     navigateToSetting: () -> Unit,
     navigateToTips: () -> Unit,
+    messageFlow: Flow<String>,
     viewModel: HomeViewModel = hiltViewModel()
 ){
     val homeState : HomeState by viewModel.viewState.collectAsStateWithLifecycle()
@@ -85,7 +75,7 @@ fun HomeRoute(
         viewModel.sideEffect.collectLatest {
             when(it){
                 is HomeSideEffect.NavigateToLounge -> {
-                    navigateToLounge()
+                    navigateToLounge(homeState.code)
                 }
                 is HomeSideEffect.NavigateToTemplate -> {
                     navigateToTemplate()
@@ -103,13 +93,20 @@ fun HomeRoute(
         }
     }
 
+    LaunchedEffect(Unit){
+        messageFlow.filter { it.isNotEmpty() }.collectLatest {
+            snackBarHostState.showSnackbar(it)
+        }
+    }
+
     HomeScreen(
         homeState = homeState,
         snackBarHostState = snackBarHostState,
         onClickLoungeButton = { viewModel.sendEvent(HomeEvent.OnClickLoungeButton) },
         onClickJoinLoungeButton = { viewModel.sendEvent(HomeEvent.OnClickJoinLoungeButton) },
-        onClickDismissButtonOfJoinDialog = { viewModel.sendEvent(HomeEvent.OnClickDismissButtonOfJoinDialog) },
         onCodeChanged = { code -> viewModel.sendEvent(HomeEvent.SetJoinCode(code)) },
+        onClickDismissButtonOfJoinDialog = { viewModel.sendEvent(HomeEvent.OnClickDismissButtonOfJoinDialog) },
+        onClickConfirmButtonOfJoinDialog = { viewModel.sendEvent(HomeEvent.OnClickConfirmButtonOfJoinDialog(homeState.code)) },
         onClickTemplateButton = { viewModel.sendEvent(HomeEvent.OnClickTemplateButton) },
         onClickSettingButton = { viewModel.sendEvent(HomeEvent.OnClickSettingButton) },
         onClickTipsButton = { viewModel.sendEvent(HomeEvent.OnClickTipsButton) },
@@ -123,8 +120,9 @@ private fun HomeScreen(
     snackBarHostState: SnackbarHostState,
     onClickLoungeButton: () -> Unit = {},
     onClickJoinLoungeButton: () -> Unit = {},
-    onClickDismissButtonOfJoinDialog: () -> Unit = {},
     onCodeChanged: (String) -> Unit = {},
+    onClickDismissButtonOfJoinDialog: () -> Unit = {},
+    onClickConfirmButtonOfJoinDialog: () -> Unit = {},
     onClickTemplateButton: () -> Unit = {},
     onClickSettingButton: () -> Unit = {},
     onClickTipsButton: () -> Unit = {},
@@ -334,6 +332,7 @@ private fun HomeScreen(
             JoinDialog(
                 homeState = homeState,
                 onCodeChanged = onCodeChanged,
+                onClickConfirmButtonOfJoinDialog = onClickConfirmButtonOfJoinDialog,
                 dismiss = onClickDismissButtonOfJoinDialog
             )
         }
@@ -380,14 +379,15 @@ fun CircularChart(
 fun JoinDialog(
     homeState: HomeState,
     onCodeChanged: (String) -> Unit = {},
+    onClickConfirmButtonOfJoinDialog: () -> Unit = {},
     dismiss: () -> Unit = {},
 ) {
     AlertDialog(
         onDismissRequest = dismiss,
         confirmButton = {
             Button(
-                onClick = { /*TODO: 초대 코드를 통해 투표 방 참여하기*/ },
-                enabled = false
+                onClick = onClickConfirmButtonOfJoinDialog,
+                enabled = homeState.code.isNotBlank()
             ) { Text("참여") }
         },
         dismissButton = { Button(dismiss) { Text("취소") } },

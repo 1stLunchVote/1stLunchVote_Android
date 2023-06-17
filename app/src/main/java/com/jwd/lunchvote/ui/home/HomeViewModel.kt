@@ -28,23 +28,16 @@ class HomeViewModel @Inject constructor(
                 sendSideEffect(HomeSideEffect.NavigateToLounge(null))
             }
             is HomeEvent.OnClickJoinLoungeButton -> {
-                joinLoungeUseCase("KqND4zmJ59")
-                    .catch {
-                        if (it is NotFoundException){
-                            updateState(HomeReduce.ShowJoinDialog)
-                            sendSideEffect(HomeSideEffect.ShowSnackBar("존재하지 않는 방입니다."))
-                        }
-                    }
-                    .onEach {
-                        sendSideEffect(HomeSideEffect.NavigateToLounge("KqND4zmJ59"))
-                    }
-                    .launchIn(viewModelScope)
+                updateState(HomeReduce.ShowJoinDialog)
+            }
+            is HomeEvent.SetJoinCode -> {
+                updateState(HomeReduce.UpdateJoinCode(event.code))
             }
             is HomeEvent.OnClickDismissButtonOfJoinDialog -> {
                 updateState(HomeReduce.DismissJoinDialog)
             }
-            is HomeEvent.SetJoinCode -> {
-                updateState(HomeReduce.UpdateJoinCode(event.code))
+            is HomeEvent.OnClickConfirmButtonOfJoinDialog -> {
+                updateState(HomeReduce.ConfirmJoinDialog(event.code))
             }
             is HomeEvent.OnClickTemplateButton -> {
                 sendSideEffect(HomeSideEffect.NavigateToTemplate)
@@ -55,6 +48,7 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.OnClickTipsButton -> {
                 sendSideEffect(HomeSideEffect.NavigateToTips)
             }
+        }
     }
 
     override fun reduceState(state: HomeState, reduce: HomeReduce): HomeState {
@@ -62,11 +56,24 @@ class HomeViewModel @Inject constructor(
             is HomeReduce.ShowJoinDialog -> {
                 state.copy(showJoinDialog = true)
             }
+            is HomeReduce.UpdateJoinCode -> {
+                state.copy(code = reduce.code)
+            }
             is HomeReduce.DismissJoinDialog -> {
                 state.copy(showJoinDialog = false)
             }
-            is HomeReduce.UpdateJoinCode -> {
-                state.copy(code = reduce.code)
+            is HomeReduce.ConfirmJoinDialog -> {
+                joinLoungeUseCase(reduce.code)
+                    .catch {
+                        if (it is NotFoundException) {
+                            sendSideEffect(HomeSideEffect.ShowSnackBar("존재하지 않는 방입니다."))
+                        }
+                    }
+                    .onEach {
+                        sendSideEffect(HomeSideEffect.NavigateToLounge(reduce.code))
+                    }
+                    .launchIn(viewModelScope)
+                state.copy(showJoinDialog = false)
             }
         }
     }
