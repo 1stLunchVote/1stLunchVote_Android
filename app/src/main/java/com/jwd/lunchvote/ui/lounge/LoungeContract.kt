@@ -36,7 +36,8 @@ class LoungeContract {
     }
 
     sealed interface LoungeReduce: ViewModelContract.Reduce {
-        data class SetLoungeId(val loungeId: String?, val isOwner: Boolean) : LoungeReduce
+        data class SetIsOwner(val isOwner: Boolean) : LoungeReduce
+        data class SetLoungeId(val loungeId: String?) : LoungeReduce
         data class SetMemberList(val memberList: List<MemberUIModel>) : LoungeReduce
         data class SetChatList(val chatList: List<ChatUIModel>) : LoungeReduce
         data class SetCurrentChat(val chat: String) : LoungeReduce

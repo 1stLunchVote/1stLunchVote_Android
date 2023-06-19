@@ -25,6 +25,7 @@
     <!-- LoungeScreen -->
     <string name="lounge_topbar_title">투표 대기방</string>
     <string name="lounge_create_loading">방을 생성중입니다\n잠시만 기다려주세요</string>
+    <string name="lounge_join_loading">방에 접속중입니다\n잠시만 기다려주세요</string>
     <string name="lounge_ready_btn">준비</string>
     <string name="lounge_start_btn">시작</string>
     <string name="lounge_exit_dialog_title">정말 나가시겠습니까?</string>

@@ -11,6 +11,7 @@ import com.jwd.lunchvote.domain.usecase.lounge.CreateLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.ExitLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.GetChatListUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.GetMemberListUseCase
+import com.jwd.lunchvote.domain.usecase.lounge.JoinLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.SendChatUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.UpdateReadyUseCase
 import com.jwd.lunchvote.model.mapper.LoungeMapper
@@ -26,6 +27,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoungeViewModel @Inject constructor(
+    private val joinLoungeUseCase: JoinLoungeUseCase,
     private val createLoungeUseCase: CreateLoungeUseCase,
     private val getMemberListUseCase: GetMemberListUseCase,
     private val getChatListUseCase: GetChatListUseCase,
@@ -36,7 +38,9 @@ class LoungeViewModel @Inject constructor(
     private val auth: FirebaseAuth,
     savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<LoungeState, LoungeEvent, LoungeReduce, LoungeSideEffect>(savedStateHandle) {
-    private val loungeId = savedStateHandle.get<String?>("id")
+    private val loungeId = savedStateHandle.get<String?>("id").also {
+        updateState(LoungeReduce.SetIsOwner(it == null))
+    }
 
     private lateinit var checkJob : Job
 
@@ -50,7 +54,7 @@ class LoungeViewModel @Inject constructor(
 
     private fun initLounge(){
         loungeId?.let {
-            updateState(LoungeReduce.SetLoungeId(it, false))
+            joinLounge(it)
             getLoungeData(it)
         } ?: run {
             createLounge()
@@ -60,8 +64,16 @@ class LoungeViewModel @Inject constructor(
     private fun createLounge(){
         createLoungeUseCase()
             .onEach {
-                updateState(LoungeReduce.SetLoungeId(it, true))
+                updateState(LoungeReduce.SetLoungeId(it))
                 getLoungeData(it)
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun joinLounge(loungeId: String){
+        joinLoungeUseCase(loungeId)
+            .onEach {
+                updateState(LoungeReduce.SetLoungeId(loungeId))
             }
             .launchIn(viewModelScope)
     }
@@ -172,7 +184,8 @@ class LoungeViewModel @Inject constructor(
 
     override fun reduceState(state: LoungeState, reduce: LoungeReduce): LoungeState {
         return when(reduce){
-            is LoungeReduce.SetLoungeId -> state.copy(loungeId = reduce.loungeId, isOwner = reduce.isOwner)
+            is LoungeReduce.SetIsOwner -> state.copy(isOwner = reduce.isOwner)
+            is LoungeReduce.SetLoungeId -> state.copy(loungeId = reduce.loungeId)
             is LoungeReduce.SetMemberList -> {
                 state.copy(
                     memberList = reduce.memberList,
