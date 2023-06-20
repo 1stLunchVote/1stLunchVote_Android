@@ -163,6 +163,7 @@ private fun LoungeScreen(
     ) { padding ->
         if (loungeState.loungeId == null){
             LoungeLoadingScreen(
+                isOwner = loungeState.isOwner,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
@@ -377,6 +378,7 @@ private fun LoungeMemberList(
 
 @Composable
 private fun LoungeLoadingScreen(
+    isOwner: Boolean = false,
     modifier: Modifier = Modifier
 ){
     Column(
@@ -389,7 +391,8 @@ private fun LoungeLoadingScreen(
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = stringResource(id = R.string.lounge_create_loading),
+            text = if (isOwner) stringResource(id = R.string.lounge_create_loading)
+                else stringResource(id = R.string.lounge_join_loading),
             textAlign = TextAlign.Center
         )
     }

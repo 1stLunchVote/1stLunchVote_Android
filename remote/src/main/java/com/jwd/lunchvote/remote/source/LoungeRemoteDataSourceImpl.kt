@@ -33,6 +33,13 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
     private val db: FirebaseDatabase,
     @Dispatcher(IO) private val dispatcher: CoroutineDispatcher
 ) : LoungeRemoteDataSource {
+    override fun checkLoungeExist(
+        loungeId: String
+    ): Flow<Boolean> = flow {
+        val roomRef = db.getReference("$Room/${loungeId}")
+        emit(roomRef.get().await().exists())
+
+    }.flowOn(dispatcher)
 
     override fun createLounge(): Flow<String?> = callbackFlow {
         val roomId = createRandomString(Room_Length)
@@ -54,10 +61,8 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
 
     override fun joinLounge(loungeId: String): Flow<Unit?> = flow {
         val roomRef = db.getReference("$Room/${loungeId}")
-        if (roomRef.get().await().exists().not()) throw NotFoundException()
 
         auth.currentUser?.let {user ->
-            // Todo : Firebase 에러 발생 시 CacellationException 발생 -> 에러 핸들링 불가
             val userExist = roomRef.child(Member).child(user.uid).get().await().getValue<Member>()
 
             addMember(roomRef, user.uid, user.displayName.toString(), user.photoUrl.toString(), false, userExist?.joinedTime)

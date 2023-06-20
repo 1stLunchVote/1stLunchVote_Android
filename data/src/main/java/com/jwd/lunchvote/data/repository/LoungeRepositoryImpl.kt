@@ -26,6 +26,10 @@ class LoungeRepositoryImpl @Inject constructor(
     private val loungeLocalDataSource: LoungeLocalDataSource,
     private val loungeRemoteDataSource: LoungeRemoteDataSource
 ): LoungeRepository {
+    override fun checkLoungeExist(loungeId: String): Flow<Boolean> {
+        return loungeRemoteDataSource.checkLoungeExist(loungeId)
+    }
+
     @OptIn(FlowPreview::class)
     override fun createLounge(): Flow<String> {
         return loungeRemoteDataSource.createLounge().map {

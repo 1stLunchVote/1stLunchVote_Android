@@ -11,6 +11,7 @@ import com.jwd.lunchvote.domain.usecase.lounge.CreateLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.ExitLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.GetChatListUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.GetMemberListUseCase
+import com.jwd.lunchvote.domain.usecase.lounge.JoinLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.SendChatUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.UpdateReadyUseCase
 import com.jwd.lunchvote.model.mapper.LoungeMapper
@@ -19,13 +20,16 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 
 @HiltViewModel
 class LoungeViewModel @Inject constructor(
+    private val joinLoungeUseCase: JoinLoungeUseCase,
     private val createLoungeUseCase: CreateLoungeUseCase,
     private val getMemberListUseCase: GetMemberListUseCase,
     private val getChatListUseCase: GetChatListUseCase,
@@ -36,9 +40,11 @@ class LoungeViewModel @Inject constructor(
     private val auth: FirebaseAuth,
     savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<LoungeState, LoungeEvent, LoungeReduce, LoungeSideEffect>(savedStateHandle) {
-    private val loungeId = savedStateHandle.get<String?>("id")
+    private val loungeId = savedStateHandle.get<String?>("id").also {
+        updateState(LoungeReduce.SetIsOwner(it == null))
+    }
 
-    private lateinit var checkJob : Job
+    private var checkJob : Job? = null
 
     override fun createInitialState(savedState: Parcelable?): LoungeState {
         return savedState as? LoungeState ?: LoungeState()
@@ -50,7 +56,7 @@ class LoungeViewModel @Inject constructor(
 
     private fun initLounge(){
         loungeId?.let {
-            updateState(LoungeReduce.SetLoungeId(it, false))
+            joinLounge(it)
             getLoungeData(it)
         } ?: run {
             createLounge()
@@ -58,12 +64,28 @@ class LoungeViewModel @Inject constructor(
     }
 
     private fun createLounge(){
-        createLoungeUseCase()
-            .onEach {
-                updateState(LoungeReduce.SetLoungeId(it, true))
-                getLoungeData(it)
+        viewModelScope.launch {
+            withTimeoutOrNull(TIMEOUT){
+                val res = createLoungeUseCase().first()
+
+                updateState(LoungeReduce.SetLoungeId(res))
+                getLoungeData(res)
+            } ?: run {
+                sendSideEffect(LoungeSideEffect.PopBackStack("방 생성에 실패하였습니다."))
             }
-            .launchIn(viewModelScope)
+        }
+    }
+
+    private fun joinLounge(loungeId: String){
+        viewModelScope.launch {
+            withTimeoutOrNull(TIMEOUT){
+                joinLoungeUseCase(loungeId).collect()
+
+                updateState(LoungeReduce.SetLoungeId(loungeId))
+            } ?: run {
+                sendSideEffect(LoungeSideEffect.PopBackStack("입장에 실패하였습니다."))
+            }
+        }
     }
 
     private fun sendChat(){
@@ -123,7 +145,15 @@ class LoungeViewModel @Inject constructor(
     }
 
     private fun exitLounge(){
-        // Todo : 다이얼로그 보여준 후 나가기 -> 서버, 로컬 다 나가기
+        viewModelScope.launch {
+            checkJob?.cancel()
+
+            currentState.loungeId?.let {
+                exitLoungeUseCase(auth.currentUser?.uid ?: return@launch, it).collect()
+            }
+
+            sendSideEffect(LoungeSideEffect.PopBackStack("투표 대기방에서 나왔습니다."))
+        }
     }
 
     override fun handleEvents(event: LoungeEvent) {
@@ -144,22 +174,9 @@ class LoungeViewModel @Inject constructor(
                 updateState(LoungeReduce.SetExitDialogShown(true))
             }
             is LoungeEvent.OnClickExit -> {
-                if (event.exit){
-                    viewModelScope.launch {
-                        checkJob.cancel()
+                if (event.exit){ exitLounge() }
 
-                        exitLoungeUseCase(
-                            auth.currentUser?.uid ?: return@launch,
-                            currentState.loungeId ?: return@launch
-                        ).catch {
-
-                        }.collect()
-                        updateState(LoungeReduce.SetExitDialogShown(false))
-                        sendSideEffect(LoungeSideEffect.PopBackStack("투표 대기방에서 나왔습니다."))
-                    }
-                } else {
-                    updateState(LoungeReduce.SetExitDialogShown(false))
-                }
+                updateState(LoungeReduce.SetExitDialogShown(false))
             }
             is LoungeEvent.OnClickInvite -> {
                 sendSideEffect(LoungeSideEffect.CopyToClipboard(currentState.loungeId ?: return))
@@ -172,7 +189,8 @@ class LoungeViewModel @Inject constructor(
 
     override fun reduceState(state: LoungeState, reduce: LoungeReduce): LoungeState {
         return when(reduce){
-            is LoungeReduce.SetLoungeId -> state.copy(loungeId = reduce.loungeId, isOwner = reduce.isOwner)
+            is LoungeReduce.SetIsOwner -> state.copy(isOwner = reduce.isOwner)
+            is LoungeReduce.SetLoungeId -> state.copy(loungeId = reduce.loungeId)
             is LoungeReduce.SetMemberList -> {
                 state.copy(
                     memberList = reduce.memberList,
@@ -184,5 +202,9 @@ class LoungeViewModel @Inject constructor(
             is LoungeReduce.SetExitDialogShown -> state.copy(exitDialogShown = reduce.shown)
             is LoungeReduce.SetScrollIndex -> state.copy(scrollIndex = reduce.index)
         }
+    }
+
+    companion object{
+        private const val TIMEOUT = 10000L
     }
 }

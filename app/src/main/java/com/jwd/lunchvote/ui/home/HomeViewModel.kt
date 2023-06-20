@@ -1,11 +1,10 @@
 package com.jwd.lunchvote.ui.home
 
-import android.content.res.Resources.NotFoundException
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
-import com.jwd.lunchvote.domain.usecase.lounge.JoinLoungeUseCase
+import com.jwd.lunchvote.domain.usecase.lounge.CheckLoungeUseCase
 import com.jwd.lunchvote.ui.home.HomeContract.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.catch
@@ -15,11 +14,30 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val joinLoungeUseCase: JoinLoungeUseCase,
+    private val checkLoungeUseCase: CheckLoungeUseCase,
     savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<HomeState, HomeEvent, HomeReduce, HomeSideEffect>(savedStateHandle){
     override fun createInitialState(savedState: Parcelable?): HomeState {
         return savedState as? HomeState ?: HomeState()
+    }
+
+    private fun checkLoungeExist(loungeId: String) {
+        checkLoungeUseCase(loungeId)
+            .onEach {
+                updateState(HomeReduce.DismissJoinDialog)
+
+                if (it){
+                    sendSideEffect(HomeSideEffect.NavigateToLounge(loungeId))
+                }
+                else {
+                    sendSideEffect(HomeSideEffect.ShowSnackBar("존재하지 않는 방입니다."))
+                }
+            }
+            .catch {
+                updateState(HomeReduce.DismissJoinDialog)
+                sendSideEffect(HomeSideEffect.ShowSnackBar("오류가 발생하였습니다."))
+            }
+            .launchIn(viewModelScope)
     }
 
     override fun handleEvents(event: HomeEvent) {
@@ -37,7 +55,7 @@ class HomeViewModel @Inject constructor(
                 updateState(HomeReduce.DismissJoinDialog)
             }
             is HomeEvent.OnClickConfirmButtonOfJoinDialog -> {
-                updateState(HomeReduce.ConfirmJoinDialog(event.code))
+                checkLoungeExist(event.code)
             }
             is HomeEvent.OnClickTemplateButton -> {
                 sendSideEffect(HomeSideEffect.NavigateToTemplate)
@@ -63,16 +81,6 @@ class HomeViewModel @Inject constructor(
                 state.copy(showJoinDialog = false)
             }
             is HomeReduce.ConfirmJoinDialog -> {
-                joinLoungeUseCase(reduce.code)
-                    .catch {
-                        if (it is NotFoundException) {
-                            sendSideEffect(HomeSideEffect.ShowSnackBar("존재하지 않는 방입니다."))
-                        }
-                    }
-                    .onEach {
-                        sendSideEffect(HomeSideEffect.NavigateToLounge(reduce.code))
-                    }
-                    .launchIn(viewModelScope)
                 state.copy(showJoinDialog = false)
             }
         }
