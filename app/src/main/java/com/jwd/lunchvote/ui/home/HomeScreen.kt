@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -65,6 +66,7 @@ fun HomeRoute(
     navigateToTemplate: () -> Unit,
     navigateToSetting: () -> Unit,
     navigateToTips: () -> Unit,
+    navigateToTest: () -> Unit,
     messageFlow: Flow<String>,
     viewModel: HomeViewModel = hiltViewModel()
 ){
@@ -111,6 +113,7 @@ fun HomeRoute(
         onClickTemplateButton = { viewModel.sendEvent(HomeEvent.OnClickTemplateButton) },
         onClickSettingButton = { viewModel.sendEvent(HomeEvent.OnClickSettingButton) },
         onClickTipsButton = { viewModel.sendEvent(HomeEvent.OnClickTipsButton) },
+        onClickTest = navigateToTest
     )
 }
 
@@ -127,9 +130,17 @@ private fun HomeScreen(
     onClickTemplateButton: () -> Unit = {},
     onClickSettingButton: () -> Unit = {},
     onClickTipsButton: () -> Unit = {},
+    onClickTest: () -> Unit = {},
 ){
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
+        // todo : 2차 투표 화면 테스트를 위한 fab
+        floatingActionButtonPosition = FabPosition.Center,
+        floatingActionButton = {
+            Button(onClick = onClickTest) {
+                Text(text = "2차 투표 화면 테스트")
+            }
+        }
     ) { padding ->
         Column(
             modifier = Modifier

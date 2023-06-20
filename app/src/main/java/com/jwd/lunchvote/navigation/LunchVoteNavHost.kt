@@ -12,6 +12,7 @@ import com.jwd.lunchvote.ui.login.LoginRoute
 import com.jwd.lunchvote.ui.login.register.RegisterEmailRoute
 import com.jwd.lunchvote.ui.lounge.LoungeRoute
 import com.jwd.lunchvote.ui.lounge.member.LoungeMemberRoute
+import com.jwd.lunchvote.ui.vote.second.SecondVoteRoute
 
 @Composable
 fun LunchVoteNavHost(
@@ -40,6 +41,10 @@ fun LunchVoteNavHost(
                     },
                     navigateToTips = {
                         navHostController.navigate(LunchVoteNavRoute.Tips.name)
+                    },
+                    navigateToTest = {
+                        // todo : 나중에 지우기
+                        navHostController.navigate(LunchVoteNavRoute.VoteNavigation.name)
                     },
                     messageFlow = it.savedStateHandle.getStateFlow(SNACK_BAR_KEY, "")
                 )
@@ -103,6 +108,18 @@ fun LunchVoteNavHost(
         }
 
         navigation(
+            route = LunchVoteNavRoute.VoteNavigation.name,
+            startDestination = LunchVoteNavRoute.SecondVote.name
+        ){
+            // Todo : 일차 투표 화면 나오면 여기에 추가
+            composable(LunchVoteNavRoute.SecondVote.name){
+                SecondVoteRoute(
+
+                )
+            }
+        }
+
+        navigation(
             route = LunchVoteNavRoute.LoginNavigation.name,
             startDestination = LunchVoteNavRoute.Login.name
         ) {
@@ -132,12 +149,15 @@ private const val SNACK_BAR_KEY = "message"
 enum class LunchVoteNavRoute {
     LoginNavigation,
     HomeNavigation,
+    VoteNavigation,
 
     Login,
     Home,
     LoungeMember,
     RegisterEmail,
     Profile,
+
+    SecondVote,
 
     Lounge,
     Template,
