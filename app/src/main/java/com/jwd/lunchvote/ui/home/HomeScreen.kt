@@ -76,7 +76,7 @@ fun HomeRoute(
         viewModel.sideEffect.collectLatest {
             when(it){
                 is HomeSideEffect.NavigateToLounge -> {
-                    navigateToLounge(homeState.code)
+                    navigateToLounge(it.loungeId)
                 }
                 is HomeSideEffect.NavigateToTemplate -> {
                     navigateToTemplate()
