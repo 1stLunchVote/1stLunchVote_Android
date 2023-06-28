@@ -114,7 +114,11 @@ fun LunchVoteNavHost(
             // Todo : 일차 투표 화면 나오면 여기에 추가
             composable(LunchVoteNavRoute.SecondVote.name){
                 SecondVoteRoute(
-
+                    popBackStack = { navHostController.navigate(LunchVoteNavRoute.Home.name){
+                        popUpTo(navHostController.graph.id){
+                            inclusive = true
+                        }
+                    } }
                 )
             }
         }

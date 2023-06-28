@@ -1,5 +1,6 @@
 package com.jwd.lunchvote.ui.vote.second
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -29,7 +30,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,8 +47,15 @@ import com.jwd.lunchvote.ui.vote.second.SecondVoteContract.*
 @Composable
 fun SecondVoteRoute(
     viewModel: SecondVoteViewModel = hiltViewModel(),
+    popBackStack: () -> Unit
 ){
     val secondVoteState : SecondVoteState by viewModel.viewState.collectAsStateWithLifecycle()
+
+    // 뒤로가기 버튼 눌렀을 때
+    BackHandler() {
+        // Todo : 뒤로가기 눌러서 나가도 투표는 그대로 진행된다고 명시할지 고민
+        popBackStack()
+    }
 
     SecondVoteScreen(
         state = secondVoteState,
@@ -135,6 +142,7 @@ private fun SecondVoteTile(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
+            .noRippleClickable { onClickVote() }
             .border(color = MaterialTheme.colorScheme.outline, width = 1.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -164,8 +172,7 @@ private fun SecondVoteTile(
 
         Box(
             modifier = Modifier
-                .size(80.dp)
-                .noRippleClickable { onClickVote() },
+                .size(80.dp),
         ) {
             if (isVoted){
                 Image(
