@@ -72,3 +72,5 @@ abstract class BaseStateViewModel<S : ViewModelContract.State, E : ViewModelCont
         const val STATE_KEY = "viewState"
     }
 }
+
+typealias Reducer<S> = (state: ViewModelContract.State, action: ViewModelContract.Reduce) -> S

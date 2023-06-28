@@ -36,4 +36,7 @@
     <string name="lounge_member_topbar_title">참여자 정보방</string>
     <string name="lounge_member_exile">추방하기</string>
     <string name="lounge_member_anonymous_nickname">익명 참가자</string>
+
+    <!-- SecondVoteScreen -->
+    <string name="second_vote_fab">투표 완료</string>
 </resources>
