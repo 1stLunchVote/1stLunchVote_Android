@@ -15,12 +15,14 @@ import com.jwd.lunchvote.data.source.remote.LoungeRemoteDataSource
 import com.jwd.lunchvote.data.util.createRandomString
 import com.jwd.lunchvote.domain.entity.LoungeChat
 import com.jwd.lunchvote.domain.entity.Member
+import com.jwd.lunchvote.remote.util.getValueEventFlow
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import org.json.JSONObject
 import timber.log.Timber
@@ -71,53 +73,18 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
         }
     }.flowOn(dispatcher)
 
-    override fun getMemberList(loungeId: String): Flow<List<Member>> = callbackFlow {
+    override fun getMemberList(loungeId: String): Flow<List<Member>> {
         val memberRef = db.getReference("$Room/${loungeId}").child(Member)
 
-        val listener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                try {
-                    val res = snapshot.getValue<HashMap<String, Member>>()
-                    trySend(res?.values?.toList()?.sortedBy { it.joinedTime } ?: emptyList())
-                } catch (e: Exception){
-                    Timber.e("error: ${e.message}")
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Timber.e("$error")
-                close(Throwable(error.message))
-            }
-        }
-
-        memberRef.addValueEventListener(listener)
-
-        awaitClose{ memberRef.removeEventListener(listener) }
+        return memberRef.getValueEventFlow<HashMap<String, Member>>()
+            .map { it.values.toList().sortedBy { m -> m.joinedTime } }.flowOn(dispatcher)
     }
 
-    override fun getChatList(loungeId: String): Flow<List<LoungeChat>> = callbackFlow {
+    override fun getChatList(loungeId: String): Flow<List<LoungeChat>> {
         val chatRef = db.getReference("$Room/${loungeId}").child(Chat)
 
-        val listener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                try {
-                    val res = snapshot.getValue<ArrayList<LoungeChat>>()
-                    Timber.e("chatList : $res")
-                    res?.let { trySend(res)}
-                } catch (e: Exception){
-                    Timber.e("error: ${e.message}")
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Timber.e("$error")
-            }
-        }
-
-        chatRef.addValueEventListener(listener)
-
-        awaitClose { chatRef.removeEventListener(listener) }
-    }.flowOn(dispatcher)
+        return chatRef.getValueEventFlow<ArrayList<LoungeChat>>().flowOn(dispatcher)
+    }
 
     override fun sendChat(
         loungeId: String, content: String?, messageType: Int
