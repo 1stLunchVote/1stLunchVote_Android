@@ -67,6 +67,7 @@ fun HomeRoute(
     navigateToSetting: () -> Unit,
     navigateToTips: () -> Unit,
     navigateToTest: () -> Unit,
+    navigateToFirstVote: () -> Unit,
     messageFlow: Flow<String>,
     viewModel: HomeViewModel = hiltViewModel()
 ){
@@ -113,7 +114,8 @@ fun HomeRoute(
         onClickTemplateButton = { viewModel.sendEvent(HomeEvent.OnClickTemplateButton) },
         onClickSettingButton = { viewModel.sendEvent(HomeEvent.OnClickSettingButton) },
         onClickTipsButton = { viewModel.sendEvent(HomeEvent.OnClickTipsButton) },
-        onClickTest = navigateToTest
+        onClickTest = navigateToTest,
+        onClickFirstVote = navigateToFirstVote
     )
 }
 
@@ -131,6 +133,7 @@ private fun HomeScreen(
     onClickSettingButton: () -> Unit = {},
     onClickTipsButton: () -> Unit = {},
     onClickTest: () -> Unit = {},
+    onClickFirstVote: () -> Unit = {}
 ){
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
@@ -139,6 +142,9 @@ private fun HomeScreen(
         floatingActionButton = {
             Button(onClick = onClickTest) {
                 Text(text = "2차 투표 화면 테스트")
+            }
+            Button(onClick = onClickFirstVote) {
+                Text("1차 투표 테스트")
             }
         }
     ) { padding ->

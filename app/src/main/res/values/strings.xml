@@ -36,4 +36,9 @@
     <string name="lounge_member_topbar_title">참여자 정보방</string>
     <string name="lounge_member_exile">추방하기</string>
     <string name="lounge_member_anonymous_nickname">익명 참가자</string>
+
+    <!-- FirstVoteScreen -->
+    <string name="exit_from_first_vote">투표 방에서 나왔습니다.</string>
+    <string name="first_vote_title">1차 투표</string>
+    <string name="first_vote_hint_text">검색</string>
 </resources>

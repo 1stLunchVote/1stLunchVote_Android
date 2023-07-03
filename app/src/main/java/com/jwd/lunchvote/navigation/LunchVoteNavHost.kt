@@ -12,6 +12,7 @@ import com.jwd.lunchvote.ui.login.LoginRoute
 import com.jwd.lunchvote.ui.login.register.RegisterEmailRoute
 import com.jwd.lunchvote.ui.lounge.LoungeRoute
 import com.jwd.lunchvote.ui.lounge.member.LoungeMemberRoute
+import com.jwd.lunchvote.ui.vote.first.FirstVoteRoute
 import com.jwd.lunchvote.ui.vote.second.SecondVoteRoute
 
 @Composable
@@ -45,6 +46,9 @@ fun LunchVoteNavHost(
                     navigateToTest = {
                         // todo : 나중에 지우기
                         navHostController.navigate(LunchVoteNavRoute.VoteNavigation.name)
+                    },
+                    navigateToFirstVote = {
+                        navHostController.navigate(LunchVoteNavRoute.FirstVote.name)
                     },
                     messageFlow = it.savedStateHandle.getStateFlow(SNACK_BAR_KEY, "")
                 )
@@ -111,7 +115,14 @@ fun LunchVoteNavHost(
             route = LunchVoteNavRoute.VoteNavigation.name,
             startDestination = LunchVoteNavRoute.SecondVote.name
         ){
-            // Todo : 일차 투표 화면 나오면 여기에 추가
+            composable(LunchVoteNavRoute.FirstVote.name) {
+                FirstVoteRoute(
+                    navigateToSecondVote = {
+                        navHostController.navigate(LunchVoteNavRoute.SecondVote.name)
+                    },
+                    popBackStack = { navHostController.popBackStack() }
+                )
+            }
             composable(LunchVoteNavRoute.SecondVote.name){
                 SecondVoteRoute(
 
@@ -157,6 +168,7 @@ enum class LunchVoteNavRoute {
     RegisterEmail,
     Profile,
 
+    FirstVote,
     SecondVote,
 
     Lounge,
