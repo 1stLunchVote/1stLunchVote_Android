@@ -4,18 +4,17 @@ import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -23,28 +22,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Outline
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.PathParser
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.R
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
+import com.jwd.lunchvote.domain.entity.Food
 import com.jwd.lunchvote.domain.entity.FoodStatus
 import com.jwd.lunchvote.model.FoodUIModel
-import com.jwd.lunchvote.ui.vote.first.FirstVoteContract.FirstVoteState
 import com.jwd.lunchvote.ui.vote.first.FirstVoteContract.FirstVoteEvent
-import com.jwd.lunchvote.ui.vote.first.FirstVoteContract.FirstVoteReduce
 import com.jwd.lunchvote.ui.vote.first.FirstVoteContract.FirstVoteSideEffect
+import com.jwd.lunchvote.ui.vote.first.FirstVoteContract.FirstVoteState
 import com.jwd.lunchvote.util.UiText
 import com.jwd.lunchvote.widget.FoodItem
 import com.jwd.lunchvote.widget.LikeDislike
@@ -76,7 +67,8 @@ fun FirstVoteRoute(
 
     FirstVoteScreen(
         firstVoteState = firstVoteState,
-        typeSearchKeyword = { search -> viewModel.sendEvent(FirstVoteEvent.TypeSearchKeyword(search)) },
+        onClickFood = { food -> viewModel.sendEvent(FirstVoteEvent.OnClickFood(food)) },
+        setSearchKeyword = { search -> viewModel.sendEvent(FirstVoteEvent.SetSearchKeyword(search)) },
         navigateToSecondVote = navigateToSecondVote,
         popBackStack = popBackStack
     )
@@ -86,7 +78,8 @@ fun FirstVoteRoute(
 @Composable
 fun FirstVoteScreen(
     firstVoteState: FirstVoteState,
-    typeSearchKeyword: (String) -> Unit = {},
+    onClickFood: (FoodUIModel) -> Unit = {},
+    setSearchKeyword: (String) -> Unit = {},
     navigateToSecondVote: () -> Unit = {},
     popBackStack: (String) -> Unit = {},
     context: Context = LocalContext.current
@@ -94,18 +87,17 @@ fun FirstVoteScreen(
     Scaffold { padding ->
         Column(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxWidth(1f)
                 .padding(padding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             ProgressTopBar(stringResource(R.string.first_vote_title)) {
                 popBackStack(UiText.StringResource(R.string.exit_from_first_vote).asString(context))
             }
-            Spacer(Modifier.height(20.dp))
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
+                    .fillMaxWidth(1f)
+                    .padding(top = 16.dp, start = 32.dp, end = 32.dp, bottom = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -118,44 +110,53 @@ fun FirstVoteScreen(
                     }
                 }
             }
-            Spacer(Modifier.height(16.dp))
             LunchVoteTextField(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
+                    .fillMaxWidth(1f)
+                    .padding(horizontal = 32.dp, vertical = 0.dp),
                 text = firstVoteState.searchKeyword,
                 hintText = stringResource(R.string.first_vote_hint_text),
-                onTextChanged = typeSearchKeyword,
+                onTextChanged = setSearchKeyword,
                 textFieldType = TextFieldType.Search
             )
             LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
+                columns = GridCells.Fixed(3),
+                modifier = Modifier
+                    .fillMaxWidth(1f)
+                    .weight(1f, false)
+                    .padding(top = 24.dp, start = 32.dp, end = 32.dp, bottom = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                items(firstVoteState.foodList) {
-
+                items(firstVoteState.foodList) {food ->
+                    FoodItem(food) { onClickFood(food) }
                 }
-                item { FoodItem(
-                    food = FoodUIModel(
-                        foodId = 0L,
-                        imageUrl = "",
-                        name = "햄버거",
-                        status = FoodStatus.DISLIKE
-                    )
-                ) }
+            }
+            Button(
+                onClick = { /*TODO*/ },
+                modifier = Modifier.padding(top = 0.dp, start = 0.dp, end = 0.dp, bottom = 24.dp)
+            ) {
+                Text("투표 완료")
             }
         }
     }
 }
 
-@Preview(showSystemUi = true)
+@Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun FirstVoteScreenPreview() {
     LunchVoteTheme {
         Surface {
             FirstVoteScreen(
                 FirstVoteState(
+                    foodList = List(20) {
+                        FoodUIModel(
+                            foodId = it.toLong(),
+                            imageUrl = "",
+                            name = "음식명",
+                            status = FoodStatus.DEFAULT
+                        )
+                    },
                     totalMember = 3,
                     endedMember = 1
                 )
