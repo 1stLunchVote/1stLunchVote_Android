@@ -34,7 +34,8 @@ class SecondVoteViewModel @Inject constructor(
             is SecondVoteEvent.OnClickVote -> {
                 updateState(SecondVoteReduce.ChangeVoted(event.index))
             }
-            is SecondVoteEvent.OnClickComplete -> {
+            is SecondVoteEvent.OnClickFab -> {
+                updateState(SecondVoteReduce.SetVoteCompleted())
             }
         }
     }
@@ -47,6 +48,9 @@ class SecondVoteViewModel @Inject constructor(
             )
             is SecondVoteReduce.ChangeVoted -> state.copy(
                 voteIndex = if (state.voteIndex == reduce.index) -1 else reduce.index,
+            )
+            is SecondVoteReduce.SetVoteCompleted -> state.copy(
+                voteCompleted = !state.voteCompleted
             )
         }
     }

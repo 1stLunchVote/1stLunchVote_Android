@@ -43,6 +43,7 @@ import com.jwd.lunchvote.core.ui.util.noRippleClickable
 import com.jwd.lunchvote.model.SecondVoteTileUIModel
 import com.jwd.lunchvote.widget.ProgressTopBar
 import com.jwd.lunchvote.ui.vote.second.SecondVoteContract.*
+import timber.log.Timber
 
 @Composable
 fun SecondVoteRoute(
@@ -60,7 +61,11 @@ fun SecondVoteRoute(
     SecondVoteScreen(
         state = secondVoteState,
         onClickVote = { viewModel.sendEvent(SecondVoteEvent.OnClickVote(it)) },
-        onClickComplete = { viewModel.sendEvent(SecondVoteEvent.OnClickComplete) },
+        onClickFab = { viewModel.sendEvent(SecondVoteEvent.OnClickFab) },
+        onVoteFinished = {
+            // Todo : 투표 종료시 호출
+            Timber.e("60 seconds finished")
+        }
     )
 }
 
@@ -69,13 +74,16 @@ fun SecondVoteRoute(
 private fun SecondVoteScreen(
     state: SecondVoteState = SecondVoteState(),
     onClickVote: (Int) -> Unit = {},
-    onClickComplete: () -> Unit = {},
+    onClickFab: () -> Unit = {},
+    onVoteFinished: () -> Unit = {}
 ){
     Scaffold(
-        topBar = { ProgressTopBar(title = "2차 투표") },
+        topBar = { ProgressTopBar(title = "2차 투표", onProgressComplete = onVoteFinished) },
         floatingActionButton = {
-            Button(onClick = onClickComplete, enabled = state.voteIndex != -1) {
-                Text(text = stringResource(id = R.string.second_vote_fab))
+            Button(onClick = onClickFab, enabled = state.voteIndex != -1) {
+                Text(text = if (state.voteCompleted) stringResource(id = R.string.second_vote_back_fab)
+                        else stringResource(id = R.string.second_vote_fab)
+                )
             }
         },
         floatingActionButtonPosition = FabPosition.Center
@@ -84,10 +92,12 @@ private fun SecondVoteScreen(
             .fillMaxSize()
             .padding(padding)
         ) {
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            SecondVoteContent(state = state, onClickVote = onClickVote)
+            if (state.voteCompleted){
+                SecondVoteComplete()
+            } else {
+                Spacer(modifier = Modifier.height(16.dp))
+                SecondVoteContent(state = state, onClickVote = onClickVote)
+            }
         }
     }
 }
@@ -183,6 +193,44 @@ private fun SecondVoteTile(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun SecondVoteComplete(
+    voteCount: Int = 1,
+    totalCount: Int = 0
+){
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(text = stringResource(id = R.string.second_vote_complete_wait),
+            style = MaterialTheme.typography.titleLarge)
+
+        Spacer(modifier = Modifier.height(40.dp))
+
+        // Todo : 투표 인디케이터 표시
+        Text(text = "인디케이터 표시 예정")
+
+        Spacer(modifier = Modifier.height(40.dp))
+
+        Text(
+            text = "현재 $voteCount" + stringResource(id = R.string.second_vote_complete_content),
+            style = MaterialTheme.typography.titleSmall
+        )
+
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SecondVoteCompletePreview(){
+    LunchVoteTheme {
+        SecondVoteComplete()
     }
 }
 
