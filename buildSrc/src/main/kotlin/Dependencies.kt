@@ -16,11 +16,11 @@ object Versions{
     const val ConstraintLayout = "2.1.4"
     const val Lifecycle = "2.6.1"
     const val Navigation = "2.5.3"
-    const val Work = "2.8.1"
     const val RecyclerView = "1.3.0"
-    const val Secret = "2.0.1"
-    const val Timber = "4.7.1"
+    const val Work = "2.8.1"
     const val SplashScreen = "1.0.0"
+    const val Timber = "4.7.1"
+    const val Secret = "2.0.1"
 
     // Hilt
     const val Hilt = "2.44"
@@ -33,11 +33,11 @@ object Versions{
     // JavaX
     const val JavaX = "1"
 
+
     // Firebase
     const val Firebase = "32.0.0"
     const val Gms = "4.3.15"
     const val GmsAuth = "20.4.0"
-    const val Kakao = "2.13.0"
 
     // Retrofit
     const val Retrofit = "2.9.0"
@@ -47,7 +47,7 @@ object Versions{
     const val Room = "2.5.1"
 
     // Compose
-    const val Compose = "2023.01.00"
+    const val Compose = "2023.04.00"
     const val Material3 = "1.0.1"
     const val ComposeNavigation = "2.5.1"
     const val ComposeHilt = "1.0.0"
@@ -63,6 +63,7 @@ object Versions{
     const val Slf4j = "2.0.7"
 
     const val Coil = "2.4.0"
+    const val Kakao = "2.14.0"
 }
 
 object Libraries{
@@ -76,13 +77,21 @@ object Libraries{
         const val Navigation = "androidx.navigation:navigation-fragment-ktx:${Versions.Navigation}"
         const val NavigationUI = "androidx.navigation:navigation-ui-ktx:${Versions.Navigation}"
         const val Work = "androidx.work:work-runtime-ktx:${Versions.Work}"
-        const val RecyclerView = "androidx.recyclerview:recyclerview:${Versions.RecyclerView}"
         const val SplashScreen = "androidx.core:core-splashscreen:${Versions.SplashScreen}"
     }
 
     object Coroutine {
         const val Coroutine = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.Coroutine}"
         const val CoroutineAndroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.Coroutine}"
+    }
+
+
+    object Firebase{
+        const val Firebase = "com.google.firebase:firebase-bom:${Versions.Firebase}"
+        const val Auth = "com.google.firebase:firebase-auth-ktx"
+        const val DataBase = "com.google.firebase:firebase-database-ktx"
+        const val GmsAuth = "com.google.android.gms:play-services-auth:${Versions.GmsAuth}"
+        const val Function = "com.google.firebase:firebase-functions-ktx"
     }
 
     object Hilt{
@@ -114,14 +123,6 @@ object Libraries{
         const val Inject = "javax.inject:javax.inject:${Versions.JavaX}"
     }
 
-    object Firebase{
-        const val Firebase = "com.google.firebase:firebase-bom:${Versions.Firebase}"
-        const val Auth = "com.google.firebase:firebase-auth-ktx"
-        const val DataBase = "com.google.firebase:firebase-database-ktx"
-        const val GmsAuth = "com.google.android.gms:play-services-auth:${Versions.GmsAuth}"
-        const val Function = "com.google.firebase:firebase-functions-ktx"
-    }
-
     object Compose{
         const val ComposeBom = "androidx.compose:compose-bom:${Versions.Compose}"
         const val Material3 = "androidx.compose.material3:material3:${Versions.Material3}"
@@ -142,6 +143,7 @@ object Libraries{
         const val RoomPaging = "androidx.room:room-paging:${Versions.Room}"
     }
 
+
     const val Kakao = "com.kakao.sdk:v2-all-rx:${Versions.Kakao}"
     const val Timber = "com.jakewharton.timber:timber:${Versions.Timber}"
     const val Coil = "io.coil-kt:coil-compose:${Versions.Coil}"
@@ -158,7 +160,6 @@ fun DependencyHandlerScope.implementationAndroidX(){
         Libraries.AndroidX.Navigation,
         Libraries.AndroidX.NavigationUI,
         Libraries.AndroidX.Work,
-        Libraries.AndroidX.RecyclerView,
         Libraries.AndroidX.SplashScreen
     )
 }
@@ -167,6 +168,13 @@ fun DependencyHandlerScope.implementationCoroutine(){
     implementations(
         Libraries.Coroutine.Coroutine,
         Libraries.Coroutine.CoroutineAndroid
+    )
+}
+
+
+fun DependencyHandlerScope.implementationFirebase(){
+    implementations(
+        platform(Libraries.Firebase.Firebase)
     )
 }
 
@@ -182,11 +190,6 @@ fun DependencyHandlerScope.implementationHilt(){
     )
 }
 
-fun DependencyHandlerScope.implementationFirebase(){
-    implementations(
-        platform(Libraries.Firebase.Firebase)
-    )
-}
 
 fun DependencyHandlerScope.implementationRetrofit(){
     implementations(

@@ -25,7 +25,7 @@ class SecondVoteContract {
     sealed interface SecondVoteReduce : ViewModelContract.Reduce {
         data class SetVoteList(val voteList: List<SecondVoteTileUIModel>) : SecondVoteReduce
         data class ChangeVoted(val index: Int) : SecondVoteReduce
-        class SetVoteCompleted : SecondVoteReduce
+        object SetVoteCompleted : SecondVoteReduce
     }
 
     sealed interface SecondVoteSideEffect : ViewModelContract.SideEffect {

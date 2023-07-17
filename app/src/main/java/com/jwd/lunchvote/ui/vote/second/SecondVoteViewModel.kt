@@ -8,6 +8,7 @@ import com.jwd.lunchvote.model.SecondVoteTileUIModel
 import com.jwd.lunchvote.ui.vote.second.SecondVoteContract.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlin.coroutines.coroutineContext
 
 @HiltViewModel
 class SecondVoteViewModel @Inject constructor(
@@ -35,7 +36,7 @@ class SecondVoteViewModel @Inject constructor(
                 updateState(SecondVoteReduce.ChangeVoted(event.index))
             }
             is SecondVoteEvent.OnClickFab -> {
-                updateState(SecondVoteReduce.SetVoteCompleted())
+                updateState(SecondVoteReduce.SetVoteCompleted)
             }
         }
     }
