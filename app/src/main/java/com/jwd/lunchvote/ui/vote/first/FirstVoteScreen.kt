@@ -97,7 +97,7 @@ fun FirstVoteScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth(1f)
-                    .padding(top = 16.dp, start = 32.dp, end = 32.dp, bottom = 8.dp),
+                    .padding(top = 16.dp, start = 24.dp, end = 24.dp, bottom = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -113,7 +113,7 @@ fun FirstVoteScreen(
             LunchVoteTextField(
                 modifier = Modifier
                     .fillMaxWidth(1f)
-                    .padding(horizontal = 32.dp, vertical = 0.dp),
+                    .padding(horizontal = 24.dp, vertical = 0.dp),
                 text = firstVoteState.searchKeyword,
                 hintText = stringResource(R.string.first_vote_hint_text),
                 onTextChanged = setSearchKeyword,
@@ -124,7 +124,7 @@ fun FirstVoteScreen(
                 modifier = Modifier
                     .fillMaxWidth(1f)
                     .weight(1f, false)
-                    .padding(top = 24.dp, start = 32.dp, end = 32.dp, bottom = 16.dp),
+                    .padding(top = 24.dp, start = 24.dp, end = 24.dp, bottom = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -133,8 +133,9 @@ fun FirstVoteScreen(
                 }
             }
             Button(
-                onClick = { /*TODO*/ },
-                modifier = Modifier.padding(top = 0.dp, start = 0.dp, end = 0.dp, bottom = 24.dp)
+                onClick = navigateToSecondVote,
+                modifier = Modifier.padding(top = 0.dp, start = 0.dp, end = 0.dp, bottom = 24.dp),
+                enabled = firstVoteState.likeList.isNotEmpty() && firstVoteState.dislikeList.isNotEmpty()
             ) {
                 Text("투표 완료")
             }
