@@ -44,6 +44,7 @@ import com.jwd.lunchvote.widget.ProgressTopBar
 import com.jwd.lunchvote.widget.StepProgress
 import com.jwd.lunchvote.widget.TextFieldType
 import kotlinx.coroutines.flow.collectLatest
+import timber.log.Timber
 
 @Composable
 fun FirstVoteRoute(
@@ -128,7 +129,7 @@ fun FirstVoteScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                items(firstVoteState.foodList) {food ->
+                items(firstVoteState.foodList.filter { it.name.contains(firstVoteState.searchKeyword) }) {food ->
                     FoodItem(food) { onClickFood(food) }
                 }
             }

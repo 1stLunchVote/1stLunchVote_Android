@@ -4,6 +4,7 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.entity.FoodStatus
+import com.jwd.lunchvote.model.FoodUIModel
 import com.jwd.lunchvote.ui.vote.first.FirstVoteContract.FirstVoteState
 import com.jwd.lunchvote.ui.vote.first.FirstVoteContract.FirstVoteEvent
 import com.jwd.lunchvote.ui.vote.first.FirstVoteContract.FirstVoteReduce
@@ -16,6 +17,19 @@ class FirstVoteViewModel (
     override fun createInitialState(savedState: Parcelable?): FirstVoteState =
         savedState as? FirstVoteState ?: FirstVoteState()
 
+    init {
+      updateState(FirstVoteReduce.UpdateFoodList(
+          List(20) {
+              FoodUIModel(
+                  foodId = it.toLong(),
+                  imageUrl = "",
+                  name = "음식명",
+                  status = FoodStatus.DEFAULT
+              )
+          }
+      ))
+    }
+
     override fun handleEvents(event: FirstVoteEvent) {
         when(event) {
             is FirstVoteEvent.OnClickFood -> updateState(FirstVoteReduce.UpdateFoodStatus(event.food))
@@ -26,6 +40,7 @@ class FirstVoteViewModel (
 
     override fun reduceState(state: FirstVoteState, reduce: FirstVoteReduce): FirstVoteState {
         return when(reduce) {
+            is FirstVoteReduce.UpdateFoodList -> state.copy(foodList = reduce.foodList)
             is FirstVoteReduce.UpdateFoodStatus -> {
                 when(reduce.food.status) {
                     FoodStatus.DEFAULT -> state.copy(

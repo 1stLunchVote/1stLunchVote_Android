@@ -11,14 +11,7 @@ import kotlinx.parcelize.Parcelize
 class FirstVoteContract {
     @Parcelize
     data class FirstVoteState(
-        val foodList: List<FoodUIModel> = List(20) {
-            FoodUIModel(
-                foodId = it.toLong(),
-                imageUrl = "",
-                name = "음식명",
-                status = FoodStatus.DEFAULT
-            )
-        },
+        val foodList: List<FoodUIModel> = emptyList(),
         val likeList: List<FoodUIModel> = emptyList(),
         val dislikeList: List<FoodUIModel> = emptyList(),
         val totalMember: Int = 0,
@@ -36,6 +29,7 @@ class FirstVoteContract {
     }
 
     sealed interface FirstVoteReduce: ViewModelContract.Reduce {
+        data class UpdateFoodList(val foodList: List<FoodUIModel>): FirstVoteReduce
         data class UpdateFoodStatus(val food: FoodUIModel): FirstVoteReduce
         data class UpdateTotalMember(val totalMember: Int): FirstVoteReduce
         data class UpdateEndedMember(val endedMember: Int): FirstVoteReduce
