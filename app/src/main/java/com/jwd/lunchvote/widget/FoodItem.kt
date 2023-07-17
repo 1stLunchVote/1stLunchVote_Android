@@ -3,7 +3,9 @@ package com.jwd.lunchvote.widget
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
@@ -11,22 +13,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.CompositingStrategy
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.vector.PathParser
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.jwd.lunchvote.R
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
@@ -41,7 +34,11 @@ fun FoodItem(
   onClick: () -> Unit = {}
 ) {
   Column(
-    modifier = Modifier.clickable { onClick() },
+    modifier = Modifier.clickable(
+      interactionSource = remember{ MutableInteractionSource() },
+      indication = null,
+      onClick = onClick
+    ),
     verticalArrangement = Arrangement.spacedBy(4.dp),
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
@@ -69,33 +66,25 @@ fun FoodItem(
         )
       }
       FoodStatus.DISLIKE -> {
-        val imageBitmap = ImageBitmap.imageResource(R.drawable.ic_mask_reversed)
-        val outlineBitmap = ImageBitmap.imageResource(R.drawable.ic_mask_outline)
-        Image(
-          painterResource(R.drawable.ic_food_image_temp),
-          null,
-          modifier = Modifier
-            .size(100.dp)
-            .graphicsLayer {
-              compositingStrategy = CompositingStrategy.Offscreen
-            }
-            .drawWithContent {
-              drawContent()
-              
-              drawImage(
-                imageBitmap,
-                dstSize = IntSize(width = size.width.toInt(), height = size.height.toInt()),
-                blendMode = BlendMode.Clear,
-              )
-              drawImage(
-                outlineBitmap,
-                dstSize = IntSize(width = size.width.toInt(), height = size.height.toInt()),
-                alpha = 0.5f
-              )
-            }
-            .alpha(0.5f),
-          contentScale = ContentScale.Crop,
-        )
+        Box(
+          modifier = Modifier.alpha(0.5f)
+        ) {
+          Image(
+            painterResource(R.drawable.ic_food_image_temp),
+            null,
+              modifier = Modifier.size(100.dp)
+          )
+          Image(
+            painterResource(R.drawable.ic_mask_reversed),
+            null,
+            modifier = Modifier.size(100.dp),
+          )
+          Image(
+            painterResource(R.drawable.ic_mask_outline),
+            null,
+            modifier = Modifier.size(100.dp)
+          )
+        }
       }
     }
     Text(

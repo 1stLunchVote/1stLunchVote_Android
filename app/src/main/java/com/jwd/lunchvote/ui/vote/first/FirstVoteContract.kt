@@ -37,10 +37,6 @@ class FirstVoteContract {
 
     sealed interface FirstVoteReduce: ViewModelContract.Reduce {
         data class UpdateFoodStatus(val food: FoodUIModel): FirstVoteReduce
-        data class AddFoodIntoLikeList(val food: FoodUIModel): FirstVoteReduce
-        data class DeleteFoodFromLikeList(val food: FoodUIModel): FirstVoteReduce
-        data class AddFoodIntoDislikeList(val food: FoodUIModel): FirstVoteReduce
-        data class DeleteFoodFromDislikeList(val food: FoodUIModel): FirstVoteReduce
         data class UpdateTotalMember(val totalMember: Int): FirstVoteReduce
         data class UpdateEndedMember(val endedMember: Int): FirstVoteReduce
         data class UpdateSearchKeyword(val searchKeyword: String): FirstVoteReduce

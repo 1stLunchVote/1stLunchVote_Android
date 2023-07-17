@@ -18,23 +18,7 @@ class FirstVoteViewModel (
 
     override fun handleEvents(event: FirstVoteEvent) {
         when(event) {
-            is FirstVoteEvent.OnClickFood -> {
-                when(event.food.status) {
-                    FoodStatus.DEFAULT -> {
-                        updateState(FirstVoteReduce.AddFoodIntoLikeList(event.food))
-                        updateState(FirstVoteReduce.UpdateFoodStatus(event.food))
-                    }
-                    FoodStatus.LIKE -> {
-                        updateState(FirstVoteReduce.DeleteFoodFromLikeList(event.food))
-                        updateState(FirstVoteReduce.AddFoodIntoDislikeList(event.food))
-                        updateState(FirstVoteReduce.UpdateFoodStatus(event.food))
-                    }
-                    FoodStatus.DISLIKE -> {
-                        updateState(FirstVoteReduce.DeleteFoodFromDislikeList(event.food))
-                        updateState(FirstVoteReduce.UpdateFoodStatus(event.food))
-                    }
-                }
-            }
+            is FirstVoteEvent.OnClickFood -> updateState(FirstVoteReduce.UpdateFoodStatus(event.food))
             is FirstVoteEvent.SetSearchKeyword -> updateState(FirstVoteReduce.UpdateSearchKeyword(event.searchKeyword))
             is FirstVoteEvent.OnClickFinishButton -> updateState(FirstVoteReduce.UpdateIsFinished(true))
         }
@@ -43,33 +27,28 @@ class FirstVoteViewModel (
     override fun reduceState(state: FirstVoteState, reduce: FirstVoteReduce): FirstVoteState {
         return when(reduce) {
             is FirstVoteReduce.UpdateFoodStatus -> {
-                Timber.w("💛 ===ktw=== ${reduce.food}")
-                state.copy(
-                    foodList = state.foodList.map {
-                        if (it == reduce.food) {
-                            it.copy(status = when(it.status) {
-                                FoodStatus.DEFAULT -> FoodStatus.LIKE
-                                FoodStatus.LIKE -> FoodStatus.DISLIKE
-                                FoodStatus.DISLIKE -> FoodStatus.DEFAULT
-                            })
-                        } else {
-                            it
+                when(reduce.food.status) {
+                    FoodStatus.DEFAULT -> state.copy(
+                        likeList = state.likeList + reduce.food.copy(status = FoodStatus.LIKE),
+                        foodList = state.foodList.map {
+                            if (it == reduce.food) it.copy(status = FoodStatus.LIKE) else it
                         }
-                    }
-                )
+                    )
+                    FoodStatus.LIKE -> state.copy(
+                        likeList = state.likeList.filter { it != reduce.food },
+                        dislikeList = state.dislikeList + reduce.food.copy(status = FoodStatus.DISLIKE),
+                        foodList = state.foodList.map {
+                            if (it == reduce.food) it.copy(status = FoodStatus.DISLIKE) else it
+                        }
+                    )
+                    FoodStatus.DISLIKE -> state.copy(
+                        dislikeList = state.dislikeList.filter { it != reduce.food },
+                        foodList = state.foodList.map {
+                            if (it == reduce.food) it.copy(status = FoodStatus.DEFAULT) else it
+                        }
+                    )
+                }
             }
-            is FirstVoteReduce.AddFoodIntoLikeList -> state.copy(
-                likeList = state.likeList + reduce.food
-            )
-            is FirstVoteReduce.DeleteFoodFromLikeList -> state.copy(
-                likeList = state.likeList.filter { it != reduce.food }
-            )
-            is FirstVoteReduce.AddFoodIntoDislikeList -> state.copy(
-                dislikeList = state.dislikeList + reduce.food
-            )
-            is FirstVoteReduce.DeleteFoodFromDislikeList -> state.copy(
-                dislikeList = state.dislikeList.filter { it != reduce.food }
-            )
             is FirstVoteReduce.UpdateTotalMember -> state.copy(totalMember = reduce.totalMember)
             is FirstVoteReduce.UpdateEndedMember -> state.copy(endedMember = reduce.endedMember)
             is FirstVoteReduce.UpdateSearchKeyword -> state.copy(searchKeyword = reduce.searchKeyword)
