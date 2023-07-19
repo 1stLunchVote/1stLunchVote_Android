@@ -42,4 +42,8 @@
     <string name="second_vote_back_fab">다시 투표하기</string>
     <string name="second_vote_complete_wait">다른 참가자 대기중..</string>
     <string name="second_vote_complete_content">명이 투표 완료했습니다!</string>
+    <!-- FirstVoteScreen -->
+    <string name="exit_from_first_vote">투표 방에서 나왔습니다.</string>
+    <string name="first_vote_title">1차 투표</string>
+    <string name="first_vote_hint_text">검색</string>
 </resources>
