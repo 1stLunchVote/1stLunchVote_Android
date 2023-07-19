@@ -24,7 +24,8 @@ import kotlinx.coroutines.delay
 fun ProgressTopBar(
     title: String,
     animationDuration : Int = 60000,
-    popBackStack : () -> Unit = {}
+    popBackStack : () -> Unit = {},
+    onProgressComplete : () -> Unit = {}
 ){
     var progress by remember { mutableStateOf(0f) }
 
@@ -33,6 +34,8 @@ fun ProgressTopBar(
         while (progress < 1f){
             progress += 1f / seconds
             delay(1000)
+
+            if (progress >= 1f) onProgressComplete()
         }
     }
 

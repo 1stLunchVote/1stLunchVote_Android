@@ -125,7 +125,11 @@ fun LunchVoteNavHost(
             }
             composable(LunchVoteNavRoute.SecondVote.name){
                 SecondVoteRoute(
-
+                    popBackStack = { navHostController.navigate(LunchVoteNavRoute.Home.name){
+                        popUpTo(navHostController.graph.id){
+                            inclusive = true
+                        }
+                    } }
                 )
             }
         }

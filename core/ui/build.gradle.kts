@@ -26,7 +26,6 @@ android {
     }
 
     buildFeatures{
-        dataBinding = true
         compose = true
     }
 
@@ -48,4 +47,8 @@ dependencies {
     implementationCoroutine()
     implementationTest()
     implementationCompose()
+
+    implementations(
+        "androidx.compose.ui:ui-tooling:1.4.3",
+    )
 }
