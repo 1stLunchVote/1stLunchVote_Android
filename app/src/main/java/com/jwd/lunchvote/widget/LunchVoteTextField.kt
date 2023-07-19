@@ -1,5 +1,6 @@
 package com.jwd.lunchvote.widget
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -14,9 +15,11 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import com.jwd.lunchvote.R
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
@@ -25,6 +28,7 @@ fun LunchVoteTextField(
     modifier: Modifier = Modifier,
     text: String,
     hintText: String,
+    textFieldType: TextFieldType = TextFieldType.Default,
     maxLines: Int = 1,
     keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
     onTextChanged: (String) -> Unit,
@@ -55,7 +59,12 @@ fun LunchVoteTextField(
             }
         ),
         visualTransformation = visualTransformation,
-        singleLine = maxLines == 1
+        singleLine = maxLines == 1,
+        leadingIcon = {
+            if (textFieldType == TextFieldType.Search) {
+                Image(painterResource(R.drawable.ic_search), null)
+            }
+        }
     )
 }
 
@@ -66,4 +75,9 @@ fun LunchVoteTextFieldPreview() {
     LunchVoteTheme {
         LunchVoteTextField(text = "", hintText = "hint", onTextChanged = {})
     }
+}
+
+enum class TextFieldType{
+    Default,
+    Search
 }

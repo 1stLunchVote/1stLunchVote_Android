@@ -211,7 +211,7 @@ fun DependencyHandlerScope.implementationCompose(){
         platform(Libraries.Compose.ComposeBom),
         Libraries.Compose.Material3,
         Libraries.Compose.Foundation,
-        Libraries.Compose.Preview,
+//        Libraries.Compose.Preview,
         Libraries.Compose.Tooling,
         Libraries.Compose.UI,
         Libraries.Compose.Navigation,
