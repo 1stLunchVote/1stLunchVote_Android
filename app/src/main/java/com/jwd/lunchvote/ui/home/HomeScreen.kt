@@ -426,7 +426,9 @@ fun JoinDialog(
             Text(
                 stringResource(R.string.home_join_btn),
                 modifier = Modifier.fillMaxWidth(),
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleLarge.copy(
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                ),
                 textAlign = TextAlign.Start
             )
             LunchVoteTextField(

@@ -1,6 +1,7 @@
 package com.jwd.lunchvote.ui.vote.first
 
 import android.content.Context
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,13 +13,11 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -30,7 +29,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.R
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
-import com.jwd.lunchvote.domain.entity.Food
 import com.jwd.lunchvote.domain.entity.FoodStatus
 import com.jwd.lunchvote.model.FoodUIModel
 import com.jwd.lunchvote.ui.vote.first.FirstVoteContract.FirstVoteEvent
@@ -43,8 +41,8 @@ import com.jwd.lunchvote.widget.LunchVoteTextField
 import com.jwd.lunchvote.widget.ProgressTopBar
 import com.jwd.lunchvote.widget.StepProgress
 import com.jwd.lunchvote.widget.TextFieldType
+import com.jwd.lunchvote.widget.VoteExitDialog
 import kotlinx.coroutines.flow.collectLatest
-import timber.log.Timber
 
 @Composable
 fun FirstVoteRoute(
@@ -55,23 +53,33 @@ fun FirstVoteRoute(
 ) {
     val firstVoteState by viewModel.viewState.collectAsStateWithLifecycle()
 
-    val snackbarHostState = remember { SnackbarHostState() }
+//    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(viewModel.sideEffect) {
         viewModel.sideEffect.collectLatest {
             when(it) {
-                is FirstVoteSideEffect.PopBackStack -> popBackStack(UiText.StringResource(R.string.exit_from_first_vote).asString(context))
+                is FirstVoteSideEffect.PopBackStack -> popBackStack(UiText.StringResource(R.string.exit_from_vote).asString(context))
                 is FirstVoteSideEffect.NavigateToSecondVote -> navigateToSecondVote()
             }
         }
+    }
+
+    BackHandler() {
+        viewModel.sendEvent(FirstVoteEvent.OnTryExit)
+    }
+
+    if (firstVoteState.voteExitDialogShown){
+        VoteExitDialog(
+            onDismiss = { viewModel.sendEvent(FirstVoteEvent.OnClickExitDialog(false)) },
+            onExit = { viewModel.sendEvent(FirstVoteEvent.OnClickExitDialog(true)) }
+        )
     }
 
     FirstVoteScreen(
         firstVoteState = firstVoteState,
         onClickFood = { food -> viewModel.sendEvent(FirstVoteEvent.OnClickFood(food)) },
         setSearchKeyword = { search -> viewModel.sendEvent(FirstVoteEvent.SetSearchKeyword(search)) },
-        navigateToSecondVote = navigateToSecondVote,
-        popBackStack = popBackStack
+        navigateToSecondVote = navigateToSecondVote
     )
 }
 
@@ -82,25 +90,22 @@ fun FirstVoteScreen(
     onClickFood: (FoodUIModel) -> Unit = {},
     setSearchKeyword: (String) -> Unit = {},
     navigateToSecondVote: () -> Unit = {},
-    popBackStack: (String) -> Unit = {},
-    context: Context = LocalContext.current
 ) {
     Scaffold { padding ->
         Column(
             modifier = Modifier
-                    .fillMaxWidth(1f)
-                    .padding(padding),
+                .fillMaxWidth(1f)
+                .padding(padding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             ProgressTopBar(
                     title = stringResource(R.string.first_vote_title),
-                    popBackStack = { popBackStack(UiText.StringResource(R.string.exit_from_first_vote).asString(context)) },
                     onProgressComplete = { navigateToSecondVote() }
             )
             Row(
                 modifier = Modifier
-                        .fillMaxWidth(1f)
-                        .padding(top = 16.dp, start = 24.dp, end = 24.dp, bottom = 8.dp),
+                    .fillMaxWidth(1f)
+                    .padding(top = 16.dp, start = 24.dp, end = 24.dp, bottom = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -115,8 +120,8 @@ fun FirstVoteScreen(
             }
             LunchVoteTextField(
                 modifier = Modifier
-                        .fillMaxWidth(1f)
-                        .padding(horizontal = 24.dp, vertical = 0.dp),
+                    .fillMaxWidth(1f)
+                    .padding(horizontal = 24.dp, vertical = 0.dp),
                 text = firstVoteState.searchKeyword,
                 hintText = stringResource(R.string.first_vote_hint_text),
                 onTextChanged = setSearchKeyword,
@@ -125,9 +130,9 @@ fun FirstVoteScreen(
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
                 modifier = Modifier
-                        .fillMaxWidth(1f)
-                        .weight(1f, false)
-                        .padding(top = 24.dp, start = 24.dp, end = 24.dp, bottom = 16.dp),
+                    .fillMaxWidth(1f)
+                    .weight(1f, false)
+                    .padding(top = 24.dp, start = 24.dp, end = 24.dp, bottom = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {

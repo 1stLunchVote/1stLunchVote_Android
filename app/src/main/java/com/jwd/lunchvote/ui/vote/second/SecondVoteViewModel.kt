@@ -38,6 +38,15 @@ class SecondVoteViewModel @Inject constructor(
             is SecondVoteEvent.OnClickFab -> {
                 updateState(SecondVoteReduce.SetVoteCompleted)
             }
+            is SecondVoteEvent.OnTryExit -> {
+                updateState(SecondVoteReduce.SetExitDialogShown(true))
+            }
+            is SecondVoteEvent.OnClickExitDialog -> {
+                updateState(SecondVoteReduce.SetExitDialogShown(false))
+                if (event.isExit) {
+                    sendSideEffect(SecondVoteSideEffect.PopBackStack)
+                }
+            }
         }
     }
 
@@ -52,6 +61,9 @@ class SecondVoteViewModel @Inject constructor(
             )
             is SecondVoteReduce.SetVoteCompleted -> state.copy(
                 voteCompleted = !state.voteCompleted
+            )
+            is SecondVoteReduce.SetExitDialogShown -> state.copy(
+                exitDialogShown = reduce.isShown
             )
         }
     }

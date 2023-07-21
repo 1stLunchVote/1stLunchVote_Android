@@ -1,5 +1,6 @@
 package com.jwd.lunchvote.ui.vote.second
 
+import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -22,10 +23,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -41,21 +44,44 @@ import com.jwd.lunchvote.R
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.core.ui.util.noRippleClickable
 import com.jwd.lunchvote.model.SecondVoteTileUIModel
+import com.jwd.lunchvote.ui.vote.first.FirstVoteContract
 import com.jwd.lunchvote.widget.ProgressTopBar
 import com.jwd.lunchvote.ui.vote.second.SecondVoteContract.*
+import com.jwd.lunchvote.util.UiText
+import com.jwd.lunchvote.widget.VoteExitDialog
+import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 
 @Composable
 fun SecondVoteRoute(
     viewModel: SecondVoteViewModel = hiltViewModel(),
-    popBackStack: () -> Unit
+    popBackStack: (String) -> Unit,
+    context: Context = LocalContext.current
 ){
     val secondVoteState : SecondVoteState by viewModel.viewState.collectAsStateWithLifecycle()
 
-    // 뒤로가기 버튼 눌렀을 때
     BackHandler() {
-        // Todo : 뒤로가기 눌러서 나가도 투표는 그대로 진행된다고 명시할지 고민
-        popBackStack()
+        viewModel.sendEvent(SecondVoteEvent.OnTryExit)
+    }
+
+    if (secondVoteState.exitDialogShown){
+        VoteExitDialog(
+            onDismiss = { viewModel.sendEvent(SecondVoteEvent.OnClickExitDialog(false)) },
+            onExit = { viewModel.sendEvent(SecondVoteEvent.OnClickExitDialog(true)) }
+        )
+    }
+
+    LaunchedEffect(viewModel.sideEffect){
+        viewModel.sideEffect.collectLatest {
+            when(it){
+                is SecondVoteSideEffect.ShowSnackBar -> {
+                    // Todo : 스낵바 표시
+                }
+                is SecondVoteSideEffect.PopBackStack -> {
+                    popBackStack(UiText.StringResource(R.string.exit_from_vote).asString(context))
+                }
+            }
+        }
     }
 
     SecondVoteScreen(

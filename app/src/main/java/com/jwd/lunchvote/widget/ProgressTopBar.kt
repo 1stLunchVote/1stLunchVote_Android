@@ -24,7 +24,6 @@ import kotlinx.coroutines.delay
 fun ProgressTopBar(
     title: String,
     animationDuration : Int = 60000,
-    popBackStack : () -> Unit = {},
     onProgressComplete : () -> Unit = {}
 ){
     var progress by remember { mutableStateOf(0f) }
@@ -47,7 +46,8 @@ fun ProgressTopBar(
     Column {
         LunchVoteTopBar(
             title = title,
-            popBackStack = popBackStack
+            popBackStack = {},
+            navIconVisible = false
         )
 
         LinearProgressIndicator(

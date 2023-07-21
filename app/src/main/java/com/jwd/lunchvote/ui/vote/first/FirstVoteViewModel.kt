@@ -35,6 +35,15 @@ class FirstVoteViewModel (
             is FirstVoteEvent.OnClickFood -> updateState(FirstVoteReduce.UpdateFoodStatus(event.food))
             is FirstVoteEvent.SetSearchKeyword -> updateState(FirstVoteReduce.UpdateSearchKeyword(event.searchKeyword))
             is FirstVoteEvent.OnClickFinishButton -> updateState(FirstVoteReduce.UpdateIsFinished(true))
+            is FirstVoteEvent.OnTryExit -> updateState(FirstVoteReduce.UpdateVoteExitDialogShown(true))
+            is FirstVoteEvent.OnClickExitDialog -> {
+                if(event.isExit) {
+                    updateState(FirstVoteReduce.UpdateVoteExitDialogShown(false))
+                    sendSideEffect(FirstVoteSideEffect.PopBackStack)
+                } else {
+                    updateState(FirstVoteReduce.UpdateVoteExitDialogShown(false))
+                }
+            }
         }
     }
 
@@ -68,6 +77,7 @@ class FirstVoteViewModel (
             is FirstVoteReduce.UpdateEndedMember -> state.copy(endedMember = reduce.endedMember)
             is FirstVoteReduce.UpdateSearchKeyword -> state.copy(searchKeyword = reduce.searchKeyword)
             is FirstVoteReduce.UpdateIsFinished -> state.copy(isFinished = reduce.isFinished)
+            is FirstVoteReduce.UpdateVoteExitDialogShown -> state.copy(voteExitDialogShown = reduce.voteExitDialogShown)
         }
     }
 

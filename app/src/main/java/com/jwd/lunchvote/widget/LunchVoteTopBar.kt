@@ -17,16 +17,19 @@ import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 @Composable
 fun LunchVoteTopBar(
     title: String,
-    popBackStack: () -> Unit
+    navIconVisible: Boolean = true,
+    popBackStack: () -> Unit,
 ){
     CenterAlignedTopAppBar(
         title = { Text(text = title) },
         navigationIcon = {
-            IconButton(onClick = popBackStack) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "navigation_back",
-                )
+            if (navIconVisible){
+                IconButton(onClick = popBackStack) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "navigation_back",
+                    )
+                }
             }
         },
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(

@@ -124,20 +124,35 @@ fun LunchVoteNavHost(
                     navigateToSecondVote = {
                         navHostController.navigate(LunchVoteNavRoute.SecondVote.name)
                     },
-                    popBackStack = { navHostController.navigate(LunchVoteNavRoute.Home.name){
-                        popUpTo(navHostController.graph.id){
-                            inclusive = true
+                    popBackStack = {
+
+                        navHostController.navigate(LunchVoteNavRoute.Home.name) {
+                            popUpTo(navHostController.graph.id) {
+                                inclusive = true
+                            }
                         }
-                    } }
+
+                        navHostController.currentBackStackEntry?.savedStateHandle?.set(
+                            SNACK_BAR_KEY,
+                            it
+                        )
+                    }
                 )
             }
             composable(LunchVoteNavRoute.SecondVote.name){
                 SecondVoteRoute(
-                    popBackStack = { navHostController.navigate(LunchVoteNavRoute.Home.name){
-                        popUpTo(navHostController.graph.id){
-                            inclusive = true
+                    popBackStack = {
+                        navHostController.navigate(LunchVoteNavRoute.Home.name) {
+                            popUpTo(navHostController.graph.id) {
+                                inclusive = true
+                            }
                         }
-                    } }
+
+                        navHostController.currentBackStackEntry?.savedStateHandle?.set(
+                            SNACK_BAR_KEY,
+                            it
+                        )
+                    }
                 )
             }
         }
