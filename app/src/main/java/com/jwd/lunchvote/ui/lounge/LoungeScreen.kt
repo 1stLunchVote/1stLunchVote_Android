@@ -84,6 +84,7 @@ import kotlinx.coroutines.flow.debounce
 @Composable
 fun LoungeRoute(
     navigateToMember: (MemberUIModel, String, Boolean) -> Unit,
+    navigateToFirstVote: (String) -> Unit,
     viewModel: LoungeViewModel = hiltViewModel(),
     popBackStack: (String) -> Unit,
     clipboardManager: ClipboardManager = LocalClipboardManager.current
@@ -102,6 +103,9 @@ fun LoungeRoute(
                 is LoungeSideEffect.CopyToClipboard -> {
                     clipboardManager.setText(AnnotatedString(it.loungeId))
                     snackBarHostState.showSnackbar("초대 코드가 복사되었습니다.")
+                }
+                is LoungeSideEffect.NavigateToVote -> {
+                    navigateToFirstVote(it.loungeId)
                 }
             }
         }
@@ -126,7 +130,7 @@ fun LoungeRoute(
         onTryExit = { viewModel.sendEvent(LoungeEvent.OnTryExit) },
         onEditChat = { viewModel.sendEvent(LoungeEvent.OnEditChat(it)) },
         onSendChat = { viewModel.sendEvent(LoungeEvent.OnSendChat) },
-        onClickReady = { viewModel.sendEvent(LoungeEvent.OnReady) },
+        onClickReadyStart = { viewModel.sendEvent(if (loungeState.isOwner) LoungeEvent.OnStart else LoungeEvent.OnReady) },
         navigateToMember = navigateToMember,
         onClickInvite = { viewModel.sendEvent(LoungeEvent.OnClickInvite) },
         onScrolled = { viewModel.sendEvent(LoungeEvent.OnScrolled(it)) }
@@ -136,15 +140,15 @@ fun LoungeRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LoungeScreen(
-    loungeState: LoungeState,
-    snackBarHostState: SnackbarHostState,
-    navigateToMember: (MemberUIModel, String, Boolean) -> Unit = {_, _, _-> },
-    onTryExit: () -> Unit = {},
-    onEditChat: (String) -> Unit = {},
-    onSendChat: () -> Unit = {},
-    onClickReady: () -> Unit = {},
-    onClickInvite: () -> Unit = {},
-    onScrolled: (Int) -> Unit = {}
+        loungeState: LoungeState,
+        snackBarHostState: SnackbarHostState,
+        navigateToMember: (MemberUIModel, String, Boolean) -> Unit = {_, _, _-> },
+        onTryExit: () -> Unit = {},
+        onEditChat: (String) -> Unit = {},
+        onSendChat: () -> Unit = {},
+        onClickReadyStart: () -> Unit = {},
+        onClickInvite: () -> Unit = {},
+        onScrolled: (Int) -> Unit = {}
 ){
     Scaffold(
         topBar = {
@@ -157,7 +161,7 @@ private fun LoungeScreen(
         bottomBar = {
             if (loungeState.memberList.isNotEmpty()){
                 LoungeBottomBar(loungeState = loungeState, onEditChat = onEditChat,
-                    onSendChat = onSendChat, onClickReady = onClickReady)
+                    onSendChat = onSendChat, onClickReadyStart = onClickReadyStart)
             }
         }
     ) { padding ->
@@ -449,10 +453,10 @@ private fun LoungeExitDialog(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun LoungeBottomBar(
-    loungeState: LoungeState,
-    onEditChat: (String) -> Unit = {},
-    onSendChat: () -> Unit = {},
-    onClickReady: () -> Unit = {},
+        loungeState: LoungeState,
+        onEditChat: (String) -> Unit = {},
+        onSendChat: () -> Unit = {},
+        onClickReadyStart: () -> Unit = {},
 ){
     val isTyping by rememberUpdatedState(newValue = WindowInsets.isImeVisible && loungeState.currentChat.isNotBlank())
 
@@ -482,7 +486,7 @@ private fun LoungeBottomBar(
                     style = buttonTextStyle,
                     modifier = Modifier
                         .clickable {
-                            onClickReady()
+                            onClickReadyStart()
                         }
                         .padding(horizontal = 16.dp, vertical = 12.dp)
                 )

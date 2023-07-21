@@ -170,6 +170,10 @@ class LoungeViewModel @Inject constructor(
                 }
                 updateReady()
             }
+            is LoungeEvent.OnStart -> {
+                // Todo : Firebase DB에서 게임 시작 연동
+                sendSideEffect(LoungeSideEffect.NavigateToVote(currentState.loungeId ?: return))
+            }
             is LoungeEvent.OnTryExit -> {
                 updateState(LoungeReduce.SetExitDialogShown(true))
             }

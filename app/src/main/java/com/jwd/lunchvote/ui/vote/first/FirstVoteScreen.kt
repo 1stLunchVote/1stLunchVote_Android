@@ -88,17 +88,19 @@ fun FirstVoteScreen(
     Scaffold { padding ->
         Column(
             modifier = Modifier
-                .fillMaxWidth(1f)
-                .padding(padding),
+                    .fillMaxWidth(1f)
+                    .padding(padding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ProgressTopBar(stringResource(R.string.first_vote_title)) {
-                popBackStack(UiText.StringResource(R.string.exit_from_first_vote).asString(context))
-            }
+            ProgressTopBar(
+                    title = stringResource(R.string.first_vote_title),
+                    popBackStack = { popBackStack(UiText.StringResource(R.string.exit_from_first_vote).asString(context)) },
+                    onProgressComplete = { navigateToSecondVote() }
+            )
             Row(
                 modifier = Modifier
-                    .fillMaxWidth(1f)
-                    .padding(top = 16.dp, start = 24.dp, end = 24.dp, bottom = 8.dp),
+                        .fillMaxWidth(1f)
+                        .padding(top = 16.dp, start = 24.dp, end = 24.dp, bottom = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -113,8 +115,8 @@ fun FirstVoteScreen(
             }
             LunchVoteTextField(
                 modifier = Modifier
-                    .fillMaxWidth(1f)
-                    .padding(horizontal = 24.dp, vertical = 0.dp),
+                        .fillMaxWidth(1f)
+                        .padding(horizontal = 24.dp, vertical = 0.dp),
                 text = firstVoteState.searchKeyword,
                 hintText = stringResource(R.string.first_vote_hint_text),
                 onTextChanged = setSearchKeyword,
@@ -123,9 +125,9 @@ fun FirstVoteScreen(
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
                 modifier = Modifier
-                    .fillMaxWidth(1f)
-                    .weight(1f, false)
-                    .padding(top = 24.dp, start = 24.dp, end = 24.dp, bottom = 16.dp),
+                        .fillMaxWidth(1f)
+                        .weight(1f, false)
+                        .padding(top = 24.dp, start = 24.dp, end = 24.dp, bottom = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {

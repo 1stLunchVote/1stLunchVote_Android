@@ -62,20 +62,24 @@ fun LunchVoteNavHost(
                 )
             ) {
                 LoungeRoute(
-                    navigateToMember = { m, loungeId, isOwner ->
-                        navHostController.navigate(
-                            LunchVoteNavRoute.LoungeMember.name
-                                    + "?id=${m.uid},loungeId=${loungeId},nickname=${m.nickname},"
-                                    + "profileUrl=${m.profileImage},isOwner=${isOwner}"
-                        )
-                    },
-                    popBackStack = {
-                        navHostController.previousBackStackEntry?.savedStateHandle?.set(
-                            SNACK_BAR_KEY,
-                            it
-                        )
-                        navHostController.popBackStack()
-                    }
+                        navigateToMember = { m, loungeId, isOwner ->
+                            navHostController.navigate(
+                                    LunchVoteNavRoute.LoungeMember.name
+                                            + "?id=${m.uid},loungeId=${loungeId},nickname=${m.nickname},"
+                                            + "profileUrl=${m.profileImage},isOwner=${isOwner}"
+                            )
+                        },
+                        popBackStack = {
+                            navHostController.previousBackStackEntry?.savedStateHandle?.set(
+                                    SNACK_BAR_KEY,
+                                    it
+                            )
+                            navHostController.popBackStack()
+                        },
+                        navigateToFirstVote = {
+                            navHostController.popBackStack()
+                            navHostController.navigate(LunchVoteNavRoute.VoteNavigation.name)
+                        }
                 )
             }
 
@@ -113,14 +117,18 @@ fun LunchVoteNavHost(
 
         navigation(
             route = LunchVoteNavRoute.VoteNavigation.name,
-            startDestination = LunchVoteNavRoute.SecondVote.name
+            startDestination = LunchVoteNavRoute.FirstVote.name
         ){
             composable(LunchVoteNavRoute.FirstVote.name) {
                 FirstVoteRoute(
                     navigateToSecondVote = {
                         navHostController.navigate(LunchVoteNavRoute.SecondVote.name)
                     },
-                    popBackStack = { navHostController.popBackStack() }
+                    popBackStack = { navHostController.navigate(LunchVoteNavRoute.Home.name){
+                        popUpTo(navHostController.graph.id){
+                            inclusive = true
+                        }
+                    } }
                 )
             }
             composable(LunchVoteNavRoute.SecondVote.name){
