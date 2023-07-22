@@ -50,7 +50,6 @@ object Versions{
 
     // Compose
     const val Compose = "2023.06.01"
-    const val Material3 = "1.1.1"
     const val ComposeHilt = "1.0.0"
     const val ComposeLifecycle = "2.6.1"
     const val ComposeConstraint = "1.0.1"
