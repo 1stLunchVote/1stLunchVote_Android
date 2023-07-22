@@ -19,15 +19,20 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
+import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListEvent
 import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListSideEffect
 import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListState
+import com.jwd.lunchvote.widget.LunchVoteTopBar
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filter
 
 @Composable
 fun TemplateListRoute(
     navigateToEditTemplate: (String?) -> Unit,
     navigateToCreateTemplate: () -> Unit,
     popBackStack: () -> Unit,
+    messageFlow: Flow<String>,
     viewModel: TemplateListViewModel = hiltViewModel()
 ){
     val templateListState : TemplateListState by viewModel.viewState.collectAsStateWithLifecycle()
@@ -45,16 +50,24 @@ fun TemplateListRoute(
         }
     }
 
+    LaunchedEffect(Unit){
+        messageFlow.filter { it.isNotEmpty() }.collectLatest {
+            snackBarHostState.showSnackbar(it)
+        }
+    }
+
     TemplateListScreen(
         templateListState = templateListState,
         snackBarHostState = snackBarHostState,
+        onClickBackButton = { viewModel.sendEvent(TemplateListEvent.OnClickBackButton) }
     )
 }
 
 @Composable
 private fun TemplateListScreen(
     templateListState: TemplateListState,
-    snackBarHostState: SnackbarHostState
+    snackBarHostState: SnackbarHostState,
+    onClickBackButton: () -> Unit = {}
 ) {
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
@@ -65,10 +78,14 @@ private fun TemplateListScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(padding)
-                    .padding(horizontal = 32.dp),
+                    .padding(padding),
                 horizontalAlignment = CenterHorizontally
             ) {
+                LunchVoteTopBar(
+                    title = "템플릿 목록",
+                    navIconVisible = true,
+                    popBackStack = onClickBackButton
+                )
 
             }
         }

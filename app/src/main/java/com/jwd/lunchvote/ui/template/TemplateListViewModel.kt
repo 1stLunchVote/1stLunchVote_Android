@@ -37,6 +37,7 @@ class TemplateListViewModel @Inject constructor(
                     initialize()
                 }
             }
+            is TemplateListEvent.OnClickBackButton -> sendSideEffect(TemplateListSideEffect.PopBaskStack)
         }
     }
 

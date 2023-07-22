@@ -170,7 +170,8 @@ fun LunchVoteNavHost(
                     navigateToCreateTemplate = {
                         navHostController.navigate(LunchVoteNavRoute.CreateTemplate.name)
                     },
-                    popBackStack = { navHostController.popBackStack() }
+                    popBackStack = { navHostController.popBackStack() },
+                    messageFlow = it.savedStateHandle.getStateFlow(SNACK_BAR_KEY, "")
                 )
             }
             composable(
@@ -183,12 +184,24 @@ fun LunchVoteNavHost(
                 )
             ) {
 //                EditTemplateScene(
-//                    popBackStack = { navHostController.popBackStack() }
+//                    popBackStack = {
+//                        navHostController.previousBackStackEntry?.savedStateHandle?.set(
+//                            SNACK_BAR_KEY,
+//                            it
+//                        )
+//                        navHostController.popBackStack()
+//                    }
 //                )
             }
             composable(LunchVoteNavRoute.CreateTemplate.name) {
 //                CreateTemplateScene(
-//                    popBackStack = { navHostController.popBackStack() }
+//                    popBackStack = {
+//                        navHostController.previousBackStackEntry?.savedStateHandle?.set(
+//                            SNACK_BAR_KEY,
+//                            it
+//                        )
+//                        navHostController.popBackStack()
+//                    }
 //                )
             }
         }

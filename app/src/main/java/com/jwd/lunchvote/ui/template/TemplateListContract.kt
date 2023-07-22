@@ -15,6 +15,7 @@ class TemplateListContract {
 
     sealed interface TemplateListEvent: ViewModelContract.Event {
         object StartInitialize: TemplateListEvent
+        object OnClickBackButton: TemplateListEvent
     }
 
     sealed interface TemplateListReduce : ViewModelContract.Reduce {
