@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LunchVoteTopBar(
     title: String,
