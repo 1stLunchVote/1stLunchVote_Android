@@ -9,35 +9,37 @@ object Apps{
 }
 
 object Versions{
-    const val Android = "8.0.0"
+    const val Android = "8.0.2"
     const val AppCompat = "1.6.1"
     const val Core = "1.10.1"
     const val Material = "1.9.0"
     const val ConstraintLayout = "2.1.4"
     const val Lifecycle = "2.6.1"
-    const val Navigation = "2.5.3"
+    const val Navigation = "2.6.0"
     const val RecyclerView = "1.3.0"
     const val Work = "2.8.1"
-    const val SplashScreen = "1.0.0"
-    const val Timber = "4.7.1"
+    const val SplashScreen = "1.0.1"
+    const val Timber = "5.0.1"
     const val Secret = "2.0.1"
 
     // Hilt
-    const val Hilt = "2.44"
+    const val Hilt = "2.47"
     const val AndroidHilt = "1.0.0"
 
     // Kotlin, Coroutine
-    const val Kotlin = "1.8.10"
-    const val Coroutine = "1.6.4"
+    const val Kotlin = "1.9.0"
+    const val Coroutine = "1.7.2"
 
     // JavaX
     const val JavaX = "1"
 
 
     // Firebase
-    const val Firebase = "32.0.0"
+    const val Firebase = "32.2.0"
     const val Gms = "4.3.15"
-    const val GmsAuth = "20.4.0"
+    const val GmsAuth = "20.6.0"
+    const val Auth = "22.1.0"
+    const val Functions = "20.3.1"
 
     // Retrofit
     const val Retrofit = "2.9.0"
@@ -47,9 +49,8 @@ object Versions{
     const val Room = "2.5.1"
 
     // Compose
-    const val Compose = "2023.04.00"
-    const val Material3 = "1.0.1"
-    const val ComposeNavigation = "2.5.1"
+    const val Compose = "2023.06.01"
+    const val Material3 = "1.1.1"
     const val ComposeHilt = "1.0.0"
     const val ComposeLifecycle = "2.6.1"
     const val ComposeConstraint = "1.0.1"
@@ -74,8 +75,9 @@ object Libraries{
         const val ConstraintLayout = "androidx.constraintlayout:constraintlayout:${Versions.ConstraintLayout}"
         const val Lifecycle = "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.Lifecycle}"
         const val LifecycleViewModel = "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.Lifecycle}"
-        const val Navigation = "androidx.navigation:navigation-fragment-ktx:${Versions.Navigation}"
+//        const val Navigation = "androidx.navigation:navigation-fragment-ktx:${Versions.Navigation}"
         const val NavigationUI = "androidx.navigation:navigation-ui-ktx:${Versions.Navigation}"
+        const val Navigation = "androidx.navigation:navigation-compose:${Versions.Navigation}"
         const val Work = "androidx.work:work-runtime-ktx:${Versions.Work}"
         const val SplashScreen = "androidx.core:core-splashscreen:${Versions.SplashScreen}"
     }
@@ -88,10 +90,10 @@ object Libraries{
 
     object Firebase{
         const val Firebase = "com.google.firebase:firebase-bom:${Versions.Firebase}"
-        const val Auth = "com.google.firebase:firebase-auth-ktx"
+        const val Auth = "com.google.firebase:firebase-auth-ktx:${Versions.Auth}"
         const val DataBase = "com.google.firebase:firebase-database-ktx"
         const val GmsAuth = "com.google.android.gms:play-services-auth:${Versions.GmsAuth}"
-        const val Function = "com.google.firebase:firebase-functions-ktx"
+        const val Function = "com.google.firebase:firebase-functions-ktx:${Versions.Functions}"
     }
 
     object Hilt{
@@ -125,12 +127,11 @@ object Libraries{
 
     object Compose{
         const val ComposeBom = "androidx.compose:compose-bom:${Versions.Compose}"
-        const val Material3 = "androidx.compose.material3:material3:${Versions.Material3}"
+        const val Material3 = "androidx.compose.material3:material3"
         const val Foundation = "androidx.compose.foundation:foundation"
         const val UI = "androidx.compose.ui:ui"
         const val Tooling = "androidx.compose.ui:ui-tooling"
         const val Preview = "androidx.compose.ui:ui-tooling-preview"
-        const val Navigation = "androidx.navigation:navigation-compose:${Versions.ComposeNavigation}"
         const val Hilt = "androidx.hilt:hilt-navigation-compose:${Versions.ComposeHilt}"
         const val Lifecycle = "androidx.lifecycle:lifecycle-runtime-compose:${Versions.ComposeLifecycle}"
         const val ConstraintLayout = "androidx.constraintlayout:constraintlayout-compose:${Versions.ComposeConstraint}"
@@ -214,10 +215,9 @@ fun DependencyHandlerScope.implementationCompose(){
         platform(Libraries.Compose.ComposeBom),
         Libraries.Compose.Material3,
         Libraries.Compose.Foundation,
-//        Libraries.Compose.Preview,
+        Libraries.Compose.Preview,
         Libraries.Compose.Tooling,
         Libraries.Compose.UI,
-        Libraries.Compose.Navigation,
         Libraries.Compose.Hilt,
         Libraries.Compose.Lifecycle,
         Libraries.Compose.ConstraintLayout

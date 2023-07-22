@@ -8,6 +8,7 @@ import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.entity.MemberStatus
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
@@ -30,7 +31,7 @@ class LoungeRepositoryImpl @Inject constructor(
         return loungeRemoteDataSource.checkLoungeExist(loungeId)
     }
 
-    @OptIn(FlowPreview::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun createLounge(): Flow<String> {
         return loungeRemoteDataSource.createLounge().map {
             it ?: throw Exception("Failed to create lounge")
@@ -39,7 +40,7 @@ class LoungeRepositoryImpl @Inject constructor(
         }
     }
 
-    @OptIn(FlowPreview::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun joinLounge(loungeId: String): Flow<Unit> {
         return loungeRemoteDataSource.joinLounge(loungeId).flatMapMerge {
             loungeRemoteDataSource.sendChat(loungeId, null, 2)
@@ -66,7 +67,7 @@ class LoungeRepositoryImpl @Inject constructor(
         return loungeLocalDataSource.insertChat(loungeId, content, 0)
     }
 
-    @OptIn(FlowPreview::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun updateReady(uid: String, loungeId: String): Flow<Unit> {
         return loungeLocalDataSource.updateMemberReady(uid, loungeId)
             .flatMapMerge {
@@ -74,7 +75,7 @@ class LoungeRepositoryImpl @Inject constructor(
             }
     }
 
-    @OptIn(FlowPreview::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun exitLounge(uid: String, loungeId: String): Flow<Unit> {
         return loungeRemoteDataSource.exitLounge(uid, loungeId)
             .flatMapMerge {
