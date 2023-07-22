@@ -137,7 +137,6 @@ fun LoungeRoute(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LoungeScreen(
         loungeState: LoungeState,
@@ -216,7 +215,6 @@ private fun LoungeContent(
     }
 }
 
-@OptIn(FlowPreview::class)
 @Composable
 private fun LoungeChatList(
     loungeState: LoungeState,

@@ -6,6 +6,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -22,7 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.jwd.lunchvote.R
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LunchVoteTextField(
     modifier: Modifier = Modifier,
@@ -42,8 +43,8 @@ fun LunchVoteTextField(
         label = { Text(text = hintText) },
         value = text,
         maxLines = maxLines,
-        colors = TextFieldDefaults.outlinedTextFieldColors(
-            unfocusedLabelColor = MaterialTheme.colorScheme.outlineVariant
+        colors = OutlinedTextFieldDefaults.colors(
+            unfocusedLabelColor = MaterialTheme.colorScheme.outlineVariant,
         ),
         onValueChange = onTextChanged,
         keyboardOptions = keyboardOptions,
