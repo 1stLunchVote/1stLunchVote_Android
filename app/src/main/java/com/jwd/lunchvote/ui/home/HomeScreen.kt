@@ -63,7 +63,7 @@ import kotlinx.coroutines.flow.filter
 @Composable
 fun HomeRoute(
     navigateToLounge: (String?) -> Unit,
-    navigateToTemplate: () -> Unit,
+    navigateToTemplateList: () -> Unit,
     navigateToSetting: () -> Unit,
     navigateToTips: () -> Unit,
     navigateToTest: () -> Unit,
@@ -81,8 +81,8 @@ fun HomeRoute(
                 is HomeSideEffect.NavigateToLounge -> {
                     navigateToLounge(it.loungeId)
                 }
-                is HomeSideEffect.NavigateToTemplate -> {
-                    navigateToTemplate()
+                is HomeSideEffect.NavigateToTemplateList -> {
+                    navigateToTemplateList()
                 }
                 is HomeSideEffect.NavigateToSetting -> {
                     navigateToSetting()
