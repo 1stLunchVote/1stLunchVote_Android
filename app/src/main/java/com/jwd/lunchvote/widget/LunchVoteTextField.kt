@@ -38,43 +38,77 @@ fun LunchVoteTextField(
     focusManager : FocusManager = LocalFocusManager.current,
     keyboardController: SoftwareKeyboardController? = LocalSoftwareKeyboardController.current
 ){
-    OutlinedTextField(
-        modifier = modifier,
-        label = { Text(text = hintText) },
-        value = text,
-        maxLines = maxLines,
-        colors = OutlinedTextFieldDefaults.colors(
-            unfocusedLabelColor = MaterialTheme.colorScheme.outlineVariant,
-        ),
-        onValueChange = onTextChanged,
-        keyboardOptions = keyboardOptions,
-        keyboardActions = KeyboardActions(
-            onDone = {
-                if(keyboardEnterNext){
-                    KeyboardActions.Default.onNext
-                } else {
-                    KeyboardActions.Default.onDone
-                    focusManager.clearFocus()
-                    keyboardController?.hide()
+    if (textFieldType == TextFieldType.Search) {
+        OutlinedTextField(
+            modifier = modifier,
+            label = { Text(text = hintText) },
+            value = text,
+            maxLines = maxLines,
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedLabelColor = MaterialTheme.colorScheme.outlineVariant,
+            ),
+            onValueChange = onTextChanged,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    if(keyboardEnterNext){
+                        KeyboardActions.Default.onNext
+                    } else {
+                        KeyboardActions.Default.onDone
+                        focusManager.clearFocus()
+                        keyboardController?.hide()
+                    }
                 }
-            }
-        ),
-        visualTransformation = visualTransformation,
-        singleLine = maxLines == 1,
-        leadingIcon = {
-            if (textFieldType == TextFieldType.Search) {
+            ),
+            visualTransformation = visualTransformation,
+            singleLine = maxLines == 1,
+            leadingIcon = {
                 Image(painterResource(R.drawable.ic_search), null)
             }
-        }
-    )
+        )
+    } else {
+        OutlinedTextField(
+            modifier = modifier,
+            label = { Text(text = hintText) },
+            value = text,
+            maxLines = maxLines,
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedLabelColor = MaterialTheme.colorScheme.outlineVariant,
+            ),
+            onValueChange = onTextChanged,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    if(keyboardEnterNext){
+                        KeyboardActions.Default.onNext
+                    } else {
+                        KeyboardActions.Default.onDone
+                        focusManager.clearFocus()
+                        keyboardController?.hide()
+                    }
+                }
+            ),
+            visualTransformation = visualTransformation,
+            singleLine = maxLines == 1
+        )
+    }
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Preview(showBackground = true)
 @Composable
-fun LunchVoteTextFieldPreview() {
+fun LunchVoteDefaultTextFieldPreview() {
     LunchVoteTheme {
         LunchVoteTextField(text = "", hintText = "hint", onTextChanged = {})
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Preview(showBackground = true)
+@Composable
+fun LunchVoteSearchTextFieldPreview() {
+    LunchVoteTheme {
+        LunchVoteTextField(text = "", hintText = "hint", textFieldType = TextFieldType.Search, onTextChanged = {})
     }
 }
 
