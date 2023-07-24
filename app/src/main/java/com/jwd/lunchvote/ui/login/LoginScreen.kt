@@ -131,7 +131,6 @@ fun LoginRoute(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LoginScreen(
     snackBarHostState: SnackbarHostState,

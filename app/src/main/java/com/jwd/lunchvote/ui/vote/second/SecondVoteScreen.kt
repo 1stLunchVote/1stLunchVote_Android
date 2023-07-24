@@ -95,7 +95,6 @@ fun SecondVoteRoute(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SecondVoteScreen(
     state: SecondVoteState = SecondVoteState(),

@@ -58,7 +58,6 @@ fun LoungeMemberRoute(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoungeMemberScreen(
     memberState: LoungeMemberState,
