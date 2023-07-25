@@ -2,8 +2,10 @@ package com.jwd.lunchvote.data.di
 
 import com.jwd.lunchvote.data.repository.LoungeRepositoryImpl
 import com.jwd.lunchvote.data.repository.LoginRepositoryImpl
+import com.jwd.lunchvote.data.repository.TemplateRepositoryImpl
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.LoginRepository
+import com.jwd.lunchvote.domain.repository.TemplateRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -24,4 +26,10 @@ abstract class DataModule {
     abstract fun bindsHomeRepository(
         homeRepositoryImpl: LoungeRepositoryImpl
     ): LoungeRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindsTemplateRepository(
+        templateRepositoryImpl: TemplateRepositoryImpl
+    ): TemplateRepository
 }

@@ -11,7 +11,7 @@ class EditTemplateContract {
   @Parcelize
   data class EditTemplateState(
     val loading: Boolean = false,
-    val template: TemplateUIModel = TemplateUIModel("", "", "", emptyList(), emptyList())
+    val template: TemplateUIModel = TemplateUIModel("", "", emptyList(), emptyList())
   ): ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this
   }

@@ -6,6 +6,9 @@ import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.data.di.Dispatcher
 import com.jwd.lunchvote.data.di.LunchVoteDispatcher
 import com.jwd.lunchvote.data.di.LunchVoteDispatcher.IO
+import com.jwd.lunchvote.domain.usecase.lounge.CheckLoungeUseCase
+import com.jwd.lunchvote.domain.usecase.template.GetTemplateUseCase
+import com.jwd.lunchvote.model.TemplateUIModel
 import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListEvent
 import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListReduce
 import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListSideEffect
@@ -18,8 +21,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TemplateListViewModel @Inject constructor(
+  private val getTemplateUseCase: GetTemplateUseCase,
   savedStateHandle: SavedStateHandle,
-  @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher
+  @Dispatcher(IO) private val dispatcher: CoroutineDispatcher
 ): BaseStateViewModel<TemplateListState, TemplateListEvent, TemplateListReduce, TemplateListSideEffect>(savedStateHandle){
   override fun createInitialState(savedState: Parcelable?): TemplateListState {
     return savedState as? TemplateListState ?: TemplateListState()
@@ -33,7 +37,7 @@ class TemplateListViewModel @Inject constructor(
     when(event) {
       is TemplateListEvent.StartInitialize -> {
         updateState(TemplateListReduce.UpdateLoading(true))
-        CoroutineScope(ioDispatcher).launch {
+        CoroutineScope(dispatcher).launch {
           initialize()
         }
       }
@@ -51,9 +55,13 @@ class TemplateListViewModel @Inject constructor(
   }
 
   private suspend fun initialize() {
+    val userId = "PIRjtPnKcmJfNbSNIidD"
+    val templateList = getTemplateUseCase.invoke(userId)
+
     updateState(TemplateListReduce.Initialize(
       TemplateListState(
-
+        loading = false,
+        templateList = templateList.map { TemplateUIModel.toUIModel(it) }
       )
     ))
   }

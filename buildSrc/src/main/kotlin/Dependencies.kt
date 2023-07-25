@@ -93,6 +93,7 @@ object Libraries{
         const val DataBase = "com.google.firebase:firebase-database-ktx"
         const val GmsAuth = "com.google.android.gms:play-services-auth:${Versions.GmsAuth}"
         const val Function = "com.google.firebase:firebase-functions-ktx:${Versions.Functions}"
+        const val FireStore = "com.google.firebase:firebase-firestore-ktx"
     }
 
     object Hilt{
