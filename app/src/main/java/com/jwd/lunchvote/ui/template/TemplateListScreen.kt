@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -18,6 +20,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,6 +34,7 @@ import com.jwd.lunchvote.navigation.SNACK_BAR_KEY
 import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListEvent
 import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListSideEffect
 import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListState
+import com.jwd.lunchvote.widget.LunchVoteTextField
 import com.jwd.lunchvote.widget.LunchVoteTopBar
 import com.jwd.lunchvote.widget.TemplateListButton
 import com.jwd.lunchvote.widget.TemplateListItem
@@ -72,21 +76,45 @@ fun TemplateListRoute(
     snackBarHostState = snackBarHostState,
     onClickBackButton = { viewModel.sendEvent(TemplateListEvent.OnClickBackButton) },
     onClickTemplate = { templateId -> viewModel.sendEvent(TemplateListEvent.OnClickTemplate(templateId)) },
-    onClickAddButton = { viewModel.sendEvent(TemplateListEvent.OnClickAddButton) }
+    onClickAddButton = { viewModel.sendEvent(TemplateListEvent.OnClickAddButton) },
+    setTemplateName = { templateName -> viewModel.sendEvent(TemplateListEvent.SetTemplateName(templateName)) },
+    onClickDismiss = { viewModel.sendEvent(TemplateListEvent.OnClickDismiss) },
+    onClickConfirm = { viewModel.sendEvent(TemplateListEvent.OnClickConfirm) }
   )
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun TemplateListScreen(
   templateListState: TemplateListState,
   snackBarHostState: SnackbarHostState,
   onClickBackButton: () -> Unit = {},
   onClickTemplate: (String) -> Unit = {},
-  onClickAddButton: () -> Unit = {}
+  onClickAddButton: () -> Unit = {},
+  setTemplateName: (String) -> Unit = {},
+  onClickDismiss: () -> Unit = {},
+  onClickConfirm: () -> Unit = {},
 ) {
   Scaffold(
     snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
   ) { padding ->
+
+    if (templateListState.dialogState) {
+      AlertDialog(
+        onDismissRequest = onClickDismiss,
+        confirmButton = { Button(onClickConfirm, enabled = templateListState.templateName.isNotBlank()) { Text("생성") } },
+        dismissButton = { Button(onClickDismiss) { Text("취소") } },
+        title = { Text("템플릿 생성", style = MaterialTheme.typography.titleLarge) },
+        text = {
+          LunchVoteTextField(
+            text = templateListState.templateName,
+            hintText = "템플릿 이름",
+            onTextChanged = setTemplateName
+          )
+        },
+      )
+    }
+
     if (templateListState.loading) {
       Dialog(onDismissRequest = {  }) { CircularProgressIndicator() }
     } else {

@@ -43,7 +43,10 @@ class TemplateListViewModel @Inject constructor(
       }
       is TemplateListEvent.OnClickBackButton -> sendSideEffect(TemplateListSideEffect.PopBackStack)
       is TemplateListEvent.OnClickTemplate -> sendSideEffect(TemplateListSideEffect.NavigateToEditTemplate(event.templateId))
-      is TemplateListEvent.OnClickAddButton -> sendSideEffect(TemplateListSideEffect.NavigateToAddTemplate)
+      is TemplateListEvent.OnClickAddButton -> updateState(TemplateListReduce.UpdateDialogState(true))
+      is TemplateListEvent.SetTemplateName -> updateState(TemplateListReduce.UpdateTemplateName(event.templateName))
+      is TemplateListEvent.OnClickDismiss -> updateState(TemplateListReduce.UpdateDialogState(false))
+      is TemplateListEvent.OnClickConfirm -> sendSideEffect(TemplateListSideEffect.NavigateToAddTemplate)
     }
   }
 
@@ -51,11 +54,13 @@ class TemplateListViewModel @Inject constructor(
     return when (reduce) {
       is TemplateListReduce.UpdateLoading -> state.copy(loading = reduce.loading)
       is TemplateListReduce.Initialize -> reduce.state
+      is TemplateListReduce.UpdateTemplateName -> state.copy(templateName = reduce.templateName)
+      is TemplateListReduce.UpdateDialogState -> state.copy(dialogState = reduce.dialogState)
     }
   }
 
   private suspend fun initialize() {
-    val userId = "PIRjtPnKcmJfNbSNIidD"
+    val userId = "PIRjtPnKcmJfNbSNIidD"   // TODO: 임시
     val templateList = getTemplateUseCase.invoke(userId)
 
     updateState(TemplateListReduce.Initialize(
