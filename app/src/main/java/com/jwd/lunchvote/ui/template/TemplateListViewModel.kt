@@ -18,41 +18,43 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TemplateListViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
-    @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher
+  savedStateHandle: SavedStateHandle,
+  @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher
 ): BaseStateViewModel<TemplateListState, TemplateListEvent, TemplateListReduce, TemplateListSideEffect>(savedStateHandle){
-    override fun createInitialState(savedState: Parcelable?): TemplateListState {
-        return savedState as? TemplateListState ?: TemplateListState()
-    }
+  override fun createInitialState(savedState: Parcelable?): TemplateListState {
+    return savedState as? TemplateListState ?: TemplateListState()
+  }
 
-    init {
-      sendEvent(TemplateListEvent.StartInitialize)
-    }
+  init {
+    sendEvent(TemplateListEvent.StartInitialize)
+  }
 
-    override fun handleEvents(event: TemplateListEvent) {
-        when(event) {
-            is TemplateListEvent.StartInitialize -> {
-                updateState(TemplateListReduce.UpdateLoading(true))
-                CoroutineScope(ioDispatcher).launch {
-                    initialize()
-                }
-            }
-            is TemplateListEvent.OnClickBackButton -> sendSideEffect(TemplateListSideEffect.PopBaskStack)
+  override fun handleEvents(event: TemplateListEvent) {
+    when(event) {
+      is TemplateListEvent.StartInitialize -> {
+        updateState(TemplateListReduce.UpdateLoading(true))
+        CoroutineScope(ioDispatcher).launch {
+          initialize()
         }
+      }
+      is TemplateListEvent.OnClickBackButton -> sendSideEffect(TemplateListSideEffect.PopBackStack)
+      is TemplateListEvent.OnClickTemplate -> sendSideEffect(TemplateListSideEffect.NavigateToEditTemplate(event.templateId))
+      is TemplateListEvent.OnClickAddButton -> sendSideEffect(TemplateListSideEffect.NavigateToCreateTemplate)
     }
+  }
 
-    override fun reduceState(state: TemplateListState, reduce: TemplateListReduce): TemplateListState {
-        return when (reduce) {
-            is TemplateListReduce.UpdateLoading -> state.copy(loading = reduce.loading)
-            is TemplateListReduce.Initialize -> reduce.state
-        }
+  override fun reduceState(state: TemplateListState, reduce: TemplateListReduce): TemplateListState {
+    return when (reduce) {
+      is TemplateListReduce.UpdateLoading -> state.copy(loading = reduce.loading)
+      is TemplateListReduce.Initialize -> reduce.state
     }
+  }
 
-    private suspend fun initialize() {
-        updateState(TemplateListReduce.Initialize(
-            TemplateListState(
+  private suspend fun initialize() {
+    updateState(TemplateListReduce.Initialize(
+      TemplateListState(
 
-            )
-        ))
-    }
+      )
+    ))
+  }
 }

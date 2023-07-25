@@ -171,7 +171,7 @@ fun LunchVoteNavHost(
                         navHostController.navigate(LunchVoteNavRoute.CreateTemplate.name)
                     },
                     popBackStack = { navHostController.popBackStack() },
-                    messageFlow = it.savedStateHandle.getStateFlow(SNACK_BAR_KEY, "")
+                    savedStateHandle = it.savedStateHandle
                 )
             }
             composable(
@@ -230,7 +230,7 @@ fun LunchVoteNavHost(
     }
 }
 
-private const val SNACK_BAR_KEY = "message"
+const val SNACK_BAR_KEY = "message"
 
 enum class LunchVoteNavRoute {
     LoginNavigation,
