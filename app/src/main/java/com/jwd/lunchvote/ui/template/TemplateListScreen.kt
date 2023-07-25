@@ -43,7 +43,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun TemplateListRoute(
   navigateToEditTemplate: (String?) -> Unit,
-  navigateToAddTemplate: () -> Unit,
+  navigateToAddTemplate: (String) -> Unit,
   popBackStack: () -> Unit,
   savedStateHandle: SavedStateHandle,
   viewModel: TemplateListViewModel = hiltViewModel()
@@ -57,7 +57,7 @@ fun TemplateListRoute(
       when(it){
         is TemplateListSideEffect.PopBackStack -> popBackStack()
         is TemplateListSideEffect.NavigateToEditTemplate -> navigateToEditTemplate(it.templateId)
-        is TemplateListSideEffect.NavigateToAddTemplate -> navigateToAddTemplate()
+        is TemplateListSideEffect.NavigateToAddTemplate -> navigateToAddTemplate(it.templateName)
         is TemplateListSideEffect.ShowSnackBar -> snackBarHostState.showSnackbar(it.message)
       }
     }

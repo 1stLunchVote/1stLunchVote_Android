@@ -38,7 +38,7 @@ class TemplateListContract {
   sealed interface TemplateListSideEffect: ViewModelContract.SideEffect {
     object PopBackStack: TemplateListSideEffect
     data class NavigateToEditTemplate(val templateId: String) : TemplateListSideEffect
-    object NavigateToAddTemplate: TemplateListSideEffect
+    data class NavigateToAddTemplate(val templateName: String): TemplateListSideEffect
     data class ShowSnackBar(val message: String) : TemplateListSideEffect
   }
 }
