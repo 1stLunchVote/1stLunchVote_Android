@@ -39,7 +39,7 @@ class TemplateListViewModel @Inject constructor(
       }
       is TemplateListEvent.OnClickBackButton -> sendSideEffect(TemplateListSideEffect.PopBackStack)
       is TemplateListEvent.OnClickTemplate -> sendSideEffect(TemplateListSideEffect.NavigateToEditTemplate(event.templateId))
-      is TemplateListEvent.OnClickAddButton -> sendSideEffect(TemplateListSideEffect.NavigateToCreateTemplate)
+      is TemplateListEvent.OnClickAddButton -> sendSideEffect(TemplateListSideEffect.NavigateToAddTemplate)
     }
   }
 

@@ -34,14 +34,12 @@ import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListState
 import com.jwd.lunchvote.widget.LunchVoteTopBar
 import com.jwd.lunchvote.widget.TemplateListButton
 import com.jwd.lunchvote.widget.TemplateListItem
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filter
 
 @Composable
 fun TemplateListRoute(
   navigateToEditTemplate: (String?) -> Unit,
-  navigateToCreateTemplate: () -> Unit,
+  navigateToAddTemplate: () -> Unit,
   popBackStack: () -> Unit,
   savedStateHandle: SavedStateHandle,
   viewModel: TemplateListViewModel = hiltViewModel()
@@ -55,7 +53,7 @@ fun TemplateListRoute(
       when(it){
         is TemplateListSideEffect.PopBackStack -> popBackStack()
         is TemplateListSideEffect.NavigateToEditTemplate -> navigateToEditTemplate(it.templateId)
-        is TemplateListSideEffect.NavigateToCreateTemplate -> navigateToCreateTemplate()
+        is TemplateListSideEffect.NavigateToAddTemplate -> navigateToAddTemplate()
         is TemplateListSideEffect.ShowSnackBar -> snackBarHostState.showSnackbar(it.message)
       }
     }

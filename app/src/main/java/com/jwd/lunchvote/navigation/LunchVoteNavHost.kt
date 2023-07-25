@@ -13,6 +13,8 @@ import com.jwd.lunchvote.ui.login.register.RegisterEmailRoute
 import com.jwd.lunchvote.ui.lounge.LoungeRoute
 import com.jwd.lunchvote.ui.lounge.member.LoungeMemberRoute
 import com.jwd.lunchvote.ui.template.TemplateListRoute
+import com.jwd.lunchvote.ui.template.add_template.AddTemplateRoute
+import com.jwd.lunchvote.ui.template.edit_template.EditTemplateRoute
 import com.jwd.lunchvote.ui.vote.first.FirstVoteRoute
 import com.jwd.lunchvote.ui.vote.second.SecondVoteRoute
 
@@ -167,8 +169,8 @@ fun LunchVoteNavHost(
                     navigateToEditTemplate = { templateId ->
                         navHostController.navigate(LunchVoteNavRoute.EditTemplate.name + "?templateId=${templateId}")
                     },
-                    navigateToCreateTemplate = {
-                        navHostController.navigate(LunchVoteNavRoute.CreateTemplate.name)
+                    navigateToAddTemplate = {
+                        navHostController.navigate(LunchVoteNavRoute.AddTemplate.name)
                     },
                     popBackStack = { navHostController.popBackStack() },
                     savedStateHandle = it.savedStateHandle
@@ -183,26 +185,26 @@ fun LunchVoteNavHost(
                     }
                 )
             ) {
-//                EditTemplateScene(
-//                    popBackStack = {
-//                        navHostController.previousBackStackEntry?.savedStateHandle?.set(
-//                            SNACK_BAR_KEY,
-//                            it
-//                        )
-//                        navHostController.popBackStack()
-//                    }
-//                )
+                EditTemplateRoute(
+                    popBackStack = {
+                        navHostController.previousBackStackEntry?.savedStateHandle?.set(
+                            SNACK_BAR_KEY,
+                            it
+                        )
+                        navHostController.popBackStack()
+                    }
+                )
             }
-            composable(LunchVoteNavRoute.CreateTemplate.name) {
-//                CreateTemplateScene(
-//                    popBackStack = {
-//                        navHostController.previousBackStackEntry?.savedStateHandle?.set(
-//                            SNACK_BAR_KEY,
-//                            it
-//                        )
-//                        navHostController.popBackStack()
-//                    }
-//                )
+            composable(LunchVoteNavRoute.AddTemplate.name) {
+                AddTemplateRoute(
+                    popBackStack = {
+                        navHostController.previousBackStackEntry?.savedStateHandle?.set(
+                            SNACK_BAR_KEY,
+                            it
+                        )
+                        navHostController.popBackStack()
+                    }
+                )
             }
         }
 
@@ -249,7 +251,7 @@ enum class LunchVoteNavRoute {
 
     TemplateList,
     EditTemplate,
-    CreateTemplate,
+    AddTemplate,
 
     Lounge,
     Setting,
