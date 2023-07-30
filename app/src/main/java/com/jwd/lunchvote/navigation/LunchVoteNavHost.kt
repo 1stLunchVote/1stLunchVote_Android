@@ -170,7 +170,7 @@ fun LunchVoteNavHost(
                         navHostController.navigate(LunchVoteNavRoute.EditTemplate.name + "?templateId=${templateId}")
                     },
                     navigateToAddTemplate = { templateName ->
-                        navHostController.navigate(LunchVoteNavRoute.AddTemplate.name + "?tempalteName=${templateName}")
+                        navHostController.navigate(LunchVoteNavRoute.AddTemplate.name + "?templateName=${templateName}")
                     },
                     popBackStack = { navHostController.popBackStack() },
                     savedStateHandle = it.savedStateHandle
