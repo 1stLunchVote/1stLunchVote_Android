@@ -1,7 +1,6 @@
 package com.jwd.lunchvote.remote.source
 
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 import com.jwd.lunchvote.data.source.remote.TemplateRemoteDataSource
 import com.jwd.lunchvote.domain.entity.Food
 import com.jwd.lunchvote.domain.entity.Template

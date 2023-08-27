@@ -39,7 +39,6 @@ import com.jwd.lunchvote.domain.entity.FoodStatus
 import com.jwd.lunchvote.domain.entity.Template
 import com.jwd.lunchvote.model.FoodUIModel
 import com.jwd.lunchvote.model.TemplateUIModel
-import com.jwd.lunchvote.ui.template.add_template.AddTemplateViewModel
 import com.jwd.lunchvote.ui.template.add_template.TemplateTitle
 import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.*
 import com.jwd.lunchvote.widget.FoodItem

@@ -5,7 +5,6 @@ import com.jwd.lunchvote.core.ui.base.ViewModelContract
 import com.jwd.lunchvote.domain.entity.Template
 import com.jwd.lunchvote.model.FoodUIModel
 import com.jwd.lunchvote.model.TemplateUIModel
-import com.jwd.lunchvote.ui.home.HomeContract
 import kotlinx.parcelize.Parcelize
 
 class EditTemplateContract {
