@@ -141,7 +141,7 @@ private fun AddTemplateScreen(
             onClick = onClickAddButton,
             enabled = addTemplateState.likeList.isNotEmpty() || addTemplateState.dislikeList.isNotEmpty()
           ) {
-            Text("투표 완료")
+            Text("템플릿 생성")
           }
         }
       }

@@ -64,6 +64,8 @@ fun TemplateListRoute(
   }
 
   LaunchedEffect(Unit){
+    viewModel.sendEvent(TemplateListEvent.StartInitialize)
+
     val message = savedStateHandle.get<String>(SNACK_BAR_KEY)
     if (!message.isNullOrEmpty()) {
       savedStateHandle[SNACK_BAR_KEY] = ""
@@ -98,7 +100,6 @@ private fun TemplateListScreen(
   Scaffold(
     snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
   ) { padding ->
-
     if (templateListState.dialogState) {
       AlertDialog(
         onDismissRequest = onClickDismiss,

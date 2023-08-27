@@ -29,10 +29,6 @@ class TemplateListViewModel @Inject constructor(
     return savedState as? TemplateListState ?: TemplateListState()
   }
 
-  init {
-    sendEvent(TemplateListEvent.StartInitialize)
-  }
-
   override fun handleEvents(event: TemplateListEvent) {
     when(event) {
       is TemplateListEvent.StartInitialize -> {
@@ -46,7 +42,10 @@ class TemplateListViewModel @Inject constructor(
       is TemplateListEvent.OnClickAddButton -> updateState(TemplateListReduce.UpdateDialogState(true))
       is TemplateListEvent.SetTemplateName -> updateState(TemplateListReduce.UpdateTemplateName(event.templateName))
       is TemplateListEvent.OnClickDismiss -> updateState(TemplateListReduce.UpdateDialogState(false))
-      is TemplateListEvent.OnClickConfirm -> sendSideEffect(TemplateListSideEffect.NavigateToAddTemplate(currentState.templateName))
+      is TemplateListEvent.OnClickConfirm -> {
+        updateState(TemplateListReduce.UpdateDialogState(false))
+        sendSideEffect(TemplateListSideEffect.NavigateToAddTemplate(currentState.templateName))
+      }
     }
   }
 

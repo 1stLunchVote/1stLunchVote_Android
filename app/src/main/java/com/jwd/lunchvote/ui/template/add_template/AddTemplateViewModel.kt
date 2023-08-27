@@ -108,6 +108,6 @@ class AddTemplateViewModel @Inject constructor(
         dislike = currentState.dislikeList.map { it.name },
       )
     )
-    sendSideEffect(AddTemplateSideEffect.PopBackStack())
+    sendSideEffect(AddTemplateSideEffect.PopBackStack("템플릿이 저장되었습니다."))
   }
 }
