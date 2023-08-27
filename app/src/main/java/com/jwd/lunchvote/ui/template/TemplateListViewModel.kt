@@ -44,7 +44,7 @@ class TemplateListViewModel @Inject constructor(
       is TemplateListEvent.OnClickDismiss -> updateState(TemplateListReduce.UpdateDialogState(false))
       is TemplateListEvent.OnClickConfirm -> {
         updateState(TemplateListReduce.UpdateDialogState(false))
-        sendSideEffect(TemplateListSideEffect.NavigateToAddTemplate(currentState.templateName))
+        sendSideEffect(TemplateListSideEffect.NavigateToAddTemplate(currentState.templateName.trim()))
       }
     }
   }
