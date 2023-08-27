@@ -1,8 +1,10 @@
 package com.jwd.lunchvote.domain.repository
 
+import com.jwd.lunchvote.domain.entity.Food
 import com.jwd.lunchvote.domain.entity.Template
-import kotlinx.coroutines.flow.Flow
 
 interface TemplateRepository {
+  suspend fun getFoods(): List<Food>
   suspend fun getTemplates(userId: String): List<Template>
+  suspend fun addTemplate(template: Template): Template
 }

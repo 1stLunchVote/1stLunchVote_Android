@@ -1,41 +1,44 @@
 package com.jwd.lunchvote.remote.source
 
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.getField
-import com.jwd.lunchvote.data.di.Dispatcher
-import com.jwd.lunchvote.data.di.LunchVoteDispatcher.*
 import com.jwd.lunchvote.data.source.remote.TemplateRemoteDataSource
+import com.jwd.lunchvote.domain.entity.Food
 import com.jwd.lunchvote.domain.entity.Template
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.tasks.await
-import timber.log.Timber
+import java.util.UUID
 import javax.inject.Inject
 
 class TemplateRemoteDataSourceImpl @Inject constructor(
   private val fireStore: FirebaseFirestore
 ): TemplateRemoteDataSource {
-  @Suppress("UNCHECKED_CAST")
+  override suspend fun getFoods(): List<Food> =
+    fireStore
+      .collection("Food")
+      .get()
+      .await()
+      .documents
+      .map { it.toObject(Food::class.java) ?: Food() }
+
   override suspend fun getTemplates(
     userId: String
-  ): List<Template> {
-    val result = fireStore
+  ): List<Template> =
+    fireStore
       .collection("Template")
       .whereEqualTo("userId", userId)
       .get()
       .await()
+      .documents
+      .map { it.toObject(Template::class.java) ?: Template() }
 
-    val data = mutableListOf<Template>()
-    for (document in result.documents) {
-      data.add(
-        Template(
-          uid = document.id,
-          userId = document["userId"] as String,
-          name = document["name"] as String,
-          like = document["like"] as? List<String> ?: emptyList(),
-          dislike = document["dislike"] as? List<String> ?: emptyList()
-        )
-      )
-    }
+  override suspend fun addTemplate(template: Template): Template {
+    val uid = UUID.randomUUID().toString()
+    val data = template.copy(id = uid)
+
+    fireStore
+      .collection("Template")
+      .document(uid)
+      .set(data)
+      .await()
 
     return data
   }

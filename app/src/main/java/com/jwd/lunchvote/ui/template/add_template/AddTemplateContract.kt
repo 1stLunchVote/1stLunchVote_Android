@@ -11,7 +11,7 @@ class AddTemplateContract {
   @Parcelize
   data class AddTemplateState(
     val loading: Boolean = false,
-    val template: TemplateUIModel = TemplateUIModel("", "", emptyList(), emptyList()),
+    val name: String = "",
     val foodList: List<FoodUIModel> = emptyList(),
     val likeList: List<FoodUIModel> = emptyList(),
     val dislikeList: List<FoodUIModel> = emptyList(),
@@ -22,10 +22,10 @@ class AddTemplateContract {
 
   sealed interface AddTemplateEvent: ViewModelContract.Event {
     data class StartInitialize(val templateName: String): AddTemplateEvent
-    object OnClickBackButton: AddTemplateEvent
+    data object OnClickBackButton: AddTemplateEvent
     data class OnClickFood(val food: FoodUIModel): AddTemplateEvent
     data class SetSearchKeyword(val searchKeyword: String): AddTemplateEvent
-    object OnClickAddButton: AddTemplateEvent
+    data object OnClickAddButton: AddTemplateEvent
   }
 
   sealed interface AddTemplateReduce : ViewModelContract.Reduce {

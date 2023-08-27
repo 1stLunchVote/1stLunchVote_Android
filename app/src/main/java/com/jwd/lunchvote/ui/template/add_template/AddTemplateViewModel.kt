@@ -6,8 +6,10 @@ import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.data.di.Dispatcher
 import com.jwd.lunchvote.data.di.LunchVoteDispatcher.IO
 import com.jwd.lunchvote.domain.entity.FoodStatus
+import com.jwd.lunchvote.domain.entity.Template
+import com.jwd.lunchvote.domain.usecase.template.AddTemplateUseCase
+import com.jwd.lunchvote.domain.usecase.template.GetFoodsUseCase
 import com.jwd.lunchvote.model.FoodUIModel
-import com.jwd.lunchvote.model.TemplateUIModel
 import com.jwd.lunchvote.ui.template.add_template.AddTemplateContract.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -17,6 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddTemplateViewModel @Inject constructor(
+  private val addTemplateUseCase: AddTemplateUseCase,
+  private val getFoodsUseCase: GetFoodsUseCase,
   savedStateHandle: SavedStateHandle,
   @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher
 ): BaseStateViewModel<AddTemplateState, AddTemplateEvent, AddTemplateReduce, AddTemplateSideEffect>(savedStateHandle){
@@ -81,25 +85,29 @@ class AddTemplateViewModel @Inject constructor(
   }
 
   private suspend fun initialize(templateName: String) {
+    val foodList = getFoodsUseCase.invoke()
 
-
-    updateState(AddTemplateReduce.Initialize(
-      AddTemplateState(
-        loading = false,
-        template = TemplateUIModel("", templateName, emptyList(), emptyList()),
-        foodList = List(20) {
-          FoodUIModel(
-            foodId = it.toLong(),
-            imageUrl = "",
-            name = "음식명",
-            status = FoodStatus.DEFAULT
-          )
-        }
+    updateState(
+      AddTemplateReduce.Initialize(
+        AddTemplateState(
+          loading = false,
+          name = templateName,
+          foodList = foodList.map { FoodUIModel(it) }
+        )
       )
-    ))
+    )
   }
 
   private suspend fun addTemplate() {
-
+    val userId = "PIRjtPnKcmJfNbSNIidD"   // TODO: 임시
+    addTemplateUseCase.invoke(
+      Template(
+        userId = userId,
+        name = currentState.name,
+        like = currentState.likeList.map { it.name },
+        dislike = currentState.dislikeList.map { it.name },
+      )
+    )
+    sendSideEffect(AddTemplateSideEffect.PopBackStack())
   }
 }

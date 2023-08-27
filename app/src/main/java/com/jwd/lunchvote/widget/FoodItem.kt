@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,6 +28,7 @@ import com.jwd.lunchvote.core.ui.theme.colorSuccess
 import com.jwd.lunchvote.core.ui.util.circleShadow
 import com.jwd.lunchvote.domain.entity.FoodStatus
 import com.jwd.lunchvote.model.FoodUIModel
+import com.skydoves.landscapist.coil.CoilImage
 
 @Composable
 fun FoodItem(
@@ -42,49 +44,40 @@ fun FoodItem(
     verticalArrangement = Arrangement.spacedBy(4.dp),
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
-    when(food.status) {
-      FoodStatus.DEFAULT -> {
+    Box(
+      modifier = if (food.status == FoodStatus.DISLIKE) Modifier.alpha(0.5f) else Modifier
+    ) {
+      CoilImage(
+        food.imageUrl,
+        modifier = Modifier
+          .size(100.dp)
+          .let {
+            when (food.status) {
+              FoodStatus.DEFAULT -> it
+                .clip(RoundedCornerShape(16.dp))
+                .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
+                .alpha(0.8f)
+              FoodStatus.LIKE -> it
+                .clip(RoundedCornerShape(16.dp))
+                .border(2.dp, colorSuccess, RoundedCornerShape(16.dp))
+                .circleShadow(colorSuccess, blurRadius = 8.dp)
+              else -> it
+            }
+          },
+        contentScale = ContentScale.Crop,
+        previewPlaceholder = R.drawable.ic_food_image_temp
+      )
+      if (food.status == FoodStatus.DISLIKE) {
         Image(
-          painterResource(R.drawable.ic_food_image_temp),
+          painterResource(R.drawable.ic_mask_reversed),
           null,
-          modifier = Modifier
-            .size(100.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
-            .alpha(0.8f)
+          modifier = Modifier.size(100.dp),
         )
-      }
-      FoodStatus.LIKE -> {
         Image(
-          painterResource(R.drawable.ic_food_image_temp),
+          painterResource(R.drawable.ic_mask_outline),
           null,
-          modifier = Modifier
-            .size(100.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .border(2.dp, colorSuccess, RoundedCornerShape(16.dp))
-            .circleShadow(colorSuccess, blurRadius = 8.dp)
+          modifier = Modifier.size(100.dp)
         )
-      }
-      FoodStatus.DISLIKE -> {
-        Box(
-          modifier = Modifier.alpha(0.5f)
-        ) {
-          Image(
-            painterResource(R.drawable.ic_food_image_temp),
-            null,
-              modifier = Modifier.size(100.dp)
-          )
-          Image(
-            painterResource(R.drawable.ic_mask_reversed),
-            null,
-            modifier = Modifier.size(100.dp),
-          )
-          Image(
-            painterResource(R.drawable.ic_mask_outline),
-            null,
-            modifier = Modifier.size(100.dp)
-          )
-        }
       }
     }
     Text(
@@ -103,7 +96,7 @@ fun FoodItemDefaultPreview(){
     ) {
       FoodItem(
         FoodUIModel(
-          foodId = 0L,
+          id = "",
           imageUrl = "",
           name = "햄버거",
           status = FoodStatus.DEFAULT
@@ -111,7 +104,7 @@ fun FoodItemDefaultPreview(){
       )
       FoodItem(
         FoodUIModel(
-          foodId = 0L,
+          id = "",
           imageUrl = "",
           name = "햄버거",
           status = FoodStatus.LIKE
@@ -119,7 +112,7 @@ fun FoodItemDefaultPreview(){
       )
       FoodItem(
         FoodUIModel(
-          foodId = 0L,
+          id = "",
           imageUrl = "",
           name = "햄버거",
           status = FoodStatus.DISLIKE

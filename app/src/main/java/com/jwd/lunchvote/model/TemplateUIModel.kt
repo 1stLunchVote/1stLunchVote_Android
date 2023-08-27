@@ -6,7 +6,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class TemplateUIModel(
-  val uid: String,
+  val id: String,
   val name: String,
   val like: List<String>,
   val dislike: List<String>
@@ -14,7 +14,7 @@ data class TemplateUIModel(
   companion object {
     fun toUIModel(template: Template): TemplateUIModel =
       TemplateUIModel(
-        uid = template.uid,
+        id = template.id ?: "",
         name = template.name,
         like = template.like,
         dislike = template.dislike

@@ -72,14 +72,14 @@ dependencies {
     implementationHilt()
     implementationTest()
     implementationFirebase()
+    implementationCoil()
 
     implementations(
         Libraries.Timber,
         Libraries.Firebase.Auth,
         Libraries.Firebase.GmsAuth,
         Libraries.Firebase.Function,
-        Libraries.Kakao,
-        Libraries.Coil
+        Libraries.Kakao
     )
 }
 

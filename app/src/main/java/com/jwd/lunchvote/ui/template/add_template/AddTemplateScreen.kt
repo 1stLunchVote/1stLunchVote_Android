@@ -114,7 +114,7 @@ private fun AddTemplateScreen(
           horizontalAlignment = CenterHorizontally
         ) {
           TemplateTitle(
-            addTemplateState.template,
+            addTemplateState.name,
             addTemplateState.likeList.size,
             addTemplateState.dislikeList.size
           )
@@ -151,7 +151,7 @@ private fun AddTemplateScreen(
 
 @Composable
 fun TemplateTitle(
-  template: TemplateUIModel,
+  name: String,
   like: Int,
   dislike: Int
 ) {
@@ -170,7 +170,7 @@ fun TemplateTitle(
       verticalArrangement = Arrangement.spacedBy(8.dp),
       horizontalAlignment = CenterHorizontally
     ) {
-      Text(template.name, style = MaterialTheme.typography.bodyLarge)
+      Text(name, style = MaterialTheme.typography.bodyLarge)
       LikeDislike(like, dislike)
     }
   }
@@ -183,12 +183,10 @@ fun AddTemplateScreenPreview() {
     Surface {
       AddTemplateScreen(
         AddTemplateState(
-          template = TemplateUIModel(
-            "", "학생회 회식 대표 메뉴", emptyList(), emptyList()
-          ),
+          name = "학생회 회식 대표 메뉴",
           foodList = List(20) {
             FoodUIModel(
-              foodId = it.toLong(),
+              id = "$it",
               imageUrl = "",
               name = "음식명",
               status = FoodStatus.DEFAULT

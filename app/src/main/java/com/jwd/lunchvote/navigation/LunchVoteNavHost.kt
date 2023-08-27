@@ -167,17 +167,17 @@ fun LunchVoteNavHost(
             composable(LunchVoteNavRoute.TemplateList.name) {
                 TemplateListRoute(
                     navigateToEditTemplate = { templateId ->
-                        navHostController.navigate(LunchVoteNavRoute.EditTemplate.name + "?templateId=${templateId}")
+                        navHostController.navigate(LunchVoteNavRoute.EditTemplate.name + "/${templateId}")
                     },
                     navigateToAddTemplate = { templateName ->
-                        navHostController.navigate(LunchVoteNavRoute.AddTemplate.name + "?templateName=${templateName}")
+                        navHostController.navigate(LunchVoteNavRoute.AddTemplate.name + "/${templateName}")
                     },
                     popBackStack = { navHostController.popBackStack() },
                     savedStateHandle = it.savedStateHandle
                 )
             }
             composable(
-                LunchVoteNavRoute.EditTemplate.name + "?templateId={templateId}",
+                LunchVoteNavRoute.EditTemplate.name + "/{templateId}",
                 arguments = listOf(
                     navArgument("templateId") {
                         type = NavType.StringType
@@ -195,7 +195,7 @@ fun LunchVoteNavHost(
                     }
                 )
             }
-            composable(LunchVoteNavRoute.AddTemplate.name + "?templateName={templateName}",
+            composable(LunchVoteNavRoute.AddTemplate.name + "/{templateName}",
                 arguments = listOf(
                     navArgument("templateName") {
                         type = NavType.StringType

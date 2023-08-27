@@ -88,7 +88,7 @@ fun TemplateListItemPreview() {
     Surface {
       TemplateListItem(
         TemplateUIModel(
-          uid = "",
+          id = "",
           name = "스트레스 받을 때(매운 음식)",
           like = listOf(),
           dislike = listOf()

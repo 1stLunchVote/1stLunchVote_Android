@@ -150,7 +150,7 @@ private fun TemplateListScreen(
           } else {
             items(templateListState.templateList) { template ->
               TemplateListItem(template) {
-                onClickTemplate(template.uid)
+                onClickTemplate(template.id)
               }
             }
           }
