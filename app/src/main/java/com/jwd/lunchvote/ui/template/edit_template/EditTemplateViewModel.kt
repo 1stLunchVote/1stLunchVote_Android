@@ -7,6 +7,7 @@ import com.jwd.lunchvote.data.di.Dispatcher
 import com.jwd.lunchvote.data.di.LunchVoteDispatcher.IO
 import com.jwd.lunchvote.domain.entity.FoodStatus
 import com.jwd.lunchvote.domain.entity.Template
+import com.jwd.lunchvote.domain.usecase.template.DeleteTemplateUseCase
 import com.jwd.lunchvote.domain.usecase.template.EditTemplateUseCase
 import com.jwd.lunchvote.domain.usecase.template.GetFoodsUseCase
 import com.jwd.lunchvote.domain.usecase.template.GetTemplateUseCase
@@ -24,6 +25,7 @@ class EditTemplateViewModel @Inject constructor(
   private val getFoodsUseCase: GetFoodsUseCase,
   private val getTemplateUseCase: GetTemplateUseCase,
   private val editTemplateUseCase: EditTemplateUseCase,
+  private val deleteTemplateUseCase: DeleteTemplateUseCase,
   savedStateHandle: SavedStateHandle,
   @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher
 ): BaseStateViewModel<EditTemplateState, EditTemplateEvent, EditTemplateReduce, EditTemplateSideEffect>(savedStateHandle){
@@ -53,6 +55,15 @@ class EditTemplateViewModel @Inject constructor(
           save()
         }
       }
+      is EditTemplateEvent.OnClickDeleteButton -> updateState(EditTemplateReduce.UpdateDialogState(true))
+      is EditTemplateEvent.OnClickDialogConfirm -> {
+        updateState(EditTemplateReduce.UpdateDialogState(false))
+        updateState(EditTemplateReduce.UpdateLoading(true))
+        CoroutineScope(ioDispatcher).launch {
+          delete()
+        }
+      }
+      is EditTemplateEvent.OnClickDialogDismiss -> updateState(EditTemplateReduce.UpdateDialogState(false))
     }
   }
 
@@ -86,6 +97,7 @@ class EditTemplateViewModel @Inject constructor(
           )
         }
       }
+      is EditTemplateReduce.UpdateDialogState -> state.copy(dialogState = reduce.dialogState)
     }
   }
 
@@ -120,5 +132,10 @@ class EditTemplateViewModel @Inject constructor(
       )
     )
     sendSideEffect(EditTemplateSideEffect.PopBackStack("템플릿이 수정되었습니다."))
+  }
+
+  private suspend fun delete() {
+    deleteTemplateUseCase.invoke(currentState.template.id)
+    sendSideEffect(EditTemplateSideEffect.PopBackStack("템플릿이 삭제되었습니다."))
   }
 }

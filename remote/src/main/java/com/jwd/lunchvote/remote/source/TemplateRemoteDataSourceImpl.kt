@@ -65,4 +65,11 @@ class TemplateRemoteDataSourceImpl @Inject constructor(
     return template
   }
 
+  override suspend fun deleteTemplate(id: String) {
+    fireStore
+      .collection("Template")
+      .document(id)
+      .delete()
+      .await()
+  }
 }

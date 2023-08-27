@@ -16,7 +16,8 @@ class EditTemplateContract {
     val foodList: List<FoodUIModel> = emptyList(),
     val likeList: List<FoodUIModel> = emptyList(),
     val dislikeList: List<FoodUIModel> = emptyList(),
-    val searchKeyword: String = ""
+    val searchKeyword: String = "",
+    val dialogState: Boolean = false
   ): ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this
   }
@@ -27,6 +28,9 @@ class EditTemplateContract {
     data class SetSearchKeyword(val searchKeyword: String): EditTemplateEvent
     data class OnClickFood(val food: FoodUIModel): EditTemplateEvent
     data object OnClickSaveButton: EditTemplateEvent
+    data object OnClickDeleteButton: EditTemplateEvent
+    data object OnClickDialogConfirm: EditTemplateEvent
+    data object OnClickDialogDismiss: EditTemplateEvent
   }
 
   sealed interface EditTemplateReduce : ViewModelContract.Reduce {
@@ -34,6 +38,7 @@ class EditTemplateContract {
     data class Initialize(val state: EditTemplateState): EditTemplateReduce
     data class UpdateSearchKeyword(val searchKeyword: String): EditTemplateReduce
     data class UpdateFoodStatus(val food: FoodUIModel): EditTemplateReduce
+    data class UpdateDialogState(val dialogState: Boolean): EditTemplateReduce
   }
 
   sealed interface EditTemplateSideEffect: ViewModelContract.SideEffect {

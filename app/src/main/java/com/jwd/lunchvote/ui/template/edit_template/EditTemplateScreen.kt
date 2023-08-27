@@ -8,8 +8,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -29,7 +35,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.R
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
+import com.jwd.lunchvote.domain.entity.FoodStatus
+import com.jwd.lunchvote.domain.entity.Template
 import com.jwd.lunchvote.model.FoodUIModel
+import com.jwd.lunchvote.model.TemplateUIModel
 import com.jwd.lunchvote.ui.template.add_template.AddTemplateViewModel
 import com.jwd.lunchvote.ui.template.add_template.TemplateTitle
 import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.*
@@ -63,7 +72,10 @@ fun EditTemplateRoute(
     onClickBackButton = { viewModel.sendEvent(EditTemplateEvent.OnClickBackButton) },
     setSearchKeyword = { viewModel.sendEvent(EditTemplateEvent.SetSearchKeyword(it)) },
     onClickFood = { viewModel.sendEvent(EditTemplateEvent.OnClickFood(it)) },
-    onClickSaveButton = { viewModel.sendEvent(EditTemplateEvent.OnClickSaveButton) }
+    onClickSaveButton = { viewModel.sendEvent(EditTemplateEvent.OnClickSaveButton) },
+    onClickDeleteButton = { viewModel.sendEvent(EditTemplateEvent.OnClickDeleteButton) },
+    onClickDialogConfirm = { viewModel.sendEvent(EditTemplateEvent.OnClickDialogConfirm) },
+    onClickDialogDismiss = { viewModel.sendEvent(EditTemplateEvent.OnClickDialogDismiss) }
   )
 }
 
@@ -75,11 +87,29 @@ private fun EditTemplateScreen(
   onClickBackButton: () -> Unit = {},
   setSearchKeyword: (String) -> Unit = {},
   onClickFood: (FoodUIModel) -> Unit = {},
-  onClickSaveButton: () -> Unit = {}
-  ) {
+  onClickSaveButton: () -> Unit = {},
+  onClickDeleteButton: () -> Unit = {},
+  onClickDialogConfirm: () -> Unit = {},
+  onClickDialogDismiss: () -> Unit = {}
+) {
   Scaffold(
     snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
   ) { padding ->
+    if (editTemplateState.dialogState) {
+      AlertDialog(
+        onDismissRequest = onClickDialogDismiss,
+        confirmButton = { Button(onClickDialogConfirm) { Text("삭제") } },
+        dismissButton = { Button(onClickDialogDismiss) { Text("취소") } },
+        title = { Text("템플릿 삭제", style = MaterialTheme.typography.titleLarge) },
+        text = {
+          Text(
+            "템플릿을 삭제하시겠습니까?",
+            style = MaterialTheme.typography.bodyMedium
+          )
+        },
+      )
+    }
+
     if (editTemplateState.loading) {
       Dialog(onDismissRequest = {  }) { CircularProgressIndicator() }
     } else {
@@ -92,7 +122,15 @@ private fun EditTemplateScreen(
         LunchVoteTopBar(
           title = "템플릿 편집",
           navIconVisible = true,
-          popBackStack = onClickBackButton
+          popBackStack = onClickBackButton,
+          actions = {
+            IconButton(onClickDeleteButton) {
+              Icon(
+                imageVector = Icons.Outlined.Delete,
+                contentDescription = "delete",
+              )
+            }
+          }
         )
         Column(
           modifier = Modifier
@@ -142,7 +180,21 @@ private fun EditTemplateScreen(
 fun EditTemplateScreenPreview() {
   LunchVoteTheme {
     EditTemplateScreen(
-      editTemplateState = EditTemplateState(),
+      editTemplateState = EditTemplateState(
+        foodList = List(20) {
+          FoodUIModel(
+            id = "$it",
+            imageUrl = "",
+            name = "음식명",
+            status = FoodStatus.DEFAULT
+          )
+        },
+        template = TemplateUIModel(
+          Template(
+            name = "스트레스 받을 때(매운 음식)"
+          )
+        )
+      ),
       snackBarHostState = remember { SnackbarHostState() }
     )
   }

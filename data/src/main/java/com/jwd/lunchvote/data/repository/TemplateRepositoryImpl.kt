@@ -23,4 +23,7 @@ class TemplateRepositoryImpl @Inject constructor(
 
   override suspend fun editTemplate(template: Template): Template =
     templateRemoteDataSource.editTemplate(template)
+
+  override suspend fun deleteTemplate(id: String): Unit =
+    templateRemoteDataSource.deleteTemplate(id)
 }
