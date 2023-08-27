@@ -4,10 +4,8 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.data.di.Dispatcher
-import com.jwd.lunchvote.data.di.LunchVoteDispatcher
 import com.jwd.lunchvote.data.di.LunchVoteDispatcher.IO
-import com.jwd.lunchvote.domain.usecase.lounge.CheckLoungeUseCase
-import com.jwd.lunchvote.domain.usecase.template.GetTemplateUseCase
+import com.jwd.lunchvote.domain.usecase.template.GetTemplatesUseCase
 import com.jwd.lunchvote.model.TemplateUIModel
 import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListEvent
 import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListReduce
@@ -21,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TemplateListViewModel @Inject constructor(
-  private val getTemplateUseCase: GetTemplateUseCase,
+  private val getTemplatesUseCase: GetTemplatesUseCase,
   savedStateHandle: SavedStateHandle,
   @Dispatcher(IO) private val dispatcher: CoroutineDispatcher
 ): BaseStateViewModel<TemplateListState, TemplateListEvent, TemplateListReduce, TemplateListSideEffect>(savedStateHandle){
@@ -60,12 +58,12 @@ class TemplateListViewModel @Inject constructor(
 
   private suspend fun initialize() {
     val userId = "PIRjtPnKcmJfNbSNIidD"   // TODO: 임시
-    val templateList = getTemplateUseCase.invoke(userId)
+    val templateList = getTemplatesUseCase.invoke(userId)
 
     updateState(TemplateListReduce.Initialize(
       TemplateListState(
         loading = false,
-        templateList = templateList.map { TemplateUIModel.toUIModel(it) }
+        templateList = templateList.map { TemplateUIModel(it) }
       )
     ))
   }

@@ -11,13 +11,12 @@ data class TemplateUIModel(
   val like: List<String>,
   val dislike: List<String>
 ): Parcelable {
-  companion object {
-    fun toUIModel(template: Template): TemplateUIModel =
-      TemplateUIModel(
-        id = template.id ?: "",
-        name = template.name,
-        like = template.like,
-        dislike = template.dislike
-      )
-  }
+  constructor(
+    template: Template
+  ): this(
+    id = template.id,
+    name = template.name,
+    like = template.like,
+    dislike = template.dislike
+  )
 }

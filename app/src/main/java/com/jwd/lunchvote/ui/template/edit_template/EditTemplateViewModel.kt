@@ -5,6 +5,10 @@ import androidx.lifecycle.SavedStateHandle
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.data.di.Dispatcher
 import com.jwd.lunchvote.data.di.LunchVoteDispatcher.IO
+import com.jwd.lunchvote.domain.usecase.template.GetTemplateUseCase
+import com.jwd.lunchvote.domain.usecase.template.GetTemplatesUseCase
+import com.jwd.lunchvote.model.TemplateUIModel
+import com.jwd.lunchvote.ui.home.HomeContract
 import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -14,6 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EditTemplateViewModel @Inject constructor(
+  private val getTemplateUseCase: GetTemplateUseCase,
   savedStateHandle: SavedStateHandle,
   @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher
 ): BaseStateViewModel<EditTemplateState, EditTemplateEvent, EditTemplateReduce, EditTemplateSideEffect>(savedStateHandle){
@@ -22,7 +27,8 @@ class EditTemplateViewModel @Inject constructor(
   }
 
   init {
-    sendEvent(EditTemplateEvent.StartInitialize)
+    val templateId = checkNotNull(savedStateHandle.get<String>("templateId"))
+    sendEvent(EditTemplateEvent.StartInitialize(templateId))
   }
 
   override fun handleEvents(event: EditTemplateEvent) {
@@ -30,7 +36,7 @@ class EditTemplateViewModel @Inject constructor(
       is EditTemplateEvent.StartInitialize -> {
         updateState(EditTemplateReduce.UpdateLoading(true))
         CoroutineScope(ioDispatcher).launch {
-          initialize()
+          initialize(event.templateId)
         }
       }
       is EditTemplateEvent.OnClickBackButton -> sendSideEffect(EditTemplateSideEffect.PopBackStack())
@@ -44,10 +50,12 @@ class EditTemplateViewModel @Inject constructor(
     }
   }
 
-  private suspend fun initialize() {
+  private suspend fun initialize(templateId: String) {
+    val template = getTemplateUseCase.invoke(templateId)
+
     updateState(EditTemplateReduce.Initialize(
       EditTemplateState(
-
+        template = TemplateUIModel(template)
       )
     ))
   }

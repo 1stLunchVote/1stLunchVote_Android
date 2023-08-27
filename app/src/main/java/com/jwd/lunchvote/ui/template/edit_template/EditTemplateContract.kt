@@ -11,14 +11,14 @@ class EditTemplateContract {
   @Parcelize
   data class EditTemplateState(
     val loading: Boolean = false,
-    val template: TemplateUIModel = TemplateUIModel("", "", emptyList(), emptyList())
+    val template: TemplateUIModel = TemplateUIModel(Template())
   ): ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this
   }
 
   sealed interface EditTemplateEvent: ViewModelContract.Event {
-    object StartInitialize: EditTemplateEvent
-    object OnClickBackButton: EditTemplateEvent
+    data class StartInitialize(val templateId: String): EditTemplateEvent
+    data object OnClickBackButton: EditTemplateEvent
   }
 
   sealed interface EditTemplateReduce : ViewModelContract.Reduce {

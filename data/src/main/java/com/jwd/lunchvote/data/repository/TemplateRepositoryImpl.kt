@@ -17,4 +17,7 @@ class TemplateRepositoryImpl @Inject constructor(
 
   override suspend fun addTemplate(template: Template): Template =
     templateRemoteDataSource.addTemplate(template)
+
+  override suspend fun getTemplate(id: String): Template =
+    templateRemoteDataSource.getTemplate(id)
 }

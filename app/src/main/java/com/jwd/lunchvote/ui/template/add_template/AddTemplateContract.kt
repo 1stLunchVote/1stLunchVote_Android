@@ -3,8 +3,6 @@ package com.jwd.lunchvote.ui.template.add_template
 import android.os.Parcelable
 import com.jwd.lunchvote.core.ui.base.ViewModelContract
 import com.jwd.lunchvote.model.FoodUIModel
-import com.jwd.lunchvote.model.TemplateUIModel
-import com.jwd.lunchvote.ui.vote.first.FirstVoteContract
 import kotlinx.parcelize.Parcelize
 
 class AddTemplateContract {
