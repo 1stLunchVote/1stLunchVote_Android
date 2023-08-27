@@ -1,10 +1,12 @@
 package com.jwd.lunchvote.remote.source
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.jwd.lunchvote.data.source.remote.TemplateRemoteDataSource
 import com.jwd.lunchvote.domain.entity.Food
 import com.jwd.lunchvote.domain.entity.Template
 import kotlinx.coroutines.tasks.await
+import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
 
@@ -25,14 +27,20 @@ class TemplateRemoteDataSourceImpl @Inject constructor(
     fireStore
       .collection("Template")
       .whereEqualTo("userId", userId)
+      .whereEqualTo("deletedAt", null)
+//      .orderBy("createdAt", Query.Direction.DESCENDING) TODO: 쿼리상에서 정렬이 되지 않음
       .get()
       .await()
       .documents
       .map { it.toObject(Template::class.java) ?: Template() }
+      .sortedByDescending { it.createdAt }
 
-  override suspend fun addTemplate(template: Template): Template {
+  override suspend fun addTemplate(
+    template: Template
+  ): Template {
     val uid = UUID.randomUUID().toString()
-    val data = template.copy(id = uid)
+    val createdAt = LocalDateTime.now().toString()
+    val data = template.copy(id = uid, createdAt = createdAt)
 
     fireStore
       .collection("Template")
@@ -65,11 +73,15 @@ class TemplateRemoteDataSourceImpl @Inject constructor(
     return template
   }
 
-  override suspend fun deleteTemplate(id: String) {
+  override suspend fun deleteTemplate(
+    id: String
+  ): Unit {
+    val deletedAt = LocalDateTime.now().toString()
+
     fireStore
       .collection("Template")
       .document(id)
-      .delete()
+      .update("deletedAt", deletedAt)
       .await()
   }
 }

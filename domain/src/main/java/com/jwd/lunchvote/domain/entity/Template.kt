@@ -5,5 +5,7 @@ data class Template(
   val userId: String = "",
   val name: String = "",
   val like: List<String> = emptyList(),
-  val dislike: List<String> = emptyList()
+  val dislike: List<String> = emptyList(),
+  val createdAt: String = "",
+  val deletedAt: String? = null
 )
