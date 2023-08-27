@@ -13,11 +13,12 @@ data class FoodUIModel (
   val status: FoodStatus = FoodStatus.DEFAULT
 ): Parcelable {
   constructor(
-    food: Food
+    food: Food,
+    status: FoodStatus = FoodStatus.DEFAULT
   ): this(
     id = food.id,
     imageUrl = food.imageUrl,
     name = food.name,
-    status = FoodStatus.DEFAULT
+    status = status
   )
 }

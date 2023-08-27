@@ -8,4 +8,5 @@ interface TemplateRemoteDataSource {
   suspend fun getTemplates(userId: String): List<Template>
   suspend fun addTemplate(template: Template): Template
   suspend fun getTemplate(id: String): Template
+  suspend fun editTemplate(template: Template): Template
 }

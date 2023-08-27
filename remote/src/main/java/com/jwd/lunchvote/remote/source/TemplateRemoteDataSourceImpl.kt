@@ -52,4 +52,17 @@ class TemplateRemoteDataSourceImpl @Inject constructor(
       .get()
       .await()
       .toObject(Template::class.java) ?: Template()
+
+  override suspend fun editTemplate(
+    template: Template
+  ): Template {
+    fireStore
+      .collection("Template")
+      .document(template.id)
+      .set(template)
+      .await()
+
+    return template
+  }
+
 }

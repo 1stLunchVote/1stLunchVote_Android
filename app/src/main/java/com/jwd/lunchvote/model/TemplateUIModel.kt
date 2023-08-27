@@ -7,6 +7,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class TemplateUIModel(
   val id: String,
+  val userId: String,
   val name: String,
   val like: List<String>,
   val dislike: List<String>
@@ -15,6 +16,7 @@ data class TemplateUIModel(
     template: Template
   ): this(
     id = template.id,
+    userId = template.userId,
     name = template.name,
     like = template.like,
     dislike = template.dislike

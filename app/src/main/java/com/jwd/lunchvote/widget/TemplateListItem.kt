@@ -89,6 +89,7 @@ fun TemplateListItemPreview() {
       TemplateListItem(
         TemplateUIModel(
           id = "",
+          userId = "",
           name = "스트레스 받을 때(매운 음식)",
           like = listOf(),
           dislike = listOf()

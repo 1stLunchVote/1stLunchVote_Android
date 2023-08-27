@@ -1,26 +1,42 @@
 package com.jwd.lunchvote.ui.template.edit_template
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.jwd.lunchvote.R
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
+import com.jwd.lunchvote.model.FoodUIModel
 import com.jwd.lunchvote.ui.template.add_template.AddTemplateViewModel
+import com.jwd.lunchvote.ui.template.add_template.TemplateTitle
 import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.*
+import com.jwd.lunchvote.widget.FoodItem
+import com.jwd.lunchvote.widget.LunchVoteTextField
 import com.jwd.lunchvote.widget.LunchVoteTopBar
+import com.jwd.lunchvote.widget.TextFieldType
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -44,16 +60,23 @@ fun EditTemplateRoute(
   EditTemplateScreen(
     editTemplateState = editTemplateState,
     snackBarHostState = snackBarHostState,
-    onClickBackButton = { viewModel.sendEvent(EditTemplateEvent.OnClickBackButton) }
+    onClickBackButton = { viewModel.sendEvent(EditTemplateEvent.OnClickBackButton) },
+    setSearchKeyword = { viewModel.sendEvent(EditTemplateEvent.SetSearchKeyword(it)) },
+    onClickFood = { viewModel.sendEvent(EditTemplateEvent.OnClickFood(it)) },
+    onClickSaveButton = { viewModel.sendEvent(EditTemplateEvent.OnClickSaveButton) }
   )
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun EditTemplateScreen(
   editTemplateState: EditTemplateState,
   snackBarHostState: SnackbarHostState,
-  onClickBackButton: () -> Unit = {}
-) {
+  onClickBackButton: () -> Unit = {},
+  setSearchKeyword: (String) -> Unit = {},
+  onClickFood: (FoodUIModel) -> Unit = {},
+  onClickSaveButton: () -> Unit = {}
+  ) {
   Scaffold(
     snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
   ) { padding ->
@@ -71,7 +94,44 @@ private fun EditTemplateScreen(
           navIconVisible = true,
           popBackStack = onClickBackButton
         )
-
+        Column(
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp, start = 24.dp, end = 24.dp, bottom = 24.dp),
+          verticalArrangement = Arrangement.spacedBy(16.dp),
+          horizontalAlignment = CenterHorizontally
+        ) {
+          TemplateTitle(
+            editTemplateState.template.name,
+            editTemplateState.likeList.size,
+            editTemplateState.dislikeList.size
+          )
+          LunchVoteTextField(
+            modifier = Modifier.fillMaxWidth(),
+            text = editTemplateState.searchKeyword,
+            hintText = stringResource(R.string.first_vote_hint_text),
+            onTextChanged = setSearchKeyword,
+            textFieldType = TextFieldType.Search
+          )
+          LazyVerticalGrid(
+            columns = GridCells.Fixed(3),
+            modifier = Modifier
+              .fillMaxWidth()
+              .weight(1f),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+          ) {
+            items(editTemplateState.foodList.filter { it.name.contains(editTemplateState.searchKeyword) }) {food ->
+              FoodItem(food) { onClickFood(food) }
+            }
+          }
+          Button(
+            onClick = onClickSaveButton,
+            enabled = editTemplateState.likeList.isNotEmpty() || editTemplateState.dislikeList.isNotEmpty()
+          ) {
+            Text("템플릿 수정")
+          }
+        }
       }
     }
   }
