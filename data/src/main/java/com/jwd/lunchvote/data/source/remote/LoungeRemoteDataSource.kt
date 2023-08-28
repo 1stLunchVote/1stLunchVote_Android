@@ -12,5 +12,5 @@ interface LoungeRemoteDataSource {
     fun getChatList(loungeId: String) : Flow<List<LoungeChat>>
     fun sendChat(loungeId: String, content: String?, messageType: Int = 0) : Flow<Unit>
     fun updateReady(uid: String, loungeId: String) : Flow<Unit>
-    fun exitLounge(uid: String, loungeId: String) : Flow<Unit>
+    suspend fun exitLounge(uid: String, loungeId: String)
 }

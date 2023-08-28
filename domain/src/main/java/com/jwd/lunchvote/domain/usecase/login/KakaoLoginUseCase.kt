@@ -6,5 +6,5 @@ import javax.inject.Inject
 class KakaoLoginUseCase @Inject constructor(
     private val loginRepository: LoginRepository
 ) {
-    operator fun invoke(accessToken: String) = loginRepository.onKakaoLogin(accessToken)
+    suspend operator fun invoke(accessToken: String) = loginRepository.onKakaoLogin(accessToken)
 }

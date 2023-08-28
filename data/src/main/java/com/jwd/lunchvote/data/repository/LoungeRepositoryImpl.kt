@@ -9,10 +9,10 @@ import com.jwd.lunchvote.domain.entity.MemberStatus
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -75,12 +75,13 @@ class LoungeRepositoryImpl @Inject constructor(
             }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override fun exitLounge(uid: String, loungeId: String): Flow<Unit> {
-        return loungeRemoteDataSource.exitLounge(uid, loungeId)
-            .flatMapMerge {
-                loungeRemoteDataSource.sendChat(loungeId, null, 3)
+    override suspend fun exitLounge(uid: String, loungeId: String) {
+        loungeRemoteDataSource.sendChat(loungeId, null, 3)
+            .onEach {
+                loungeRemoteDataSource.exitLounge(uid, loungeId)
+                loungeLocalDataSource.deleteAllChat(loungeId)
             }
+            .first()
     }
 
     override fun getMemberStatus(uid: String, loungeId: String): Flow<MemberStatus>{
@@ -98,6 +99,7 @@ class LoungeRepositoryImpl @Inject constructor(
                 }
             }
     }
+
 
     private suspend fun syncMemberList(loungeId: String){
         loungeRemoteDataSource.getMemberList(loungeId)

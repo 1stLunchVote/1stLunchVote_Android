@@ -12,4 +12,5 @@ interface LoungeLocalDataSource {
     fun insertChat(loungeId: String, content: String, type: Int): Flow<Unit>
     fun deleteChat(loungeId: String): Flow<Unit>
     fun updateMemberReady(uid: String, loungeId: String): Flow<Unit>
+    suspend fun deleteAllChat(loungeId: String)
 }

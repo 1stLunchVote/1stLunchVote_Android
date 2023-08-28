@@ -6,5 +6,7 @@ import javax.inject.Inject
 class ExitLoungeUseCase @Inject constructor(
     private val loungeRepository: LoungeRepository
 ) {
-    operator fun invoke(uid: String, loungeId: String) = loungeRepository.exitLounge(uid, loungeId)
+    suspend operator fun invoke(uid: String, loungeId: String) {
+        loungeRepository.exitLounge(uid, loungeId)
+    }
 }

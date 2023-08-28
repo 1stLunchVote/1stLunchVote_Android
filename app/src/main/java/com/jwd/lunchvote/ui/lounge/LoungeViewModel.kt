@@ -17,6 +17,8 @@ import com.jwd.lunchvote.domain.usecase.lounge.UpdateReadyUseCase
 import com.jwd.lunchvote.model.mapper.LoungeMapper
 import com.jwd.lunchvote.ui.lounge.LoungeContract.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
@@ -145,14 +147,15 @@ class LoungeViewModel @Inject constructor(
     }
 
     private fun exitLounge(){
-        viewModelScope.launch {
+        // 대기방에서 먼저 나오고 백그라운드로 라운 나오기
+        CoroutineScope(Dispatchers.IO).launch{
             checkJob?.cancel()
 
-            currentState.loungeId?.let {
-                exitLoungeUseCase(auth.currentUser?.uid ?: return@launch, it).collect()
-            }
-
             sendSideEffect(LoungeSideEffect.PopBackStack("투표 대기방에서 나왔습니다."))
+
+            currentState.loungeId?.let {
+                exitLoungeUseCase(auth.currentUser?.uid ?: return@launch, it)
+            }
         }
     }
 

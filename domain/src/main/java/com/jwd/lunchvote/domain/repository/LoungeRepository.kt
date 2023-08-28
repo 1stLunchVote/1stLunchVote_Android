@@ -13,6 +13,6 @@ interface LoungeRepository {
     fun getChatList(loungeId: String) : Flow<List<LoungeChat>>
     fun sendChat(loungeId: String, content: String) : Flow<Unit>
     fun updateReady(uid: String, loungeId: String) : Flow<Unit>
-    fun exitLounge(uid: String, loungeId: String) : Flow<Unit>
+    suspend fun exitLounge(uid: String, loungeId: String)
     fun getMemberStatus(uid: String, loungeId: String) : Flow<MemberStatus>
 }

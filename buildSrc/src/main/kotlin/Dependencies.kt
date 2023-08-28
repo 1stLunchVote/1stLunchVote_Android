@@ -46,7 +46,7 @@ object Versions{
     const val OkHttp = "4.9.1"
 
     // Room
-    const val Room = "2.5.1"
+    const val Room = "2.5.2"
 
     // Compose
     const val Compose = "2023.06.01"

@@ -18,7 +18,7 @@ import com.jwd.lunchvote.local.room.entity.MemberEntity
         MemberEntity::class,
         FoodEntity::class
     ],
-    version = 2
+    version = 3
 )
 abstract class LunchVoteDataBase : RoomDatabase() {
     abstract fun chatDao(): ChatDao

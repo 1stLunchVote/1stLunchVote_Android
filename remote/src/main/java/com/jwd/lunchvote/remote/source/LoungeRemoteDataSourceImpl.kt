@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import timber.log.Timber
 import java.time.LocalDateTime
@@ -120,13 +121,14 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
         emit(Unit)
     }.flowOn(dispatcher)
 
-    override fun exitLounge(
+    override suspend fun exitLounge(
         uid: String, loungeId: String
-    ): Flow<Unit> = flow {
-        val memberRef = db.getReference("$Room/${loungeId}").child(Member).child(uid)
-        memberRef.setValue(null).await()
-        emit(Unit)
-    }.flowOn(dispatcher)
+    ){
+        withContext(dispatcher){
+            val memberRef = db.getReference("$Room/${loungeId}").child(Member).child(uid)
+            memberRef.setValue(null).await()
+        }
+    }
 
     private fun addMember(
         roomRef: DatabaseReference, uid: String, displayName: String,
