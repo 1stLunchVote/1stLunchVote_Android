@@ -12,6 +12,9 @@ import com.jwd.lunchvote.ui.login.LoginRoute
 import com.jwd.lunchvote.ui.login.register.RegisterEmailRoute
 import com.jwd.lunchvote.ui.lounge.LoungeRoute
 import com.jwd.lunchvote.ui.lounge.member.LoungeMemberRoute
+import com.jwd.lunchvote.ui.template.TemplateListRoute
+import com.jwd.lunchvote.ui.template.add_template.AddTemplateRoute
+import com.jwd.lunchvote.ui.template.edit_template.EditTemplateRoute
 import com.jwd.lunchvote.ui.vote.first.FirstVoteRoute
 import com.jwd.lunchvote.ui.vote.second.SecondVoteRoute
 
@@ -34,8 +37,8 @@ fun LunchVoteNavHost(
                         val query = if (id != null) "?id=$id" else ""
                         navHostController.navigate(LunchVoteNavRoute.Lounge.name + query)
                     },
-                    navigateToTemplate = {
-                        navHostController.navigate(LunchVoteNavRoute.Template.name)
+                    navigateToTemplateList = {
+                        navHostController.navigate(LunchVoteNavRoute.TemplateList.name)
                     },
                     navigateToSetting = {
                         navHostController.navigate(LunchVoteNavRoute.Setting.name)
@@ -118,7 +121,7 @@ fun LunchVoteNavHost(
         navigation(
             route = LunchVoteNavRoute.VoteNavigation.name,
             startDestination = LunchVoteNavRoute.FirstVote.name
-        ){
+        ) {
             composable(LunchVoteNavRoute.FirstVote.name) {
                 FirstVoteRoute(
                     navigateToSecondVote = {
@@ -158,6 +161,61 @@ fun LunchVoteNavHost(
         }
 
         navigation(
+            route = LunchVoteNavRoute.TemplateNavigation.name,
+            startDestination = LunchVoteNavRoute.TemplateList.name
+        ) {
+            composable(LunchVoteNavRoute.TemplateList.name) {
+                TemplateListRoute(
+                    navigateToEditTemplate = { templateId ->
+                        navHostController.navigate(LunchVoteNavRoute.EditTemplate.name + "/${templateId}")
+                    },
+                    navigateToAddTemplate = { templateName ->
+                        navHostController.navigate(LunchVoteNavRoute.AddTemplate.name + "/${templateName}")
+                    },
+                    popBackStack = { navHostController.popBackStack() },
+                    savedStateHandle = it.savedStateHandle
+                )
+            }
+            composable(
+                LunchVoteNavRoute.EditTemplate.name + "/{templateId}",
+                arguments = listOf(
+                    navArgument("templateId") {
+                        type = NavType.StringType
+                        nullable = false
+                    }
+                )
+            ) {
+                EditTemplateRoute(
+                    popBackStack = {
+                        navHostController.previousBackStackEntry?.savedStateHandle?.set(
+                            SNACK_BAR_KEY,
+                            it
+                        )
+                        navHostController.popBackStack()
+                    }
+                )
+            }
+            composable(LunchVoteNavRoute.AddTemplate.name + "/{templateName}",
+                arguments = listOf(
+                    navArgument("templateName") {
+                        type = NavType.StringType
+                        nullable = false
+                    }
+                )
+            ) {
+                AddTemplateRoute(
+                    popBackStack = {
+                        navHostController.previousBackStackEntry?.savedStateHandle?.set(
+                            SNACK_BAR_KEY,
+                            it
+                        )
+                        navHostController.popBackStack()
+                    }
+                )
+            }
+        }
+
+        navigation(
             route = LunchVoteNavRoute.LoginNavigation.name,
             startDestination = LunchVoteNavRoute.Login.name
         ) {
@@ -178,16 +236,16 @@ fun LunchVoteNavHost(
                 )
             }
         }
-
     }
 }
 
-private const val SNACK_BAR_KEY = "message"
+const val SNACK_BAR_KEY = "message"
 
 enum class LunchVoteNavRoute {
     LoginNavigation,
     HomeNavigation,
     VoteNavigation,
+    TemplateNavigation,
 
     Login,
     Home,
@@ -198,8 +256,11 @@ enum class LunchVoteNavRoute {
     FirstVote,
     SecondVote,
 
+    TemplateList,
+    EditTemplate,
+    AddTemplate,
+
     Lounge,
-    Template,
     Setting,
     Tips
 }

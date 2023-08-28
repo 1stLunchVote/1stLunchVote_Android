@@ -160,7 +160,7 @@ fun FirstVoteScreenPreview() {
                 FirstVoteState(
                     foodList = List(20) {
                         FoodUIModel(
-                            foodId = it.toLong(),
+                            id = "$it",
                             imageUrl = "",
                             name = "음식명",
                             status = FoodStatus.DEFAULT

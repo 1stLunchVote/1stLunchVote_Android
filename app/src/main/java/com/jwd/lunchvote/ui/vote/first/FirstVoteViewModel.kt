@@ -21,7 +21,7 @@ class FirstVoteViewModel (
       updateState(FirstVoteReduce.UpdateFoodList(
           List(20) {
               FoodUIModel(
-                  foodId = it.toLong(),
+                  id = "$it",
                   imageUrl = "",
                   name = "음식명",
                   status = FoodStatus.DEFAULT

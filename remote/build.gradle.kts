@@ -45,6 +45,7 @@ dependencies {
         Libraries.Firebase.Auth,
         Libraries.Firebase.GmsAuth,
         Libraries.Firebase.Function,
-        Libraries.Firebase.DataBase
+        Libraries.Firebase.DataBase,
+        Libraries.Firebase.FireStore
     )
 }

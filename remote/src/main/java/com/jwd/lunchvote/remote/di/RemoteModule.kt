@@ -2,8 +2,10 @@ package com.jwd.lunchvote.remote.di
 
 import com.jwd.lunchvote.data.source.remote.LoginRemoteDataSource
 import com.jwd.lunchvote.data.source.remote.LoungeRemoteDataSource
+import com.jwd.lunchvote.data.source.remote.TemplateRemoteDataSource
 import com.jwd.lunchvote.remote.source.LoginRemoteDataSourceImpl
 import com.jwd.lunchvote.remote.source.LoungeRemoteDataSourceImpl
+import com.jwd.lunchvote.remote.source.TemplateRemoteDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -24,4 +26,10 @@ internal interface RemoteModule {
     fun bindsLoungeRemoteDataSource(
         loungeRemoteDataSourceImpl: LoungeRemoteDataSourceImpl
     ): LoungeRemoteDataSource
+
+    @Binds
+    @Singleton
+    fun bindsTemplateRemoteDataSource(
+        templateRemoteDataSourceImpl: TemplateRemoteDataSourceImpl
+    ): TemplateRemoteDataSource
 }

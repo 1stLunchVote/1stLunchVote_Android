@@ -63,6 +63,7 @@ object Versions{
     const val Slf4j = "2.0.7"
 
     const val Coil = "2.4.0"
+    const val CoilLandscapist = "1.4.7"
     const val Kakao = "2.14.0"
 }
 
@@ -93,6 +94,7 @@ object Libraries{
         const val DataBase = "com.google.firebase:firebase-database-ktx"
         const val GmsAuth = "com.google.android.gms:play-services-auth:${Versions.GmsAuth}"
         const val Function = "com.google.firebase:firebase-functions-ktx:${Versions.Functions}"
+        const val FireStore = "com.google.firebase:firebase-firestore-ktx"
     }
 
     object Hilt{
@@ -143,10 +145,13 @@ object Libraries{
         const val RoomPaging = "androidx.room:room-paging:${Versions.Room}"
     }
 
-
     const val Kakao = "com.kakao.sdk:v2-all-rx:${Versions.Kakao}"
     const val Timber = "com.jakewharton.timber:timber:${Versions.Timber}"
-    const val Coil = "io.coil-kt:coil-compose:${Versions.Coil}"
+
+    object Coil{
+        const val Coil = "io.coil-kt:coil-compose:${Versions.Coil}"
+        const val CoilLandscapist = "com.github.skydoves:landscapist-coil:${Versions.CoilLandscapist}"
+    }
 }
 
 fun DependencyHandlerScope.implementationAndroidX(){
@@ -220,6 +225,13 @@ fun DependencyHandlerScope.implementationCompose(){
         Libraries.Compose.Hilt,
         Libraries.Compose.Lifecycle,
         Libraries.Compose.ConstraintLayout
+    )
+}
+
+fun DependencyHandlerScope.implementationCoil() {
+    implementations(
+        Libraries.Coil.Coil,
+        Libraries.Coil.CoilLandscapist
     )
 }
 

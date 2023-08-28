@@ -58,7 +58,7 @@ class HomeViewModel @Inject constructor(
                 checkLoungeExist(event.code)
             }
             is HomeEvent.OnClickTemplateButton -> {
-                sendSideEffect(HomeSideEffect.NavigateToTemplate)
+                sendSideEffect(HomeSideEffect.NavigateToTemplateList)
             }
             is HomeEvent.OnClickSettingButton -> {
                 sendSideEffect(HomeSideEffect.NavigateToSetting)
