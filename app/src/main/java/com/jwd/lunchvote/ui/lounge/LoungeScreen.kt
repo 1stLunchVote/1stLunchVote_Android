@@ -406,46 +406,46 @@ private fun LoungeExitDialog(
     onConfirm: () -> Unit = {},
     isOwner: Boolean = false,
 ){
-    LunchVoteDialog(
-        onDismiss = onDismiss
-    ){
-        Image(painter = painterResource(id = R.drawable.ic_warn), contentDescription = "exit_warn")
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Text(
-            text = stringResource(id = R.string.lounge_exit_dialog_title),
-            style = MaterialTheme.typography.titleLarge.copy(
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = if (isOwner) stringResource(id = R.string.lounge_exit_dialog_owner_content)
-                else stringResource(id = R.string.lounge_exit_dialog_member_content),
-            style = MaterialTheme.typography.bodyMedium.copy(
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Row(modifier = Modifier.fillMaxWidth()) {
-            Spacer(modifier = Modifier.weight(1f))
-
-            Button(onClick = onDismiss) {
-                Text(text = "취소")
-            }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Button(onClick = onConfirm) {
-                Text(text = "나가기")
-            }
-        }
-    }
+//    LunchVoteDialog(
+//        onDismiss = onDismiss
+//    ){
+//        Image(painter = painterResource(id = R.drawable.ic_warn), contentDescription = "exit_warn")
+//
+//        Spacer(modifier = Modifier.height(20.dp))
+//
+//        Text(
+//            text = stringResource(id = R.string.lounge_exit_dialog_title),
+//            style = MaterialTheme.typography.titleLarge.copy(
+//                color = MaterialTheme.colorScheme.onPrimaryContainer
+//            )
+//        )
+//
+//        Spacer(modifier = Modifier.height(16.dp))
+//
+//        Text(
+//            text = if (isOwner) stringResource(id = R.string.lounge_exit_dialog_owner_content)
+//                else stringResource(id = R.string.lounge_exit_dialog_member_content),
+//            style = MaterialTheme.typography.bodyMedium.copy(
+//                color = MaterialTheme.colorScheme.onPrimaryContainer
+//            )
+//        )
+//
+//        Spacer(modifier = Modifier.height(24.dp))
+//
+//        Row(modifier = Modifier.fillMaxWidth()) {
+//            Spacer(modifier = Modifier.weight(1f))
+//
+//            Button(onClick = onDismiss) {
+//                Text(text = "취소")
+//            }
+//
+//            Spacer(modifier = Modifier.width(8.dp))
+//
+//            Button(onClick = onConfirm) {
+//                Text(text = "나가기")
+//            }
+//        }
+//    }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
