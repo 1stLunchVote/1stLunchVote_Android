@@ -19,12 +19,12 @@ class LoungeMemberContract {
     }
 
     sealed interface LoungeMemberReduce : ViewModelContract.Reduce {
-        class SetMemberInfo(val memberId: String, val nickname: String, val profileUrl: String?, val isOwner: Boolean) : LoungeMemberReduce
+        data class SetMemberInfo(val memberId: String, val nickname: String, val profileUrl: String?, val isOwner: Boolean) : LoungeMemberReduce
 
     }
 
     sealed interface LoungeMemberSideEffect : ViewModelContract.SideEffect {
-        object PopBackStack : LoungeMemberSideEffect
+        data object PopBackStack : LoungeMemberSideEffect
     }
 
     sealed interface LoungeMemberDialogState: ViewModelContract.DialogState

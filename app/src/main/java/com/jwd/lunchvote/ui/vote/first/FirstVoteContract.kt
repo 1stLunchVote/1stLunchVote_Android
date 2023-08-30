@@ -26,8 +26,8 @@ class FirstVoteContract {
     sealed interface FirstVoteEvent: ViewModelContract.Event {
         data class OnClickFood(val food: FoodUIModel): FirstVoteEvent
         data class SetSearchKeyword(val searchKeyword: String): FirstVoteEvent
-        object OnClickFinishButton: FirstVoteEvent
-        object OnTryExit : FirstVoteEvent
+        data object OnClickFinishButton: FirstVoteEvent
+        data object OnTryExit : FirstVoteEvent
         data class OnClickExitDialog(val isExit: Boolean): FirstVoteEvent
     }
 
@@ -42,8 +42,8 @@ class FirstVoteContract {
     }
 
     sealed interface FirstVoteSideEffect: ViewModelContract.SideEffect {
-        object PopBackStack: FirstVoteSideEffect
-        object NavigateToSecondVote: FirstVoteSideEffect
+        data object PopBackStack: FirstVoteSideEffect
+        data object NavigateToSecondVote: FirstVoteSideEffect
     }
 
     sealed interface FirstVoteDialogState: ViewModelContract.DialogState

@@ -13,17 +13,17 @@ class RegisterEmailContract {
     }
 
     sealed interface RegisterEmailEvent : ViewModelContract.Event {
-        class SetEmail(val email: String) : RegisterEmailEvent
-        object OnClickConfirm : RegisterEmailEvent
+        data class SetEmail(val email: String) : RegisterEmailEvent
+        data object OnClickConfirm : RegisterEmailEvent
     }
 
     sealed interface RegisterEmailReduce : ViewModelContract.Reduce {
-        class UpdateEmail(val email: String) : RegisterEmailReduce
+        data class UpdateEmail(val email: String) : RegisterEmailReduce
     }
 
     sealed interface RegisterEmailSideEffect : ViewModelContract.SideEffect {
-        object NavigateToRegisterPassword : RegisterEmailSideEffect
-        class ShowSnackBar(val message: String) : RegisterEmailSideEffect
+        data object NavigateToRegisterPassword : RegisterEmailSideEffect
+        data class ShowSnackBar(val message: String) : RegisterEmailSideEffect
     }
 
     sealed interface RegisterEmailDialogState: ViewModelContract.DialogState

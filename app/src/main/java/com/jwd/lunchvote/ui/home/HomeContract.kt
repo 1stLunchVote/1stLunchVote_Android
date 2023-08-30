@@ -15,28 +15,28 @@ class HomeContract {
     }
 
     sealed interface HomeEvent: ViewModelContract.Event {
-        object OnClickLoungeButton : HomeEvent
-        object OnClickJoinLoungeButton : HomeEvent
+        data object OnClickLoungeButton : HomeEvent
+        data object OnClickJoinLoungeButton : HomeEvent
         class SetJoinCode(val code: String) : HomeEvent
-        object OnClickDismissButtonOfJoinDialog : HomeEvent
+        data object OnClickDismissButtonOfJoinDialog : HomeEvent
         class OnClickConfirmButtonOfJoinDialog(val code: String) : HomeEvent
-        object OnClickTemplateButton : HomeEvent
-        object OnClickSettingButton : HomeEvent
-        object OnClickTipsButton : HomeEvent
+        data object OnClickTemplateButton : HomeEvent
+        data object OnClickSettingButton : HomeEvent
+        data object OnClickTipsButton : HomeEvent
     }
 
     sealed interface HomeReduce : ViewModelContract.Reduce {
-        object ShowJoinDialog : HomeReduce
+        data object ShowJoinDialog : HomeReduce
         class UpdateJoinCode(val code: String) : HomeReduce
-        object DismissJoinDialog : HomeReduce
+        data object DismissJoinDialog : HomeReduce
         class ConfirmJoinDialog(val code: String) : HomeReduce
     }
 
     sealed interface HomeSideEffect: ViewModelContract.SideEffect {
         class NavigateToLounge(val loungeId: String?) : HomeSideEffect
-        object NavigateToTemplateList : HomeSideEffect
-        object NavigateToSetting : HomeSideEffect
-        object NavigateToTips : HomeSideEffect
+        data object NavigateToTemplateList : HomeSideEffect
+        data object NavigateToSetting : HomeSideEffect
+        data object NavigateToTips : HomeSideEffect
         class ShowSnackBar(val message: String) : HomeSideEffect
     }
 
