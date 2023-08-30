@@ -52,4 +52,6 @@ class LoungeContract {
         data class NavigateToVote(val loungeId: String) : LoungeSideEffect
         data class CopyToClipboard(val loungeId: String) : LoungeSideEffect
     }
+
+    sealed interface LoungeDialogState: ViewModelContract.DialogState
 }

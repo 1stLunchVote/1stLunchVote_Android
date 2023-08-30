@@ -25,4 +25,6 @@ class RegisterEmailContract {
         object NavigateToRegisterPassword : RegisterEmailSideEffect
         class ShowSnackBar(val message: String) : RegisterEmailSideEffect
     }
+
+    sealed interface RegisterEmailDialogState: ViewModelContract.DialogState
 }

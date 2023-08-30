@@ -7,6 +7,7 @@ import com.jwd.lunchvote.data.di.Dispatcher
 import com.jwd.lunchvote.data.di.LunchVoteDispatcher.IO
 import com.jwd.lunchvote.domain.usecase.template.GetTemplatesUseCase
 import com.jwd.lunchvote.model.TemplateUIModel
+import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListDialogState
 import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListEvent
 import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListReduce
 import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListSideEffect
@@ -22,7 +23,7 @@ class TemplateListViewModel @Inject constructor(
   private val getTemplatesUseCase: GetTemplatesUseCase,
   savedStateHandle: SavedStateHandle,
   @Dispatcher(IO) private val dispatcher: CoroutineDispatcher
-): BaseStateViewModel<TemplateListState, TemplateListEvent, TemplateListReduce, TemplateListSideEffect>(savedStateHandle){
+): BaseStateViewModel<TemplateListState, TemplateListEvent, TemplateListReduce, TemplateListSideEffect, TemplateListDialogState>(savedStateHandle){
   override fun createInitialState(savedState: Parcelable?): TemplateListState {
     return savedState as? TemplateListState ?: TemplateListState()
   }

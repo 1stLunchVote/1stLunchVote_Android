@@ -37,4 +37,6 @@ class SecondVoteContract {
         data class ShowSnackBar(val message: String) : SecondVoteSideEffect
         object PopBackStack : SecondVoteSideEffect
     }
+
+    sealed interface SecondVoteDialogState: ViewModelContract.DialogState
 }

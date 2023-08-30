@@ -39,4 +39,6 @@ class LoginContract {
         object LaunchKakaoLogin : LoginSideEffect
         class ShowSnackBar(val message: String) : LoginSideEffect
     }
+
+    sealed interface LoginDialogState: ViewModelContract.DialogState
 }

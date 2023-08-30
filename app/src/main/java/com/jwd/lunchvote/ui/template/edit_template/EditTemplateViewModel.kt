@@ -28,7 +28,7 @@ class EditTemplateViewModel @Inject constructor(
   private val deleteTemplateUseCase: DeleteTemplateUseCase,
   savedStateHandle: SavedStateHandle,
   @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher
-): BaseStateViewModel<EditTemplateState, EditTemplateEvent, EditTemplateReduce, EditTemplateSideEffect>(savedStateHandle){
+): BaseStateViewModel<EditTemplateState, EditTemplateEvent, EditTemplateReduce, EditTemplateSideEffect, EditTemplateDialogState>(savedStateHandle){
   override fun createInitialState(savedState: Parcelable?): EditTemplateState {
     return savedState as? EditTemplateState ?: EditTemplateState()
   }

@@ -39,4 +39,6 @@ class HomeContract {
         object NavigateToTips : HomeSideEffect
         class ShowSnackBar(val message: String) : HomeSideEffect
     }
+
+    sealed interface HomeDialogState: ViewModelContract.DialogState
 }

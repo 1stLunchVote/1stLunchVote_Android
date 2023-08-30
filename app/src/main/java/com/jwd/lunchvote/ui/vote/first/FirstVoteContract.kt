@@ -45,4 +45,6 @@ class FirstVoteContract {
         object PopBackStack: FirstVoteSideEffect
         object NavigateToSecondVote: FirstVoteSideEffect
     }
+
+    sealed interface FirstVoteDialogState: ViewModelContract.DialogState
 }

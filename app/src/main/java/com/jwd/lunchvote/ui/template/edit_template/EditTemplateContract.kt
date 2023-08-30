@@ -44,4 +44,6 @@ class EditTemplateContract {
     data class PopBackStack(val message: String = ""): EditTemplateSideEffect
     data class ShowSnackBar(val message: String) : EditTemplateSideEffect
   }
+
+  sealed interface EditTemplateDialogState: ViewModelContract.DialogState
 }

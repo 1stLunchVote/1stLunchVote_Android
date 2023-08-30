@@ -16,7 +16,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val checkLoungeUseCase: CheckLoungeUseCase,
     savedStateHandle: SavedStateHandle
-): BaseStateViewModel<HomeState, HomeEvent, HomeReduce, HomeSideEffect>(savedStateHandle){
+): BaseStateViewModel<HomeState, HomeEvent, HomeReduce, HomeSideEffect, HomeDialogState>(savedStateHandle){
     override fun createInitialState(savedState: Parcelable?): HomeState {
         return savedState as? HomeState ?: HomeState()
     }

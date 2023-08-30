@@ -39,4 +39,6 @@ class TemplateListContract {
     data class NavigateToAddTemplate(val templateName: String): TemplateListSideEffect
     data class ShowSnackBar(val message: String) : TemplateListSideEffect
   }
+
+  sealed interface TemplateListDialogState: ViewModelContract.DialogState
 }

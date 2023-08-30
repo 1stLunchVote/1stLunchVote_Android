@@ -23,7 +23,7 @@ class AddTemplateViewModel @Inject constructor(
   private val getFoodsUseCase: GetFoodsUseCase,
   savedStateHandle: SavedStateHandle,
   @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher
-): BaseStateViewModel<AddTemplateState, AddTemplateEvent, AddTemplateReduce, AddTemplateSideEffect>(savedStateHandle){
+): BaseStateViewModel<AddTemplateState, AddTemplateEvent, AddTemplateReduce, AddTemplateSideEffect, AddTemplateDialogState>(savedStateHandle){
   override fun createInitialState(savedState: Parcelable?): AddTemplateState {
     return savedState as? AddTemplateState ?: AddTemplateState()
   }
