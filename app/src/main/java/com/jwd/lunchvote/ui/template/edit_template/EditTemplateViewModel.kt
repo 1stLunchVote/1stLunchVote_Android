@@ -48,8 +48,16 @@ class EditTemplateViewModel @Inject constructor(
       is OnClickBackButton -> sendSideEffect(PopBackStack())
       is SetSearchKeyword -> updateState(UpdateSearchKeyword(event.searchKeyword))
       is OnClickFood -> updateState(UpdateFoodStatus(event.food))
-      is OnClickSaveButton -> toggleDialog(EditTemplateConfirm { viewModelScope.launch { save() } })
-      is OnClickDeleteButton -> toggleDialog(DeleteTemplateConfirm { viewModelScope.launch { delete() } })
+      is OnClickSaveButton -> toggleDialog(
+        EditTemplateConfirm(
+          onClickConfirm = { viewModelScope.launch { save() } }
+        )
+      )
+      is OnClickDeleteButton -> toggleDialog(
+        DeleteTemplateConfirm (
+          onClickConfirm = { viewModelScope.launch { delete() } }
+        )
+      )
       is OnClickDialogDismiss -> toggleDialog(null)
     }
   }
@@ -67,7 +75,6 @@ class EditTemplateViewModel @Inject constructor(
               if (it == reduce.food) it.copy(status = FoodStatus.LIKE) else it
             }
           )
-
           FoodStatus.LIKE -> state.copy(
             likeList = state.likeList.filter { it != reduce.food },
             dislikeList = state.dislikeList + reduce.food.copy(status = FoodStatus.DISLIKE),
@@ -75,7 +82,6 @@ class EditTemplateViewModel @Inject constructor(
               if (it == reduce.food) it.copy(status = FoodStatus.DISLIKE) else it
             }
           )
-
           FoodStatus.DISLIKE -> state.copy(
             dislikeList = state.dislikeList.filter { it != reduce.food },
             foodList = state.foodList.map {
@@ -92,21 +98,22 @@ class EditTemplateViewModel @Inject constructor(
 
     val foodList = getFoodsUseCase.invoke()
     val template = getTemplateUseCase.invoke(templateId)
-
-    updateState(Initialize(
-      EditTemplateState(
-        template = TemplateUIModel(template),
-        foodList = foodList.map {
-          when (it.name) {
-            in template.like -> FoodUIModel(it, FoodStatus.LIKE)
-            in template.dislike -> FoodUIModel(it, FoodStatus.DISLIKE)
-            else -> FoodUIModel(it)
-          }
-        },
-        likeList = foodList.filter { template.like.contains(it.name) }.map { FoodUIModel(it, FoodStatus.LIKE) },
-        dislikeList = foodList.filter { template.dislike.contains(it.name) }.map { FoodUIModel(it, FoodStatus.DISLIKE) }
+    updateState(
+      Initialize(
+        EditTemplateState(
+          template = TemplateUIModel(template),
+          foodList = foodList.map {
+            when (it.name) {
+              in template.like -> FoodUIModel(it, FoodStatus.LIKE)
+              in template.dislike -> FoodUIModel(it, FoodStatus.DISLIKE)
+              else -> FoodUIModel(it)
+            }
+          },
+          likeList = foodList.filter { template.like.contains(it.name) }.map { FoodUIModel(it, FoodStatus.LIKE) },
+          dislikeList = foodList.filter { template.dislike.contains(it.name) }.map { FoodUIModel(it, FoodStatus.DISLIKE) }
+        )
       )
-    ))
+    )
   }
 
   private suspend fun save() {
