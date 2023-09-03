@@ -15,7 +15,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateDialogState
-import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateDialogState.*
+import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateDialogState.DeleteTemplateConfirm
+import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateDialogState.EditTemplateConfirm
 import com.jwd.lunchvote.widget.LunchVoteDialog
 
 @Composable

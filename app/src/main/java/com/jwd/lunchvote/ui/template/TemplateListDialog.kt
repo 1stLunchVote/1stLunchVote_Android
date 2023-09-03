@@ -9,6 +9,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.tooling.preview.Preview
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListDialogState
+import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListDialogState.AddTemplate
 import com.jwd.lunchvote.widget.LunchVoteDialog
 import com.jwd.lunchvote.widget.LunchVoteTextField
 
@@ -19,7 +20,7 @@ fun TemplateListDialog(
   onClickDismissButton: () -> Unit
 ) {
   when (templateListDialogState) {
-    is TemplateListDialogState.AddTemplate -> {
+    is AddTemplate -> {
       var templateName by remember { mutableStateOf("") }
       LunchVoteDialog(
         title = "템플릿 생성",
@@ -49,7 +50,7 @@ fun TemplateListDialog(
 fun AddTemplateDialogPreview() {
   LunchVoteTheme {
     TemplateListDialog(
-      TemplateListDialogState.AddTemplate {}
+      AddTemplate {}
     ) {}
   }
 }

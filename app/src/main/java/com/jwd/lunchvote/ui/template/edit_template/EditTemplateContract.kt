@@ -1,8 +1,11 @@
 package com.jwd.lunchvote.ui.template.edit_template
 
 import android.os.Parcelable
-import com.jwd.lunchvote.core.ui.base.ViewModelContract
-import com.jwd.lunchvote.core.ui.base.ViewModelContract.*
+import com.jwd.lunchvote.core.ui.base.ViewModelContract.DialogState
+import com.jwd.lunchvote.core.ui.base.ViewModelContract.Event
+import com.jwd.lunchvote.core.ui.base.ViewModelContract.Reduce
+import com.jwd.lunchvote.core.ui.base.ViewModelContract.SideEffect
+import com.jwd.lunchvote.core.ui.base.ViewModelContract.State
 import com.jwd.lunchvote.domain.entity.Template
 import com.jwd.lunchvote.model.FoodUIModel
 import com.jwd.lunchvote.model.TemplateUIModel

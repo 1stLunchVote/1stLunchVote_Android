@@ -29,8 +29,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.navigation.SNACK_BAR_KEY
 import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListDialogState
-import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListEvent
-import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListSideEffect
+import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListEvent.OnClickAddButton
+import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListEvent.OnClickBackButton
+import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListEvent.OnClickDismissButton
+import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListEvent.OnClickTemplate
+import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListEvent.StartInitialize
+import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListSideEffect.NavigateToAddTemplate
+import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListSideEffect.NavigateToEditTemplate
+import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListSideEffect.PopBackStack
+import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListSideEffect.ShowSnackBar
 import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListState
 import com.jwd.lunchvote.widget.LunchVoteTopBar
 import com.jwd.lunchvote.widget.TemplateListButton
@@ -53,16 +60,16 @@ fun TemplateListRoute(
   LaunchedEffect(viewModel.sideEffect){
     viewModel.sideEffect.collectLatest {
       when(it){
-        is TemplateListSideEffect.PopBackStack -> popBackStack()
-        is TemplateListSideEffect.NavigateToEditTemplate -> navigateToEditTemplate(it.templateId)
-        is TemplateListSideEffect.NavigateToAddTemplate -> navigateToAddTemplate(it.templateName)
-        is TemplateListSideEffect.ShowSnackBar -> snackBarHostState.showSnackbar(it.message)
+        is PopBackStack -> popBackStack()
+        is NavigateToEditTemplate -> navigateToEditTemplate(it.templateId)
+        is NavigateToAddTemplate -> navigateToAddTemplate(it.templateName)
+        is ShowSnackBar -> snackBarHostState.showSnackbar(it.message)
       }
     }
   }
 
   LaunchedEffect(Unit){
-    viewModel.sendEvent(TemplateListEvent.StartInitialize)
+    viewModel.sendEvent(StartInitialize)
 
     val message = savedStateHandle.get<String>(SNACK_BAR_KEY)
     if (!message.isNullOrEmpty()) {
@@ -73,15 +80,15 @@ fun TemplateListRoute(
 
   TemplateListDialog(
     templateListDialogState = templateListDialogState,
-    onClickDismissButton = { viewModel.sendEvent(TemplateListEvent.OnClickDismissButton) }
+    onClickDismissButton = { viewModel.sendEvent(OnClickDismissButton) }
   )
 
   TemplateListScreen(
     templateListState = templateListState,
     snackBarHostState = snackBarHostState,
-    onClickBackButton = { viewModel.sendEvent(TemplateListEvent.OnClickBackButton) },
-    onClickTemplate = { templateId -> viewModel.sendEvent(TemplateListEvent.OnClickTemplate(templateId)) },
-    onClickAddButton = { viewModel.sendEvent(TemplateListEvent.OnClickAddButton) }
+    onClickBackButton = { viewModel.sendEvent(OnClickBackButton) },
+    onClickTemplate = { templateId -> viewModel.sendEvent(OnClickTemplate(templateId)) },
+    onClickAddButton = { viewModel.sendEvent(OnClickAddButton) }
   )
 }
 
