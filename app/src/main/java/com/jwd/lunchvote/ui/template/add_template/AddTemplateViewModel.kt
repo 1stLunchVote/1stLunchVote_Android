@@ -36,7 +36,6 @@ class AddTemplateViewModel @Inject constructor(
   override fun handleEvents(event: AddTemplateEvent) {
     when(event) {
       is AddTemplateEvent.StartInitialize -> {
-        updateState(AddTemplateReduce.UpdateLoading(true))
         CoroutineScope(ioDispatcher).launch {
           initialize(event.templateName)
         }
@@ -45,7 +44,6 @@ class AddTemplateViewModel @Inject constructor(
       is AddTemplateEvent.OnClickFood -> updateState(AddTemplateReduce.UpdateFoodStatus(event.food))
       is AddTemplateEvent.SetSearchKeyword -> updateState(AddTemplateReduce.UpdateSearchKeyword(event.searchKeyword))
       is AddTemplateEvent.OnClickAddButton -> {
-        updateState(AddTemplateReduce.UpdateLoading(true))
         CoroutineScope(ioDispatcher).launch {
           addTemplate()
         }
@@ -85,8 +83,9 @@ class AddTemplateViewModel @Inject constructor(
   }
 
   private suspend fun initialize(templateName: String) {
-    val foodList = getFoodsUseCase.invoke()
+    updateState(AddTemplateReduce.UpdateLoading(true))
 
+    val foodList = getFoodsUseCase.invoke()
     updateState(
       AddTemplateReduce.Initialize(
         AddTemplateState(
@@ -99,6 +98,8 @@ class AddTemplateViewModel @Inject constructor(
   }
 
   private suspend fun addTemplate() {
+    updateState(AddTemplateReduce.UpdateLoading(true))
+
     val userId = "PIRjtPnKcmJfNbSNIidD"   // TODO: 임시
     addTemplateUseCase.invoke(
       Template(

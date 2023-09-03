@@ -31,14 +31,17 @@ class TemplateListViewModel @Inject constructor(
   override fun handleEvents(event: TemplateListEvent) {
     when(event) {
       is TemplateListEvent.StartInitialize -> {
-        updateState(TemplateListReduce.UpdateLoading(true))
         CoroutineScope(dispatcher).launch {
           initialize()
         }
       }
       is TemplateListEvent.OnClickBackButton -> sendSideEffect(TemplateListSideEffect.PopBackStack)
       is TemplateListEvent.OnClickTemplate -> sendSideEffect(TemplateListSideEffect.NavigateToEditTemplate(event.templateId))
-      is TemplateListEvent.OnClickAddButton -> toggleDialog(TemplateListDialogState.AddTemplate { sendSideEffect(TemplateListSideEffect.NavigateToAddTemplate(it)) })
+      is TemplateListEvent.OnClickAddButton -> toggleDialog(
+        TemplateListDialogState.AddTemplate {
+          sendSideEffect(TemplateListSideEffect.NavigateToAddTemplate(it))
+        }
+      )
       is TemplateListEvent.OnClickDismissButton -> toggleDialog(null)
     }
   }
@@ -51,6 +54,8 @@ class TemplateListViewModel @Inject constructor(
   }
 
   private suspend fun initialize() {
+    updateState(TemplateListReduce.UpdateLoading(true))
+
     val userId = "PIRjtPnKcmJfNbSNIidD"   // TODO: 임시
     val templateList = getTemplatesUseCase.invoke(userId)
 
