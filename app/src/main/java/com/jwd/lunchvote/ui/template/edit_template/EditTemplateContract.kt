@@ -28,7 +28,6 @@ class EditTemplateContract {
     data class OnClickFood(val food: FoodUIModel): EditTemplateEvent
     data object OnClickSaveButton: EditTemplateEvent
     data object OnClickDeleteButton: EditTemplateEvent
-    data object OnClickDialogConfirm: EditTemplateEvent
     data object OnClickDialogDismiss: EditTemplateEvent
   }
 
@@ -37,7 +36,6 @@ class EditTemplateContract {
     data class Initialize(val state: EditTemplateState): EditTemplateReduce
     data class UpdateSearchKeyword(val searchKeyword: String): EditTemplateReduce
     data class UpdateFoodStatus(val food: FoodUIModel): EditTemplateReduce
-    data class UpdateDialogState(val dialogState: Boolean): EditTemplateReduce
   }
 
   sealed interface EditTemplateSideEffect: ViewModelContract.SideEffect {
@@ -45,5 +43,8 @@ class EditTemplateContract {
     data class ShowSnackBar(val message: String) : EditTemplateSideEffect
   }
 
-  sealed interface EditTemplateDialogState: ViewModelContract.DialogState
+  sealed interface EditTemplateDialogState: ViewModelContract.DialogState {
+    data class DeleteTemplateConfirm(val onClickConfirm: () -> Unit): EditTemplateDialogState
+    data class EditTemplateConfirm(val onClickConfirm: () -> Unit): EditTemplateDialogState
+  }
 }

@@ -41,7 +41,6 @@ class EditTemplateViewModel @Inject constructor(
   override fun handleEvents(event: EditTemplateEvent) {
     when(event) {
       is EditTemplateEvent.StartInitialize -> {
-        updateState(EditTemplateReduce.UpdateLoading(true))
         CoroutineScope(ioDispatcher).launch {
           initialize(event.templateId)
         }
@@ -49,21 +48,21 @@ class EditTemplateViewModel @Inject constructor(
       is EditTemplateEvent.OnClickBackButton -> sendSideEffect(EditTemplateSideEffect.PopBackStack())
       is EditTemplateEvent.SetSearchKeyword -> updateState(EditTemplateReduce.UpdateSearchKeyword(event.searchKeyword))
       is EditTemplateEvent.OnClickFood -> updateState(EditTemplateReduce.UpdateFoodStatus(event.food))
-      is EditTemplateEvent.OnClickSaveButton -> {
-        updateState(EditTemplateReduce.UpdateLoading(true))
-        CoroutineScope(ioDispatcher).launch {
-          save()
+      is EditTemplateEvent.OnClickSaveButton -> toggleDialog(
+        EditTemplateDialogState.EditTemplateConfirm {
+          CoroutineScope(ioDispatcher).launch {
+            save()
+          }
         }
-      }
-      is EditTemplateEvent.OnClickDeleteButton -> updateState(EditTemplateReduce.UpdateDialogState(true))
-      is EditTemplateEvent.OnClickDialogConfirm -> {
-        updateState(EditTemplateReduce.UpdateDialogState(false))
-        updateState(EditTemplateReduce.UpdateLoading(true))
-        CoroutineScope(ioDispatcher).launch {
-          delete()
+      )
+      is EditTemplateEvent.OnClickDeleteButton -> toggleDialog(
+        EditTemplateDialogState.DeleteTemplateConfirm {
+          CoroutineScope(ioDispatcher).launch {
+            delete()
+          }
         }
-      }
-      is EditTemplateEvent.OnClickDialogDismiss -> updateState(EditTemplateReduce.UpdateDialogState(false))
+      )
+      is EditTemplateEvent.OnClickDialogDismiss -> toggleDialog(null)
     }
   }
 
@@ -97,11 +96,12 @@ class EditTemplateViewModel @Inject constructor(
           )
         }
       }
-      is EditTemplateReduce.UpdateDialogState -> state.copy(dialogState = reduce.dialogState)
     }
   }
 
   private suspend fun initialize(templateId: String) {
+    updateState(EditTemplateReduce.UpdateLoading(true))
+
     val foodList = getFoodsUseCase.invoke()
     val template = getTemplateUseCase.invoke(templateId)
 
@@ -122,6 +122,8 @@ class EditTemplateViewModel @Inject constructor(
   }
 
   private suspend fun save() {
+    updateState(EditTemplateReduce.UpdateLoading(true))
+
     editTemplateUseCase.invoke(
       Template(
         id = currentState.template.id,
@@ -135,6 +137,8 @@ class EditTemplateViewModel @Inject constructor(
   }
 
   private suspend fun delete() {
+    updateState(EditTemplateReduce.UpdateLoading(true))
+
     deleteTemplateUseCase.invoke(currentState.template.id)
     sendSideEffect(EditTemplateSideEffect.PopBackStack("템플릿이 삭제되었습니다."))
   }

@@ -53,6 +53,7 @@ fun EditTemplateRoute(
   viewModel: EditTemplateViewModel = hiltViewModel()
 ){
   val editTemplateState : EditTemplateState by viewModel.viewState.collectAsStateWithLifecycle()
+  val editTemplateDialogState : EditTemplateDialogState? by viewModel.dialogState.collectAsStateWithLifecycle()
 
   val snackBarHostState = remember { SnackbarHostState() }
 
@@ -65,6 +66,11 @@ fun EditTemplateRoute(
     }
   }
 
+  EditTemplateDialog(
+    editTemplateDialogState = editTemplateDialogState,
+    onClickDismissButton = { viewModel.sendEvent(EditTemplateEvent.OnClickDialogDismiss) }
+  )
+
   EditTemplateScreen(
     editTemplateState = editTemplateState,
     snackBarHostState = snackBarHostState,
@@ -72,9 +78,7 @@ fun EditTemplateRoute(
     setSearchKeyword = { viewModel.sendEvent(EditTemplateEvent.SetSearchKeyword(it)) },
     onClickFood = { viewModel.sendEvent(EditTemplateEvent.OnClickFood(it)) },
     onClickSaveButton = { viewModel.sendEvent(EditTemplateEvent.OnClickSaveButton) },
-    onClickDeleteButton = { viewModel.sendEvent(EditTemplateEvent.OnClickDeleteButton) },
-    onClickDialogConfirm = { viewModel.sendEvent(EditTemplateEvent.OnClickDialogConfirm) },
-    onClickDialogDismiss = { viewModel.sendEvent(EditTemplateEvent.OnClickDialogDismiss) }
+    onClickDeleteButton = { viewModel.sendEvent(EditTemplateEvent.OnClickDeleteButton) }
   )
 }
 
@@ -87,28 +91,11 @@ private fun EditTemplateScreen(
   setSearchKeyword: (String) -> Unit = {},
   onClickFood: (FoodUIModel) -> Unit = {},
   onClickSaveButton: () -> Unit = {},
-  onClickDeleteButton: () -> Unit = {},
-  onClickDialogConfirm: () -> Unit = {},
-  onClickDialogDismiss: () -> Unit = {}
+  onClickDeleteButton: () -> Unit = {}
 ) {
   Scaffold(
     snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
   ) { padding ->
-    if (editTemplateState.dialogState) {
-      AlertDialog(
-        onDismissRequest = onClickDialogDismiss,
-        confirmButton = { Button(onClickDialogConfirm) { Text("삭제") } },
-        dismissButton = { Button(onClickDialogDismiss) { Text("취소") } },
-        title = { Text("템플릿 삭제", style = MaterialTheme.typography.titleLarge) },
-        text = {
-          Text(
-            "템플릿을 삭제하시겠습니까?",
-            style = MaterialTheme.typography.bodyMedium
-          )
-        },
-      )
-    }
-
     if (editTemplateState.loading) {
       Dialog(onDismissRequest = {  }) { CircularProgressIndicator() }
     } else {
