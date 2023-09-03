@@ -2,9 +2,8 @@ package com.jwd.lunchvote.ui.template.edit_template
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
-import com.jwd.lunchvote.data.di.Dispatcher
-import com.jwd.lunchvote.data.di.LunchVoteDispatcher.IO
 import com.jwd.lunchvote.domain.entity.FoodStatus
 import com.jwd.lunchvote.domain.entity.Template
 import com.jwd.lunchvote.domain.usecase.template.DeleteTemplateUseCase
@@ -13,10 +12,12 @@ import com.jwd.lunchvote.domain.usecase.template.GetFoodsUseCase
 import com.jwd.lunchvote.domain.usecase.template.GetTemplateUseCase
 import com.jwd.lunchvote.model.FoodUIModel
 import com.jwd.lunchvote.model.TemplateUIModel
-import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.*
+import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateDialogState
+import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateEvent
+import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateReduce
+import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateSideEffect
+import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,8 +27,7 @@ class EditTemplateViewModel @Inject constructor(
   private val getTemplateUseCase: GetTemplateUseCase,
   private val editTemplateUseCase: EditTemplateUseCase,
   private val deleteTemplateUseCase: DeleteTemplateUseCase,
-  savedStateHandle: SavedStateHandle,
-  @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher
+  savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<EditTemplateState, EditTemplateEvent, EditTemplateReduce, EditTemplateSideEffect, EditTemplateDialogState>(savedStateHandle){
   override fun createInitialState(savedState: Parcelable?): EditTemplateState {
     return savedState as? EditTemplateState ?: EditTemplateState()
@@ -41,7 +41,7 @@ class EditTemplateViewModel @Inject constructor(
   override fun handleEvents(event: EditTemplateEvent) {
     when(event) {
       is EditTemplateEvent.StartInitialize -> {
-        CoroutineScope(ioDispatcher).launch {
+        viewModelScope.launch {
           initialize(event.templateId)
         }
       }
@@ -50,14 +50,14 @@ class EditTemplateViewModel @Inject constructor(
       is EditTemplateEvent.OnClickFood -> updateState(EditTemplateReduce.UpdateFoodStatus(event.food))
       is EditTemplateEvent.OnClickSaveButton -> toggleDialog(
         EditTemplateDialogState.EditTemplateConfirm {
-          CoroutineScope(ioDispatcher).launch {
+          viewModelScope.launch {
             save()
           }
         }
       )
       is EditTemplateEvent.OnClickDeleteButton -> toggleDialog(
         EditTemplateDialogState.DeleteTemplateConfirm {
-          CoroutineScope(ioDispatcher).launch {
+          viewModelScope.launch {
             delete()
           }
         }
