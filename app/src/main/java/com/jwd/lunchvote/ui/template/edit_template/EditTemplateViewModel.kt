@@ -13,9 +13,13 @@ import com.jwd.lunchvote.domain.usecase.template.GetTemplateUseCase
 import com.jwd.lunchvote.model.FoodUIModel
 import com.jwd.lunchvote.model.TemplateUIModel
 import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateDialogState
+import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateDialogState.*
 import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateEvent
+import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateEvent.*
 import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateReduce
+import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateReduce.*
 import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateSideEffect
+import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateSideEffect.*
 import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -35,43 +39,27 @@ class EditTemplateViewModel @Inject constructor(
 
   init {
     val templateId = checkNotNull(savedStateHandle.get<String>("templateId"))
-    sendEvent(EditTemplateEvent.StartInitialize(templateId))
+    sendEvent(StartInitialize(templateId))
   }
 
   override fun handleEvents(event: EditTemplateEvent) {
     when(event) {
-      is EditTemplateEvent.StartInitialize -> {
-        viewModelScope.launch {
-          initialize(event.templateId)
-        }
-      }
-      is EditTemplateEvent.OnClickBackButton -> sendSideEffect(EditTemplateSideEffect.PopBackStack())
-      is EditTemplateEvent.SetSearchKeyword -> updateState(EditTemplateReduce.UpdateSearchKeyword(event.searchKeyword))
-      is EditTemplateEvent.OnClickFood -> updateState(EditTemplateReduce.UpdateFoodStatus(event.food))
-      is EditTemplateEvent.OnClickSaveButton -> toggleDialog(
-        EditTemplateDialogState.EditTemplateConfirm {
-          viewModelScope.launch {
-            save()
-          }
-        }
-      )
-      is EditTemplateEvent.OnClickDeleteButton -> toggleDialog(
-        EditTemplateDialogState.DeleteTemplateConfirm {
-          viewModelScope.launch {
-            delete()
-          }
-        }
-      )
-      is EditTemplateEvent.OnClickDialogDismiss -> toggleDialog(null)
+      is StartInitialize -> viewModelScope.launch { initialize(event.templateId) }
+      is OnClickBackButton -> sendSideEffect(PopBackStack())
+      is SetSearchKeyword -> updateState(UpdateSearchKeyword(event.searchKeyword))
+      is OnClickFood -> updateState(UpdateFoodStatus(event.food))
+      is OnClickSaveButton -> toggleDialog(EditTemplateConfirm { viewModelScope.launch { save() } })
+      is OnClickDeleteButton -> toggleDialog(DeleteTemplateConfirm { viewModelScope.launch { delete() } })
+      is OnClickDialogDismiss -> toggleDialog(null)
     }
   }
 
   override fun reduceState(state: EditTemplateState, reduce: EditTemplateReduce): EditTemplateState {
     return when (reduce) {
-      is EditTemplateReduce.UpdateLoading -> state.copy(loading = reduce.loading)
-      is EditTemplateReduce.Initialize -> reduce.state
-      is EditTemplateReduce.UpdateSearchKeyword -> state.copy(searchKeyword = reduce.searchKeyword)
-      is EditTemplateReduce.UpdateFoodStatus -> {
+      is UpdateLoading -> state.copy(loading = reduce.loading)
+      is Initialize -> reduce.state
+      is UpdateSearchKeyword -> state.copy(searchKeyword = reduce.searchKeyword)
+      is UpdateFoodStatus -> {
         when (reduce.food.status) {
           FoodStatus.DEFAULT -> state.copy(
             likeList = state.likeList + reduce.food.copy(status = FoodStatus.LIKE),
@@ -100,12 +88,12 @@ class EditTemplateViewModel @Inject constructor(
   }
 
   private suspend fun initialize(templateId: String) {
-    updateState(EditTemplateReduce.UpdateLoading(true))
+    updateState(UpdateLoading(true))
 
     val foodList = getFoodsUseCase.invoke()
     val template = getTemplateUseCase.invoke(templateId)
 
-    updateState(EditTemplateReduce.Initialize(
+    updateState(Initialize(
       EditTemplateState(
         template = TemplateUIModel(template),
         foodList = foodList.map {
@@ -122,7 +110,7 @@ class EditTemplateViewModel @Inject constructor(
   }
 
   private suspend fun save() {
-    updateState(EditTemplateReduce.UpdateLoading(true))
+    updateState(UpdateLoading(true))
 
     editTemplateUseCase.invoke(
       Template(
@@ -133,13 +121,13 @@ class EditTemplateViewModel @Inject constructor(
         dislike = currentState.dislikeList.map { it.name }
       )
     )
-    sendSideEffect(EditTemplateSideEffect.PopBackStack("템플릿이 수정되었습니다."))
+    sendSideEffect(PopBackStack("템플릿이 수정되었습니다."))
   }
 
   private suspend fun delete() {
-    updateState(EditTemplateReduce.UpdateLoading(true))
+    updateState(UpdateLoading(true))
 
     deleteTemplateUseCase.invoke(currentState.template.id)
-    sendSideEffect(EditTemplateSideEffect.PopBackStack("템플릿이 삭제되었습니다."))
+    sendSideEffect(PopBackStack("템플릿이 삭제되었습니다."))
   }
 }

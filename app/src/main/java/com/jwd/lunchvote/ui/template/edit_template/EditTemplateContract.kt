@@ -2,6 +2,7 @@ package com.jwd.lunchvote.ui.template.edit_template
 
 import android.os.Parcelable
 import com.jwd.lunchvote.core.ui.base.ViewModelContract
+import com.jwd.lunchvote.core.ui.base.ViewModelContract.*
 import com.jwd.lunchvote.domain.entity.Template
 import com.jwd.lunchvote.model.FoodUIModel
 import com.jwd.lunchvote.model.TemplateUIModel
@@ -16,11 +17,11 @@ class EditTemplateContract {
     val likeList: List<FoodUIModel> = emptyList(),
     val dislikeList: List<FoodUIModel> = emptyList(),
     val searchKeyword: String = ""
-  ): ViewModelContract.State, Parcelable {
+  ): State, Parcelable {
     override fun toParcelable(): Parcelable = this
   }
 
-  sealed interface EditTemplateEvent: ViewModelContract.Event {
+  sealed interface EditTemplateEvent: Event {
     data class StartInitialize(val templateId: String): EditTemplateEvent
     data object OnClickBackButton: EditTemplateEvent
     data class SetSearchKeyword(val searchKeyword: String): EditTemplateEvent
@@ -30,19 +31,19 @@ class EditTemplateContract {
     data object OnClickDialogDismiss: EditTemplateEvent
   }
 
-  sealed interface EditTemplateReduce : ViewModelContract.Reduce {
+  sealed interface EditTemplateReduce : Reduce {
     data class UpdateLoading(val loading: Boolean): EditTemplateReduce
     data class Initialize(val state: EditTemplateState): EditTemplateReduce
     data class UpdateSearchKeyword(val searchKeyword: String): EditTemplateReduce
     data class UpdateFoodStatus(val food: FoodUIModel): EditTemplateReduce
   }
 
-  sealed interface EditTemplateSideEffect: ViewModelContract.SideEffect {
+  sealed interface EditTemplateSideEffect: SideEffect {
     data class PopBackStack(val message: String = ""): EditTemplateSideEffect
     data class ShowSnackBar(val message: String) : EditTemplateSideEffect
   }
 
-  sealed interface EditTemplateDialogState: ViewModelContract.DialogState {
+  sealed interface EditTemplateDialogState: DialogState {
     data class DeleteTemplateConfirm(val onClickConfirm: () -> Unit): EditTemplateDialogState
     data class EditTemplateConfirm(val onClickConfirm: () -> Unit): EditTemplateDialogState
   }

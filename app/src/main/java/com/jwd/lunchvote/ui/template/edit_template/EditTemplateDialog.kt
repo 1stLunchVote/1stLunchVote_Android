@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateDialogState
+import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateDialogState.*
 import com.jwd.lunchvote.widget.LunchVoteDialog
 
 @Composable
@@ -23,7 +24,7 @@ fun EditTemplateDialog(
   onClickDismissButton: () -> Unit
 ) {
   when (editTemplateDialogState) {
-    is EditTemplateDialogState.DeleteTemplateConfirm -> {
+    is DeleteTemplateConfirm -> {
       LunchVoteDialog(
         title = "템플릿 삭제",
         dismissText = "취소",
@@ -50,7 +51,7 @@ fun EditTemplateDialog(
         }
       )
     }
-    is EditTemplateDialogState.EditTemplateConfirm -> {
+    is EditTemplateConfirm -> {
       LunchVoteDialog(
         title = "템플릿 수정",
         dismissText = "취소",
@@ -86,7 +87,7 @@ fun EditTemplateDialog(
 fun DeleteTemplateDialogPreview1() {
   LunchVoteTheme {
     EditTemplateDialog(
-      EditTemplateDialogState.DeleteTemplateConfirm {}
+      DeleteTemplateConfirm {}
     ) {}
   }
 }
@@ -96,7 +97,7 @@ fun DeleteTemplateDialogPreview1() {
 fun DeleteTemplateDialogPreview2() {
   LunchVoteTheme {
     EditTemplateDialog(
-      EditTemplateDialogState.EditTemplateConfirm {}
+      EditTemplateConfirm {}
     ) {}
   }
 }
