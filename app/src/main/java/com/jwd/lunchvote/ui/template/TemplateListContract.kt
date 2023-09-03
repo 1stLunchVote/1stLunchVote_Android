@@ -9,9 +9,7 @@ class TemplateListContract {
   @Parcelize
   data class TemplateListState(
     val loading: Boolean = false,
-    val templateList: List<TemplateUIModel> = emptyList(),
-    val dialogState: Boolean = false,
-    val templateName: String = ""
+    val templateList: List<TemplateUIModel> = emptyList()
   ): ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this
   }
@@ -21,16 +19,12 @@ class TemplateListContract {
     data object OnClickBackButton: TemplateListEvent
     data class OnClickTemplate(val templateId: String): TemplateListEvent
     data object OnClickAddButton: TemplateListEvent
-    data class SetTemplateName(val templateName: String): TemplateListEvent
-    data object OnClickDismiss: TemplateListEvent
-    data object OnClickConfirm: TemplateListEvent
+    data object OnClickDismissButton: TemplateListEvent
   }
 
   sealed interface TemplateListReduce : ViewModelContract.Reduce {
     data class UpdateLoading(val loading: Boolean): TemplateListReduce
     data class Initialize(val state: TemplateListState): TemplateListReduce
-    data class UpdateDialogState(val dialogState: Boolean): TemplateListReduce
-    data class UpdateTemplateName(val templateName: String): TemplateListReduce
   }
 
   sealed interface TemplateListSideEffect: ViewModelContract.SideEffect {
@@ -40,5 +34,7 @@ class TemplateListContract {
     data class ShowSnackBar(val message: String) : TemplateListSideEffect
   }
 
-  sealed interface TemplateListDialogState: ViewModelContract.DialogState
+  sealed interface TemplateListDialogState: ViewModelContract.DialogState {
+    data class AddTemplate(val onClickConfirm: (String) -> Unit): TemplateListDialogState
+  }
 }

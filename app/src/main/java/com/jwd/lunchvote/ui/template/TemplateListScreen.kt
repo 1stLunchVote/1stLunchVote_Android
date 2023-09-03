@@ -31,6 +31,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.navigation.SNACK_BAR_KEY
+import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListDialogState
 import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListEvent
 import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListSideEffect
 import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListState
@@ -49,6 +50,7 @@ fun TemplateListRoute(
   viewModel: TemplateListViewModel = hiltViewModel()
 ){
   val templateListState : TemplateListState by viewModel.viewState.collectAsStateWithLifecycle()
+  val templateListDialogState : TemplateListDialogState? by viewModel.dialogState.collectAsStateWithLifecycle()
 
   val snackBarHostState = remember { SnackbarHostState() }
 
@@ -73,19 +75,20 @@ fun TemplateListRoute(
     }
   }
 
+  TemplateListDialog(
+    templateListDialogState = templateListDialogState,
+    onClickDismissButton = { viewModel.sendEvent(TemplateListEvent.OnClickDismissButton) }
+  )
+
   TemplateListScreen(
     templateListState = templateListState,
     snackBarHostState = snackBarHostState,
     onClickBackButton = { viewModel.sendEvent(TemplateListEvent.OnClickBackButton) },
     onClickTemplate = { templateId -> viewModel.sendEvent(TemplateListEvent.OnClickTemplate(templateId)) },
-    onClickAddButton = { viewModel.sendEvent(TemplateListEvent.OnClickAddButton) },
-    setTemplateName = { templateName -> viewModel.sendEvent(TemplateListEvent.SetTemplateName(templateName)) },
-    onClickDismiss = { viewModel.sendEvent(TemplateListEvent.OnClickDismiss) },
-    onClickConfirm = { viewModel.sendEvent(TemplateListEvent.OnClickConfirm) }
+    onClickAddButton = { viewModel.sendEvent(TemplateListEvent.OnClickAddButton) }
   )
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun TemplateListScreen(
   templateListState: TemplateListState,
@@ -93,29 +96,10 @@ private fun TemplateListScreen(
   onClickBackButton: () -> Unit = {},
   onClickTemplate: (String) -> Unit = {},
   onClickAddButton: () -> Unit = {},
-  setTemplateName: (String) -> Unit = {},
-  onClickDismiss: () -> Unit = {},
-  onClickConfirm: () -> Unit = {},
 ) {
   Scaffold(
     snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
   ) { padding ->
-    if (templateListState.dialogState) {
-      AlertDialog(
-        onDismissRequest = onClickDismiss,
-        confirmButton = { Button(onClickConfirm, enabled = templateListState.templateName.isNotBlank()) { Text("생성") } },
-        dismissButton = { Button(onClickDismiss) { Text("취소") } },
-        title = { Text("템플릿 생성", style = MaterialTheme.typography.titleLarge) },
-        text = {
-          LunchVoteTextField(
-            text = templateListState.templateName,
-            hintText = "템플릿 이름",
-            onTextChanged = setTemplateName
-          )
-        },
-      )
-    }
-
     if (templateListState.loading) {
       Dialog(onDismissRequest = {  }) { CircularProgressIndicator() }
     } else {

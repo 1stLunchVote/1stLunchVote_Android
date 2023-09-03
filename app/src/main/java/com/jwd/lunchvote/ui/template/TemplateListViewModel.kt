@@ -38,13 +38,8 @@ class TemplateListViewModel @Inject constructor(
       }
       is TemplateListEvent.OnClickBackButton -> sendSideEffect(TemplateListSideEffect.PopBackStack)
       is TemplateListEvent.OnClickTemplate -> sendSideEffect(TemplateListSideEffect.NavigateToEditTemplate(event.templateId))
-      is TemplateListEvent.OnClickAddButton -> updateState(TemplateListReduce.UpdateDialogState(true))
-      is TemplateListEvent.SetTemplateName -> updateState(TemplateListReduce.UpdateTemplateName(event.templateName))
-      is TemplateListEvent.OnClickDismiss -> updateState(TemplateListReduce.UpdateDialogState(false))
-      is TemplateListEvent.OnClickConfirm -> {
-        updateState(TemplateListReduce.UpdateDialogState(false))
-        sendSideEffect(TemplateListSideEffect.NavigateToAddTemplate(currentState.templateName.trim()))
-      }
+      is TemplateListEvent.OnClickAddButton -> toggleDialog(TemplateListDialogState.AddTemplate { sendSideEffect(TemplateListSideEffect.NavigateToAddTemplate(it)) })
+      is TemplateListEvent.OnClickDismissButton -> toggleDialog(null)
     }
   }
 
@@ -52,8 +47,6 @@ class TemplateListViewModel @Inject constructor(
     return when (reduce) {
       is TemplateListReduce.UpdateLoading -> state.copy(loading = reduce.loading)
       is TemplateListReduce.Initialize -> reduce.state
-      is TemplateListReduce.UpdateTemplateName -> state.copy(templateName = reduce.templateName)
-      is TemplateListReduce.UpdateDialogState -> state.copy(dialogState = reduce.dialogState)
     }
   }
 
