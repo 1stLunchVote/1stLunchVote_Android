@@ -15,8 +15,7 @@ class EditTemplateContract {
     val foodList: List<FoodUIModel> = emptyList(),
     val likeList: List<FoodUIModel> = emptyList(),
     val dislikeList: List<FoodUIModel> = emptyList(),
-    val searchKeyword: String = "",
-    val dialogState: Boolean = false
+    val searchKeyword: String = ""
   ): ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this
   }
