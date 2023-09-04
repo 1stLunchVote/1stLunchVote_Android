@@ -1,33 +1,30 @@
 package com.jwd.lunchvote.remote.source
 
-import android.content.res.Resources.NotFoundException
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.functions.FirebaseFunctions
 import com.jwd.lunchvote.data.di.Dispatcher
 import com.jwd.lunchvote.data.di.LunchVoteDispatcher.IO
+import com.jwd.lunchvote.data.model.LoungeChatData
+import com.jwd.lunchvote.data.model.type.MessageDataType
 import com.jwd.lunchvote.data.source.remote.LoungeRemoteDataSource
-import com.jwd.lunchvote.data.util.createRandomString
-import com.jwd.lunchvote.domain.entity.LoungeChat
 import com.jwd.lunchvote.domain.entity.Member
+import com.jwd.lunchvote.remote.mapper.LoungeChatRemoteMapper
+import com.jwd.lunchvote.remote.mapper.MessageRemoteTypeMapper
+import com.jwd.lunchvote.remote.model.LoungeChatRemote
 import com.jwd.lunchvote.remote.util.getValueEventFlow
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
-import timber.log.Timber
 import java.time.LocalDateTime
+import java.util.UUID
 import javax.inject.Inject
 
 class LoungeRemoteDataSourceImpl @Inject constructor(
@@ -36,43 +33,42 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
     private val db: FirebaseDatabase,
     @Dispatcher(IO) private val dispatcher: CoroutineDispatcher
 ) : LoungeRemoteDataSource {
-    override fun checkLoungeExist(
+    override suspend fun checkLoungeExist(
         loungeId: String
-    ): Flow<Boolean> = flow {
+    ): Boolean = withContext(dispatcher) {
         val roomRef = db.getReference("$Room/${loungeId}")
-        emit(roomRef.get().await().exists())
+        roomRef.get().await().exists()
+    }
 
-    }.flowOn(dispatcher)
-
-    override fun createLounge(): Flow<String?> = callbackFlow {
-        val roomId = createRandomString(Room_Length)
+    override suspend fun createLounge(): String = withContext(dispatcher) {
+        val roomId = UUID.randomUUID().toString()
 
         val roomRef = db.getReference("$Room/${roomId}")
         auth.currentUser?.let{ user ->
-            roomRef.setValue(mapOf("owner" to user.uid))
-                .addOnSuccessListener {
-                    trySend(roomId)
-                }
-                .addOnFailureListener {
-                    Timber.e(it)
-                    trySend(null)
-                }
+            roomRef.setValue(mapOf("owner" to user.uid)).await()
+
             addMember(roomRef, user.uid, user.displayName.toString(), user.photoUrl.toString(), true)
         }
-        awaitClose()
-    }.flowOn(dispatcher)
 
-    override fun joinLounge(loungeId: String): Flow<Unit?> = flow {
-        val roomRef = db.getReference("$Room/${loungeId}")
+        return@withContext roomId
+    }
 
-        auth.currentUser?.let {user ->
-            val userExist = roomRef.child(Member).child(user.uid).get().await().getValue<Member>()
+    override suspend fun joinLounge(loungeId: String) {
+        withContext(dispatcher) {
+            val roomRef = db.getReference("$Room/${loungeId}")
 
-            addMember(roomRef, user.uid, user.displayName.toString(), user.photoUrl.toString(), false, userExist?.joinedTime)
+            auth.currentUser?.let { user ->
+                val userExist =
+                    roomRef.child(Member).child(user.uid).get().await().getValue<Member>()
 
-            emit(if(userExist != null) null else Unit)
+                addMember(
+                    roomRef, user.uid, user.displayName.toString(), user.photoUrl.toString(),
+                    false, userExist?.joinedTime
+                )
+
+            }
         }
-    }.flowOn(dispatcher)
+    }
 
     override fun getMemberList(loungeId: String): Flow<List<Member>> {
         val memberRef = db.getReference("$Room/${loungeId}").child(Member)
@@ -81,35 +77,39 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
             .map { it.values.toList().sortedBy { m -> m.joinedTime } }.flowOn(dispatcher)
     }
 
-    override fun getChatList(loungeId: String): Flow<List<LoungeChat>> {
-        val chatRef = db.getReference("$Room/${loungeId}").child(Chat)
+    override fun getChatList(loungeId: String): Flow<List<LoungeChatData>> {
+        val chatRef = db.getReference(Chat).child(loungeId)
 
-        return chatRef.getValueEventFlow<ArrayList<LoungeChat>>().flowOn(dispatcher)
+        return chatRef.getValueEventFlow<HashMap<String, LoungeChatRemote>>()
+            .map { it.values.map(LoungeChatRemoteMapper::mapToRight).sortedBy { chat -> chat.createdAt } }
+            .flowOn(dispatcher)
     }
 
-    override fun sendChat(
-        loungeId: String, content: String?, messageType: Int
-    ): Flow<Unit> = flow {
-        val name = auth.currentUser?.displayName?.ifBlank { "익명" }
-        val chatContent = content ?: when (messageType) {
-            1 -> Chat_Create
-            2 -> "$name $Chat_Join"
-            else -> "$name $Chat_Exit"
+    override suspend fun sendChat(
+        id: String, loungeId: String, content: String?, type: MessageDataType,
+    ) {
+        withContext(dispatcher) {
+            val name = auth.currentUser?.displayName?.ifBlank { "익명" }
+            val messageType = type.let(MessageRemoteTypeMapper::mapToLeft)
+            val chatContent = content ?: when (messageType) {
+                1 -> Chat_Create
+                2 -> "$name $Chat_Join"
+                else -> "$name $Chat_Exit"
+            }
+
+            val data = JSONObject().apply {
+                put("id", id)
+                put("loungeId", loungeId)
+                put("userId", auth.currentUser?.uid)
+                put("userProfile", auth.currentUser?.photoUrl.toString())
+                put("message", chatContent)
+                put("type", messageType)
+                put("createdAt", LocalDateTime.now().toString())
+            }
+
+            functions.getHttpsCallable("sendChat").call(data).await()
         }
-
-        val data = JSONObject().apply {
-            put("loungeId", loungeId)
-            put("sender", auth.currentUser?.uid)
-            put("senderProfile", auth.currentUser?.photoUrl.toString())
-            put("content", chatContent)
-            put("createdAt", LocalDateTime.now().toString())
-            put("messageType", messageType)
-        }
-
-        functions.getHttpsCallable("sendChat").call(data).await()
-        emit(Unit)
-
-    }.flowOn(dispatcher)
+    }
 
     override fun updateReady(
         uid: String, loungeId: String
@@ -144,10 +144,10 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
 
     companion object{
         const val Room = "rooms"
+        const val Chat = "Chat"
         const val Room_Length = 10
         const val Member = "members"
         const val Ready = "ready"
-        const val Chat = "chats"
         const val Chat_Create = "투표 방이 생성되었습니다."
         const val Chat_Join = "님이 입장했습니다."
         const val Chat_Exit = "님이 퇴장했습니다."

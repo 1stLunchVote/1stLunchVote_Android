@@ -42,16 +42,17 @@ class HomeViewModel @Inject constructor(
   }
 
   private fun checkLoungeExist(loungeId: String) {
-    checkLoungeUseCase(loungeId)
-      .onEach {
-        if (it) sendSideEffect(HomeSideEffect.NavigateToLounge(loungeId))
-        else sendSideEffect(HomeSideEffect.ShowSnackBar("존재하지 않는 방입니다."))
-        updateState(HomeReduce.UpdateLoading(false))
-      }
-      .catch {
-        sendSideEffect(HomeSideEffect.ShowSnackBar("오류가 발생하였습니다."))
-        updateState(HomeReduce.UpdateLoading(false))
-      }
-      .launchIn(viewModelScope)
+    launch {
+      runCatching { checkLoungeUseCase(loungeId) }
+        .onSuccess {
+          if (it) sendSideEffect(HomeSideEffect.NavigateToLounge(loungeId))
+          else sendSideEffect(HomeSideEffect.ShowSnackBar("존재하지 않는 방입니다."))
+          updateState(HomeReduce.UpdateLoading(false))
+        }
+        .onFailure {
+          sendSideEffect(HomeSideEffect.ShowSnackBar("오류가 발생하였습니다."))
+          updateState(HomeReduce.UpdateLoading(false))
+        }
+    }
   }
 }

@@ -277,6 +277,7 @@ private fun LoginButtonList(
     Image(
         painter = painterResource(id = R.drawable.bg_kakao_login), 
         contentDescription = "kakao_login",
+        contentScale = ContentScale.FillWidth,
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onKakaoLogin)
@@ -287,6 +288,7 @@ private fun LoginButtonList(
     Image(
         painter = painterResource(id = R.drawable.bg_google_login),
         contentDescription = "google_login",
+        contentScale = ContentScale.FillWidth,
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onGoogleLogin)

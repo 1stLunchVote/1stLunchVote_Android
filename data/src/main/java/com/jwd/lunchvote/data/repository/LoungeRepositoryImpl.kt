@@ -1,5 +1,7 @@
 package com.jwd.lunchvote.data.repository
 
+import com.jwd.lunchvote.data.mapper.type.LoungeChatDataMapper
+import com.jwd.lunchvote.data.model.type.MessageDataType
 import com.jwd.lunchvote.data.source.local.LoungeLocalDataSource
 import com.jwd.lunchvote.data.source.remote.LoungeRemoteDataSource
 import com.jwd.lunchvote.data.worker.SendWorkerManager
@@ -8,18 +10,14 @@ import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.entity.MemberStatus
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
-import timber.log.Timber
-import java.time.LocalDateTime
+import java.util.UUID
 import javax.inject.Inject
 
 class LoungeRepositoryImpl @Inject constructor(
@@ -27,24 +25,21 @@ class LoungeRepositoryImpl @Inject constructor(
     private val loungeLocalDataSource: LoungeLocalDataSource,
     private val loungeRemoteDataSource: LoungeRemoteDataSource
 ): LoungeRepository {
-    override fun checkLoungeExist(loungeId: String): Flow<Boolean> {
+    override suspend fun checkLoungeExist(loungeId: String): Boolean {
         return loungeRemoteDataSource.checkLoungeExist(loungeId)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override fun createLounge(): Flow<String> {
-        return loungeRemoteDataSource.createLounge().map {
-            it ?: throw Exception("Failed to create lounge")
-        }.flatMapMerge {id ->
-            loungeRemoteDataSource.sendChat(id, null, 1).map { id }
-        }
+    override suspend fun createLounge(): String {
+        val id = UUID.randomUUID().toString()
+        val loungeId = loungeRemoteDataSource.createLounge()
+        loungeRemoteDataSource.sendChat(id, loungeId, null, MessageDataType.CREATE)
+        return loungeId
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override fun joinLounge(loungeId: String): Flow<Unit> {
-        return loungeRemoteDataSource.joinLounge(loungeId).flatMapMerge {
-            loungeRemoteDataSource.sendChat(loungeId, null, 2)
-        }
+    override suspend fun joinLounge(loungeId: String) {
+        val id = UUID.randomUUID().toString()
+        loungeRemoteDataSource.joinLounge(loungeId)
+        loungeRemoteDataSource.sendChat(id, loungeId, null, MessageDataType.JOIN)
     }
 
     override fun getMemberList(loungeId: String): Flow<List<Member>> {
@@ -54,34 +49,29 @@ class LoungeRepositoryImpl @Inject constructor(
     }
 
     override fun getChatList(loungeId: String): Flow<List<LoungeChat>> {
-        Timber.e(LocalDateTime.now().toString())
         return loungeLocalDataSource.getChatList(loungeId)
-            .filter {
-                it.isNotEmpty()
-            }
+            .map{it.map(LoungeChatDataMapper::mapToRight)}
+            .filter { it.isNotEmpty() }
             .onStart { syncChatList(loungeId) }
     }
 
-    override fun sendChat(loungeId: String, content: String): Flow<Unit> {
-        sendWorkerManager.startSendWork(loungeId, content)
-        return loungeLocalDataSource.insertChat(loungeId, content, 0)
+    // 일반 채팅 메시지 보내는 경우
+    override suspend fun sendChat(loungeId: String, content: String) {
+        val id = UUID.randomUUID().toString()
+        sendWorkerManager.startSendWork(id, loungeId, content)
+        return loungeLocalDataSource.insertChat(id, loungeId, content, MessageDataType.NORMAL)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override fun updateReady(uid: String, loungeId: String): Flow<Unit> {
-        return loungeLocalDataSource.updateMemberReady(uid, loungeId)
-            .flatMapMerge {
-                loungeRemoteDataSource.updateReady(uid, loungeId)
-            }
+    override suspend fun updateReady(uid: String, loungeId: String) {
+        loungeLocalDataSource.updateMemberReady(uid, loungeId)
+        loungeRemoteDataSource.updateReady(uid, loungeId)
     }
 
     override suspend fun exitLounge(uid: String, loungeId: String) {
-        loungeRemoteDataSource.sendChat(loungeId, null, 3)
-            .onEach {
-                loungeRemoteDataSource.exitLounge(uid, loungeId)
-                loungeLocalDataSource.deleteAllChat(loungeId)
-            }
-            .first()
+        val id = UUID.randomUUID().toString()
+        loungeRemoteDataSource.sendChat(id, loungeId, null, MessageDataType.EXIT)
+        loungeRemoteDataSource.exitLounge(uid, loungeId)
+        loungeLocalDataSource.deleteAllChat(loungeId)
     }
 
     override fun getMemberStatus(uid: String, loungeId: String): Flow<MemberStatus>{
@@ -111,8 +101,9 @@ class LoungeRepositoryImpl @Inject constructor(
 
     private suspend fun syncChatList(loungeId: String){
         loungeRemoteDataSource.getChatList(loungeId)
+            .map { it.map(LoungeChatDataMapper::mapToRight) }
             .onEach{
-                loungeLocalDataSource.putChatList(it, loungeId)
+                loungeLocalDataSource.putChatList(it.map(LoungeChatDataMapper::mapToLeft), loungeId)
             }
             .launchIn(CoroutineScope(currentCoroutineContext()))
     }

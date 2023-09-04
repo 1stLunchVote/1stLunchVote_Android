@@ -142,7 +142,6 @@ object Libraries{
         const val Room = "androidx.room:room-ktx:${Versions.Room}"
         const val RoomCompiler = "androidx.room:room-compiler:${Versions.Room}"
         const val RoomRuntime = "androidx.room:room-runtime:${Versions.Room}"
-        const val RoomPaging = "androidx.room:room-paging:${Versions.Room}"
     }
 
     const val Kakao = "com.kakao.sdk:v2-all-rx:${Versions.Kakao}"
@@ -206,8 +205,7 @@ fun DependencyHandlerScope.implementationRetrofit(){
 fun DependencyHandlerScope.implementationRoom(){
     implementations(
         Libraries.Room.Room,
-        Libraries.Room.RoomRuntime,
-        Libraries.Room.RoomPaging
+        Libraries.Room.RoomRuntime
     )
     kapts(
         Libraries.Room.RoomCompiler

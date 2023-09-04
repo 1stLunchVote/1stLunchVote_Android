@@ -4,6 +4,8 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,6 +50,12 @@ abstract class BaseStateViewModel<S : ViewModelContract.State, E : ViewModelCont
         }.launchIn(viewModelScope)
     }
 
+    // todo : coroutineExceptionHandler 만들어서 에러 처리 한 번에?
+    inline fun launch(crossinline action: suspend CoroutineScope.() -> Unit): Job {
+        return viewModelScope.launch {
+            action(this)
+        }
+    }
 
     protected fun updateState(reduce: R){
         viewModelScope.launch {

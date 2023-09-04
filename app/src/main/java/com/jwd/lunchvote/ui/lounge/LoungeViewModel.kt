@@ -14,19 +14,18 @@ import com.jwd.lunchvote.domain.usecase.lounge.GetMemberListUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.JoinLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.SendChatUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.UpdateReadyUseCase
-import com.jwd.lunchvote.model.mapper.LoungeMapper
+import com.jwd.lunchvote.mapper.LoungeMapper
 import com.jwd.lunchvote.ui.lounge.LoungeContract.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,7 +41,7 @@ class LoungeViewModel @Inject constructor(
     private val auth: FirebaseAuth,
     savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<LoungeState, LoungeEvent, LoungeReduce, LoungeSideEffect, LoungeDialogState>(savedStateHandle) {
-    private val loungeId = savedStateHandle.get<String?>("id").also {
+    private val loungeId = savedStateHandle.get<String?>(LOUNGE_KEY_ID).also {
         updateState(LoungeReduce.SetIsOwner(it == null))
     }
 
@@ -58,17 +57,17 @@ class LoungeViewModel @Inject constructor(
 
     private fun initLounge(){
         loungeId?.let {
-            joinLounge(it)
             getLoungeData(it)
+            joinLounge(it)
         } ?: run {
             createLounge()
         }
     }
 
     private fun createLounge(){
-        viewModelScope.launch {
+        launch {
             withTimeoutOrNull(TIMEOUT){
-                val res = createLoungeUseCase().first()
+                val res = createLoungeUseCase()
 
                 updateState(LoungeReduce.SetLoungeId(res))
                 getLoungeData(res)
@@ -79,9 +78,9 @@ class LoungeViewModel @Inject constructor(
     }
 
     private fun joinLounge(loungeId: String){
-        viewModelScope.launch {
+        launch {
             withTimeoutOrNull(TIMEOUT){
-                joinLoungeUseCase(loungeId).collect()
+                joinLoungeUseCase(loungeId)
 
                 updateState(LoungeReduce.SetLoungeId(loungeId))
             } ?: run {
@@ -91,8 +90,9 @@ class LoungeViewModel @Inject constructor(
     }
 
     private fun sendChat(){
-        sendChatUseCase(currentState.loungeId ?: return, currentState.currentChat)
-            .launchIn(viewModelScope)
+        launch {
+            sendChatUseCase(currentState.loungeId ?: return@launch, currentState.currentChat)
+        }
     }
 
     private fun getLoungeData(loungeId: String){
@@ -100,7 +100,7 @@ class LoungeViewModel @Inject constructor(
             .onEach {
                 updateState(
                     LoungeReduce.SetChatList(it.map { chat ->
-                        LoungeMapper.mapToChat(chat, chat.sender == auth.currentUser?.uid) }
+                        LoungeMapper.mapToChat(chat, chat.userId == auth.currentUser?.uid) }
                     )
                 )
             }
@@ -130,20 +130,23 @@ class LoungeViewModel @Inject constructor(
     }
 
     private fun updateReady(){
-        updateReadyUseCase(auth.currentUser?.uid ?: return, currentState.loungeId ?: return)
-            .catch {
-                sendSideEffect(LoungeSideEffect.ShowSnackBar(
-                    if (currentState.isOwner) "게임 시작 실패" else "준비 상태 변경 실패")
+        launch {
+            runCatching {
+                updateReadyUseCase(
+                    auth.currentUser?.uid ?: return@launch,
+                    currentState.loungeId ?: return@launch
                 )
-            }
-            .onEach {
+            }.onSuccess {
                 if (currentState.isOwner){
                     // Todo : Owner가 레디가 되면 다음 화면으로 넘어가기
 
                 }
+            }.onFailure {
+                sendSideEffect(LoungeSideEffect.ShowSnackBar(
+                    if (currentState.isOwner) "게임 시작 실패" else "준비 상태 변경 실패")
+                )
             }
-            .launchIn(viewModelScope)
-
+        }
     }
 
     private fun exitLounge(){
@@ -213,5 +216,6 @@ class LoungeViewModel @Inject constructor(
 
     companion object{
         private const val TIMEOUT = 10000L
+        private const val LOUNGE_KEY_ID = "id"
     }
 }

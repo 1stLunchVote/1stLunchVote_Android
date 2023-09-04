@@ -4,7 +4,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.jwd.lunchvote.local.room.entity.LoungeEntity
 import com.jwd.lunchvote.local.room.entity.MemberEntity
 import kotlinx.coroutines.flow.Flow
 

@@ -1,6 +1,5 @@
 package com.jwd.lunchvote.ui.lounge
 
-import android.content.res.Configuration.UI_MODE_NIGHT_MASK
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -26,10 +25,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -70,13 +67,11 @@ import com.jwd.lunchvote.core.ui.theme.colorNeutral90
 import com.jwd.lunchvote.core.ui.theme.colorOutlineVariant
 import com.jwd.lunchvote.core.ui.util.circleShadow
 import com.jwd.lunchvote.core.ui.util.modifyIf
-import com.jwd.lunchvote.model.ChatUIModel
+import com.jwd.lunchvote.domain.entity.type.MessageType
 import com.jwd.lunchvote.model.MemberUIModel
 import com.jwd.lunchvote.ui.lounge.LoungeContract.*
 import com.jwd.lunchvote.widget.ChatBubble
-import com.jwd.lunchvote.widget.LunchVoteDialog
 import com.jwd.lunchvote.widget.LunchVoteTopBar
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 
@@ -133,27 +128,30 @@ fun LoungeRoute(
         onClickReadyStart = { viewModel.sendEvent(if (loungeState.isOwner) LoungeEvent.OnStart else LoungeEvent.OnReady) },
         navigateToMember = navigateToMember,
         onClickInvite = { viewModel.sendEvent(LoungeEvent.OnClickInvite) },
-        onScrolled = { viewModel.sendEvent(LoungeEvent.OnScrolled(it)) }
+        onScrolled = { viewModel.sendEvent(LoungeEvent.OnScrolled(it)) },
+        popBackStack = popBackStack
     )
 }
 
 @Composable
 private fun LoungeScreen(
-        loungeState: LoungeState,
-        snackBarHostState: SnackbarHostState,
-        navigateToMember: (MemberUIModel, String, Boolean) -> Unit = {_, _, _-> },
-        onTryExit: () -> Unit = {},
-        onEditChat: (String) -> Unit = {},
-        onSendChat: () -> Unit = {},
-        onClickReadyStart: () -> Unit = {},
-        onClickInvite: () -> Unit = {},
-        onScrolled: (Int) -> Unit = {}
+    loungeState: LoungeState,
+    snackBarHostState: SnackbarHostState,
+    navigateToMember: (MemberUIModel, String, Boolean) -> Unit = { _, _, _ -> },
+    onTryExit: () -> Unit = {},
+    onEditChat: (String) -> Unit = {},
+    onSendChat: () -> Unit = {},
+    onClickReadyStart: () -> Unit = {},
+    onClickInvite: () -> Unit = {},
+    onScrolled: (Int) -> Unit = {},
+    popBackStack: (String) -> Unit = {}
 ){
     Scaffold(
         topBar = {
             LunchVoteTopBar(
                 title = stringResource(id = R.string.lounge_topbar_title),
-                popBackStack = onTryExit
+                // 추후에 지워야함
+                popBackStack = { popBackStack(loungeState.loungeId.orEmpty()) }
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
@@ -256,7 +254,7 @@ private fun LoungeChatList(
 
         items(loungeState.chatList) { chat ->
             // 채팅방 생성, 참가 메시지
-            if (chat.messageType != 0) {
+            if (chat.messageType != MessageType.NORMAL) {
                 Surface(
                     shape = RoundedCornerShape(24.dp),
                     color = colorNeutral90,
@@ -537,53 +535,3 @@ private fun LoungeExitDialogPreview(){
         LoungeExitDialog()
     }
 }
-
-@Preview(showBackground = true, uiMode = UI_MODE_NIGHT_MASK)
-@Composable
-private fun LoungeScreenPreview(){
-    LunchVoteTheme {
-        LoungeScreen(
-            loungeState = LoungeState(loungeId = "1234", chatList = chatList, memberList = listOf(
-                MemberUIModel("test", "nick","http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg", true),
-            )),
-            snackBarHostState = remember { SnackbarHostState() },
-        )
-    }
-}
-
-private val chatList = listOf(
-    ChatUIModel(
-        messageType = 1,
-        content = "채팅방이 생성되었습니다.",
-        isMine = true,
-        sender = "sender",
-        createdAt = "",
-        profileImage = ""
-    ),
-    ChatUIModel(
-        messageType = 0,
-        content = "안녕하세요",
-        isMine = false,
-        sender = "sender",
-        createdAt = "",
-        profileImage = ""
-    ),
-    ChatUIModel(
-        messageType = 0,
-        content = "전송완료",
-        isMine = true,
-        sender = "sender",
-        createdAt = "",
-        profileImage = "",
-        sendStatus = 0
-    ),
-    ChatUIModel(
-        messageType = 0,
-        content = "안녕하세요",
-        isMine = true,
-        sender = "sender",
-        createdAt = "",
-        profileImage = "",
-        sendStatus = 1
-    ),
-)

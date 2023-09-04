@@ -15,7 +15,7 @@ inline fun <reified T> DatabaseReference.getValueEventFlow() = callbackFlow<T> {
 
             value?.let {
                 trySend(it)
-            } ?: run { close(Throwable("data should not be null")) }
+            }
         }
 
         override fun onCancelled(error: DatabaseError) {

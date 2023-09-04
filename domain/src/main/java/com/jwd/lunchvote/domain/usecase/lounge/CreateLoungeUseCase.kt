@@ -6,5 +6,5 @@ import javax.inject.Inject
 class CreateLoungeUseCase @Inject constructor(
     private val repository: LoungeRepository
 ){
-    operator fun invoke() = repository.createLounge()
+    suspend operator fun invoke() = repository.createLounge()
 }
