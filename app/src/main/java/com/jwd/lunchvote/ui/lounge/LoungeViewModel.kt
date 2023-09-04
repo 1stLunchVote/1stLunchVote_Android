@@ -20,12 +20,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -57,8 +55,8 @@ class LoungeViewModel @Inject constructor(
 
     private fun initLounge(){
         loungeId?.let {
-            getLoungeData(it)
             joinLounge(it)
+            getLoungeData(it)
         } ?: run {
             createLounge()
         }
@@ -70,7 +68,9 @@ class LoungeViewModel @Inject constructor(
                 val res = createLoungeUseCase()
 
                 updateState(LoungeReduce.SetLoungeId(res))
+
                 getLoungeData(res)
+                checkMemberStatus()
             } ?: run {
                 sendSideEffect(LoungeSideEffect.PopBackStack("방 생성에 실패하였습니다."))
             }
@@ -83,6 +83,8 @@ class LoungeViewModel @Inject constructor(
                 joinLoungeUseCase(loungeId)
 
                 updateState(LoungeReduce.SetLoungeId(loungeId))
+
+                checkMemberStatus()
             } ?: run {
                 sendSideEffect(LoungeSideEffect.PopBackStack("입장에 실패하였습니다."))
             }
@@ -114,7 +116,10 @@ class LoungeViewModel @Inject constructor(
             }
             .launchIn(viewModelScope)
 
-        checkJob = checkMemberStatusUseCase(auth.currentUser?.uid ?: return, loungeId)
+    }
+
+    private fun checkMemberStatus(){
+        checkJob = checkMemberStatusUseCase(auth.currentUser?.uid ?: return, currentState.loungeId ?: return)
             .onEach {
                 when(it){
                     MemberStatus.EXITED -> {

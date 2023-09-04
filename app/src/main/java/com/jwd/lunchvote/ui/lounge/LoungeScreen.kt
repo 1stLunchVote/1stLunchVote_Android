@@ -55,13 +55,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.jwd.lunchvote.R
-import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.core.ui.theme.buttonTextStyle
 import com.jwd.lunchvote.core.ui.theme.colorNeutral90
 import com.jwd.lunchvote.core.ui.theme.colorOutlineVariant
@@ -72,6 +70,7 @@ import com.jwd.lunchvote.model.MemberUIModel
 import com.jwd.lunchvote.ui.lounge.LoungeContract.*
 import com.jwd.lunchvote.widget.ChatBubble
 import com.jwd.lunchvote.widget.LunchVoteTopBar
+import com.jwd.lunchvote.widget.VoteExitDialog
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 
@@ -112,9 +111,9 @@ fun LoungeRoute(
     }
 
     if (loungeState.exitDialogShown){
-        LoungeExitDialog(
+        VoteExitDialog(
             onDismiss = { viewModel.sendEvent(LoungeEvent.OnClickExit(false)) },
-            onConfirm = { viewModel.sendEvent(LoungeEvent.OnClickExit(true)) },
+            onExit = { viewModel.sendEvent(LoungeEvent.OnClickExit(true)) },
             isOwner = loungeState.isOwner
         )
     }
@@ -129,7 +128,6 @@ fun LoungeRoute(
         navigateToMember = navigateToMember,
         onClickInvite = { viewModel.sendEvent(LoungeEvent.OnClickInvite) },
         onScrolled = { viewModel.sendEvent(LoungeEvent.OnScrolled(it)) },
-        popBackStack = popBackStack
     )
 }
 
@@ -143,15 +141,14 @@ private fun LoungeScreen(
     onSendChat: () -> Unit = {},
     onClickReadyStart: () -> Unit = {},
     onClickInvite: () -> Unit = {},
-    onScrolled: (Int) -> Unit = {},
-    popBackStack: (String) -> Unit = {}
+    onScrolled: (Int) -> Unit = {}
 ){
     Scaffold(
         topBar = {
             LunchVoteTopBar(
                 title = stringResource(id = R.string.lounge_topbar_title),
                 // 추후에 지워야함
-                popBackStack = { popBackStack(loungeState.loungeId.orEmpty()) }
+                popBackStack = onTryExit
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
@@ -398,53 +395,6 @@ private fun LoungeLoadingScreen(
     }
 }
 
-@Composable
-private fun LoungeExitDialog(
-    onDismiss: () -> Unit = {},
-    onConfirm: () -> Unit = {},
-    isOwner: Boolean = false,
-){
-//    LunchVoteDialog(
-//        onDismiss = onDismiss
-//    ){
-//        Image(painter = painterResource(id = R.drawable.ic_warn), contentDescription = "exit_warn")
-//
-//        Spacer(modifier = Modifier.height(20.dp))
-//
-//        Text(
-//            text = stringResource(id = R.string.lounge_exit_dialog_title),
-//            style = MaterialTheme.typography.titleLarge.copy(
-//                color = MaterialTheme.colorScheme.onPrimaryContainer
-//            )
-//        )
-//
-//        Spacer(modifier = Modifier.height(16.dp))
-//
-//        Text(
-//            text = if (isOwner) stringResource(id = R.string.lounge_exit_dialog_owner_content)
-//                else stringResource(id = R.string.lounge_exit_dialog_member_content),
-//            style = MaterialTheme.typography.bodyMedium.copy(
-//                color = MaterialTheme.colorScheme.onPrimaryContainer
-//            )
-//        )
-//
-//        Spacer(modifier = Modifier.height(24.dp))
-//
-//        Row(modifier = Modifier.fillMaxWidth()) {
-//            Spacer(modifier = Modifier.weight(1f))
-//
-//            Button(onClick = onDismiss) {
-//                Text(text = "취소")
-//            }
-//
-//            Spacer(modifier = Modifier.width(8.dp))
-//
-//            Button(onClick = onConfirm) {
-//                Text(text = "나가기")
-//            }
-//        }
-//    }
-}
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -525,13 +475,5 @@ private fun LoungeBottomBar(
                 )
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun LoungeExitDialogPreview(){
-    LunchVoteTheme {
-        LoungeExitDialog()
     }
 }
