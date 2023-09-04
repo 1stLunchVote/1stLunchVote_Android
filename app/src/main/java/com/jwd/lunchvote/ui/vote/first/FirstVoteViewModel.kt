@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.entity.FoodStatus
 import com.jwd.lunchvote.model.FoodUIModel
+import com.jwd.lunchvote.ui.vote.first.FirstVoteContract.FirstVoteDialogState
 import com.jwd.lunchvote.ui.vote.first.FirstVoteContract.FirstVoteState
 import com.jwd.lunchvote.ui.vote.first.FirstVoteContract.FirstVoteEvent
 import com.jwd.lunchvote.ui.vote.first.FirstVoteContract.FirstVoteReduce
@@ -13,7 +14,7 @@ import timber.log.Timber
 
 class FirstVoteViewModel (
     savedStateHandle: SavedStateHandle
-): BaseStateViewModel<FirstVoteState, FirstVoteEvent, FirstVoteReduce, FirstVoteSideEffect>(savedStateHandle) {
+): BaseStateViewModel<FirstVoteState, FirstVoteEvent, FirstVoteReduce, FirstVoteSideEffect, FirstVoteDialogState>(savedStateHandle) {
     override fun createInitialState(savedState: Parcelable?): FirstVoteState =
         savedState as? FirstVoteState ?: FirstVoteState()
 

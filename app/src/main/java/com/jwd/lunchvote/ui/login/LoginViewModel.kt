@@ -19,7 +19,7 @@ class LoginViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val auth: FirebaseAuth,
     private val kakaoLoginUseCase: KakaoLoginUseCase
-): BaseStateViewModel<LoginState, LoginEvent, LoginReduce, LoginSideEffect>(savedStateHandle){
+): BaseStateViewModel<LoginState, LoginEvent, LoginReduce, LoginSideEffect, LoginDialogState>(savedStateHandle){
     override fun createInitialState(savedState: Parcelable?): LoginState {
         return savedState as? LoginState ?: LoginState()
     }

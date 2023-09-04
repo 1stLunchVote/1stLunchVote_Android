@@ -13,7 +13,7 @@ import kotlin.coroutines.coroutineContext
 @HiltViewModel
 class SecondVoteViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
-): BaseStateViewModel<SecondVoteState, SecondVoteEvent, SecondVoteReduce, SecondVoteSideEffect>(savedStateHandle){
+): BaseStateViewModel<SecondVoteState, SecondVoteEvent, SecondVoteReduce, SecondVoteSideEffect, SecondVoteDialogState>(savedStateHandle){
 
     override fun createInitialState(savedState: Parcelable?): SecondVoteState {
         return savedState as? SecondVoteState

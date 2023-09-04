@@ -37,4 +37,6 @@ class AddTemplateContract {
     data class PopBackStack(val message: String = ""): AddTemplateSideEffect
     data class ShowSnackBar(val message: String) : AddTemplateSideEffect
   }
+
+  sealed interface AddTemplateDialogState: ViewModelContract.DialogState
 }

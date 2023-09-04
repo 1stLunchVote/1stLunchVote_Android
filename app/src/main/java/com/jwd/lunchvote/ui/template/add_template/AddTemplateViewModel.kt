@@ -2,18 +2,19 @@ package com.jwd.lunchvote.ui.template.add_template
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
-import com.jwd.lunchvote.data.di.Dispatcher
-import com.jwd.lunchvote.data.di.LunchVoteDispatcher.IO
 import com.jwd.lunchvote.domain.entity.FoodStatus
 import com.jwd.lunchvote.domain.entity.Template
 import com.jwd.lunchvote.domain.usecase.template.AddTemplateUseCase
 import com.jwd.lunchvote.domain.usecase.template.GetFoodsUseCase
 import com.jwd.lunchvote.model.FoodUIModel
-import com.jwd.lunchvote.ui.template.add_template.AddTemplateContract.*
+import com.jwd.lunchvote.ui.template.add_template.AddTemplateContract.AddTemplateDialogState
+import com.jwd.lunchvote.ui.template.add_template.AddTemplateContract.AddTemplateEvent
+import com.jwd.lunchvote.ui.template.add_template.AddTemplateContract.AddTemplateReduce
+import com.jwd.lunchvote.ui.template.add_template.AddTemplateContract.AddTemplateSideEffect
+import com.jwd.lunchvote.ui.template.add_template.AddTemplateContract.AddTemplateState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,9 +22,8 @@ import javax.inject.Inject
 class AddTemplateViewModel @Inject constructor(
   private val addTemplateUseCase: AddTemplateUseCase,
   private val getFoodsUseCase: GetFoodsUseCase,
-  savedStateHandle: SavedStateHandle,
-  @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher
-): BaseStateViewModel<AddTemplateState, AddTemplateEvent, AddTemplateReduce, AddTemplateSideEffect>(savedStateHandle){
+  savedStateHandle: SavedStateHandle
+): BaseStateViewModel<AddTemplateState, AddTemplateEvent, AddTemplateReduce, AddTemplateSideEffect, AddTemplateDialogState>(savedStateHandle){
   override fun createInitialState(savedState: Parcelable?): AddTemplateState {
     return savedState as? AddTemplateState ?: AddTemplateState()
   }
@@ -36,8 +36,7 @@ class AddTemplateViewModel @Inject constructor(
   override fun handleEvents(event: AddTemplateEvent) {
     when(event) {
       is AddTemplateEvent.StartInitialize -> {
-        updateState(AddTemplateReduce.UpdateLoading(true))
-        CoroutineScope(ioDispatcher).launch {
+        viewModelScope.launch {
           initialize(event.templateName)
         }
       }
@@ -45,8 +44,7 @@ class AddTemplateViewModel @Inject constructor(
       is AddTemplateEvent.OnClickFood -> updateState(AddTemplateReduce.UpdateFoodStatus(event.food))
       is AddTemplateEvent.SetSearchKeyword -> updateState(AddTemplateReduce.UpdateSearchKeyword(event.searchKeyword))
       is AddTemplateEvent.OnClickAddButton -> {
-        updateState(AddTemplateReduce.UpdateLoading(true))
-        CoroutineScope(ioDispatcher).launch {
+        viewModelScope.launch {
           addTemplate()
         }
       }
@@ -85,8 +83,9 @@ class AddTemplateViewModel @Inject constructor(
   }
 
   private suspend fun initialize(templateName: String) {
-    val foodList = getFoodsUseCase.invoke()
+    updateState(AddTemplateReduce.UpdateLoading(true))
 
+    val foodList = getFoodsUseCase.invoke()
     updateState(
       AddTemplateReduce.Initialize(
         AddTemplateState(
@@ -99,6 +98,8 @@ class AddTemplateViewModel @Inject constructor(
   }
 
   private suspend fun addTemplate() {
+    updateState(AddTemplateReduce.UpdateLoading(true))
+
     val userId = "PIRjtPnKcmJfNbSNIidD"   // TODO: 임시
     addTemplateUseCase.invoke(
       Template(

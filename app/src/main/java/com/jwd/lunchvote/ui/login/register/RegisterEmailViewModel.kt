@@ -8,7 +8,7 @@ import javax.inject.Inject
 
 class RegisterEmailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
-): BaseStateViewModel<RegisterEmailState, RegisterEmailEvent, RegisterEmailReduce, RegisterEmailSideEffect>(savedStateHandle) {
+): BaseStateViewModel<RegisterEmailState, RegisterEmailEvent, RegisterEmailReduce, RegisterEmailSideEffect, RegisterEmailDialogState>(savedStateHandle) {
     override fun createInitialState(savedState: Parcelable?): RegisterEmailState {
         return savedState as? RegisterEmailState ?: RegisterEmailState()
     }
