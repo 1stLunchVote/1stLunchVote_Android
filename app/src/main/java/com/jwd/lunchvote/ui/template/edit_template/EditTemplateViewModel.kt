@@ -4,7 +4,9 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
-import com.jwd.lunchvote.domain.entity.FoodStatus
+import com.jwd.lunchvote.domain.entity.FoodStatus.DEFAULT
+import com.jwd.lunchvote.domain.entity.FoodStatus.DISLIKE
+import com.jwd.lunchvote.domain.entity.FoodStatus.LIKE
 import com.jwd.lunchvote.domain.entity.Template
 import com.jwd.lunchvote.domain.usecase.template.DeleteTemplateUseCase
 import com.jwd.lunchvote.domain.usecase.template.EditTemplateUseCase
@@ -79,23 +81,23 @@ class EditTemplateViewModel @Inject constructor(
       is UpdateSearchKeyword -> state.copy(searchKeyword = reduce.searchKeyword)
       is UpdateFoodStatus -> {
         when (reduce.food.status) {
-          FoodStatus.DEFAULT -> state.copy(
-            likeList = state.likeList + reduce.food.copy(status = FoodStatus.LIKE),
+          DEFAULT -> state.copy(
+            likeList = state.likeList + reduce.food.copy(status = LIKE),
             foodList = state.foodList.map {
-              if (it == reduce.food) it.copy(status = FoodStatus.LIKE) else it
+              if (it == reduce.food) it.copy(status = LIKE) else it
             }
           )
-          FoodStatus.LIKE -> state.copy(
+          LIKE -> state.copy(
             likeList = state.likeList.filter { it != reduce.food },
-            dislikeList = state.dislikeList + reduce.food.copy(status = FoodStatus.DISLIKE),
+            dislikeList = state.dislikeList + reduce.food.copy(status = DISLIKE),
             foodList = state.foodList.map {
-              if (it == reduce.food) it.copy(status = FoodStatus.DISLIKE) else it
+              if (it == reduce.food) it.copy(status = DISLIKE) else it
             }
           )
-          FoodStatus.DISLIKE -> state.copy(
+          DISLIKE -> state.copy(
             dislikeList = state.dislikeList.filter { it != reduce.food },
             foodList = state.foodList.map {
-              if (it == reduce.food) it.copy(status = FoodStatus.DEFAULT) else it
+              if (it == reduce.food) it.copy(status = DEFAULT) else it
             }
           )
         }
@@ -114,13 +116,13 @@ class EditTemplateViewModel @Inject constructor(
           template = TemplateUIModel(template),
           foodList = foodList.map {
             when (it.name) {
-              in template.like -> FoodUIModel(it, FoodStatus.LIKE)
-              in template.dislike -> FoodUIModel(it, FoodStatus.DISLIKE)
+              in template.like -> FoodUIModel(it, LIKE)
+              in template.dislike -> FoodUIModel(it, DISLIKE)
               else -> FoodUIModel(it)
             }
           },
-          likeList = foodList.filter { template.like.contains(it.name) }.map { FoodUIModel(it, FoodStatus.LIKE) },
-          dislikeList = foodList.filter { template.dislike.contains(it.name) }.map { FoodUIModel(it, FoodStatus.DISLIKE) }
+          likeList = foodList.filter { template.like.contains(it.name) }.map { FoodUIModel(it, LIKE) },
+          dislikeList = foodList.filter { template.dislike.contains(it.name) }.map { FoodUIModel(it, DISLIKE) }
         )
       )
     )
