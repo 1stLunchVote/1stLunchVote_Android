@@ -3,6 +3,7 @@ package com.jwd.lunchvote.ui.template.add_template
 import android.os.Parcelable
 import com.jwd.lunchvote.core.ui.base.ViewModelContract
 import com.jwd.lunchvote.model.FoodUIModel
+import com.jwd.lunchvote.model.enums.FoodStatus
 import kotlinx.parcelize.Parcelize
 
 class AddTemplateContract {
@@ -10,7 +11,7 @@ class AddTemplateContract {
   data class AddTemplateState(
     val loading: Boolean = false,
     val name: String = "",
-    val foodList: List<FoodUIModel> = emptyList(),
+    val foodMap: Map<FoodUIModel, FoodStatus> = emptyMap(),
     val likeList: List<FoodUIModel> = emptyList(),
     val dislikeList: List<FoodUIModel> = emptyList(),
     val searchKeyword: String = "",
