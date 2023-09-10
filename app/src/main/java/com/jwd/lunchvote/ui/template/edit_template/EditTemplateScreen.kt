@@ -33,8 +33,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.R
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
-import com.jwd.lunchvote.domain.entity.FoodStatus
 import com.jwd.lunchvote.domain.entity.Template
+import com.jwd.lunchvote.model.FoodStatus
 import com.jwd.lunchvote.model.FoodUIModel
 import com.jwd.lunchvote.model.TemplateUIModel
 import com.jwd.lunchvote.ui.template.add_template.TemplateTitle
@@ -152,8 +152,8 @@ private fun EditTemplateScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.SpaceBetween
           ) {
-            items(editTemplateState.foodList.filter { it.name.contains(editTemplateState.searchKeyword) }) {food ->
-              FoodItem(food) { onClickFood(food) }
+            items(editTemplateState.foodMap.keys.filter { it.name.contains(editTemplateState.searchKeyword) }) {food ->
+              FoodItem(food, editTemplateState.foodMap[food]!!) { onClickFood(food) }
             }
           }
           Button(
@@ -174,14 +174,23 @@ fun EditTemplateScreenPreview() {
   LunchVoteTheme {
     EditTemplateScreen(
       editTemplateState = EditTemplateState(
-        foodList = List(20) {
+        foodMap = mapOf(
           FoodUIModel(
-            id = "$it",
+            id = "1",
             imageUrl = "",
-            name = "음식명",
-            status = FoodStatus.DEFAULT
-          )
-        },
+            name = "음식명"
+          ) to FoodStatus.DEFAULT,
+          FoodUIModel(
+            id = "2",
+            imageUrl = "",
+            name = "음식명"
+          ) to FoodStatus.DEFAULT,
+          FoodUIModel(
+            id = "3",
+            imageUrl = "",
+            name = "음식명"
+          ) to FoodStatus.DEFAULT,
+        ),
         template = TemplateUIModel(
           Template(
             name = "스트레스 받을 때(매운 음식)"

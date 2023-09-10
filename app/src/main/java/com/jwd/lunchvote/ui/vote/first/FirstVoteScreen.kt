@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -29,7 +28,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.R
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
-import com.jwd.lunchvote.domain.entity.FoodStatus
+import com.jwd.lunchvote.model.FoodStatus
 import com.jwd.lunchvote.model.FoodUIModel
 import com.jwd.lunchvote.ui.vote.first.FirstVoteContract.FirstVoteEvent
 import com.jwd.lunchvote.ui.vote.first.FirstVoteContract.FirstVoteSideEffect
@@ -137,7 +136,7 @@ fun FirstVoteScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 items(firstVoteState.foodList.filter { it.name.contains(firstVoteState.searchKeyword) }) {food ->
-                    FoodItem(food) { onClickFood(food) }
+                    FoodItem(food, FoodStatus.DEFAULT) { onClickFood(food) }
                 }
             }
             Button(

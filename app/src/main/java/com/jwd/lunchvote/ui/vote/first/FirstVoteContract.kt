@@ -2,9 +2,6 @@ package com.jwd.lunchvote.ui.vote.first
 
 import android.os.Parcelable
 import com.jwd.lunchvote.core.ui.base.ViewModelContract
-import com.jwd.lunchvote.domain.entity.Food
-import com.jwd.lunchvote.domain.entity.FoodStatus
-import com.jwd.lunchvote.local.room.entity.FoodEntity
 import com.jwd.lunchvote.model.FoodUIModel
 import kotlinx.parcelize.Parcelize
 

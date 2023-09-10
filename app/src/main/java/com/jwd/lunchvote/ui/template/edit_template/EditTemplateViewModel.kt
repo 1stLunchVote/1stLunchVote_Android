@@ -4,16 +4,17 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
-import com.jwd.lunchvote.domain.entity.FoodStatus.DEFAULT
-import com.jwd.lunchvote.domain.entity.FoodStatus.DISLIKE
-import com.jwd.lunchvote.domain.entity.FoodStatus.LIKE
 import com.jwd.lunchvote.domain.entity.Template
 import com.jwd.lunchvote.domain.usecase.template.DeleteTemplateUseCase
 import com.jwd.lunchvote.domain.usecase.template.EditTemplateUseCase
 import com.jwd.lunchvote.domain.usecase.template.GetFoodsUseCase
 import com.jwd.lunchvote.domain.usecase.template.GetTemplateUseCase
+import com.jwd.lunchvote.model.FoodStatus.DEFAULT
+import com.jwd.lunchvote.model.FoodStatus.DISLIKE
+import com.jwd.lunchvote.model.FoodStatus.LIKE
 import com.jwd.lunchvote.model.FoodUIModel
 import com.jwd.lunchvote.model.TemplateUIModel
+import com.jwd.lunchvote.model.updateFoodMap
 import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateDialogState
 import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateDialogState.DeleteTemplateConfirm
 import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateDialogState.EditTemplateConfirm
@@ -35,6 +36,7 @@ import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemp
 import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -59,7 +61,10 @@ class EditTemplateViewModel @Inject constructor(
       is StartInitialize -> viewModelScope.launch { initialize(event.templateId) }
       is OnClickBackButton -> sendSideEffect(PopBackStack())
       is SetSearchKeyword -> updateState(UpdateSearchKeyword(event.searchKeyword))
-      is OnClickFood -> updateState(UpdateFoodStatus(event.food))
+      is OnClickFood -> {
+        Timber.w("💛 ===ktw=== ${currentState.likeList.map { it.name }} ${currentState.dislikeList.map { it.name }}")
+        updateState(UpdateFoodStatus(event.food))
+      }
       is OnClickSaveButton -> toggleDialog(
         EditTemplateConfirm(
           onClickConfirm = { viewModelScope.launch { save() } }
@@ -79,28 +84,20 @@ class EditTemplateViewModel @Inject constructor(
       is UpdateLoading -> state.copy(loading = reduce.loading)
       is Initialize -> reduce.state
       is UpdateSearchKeyword -> state.copy(searchKeyword = reduce.searchKeyword)
-      is UpdateFoodStatus -> {
-        when (reduce.food.status) {
-          DEFAULT -> state.copy(
-            likeList = state.likeList + reduce.food.copy(status = LIKE),
-            foodList = state.foodList.map {
-              if (it == reduce.food) it.copy(status = LIKE) else it
-            }
-          )
-          LIKE -> state.copy(
-            likeList = state.likeList.filter { it != reduce.food },
-            dislikeList = state.dislikeList + reduce.food.copy(status = DISLIKE),
-            foodList = state.foodList.map {
-              if (it == reduce.food) it.copy(status = DISLIKE) else it
-            }
-          )
-          DISLIKE -> state.copy(
-            dislikeList = state.dislikeList.filter { it != reduce.food },
-            foodList = state.foodList.map {
-              if (it == reduce.food) it.copy(status = DEFAULT) else it
-            }
-          )
-        }
+      is UpdateFoodStatus -> when (reduce.food) {
+        in state.likeList -> state.copy(
+          foodMap = state.foodMap.updateFoodMap(reduce.food),
+          likeList = state.likeList.filter { it.id != reduce.food.id },
+          dislikeList = state.dislikeList + reduce.food
+        )
+        in state.dislikeList -> state.copy(
+          foodMap = state.foodMap.updateFoodMap(reduce.food),
+          dislikeList = state.dislikeList.filter { it.id != reduce.food.id }
+        )
+        else -> state.copy(
+          foodMap = state.foodMap.updateFoodMap(reduce.food),
+          likeList = state.likeList + reduce.food
+        )
       }
     }
   }
@@ -114,15 +111,15 @@ class EditTemplateViewModel @Inject constructor(
       Initialize(
         EditTemplateState(
           template = TemplateUIModel(template),
-          foodList = foodList.map {
-            when (it.name) {
-              in template.like -> FoodUIModel(it, LIKE)
-              in template.dislike -> FoodUIModel(it, DISLIKE)
-              else -> FoodUIModel(it)
+          foodMap = foodList.associate {
+            FoodUIModel(it) to when (it.name) {
+              in template.like -> LIKE
+              in template.dislike -> DISLIKE
+              else -> DEFAULT
             }
           },
-          likeList = foodList.filter { template.like.contains(it.name) }.map { FoodUIModel(it, LIKE) },
-          dislikeList = foodList.filter { template.dislike.contains(it.name) }.map { FoodUIModel(it, DISLIKE) }
+          likeList = foodList.filter { template.like.contains(it.name) }.map { FoodUIModel(it) },
+          dislikeList = foodList.filter { template.dislike.contains(it.name) }.map { FoodUIModel(it) }
         )
       )
     )

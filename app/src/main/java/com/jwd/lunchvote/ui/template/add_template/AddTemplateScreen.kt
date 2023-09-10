@@ -37,7 +37,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.R
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
-import com.jwd.lunchvote.domain.entity.FoodStatus
+import com.jwd.lunchvote.model.FoodStatus
 import com.jwd.lunchvote.model.FoodUIModel
 import com.jwd.lunchvote.ui.template.add_template.AddTemplateContract.AddTemplateEvent
 import com.jwd.lunchvote.ui.template.add_template.AddTemplateContract.AddTemplateSideEffect
@@ -132,7 +132,7 @@ private fun AddTemplateScreen(
             horizontalArrangement = Arrangement.SpaceBetween
           ) {
             items(addTemplateState.foodList.filter { it.name.contains(addTemplateState.searchKeyword) }) {food ->
-              FoodItem(food) { onClickFood(food) }
+              FoodItem(food, FoodStatus.DEFAULT) { onClickFood(food) }
             }
           }
           Button(
