@@ -51,7 +51,7 @@ fun LunchVoteNavHost(
                         navHostController.navigate(LunchVoteNavRoute.VoteNavigation.name)
                     },
                     navigateToFirstVote = {
-                        navHostController.navigate(LunchVoteNavRoute.FirstVote.name + "loungeId"/*TODO*/)
+                        navHostController.navigate(LunchVoteNavRoute.FirstVote.name + "/loungeId"/*TODO*/)
                     },
                     messageFlow = it.savedStateHandle.getStateFlow(SNACK_BAR_KEY, "")
                 )

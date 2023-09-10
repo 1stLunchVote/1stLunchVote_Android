@@ -2,19 +2,16 @@ package com.jwd.lunchvote.ui.vote.first
 
 import android.os.Parcelable
 import com.jwd.lunchvote.core.ui.base.ViewModelContract
-import com.jwd.lunchvote.domain.entity.Food
-import com.jwd.lunchvote.domain.entity.FoodStatus
-import com.jwd.lunchvote.domain.entity.Template
-import com.jwd.lunchvote.local.room.entity.FoodEntity
 import com.jwd.lunchvote.model.FoodUIModel
 import com.jwd.lunchvote.model.TemplateUIModel
+import com.jwd.lunchvote.model.enums.FoodStatus
 import kotlinx.parcelize.Parcelize
 
 class FirstVoteContract {
   @Parcelize
   data class FirstVoteState(
     val loading: Boolean = false,
-    val foodList: List<FoodUIModel> = emptyList(),
+    val foodMap: Map<FoodUIModel, FoodStatus> = emptyMap(),
     val likeList: List<FoodUIModel> = emptyList(),
     val dislikeList: List<FoodUIModel> = emptyList(),
     val totalMember: Int = 0,
@@ -31,12 +28,12 @@ class FirstVoteContract {
     data class SetSearchKeyword(val searchKeyword: String): FirstVoteEvent
     data object OnClickFinishButton: FirstVoteEvent
     data object OnClickExitButton: FirstVoteEvent
+    object OnClickDismissButton: FirstVoteEvent
   }
 
   sealed interface FirstVoteReduce: ViewModelContract.Reduce {
     data class UpdateLoading(val loading: Boolean): FirstVoteReduce
     data class Initialize(val state: FirstVoteState): FirstVoteReduce
-    data class UpdateFoodList(val foodList: List<FoodUIModel>): FirstVoteReduce
     data class UpdateFoodStatus(val food: FoodUIModel): FirstVoteReduce
     data class UpdateTotalMember(val totalMember: Int): FirstVoteReduce
     data class UpdateEndedMember(val endedMember: Int): FirstVoteReduce
@@ -50,7 +47,7 @@ class FirstVoteContract {
   }
 
   sealed interface FirstVoteDialogState: ViewModelContract.DialogState {
-    data class SelectTemplateDialog(val templateList: List<TemplateUIModel>, val selectTemplate: (TemplateUIModel) -> Unit): FirstVoteDialogState
+    data class SelectTemplateDialog(val templateList: List<TemplateUIModel>, val selectTemplate: (TemplateUIModel?) -> Unit): FirstVoteDialogState
     data class VoteExitDialogState(val onClickConfirmButton: () -> Unit): FirstVoteDialogState
   }
 }

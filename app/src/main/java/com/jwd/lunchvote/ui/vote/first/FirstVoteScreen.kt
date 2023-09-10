@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -31,8 +30,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.R
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
-import com.jwd.lunchvote.domain.entity.FoodStatus
 import com.jwd.lunchvote.model.FoodUIModel
+import com.jwd.lunchvote.model.enums.FoodStatus
 import com.jwd.lunchvote.ui.vote.first.FirstVoteContract.FirstVoteEvent
 import com.jwd.lunchvote.ui.vote.first.FirstVoteContract.FirstVoteSideEffect
 import com.jwd.lunchvote.ui.vote.first.FirstVoteContract.FirstVoteState
@@ -43,7 +42,6 @@ import com.jwd.lunchvote.widget.LunchVoteTextField
 import com.jwd.lunchvote.widget.ProgressTopBar
 import com.jwd.lunchvote.widget.StepProgress
 import com.jwd.lunchvote.widget.TextFieldType
-import com.jwd.lunchvote.widget.VoteExitDialog
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -54,6 +52,7 @@ fun FirstVoteRoute(
   context: Context = LocalContext.current
 ) {
   val firstVoteState by viewModel.viewState.collectAsStateWithLifecycle()
+  val firstVoteDialogState by viewModel.dialogState.collectAsStateWithLifecycle()
 
   val snackbarHostState = remember { SnackbarHostState() }
 
@@ -66,16 +65,14 @@ fun FirstVoteRoute(
     }
   }
 
-  BackHandler() {
-    viewModel.sendEvent(FirstVoteEvent.OnTryExit)
+  BackHandler {
+    viewModel.sendEvent(FirstVoteEvent.OnClickExitButton)
   }
 
-  if (firstVoteState.voteExitDialogShown){
-    VoteExitDialog(
-      onDismiss = { viewModel.sendEvent(FirstVoteEvent.OnClickExitDialog(false)) },
-      onExit = { viewModel.sendEvent(FirstVoteEvent.OnClickExitDialog(true)) }
-    )
-  }
+  FirstVoteDialog(
+    firstVoteDialogState = firstVoteDialogState,
+    onClickDismissButton = { viewModel.sendEvent(FirstVoteEvent.OnClickDismissButton) }
+  )
 
   FirstVoteScreen(
     firstVoteState = firstVoteState,
@@ -138,8 +135,8 @@ fun FirstVoteScreen(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
       ) {
-        items(firstVoteState.foodList.filter { it.name.contains(firstVoteState.searchKeyword) }) {food ->
-          FoodItem(food) { onClickFood(food) }
+        items(firstVoteState.foodMap.keys.filter { it.name.contains(firstVoteState.searchKeyword) }) {food ->
+          FoodItem(food, firstVoteState.foodMap[food]!!) { onClickFood(food) }
         }
       }
       Button(
@@ -160,14 +157,23 @@ fun FirstVoteScreenPreview() {
     Surface {
       FirstVoteScreen(
         FirstVoteState(
-          foodList = List(20) {
+          foodMap = mapOf(
             FoodUIModel(
-              id = "$it",
+              id = "1",
               imageUrl = "",
-              name = "음식명",
-              status = FoodStatus.DEFAULT
-            )
-          },
+              name = "음식명"
+            ) to FoodStatus.DEFAULT,
+            FoodUIModel(
+              id = "2",
+              imageUrl = "",
+              name = "음식명"
+            ) to FoodStatus.DEFAULT,
+            FoodUIModel(
+              id = "3",
+              imageUrl = "",
+              name = "음식명"
+            ) to FoodStatus.DEFAULT,
+          ),
           totalMember = 3,
           endedMember = 1
         )
