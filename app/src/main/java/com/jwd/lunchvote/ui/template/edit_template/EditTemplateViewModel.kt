@@ -36,7 +36,6 @@ import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemp
 import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -61,10 +60,7 @@ class EditTemplateViewModel @Inject constructor(
       is StartInitialize -> viewModelScope.launch { initialize(event.templateId) }
       is OnClickBackButton -> sendSideEffect(PopBackStack())
       is SetSearchKeyword -> updateState(UpdateSearchKeyword(event.searchKeyword))
-      is OnClickFood -> {
-        Timber.w("💛 ===ktw=== ${currentState.likeList.map { it.name }} ${currentState.dislikeList.map { it.name }}")
-        updateState(UpdateFoodStatus(event.food))
-      }
+      is OnClickFood -> updateState(UpdateFoodStatus(event.food))
       is OnClickSaveButton -> toggleDialog(
         EditTemplateConfirm(
           onClickConfirm = { viewModelScope.launch { save() } }
