@@ -2,6 +2,7 @@ package com.jwd.lunchvote.model
 
 import android.os.Parcelable
 import com.jwd.lunchvote.domain.entity.Food
+import com.jwd.lunchvote.model.enums.FoodStatus
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

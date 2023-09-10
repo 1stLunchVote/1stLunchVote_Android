@@ -3,7 +3,7 @@ package com.jwd.lunchvote.ui.vote.first
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
-import com.jwd.lunchvote.model.FoodStatus
+import com.jwd.lunchvote.model.enums.FoodStatus
 import com.jwd.lunchvote.model.FoodUIModel
 import com.jwd.lunchvote.ui.vote.first.FirstVoteContract.FirstVoteDialogState
 import com.jwd.lunchvote.ui.vote.first.FirstVoteContract.FirstVoteState

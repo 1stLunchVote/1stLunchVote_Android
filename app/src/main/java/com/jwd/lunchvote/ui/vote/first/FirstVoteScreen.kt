@@ -28,7 +28,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.R
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
-import com.jwd.lunchvote.model.FoodStatus
+import com.jwd.lunchvote.model.enums.FoodStatus
 import com.jwd.lunchvote.model.FoodUIModel
 import com.jwd.lunchvote.ui.vote.first.FirstVoteContract.FirstVoteEvent
 import com.jwd.lunchvote.ui.vote.first.FirstVoteContract.FirstVoteSideEffect

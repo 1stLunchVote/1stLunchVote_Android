@@ -4,9 +4,9 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
-import com.jwd.lunchvote.model.FoodStatus.DEFAULT
-import com.jwd.lunchvote.model.FoodStatus.DISLIKE
-import com.jwd.lunchvote.model.FoodStatus.LIKE
+import com.jwd.lunchvote.model.enums.FoodStatus.DEFAULT
+import com.jwd.lunchvote.model.enums.FoodStatus.DISLIKE
+import com.jwd.lunchvote.model.enums.FoodStatus.LIKE
 import com.jwd.lunchvote.domain.entity.Template
 import com.jwd.lunchvote.domain.usecase.template.AddTemplateUseCase
 import com.jwd.lunchvote.domain.usecase.template.GetFoodsUseCase

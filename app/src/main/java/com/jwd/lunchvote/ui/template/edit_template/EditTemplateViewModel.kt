@@ -9,11 +9,11 @@ import com.jwd.lunchvote.domain.usecase.template.DeleteTemplateUseCase
 import com.jwd.lunchvote.domain.usecase.template.EditTemplateUseCase
 import com.jwd.lunchvote.domain.usecase.template.GetFoodsUseCase
 import com.jwd.lunchvote.domain.usecase.template.GetTemplateUseCase
-import com.jwd.lunchvote.model.FoodStatus.DEFAULT
-import com.jwd.lunchvote.model.FoodStatus.DISLIKE
-import com.jwd.lunchvote.model.FoodStatus.LIKE
 import com.jwd.lunchvote.model.FoodUIModel
 import com.jwd.lunchvote.model.TemplateUIModel
+import com.jwd.lunchvote.model.enums.FoodStatus.DEFAULT
+import com.jwd.lunchvote.model.enums.FoodStatus.DISLIKE
+import com.jwd.lunchvote.model.enums.FoodStatus.LIKE
 import com.jwd.lunchvote.model.updateFoodMap
 import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateDialogState
 import com.jwd.lunchvote.ui.template.edit_template.EditTemplateContract.EditTemplateDialogState.DeleteTemplateConfirm
