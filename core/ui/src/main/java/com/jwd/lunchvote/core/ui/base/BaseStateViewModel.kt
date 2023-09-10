@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 abstract class BaseStateViewModel<S : ViewModelContract.State, E : ViewModelContract.Event,
-        R: ViewModelContract.Reduce, SE : ViewModelContract.SideEffect>(
+        R: ViewModelContract.Reduce, SE : ViewModelContract.SideEffect, DS: ViewModelContract.DialogState>(
     private val stateHandler: SavedStateHandle
 ) : ViewModel()
 {
@@ -34,6 +34,9 @@ abstract class BaseStateViewModel<S : ViewModelContract.State, E : ViewModelCont
 
     private val _sideEffect: Channel<SE> = Channel()
     val sideEffect = _sideEffect.receiveAsFlow()
+
+    private val _dialogState = MutableStateFlow<DS?>(null)
+    val dialogState : StateFlow<DS?> = _dialogState.asStateFlow()
 
     init {
         _events.onEach(::handleEvents)
@@ -61,6 +64,12 @@ abstract class BaseStateViewModel<S : ViewModelContract.State, E : ViewModelCont
     fun sendEvent(event: E) {
         viewModelScope.launch {
             _events.emit(event)
+        }
+    }
+
+    protected fun toggleDialog(dialogState: DS?){
+        viewModelScope.launch {
+            _dialogState.value = dialogState
         }
     }
 

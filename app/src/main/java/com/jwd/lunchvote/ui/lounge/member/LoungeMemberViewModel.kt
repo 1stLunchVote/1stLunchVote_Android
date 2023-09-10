@@ -18,7 +18,7 @@ class LoungeMemberViewModel @Inject constructor(
     auth: FirebaseAuth,
     checkMemberStatusUseCase: CheckMemberStatusUseCase,
     savedStateHandle: SavedStateHandle,
-): BaseStateViewModel<LoungeMemberState, LoungeMemberEvent, LoungeMemberReduce, LoungeMemberSideEffect>(savedStateHandle){
+): BaseStateViewModel<LoungeMemberState, LoungeMemberEvent, LoungeMemberReduce, LoungeMemberSideEffect, LoungeMemberDialogState>(savedStateHandle){
     private val memberId = checkNotNull(savedStateHandle.get<String?>("id"))
     private val loungeId = checkNotNull(savedStateHandle.get<String?>("loungeId"))
     private val nickname = checkNotNull(savedStateHandle.get<String?>("nickname"))

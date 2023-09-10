@@ -26,13 +26,14 @@ import com.jwd.lunchvote.R
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.core.ui.theme.colorSuccess
 import com.jwd.lunchvote.core.ui.util.circleShadow
-import com.jwd.lunchvote.domain.entity.FoodStatus
+import com.jwd.lunchvote.model.enums.FoodStatus
 import com.jwd.lunchvote.model.FoodUIModel
 import com.skydoves.landscapist.coil.CoilImage
 
 @Composable
 fun FoodItem(
   food: FoodUIModel,
+  status: FoodStatus,
   onClick: () -> Unit = {}
 ) {
   Column(
@@ -45,14 +46,14 @@ fun FoodItem(
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
     Box(
-      modifier = if (food.status == FoodStatus.DISLIKE) Modifier.alpha(0.5f) else Modifier
+      modifier = if (status == FoodStatus.DISLIKE) Modifier.alpha(0.5f) else Modifier
     ) {
       CoilImage(
         food.imageUrl,
         modifier = Modifier
           .size(100.dp)
           .let {
-            when (food.status) {
+            when (status) {
               FoodStatus.DEFAULT -> it
                 .clip(RoundedCornerShape(16.dp))
                 .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
@@ -67,7 +68,7 @@ fun FoodItem(
         contentScale = ContentScale.Crop,
         previewPlaceholder = R.drawable.ic_food_image_temp
       )
-      if (food.status == FoodStatus.DISLIKE) {
+      if (status == FoodStatus.DISLIKE) {
         Image(
           painterResource(R.drawable.ic_mask_reversed),
           null,
@@ -98,25 +99,25 @@ fun FoodItemDefaultPreview(){
         FoodUIModel(
           id = "",
           imageUrl = "",
-          name = "햄버거",
-          status = FoodStatus.DEFAULT
-        )
+          name = "햄버거"
+        ),
+        status = FoodStatus.DEFAULT
       )
       FoodItem(
         FoodUIModel(
           id = "",
           imageUrl = "",
-          name = "햄버거",
-          status = FoodStatus.LIKE
-        )
+          name = "햄버거"
+        ),
+        status = FoodStatus.LIKE
       )
       FoodItem(
         FoodUIModel(
           id = "",
           imageUrl = "",
-          name = "햄버거",
-          status = FoodStatus.DISLIKE
-        )
+          name = "햄버거"
+        ),
+        status = FoodStatus.DISLIKE
       )
     }
   }

@@ -16,11 +16,11 @@ class LoginContract {
     }
 
     sealed interface LoginEvent : ViewModelContract.Event {
-        class SetEmail(val email: String) : LoginEvent
-        class SetPwd(val pwd: String) : LoginEvent
-        object OnClickEmailLogin : LoginEvent
-        object OnClickGoogleLogin : LoginEvent
-        object OnClickKakaoLogin : LoginEvent
+        data class SetEmail(val email: String) : LoginEvent
+        data class SetPwd(val pwd: String) : LoginEvent
+        data object OnClickEmailLogin : LoginEvent
+        data object OnClickGoogleLogin : LoginEvent
+        data object OnClickKakaoLogin : LoginEvent
         class ProcessGoogleLogin(val account: GoogleSignInAccount) : LoginEvent
         class ProcessKakaoLogin(val accessToken: String) : LoginEvent
         class OnLoginFailure(val canceled: Boolean = false) : LoginEvent
@@ -34,9 +34,11 @@ class LoginContract {
     }
 
     sealed interface LoginSideEffect : ViewModelContract.SideEffect {
-        object NavigateToHome : LoginSideEffect
-        object LaunchGoogleLogin : LoginSideEffect
-        object LaunchKakaoLogin : LoginSideEffect
+        data object NavigateToHome : LoginSideEffect
+        data object LaunchGoogleLogin : LoginSideEffect
+        data object LaunchKakaoLogin : LoginSideEffect
         class ShowSnackBar(val message: String) : LoginSideEffect
     }
+
+    sealed interface LoginDialogState: ViewModelContract.DialogState
 }

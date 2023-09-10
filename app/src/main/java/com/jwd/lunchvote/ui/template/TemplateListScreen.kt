@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -20,7 +18,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,10 +28,17 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.navigation.SNACK_BAR_KEY
-import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListEvent
-import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListSideEffect
+import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListDialogState
+import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListEvent.OnClickAddButton
+import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListEvent.OnClickBackButton
+import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListEvent.OnClickDismissButton
+import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListEvent.OnClickTemplate
+import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListEvent.StartInitialize
+import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListSideEffect.NavigateToAddTemplate
+import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListSideEffect.NavigateToEditTemplate
+import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListSideEffect.PopBackStack
+import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListSideEffect.ShowSnackBar
 import com.jwd.lunchvote.ui.template.TemplateListContract.TemplateListState
-import com.jwd.lunchvote.widget.LunchVoteTextField
 import com.jwd.lunchvote.widget.LunchVoteTopBar
 import com.jwd.lunchvote.widget.TemplateListButton
 import com.jwd.lunchvote.widget.TemplateListItem
@@ -49,22 +53,23 @@ fun TemplateListRoute(
   viewModel: TemplateListViewModel = hiltViewModel()
 ){
   val templateListState : TemplateListState by viewModel.viewState.collectAsStateWithLifecycle()
+  val templateListDialogState : TemplateListDialogState? by viewModel.dialogState.collectAsStateWithLifecycle()
 
   val snackBarHostState = remember { SnackbarHostState() }
 
   LaunchedEffect(viewModel.sideEffect){
     viewModel.sideEffect.collectLatest {
       when(it){
-        is TemplateListSideEffect.PopBackStack -> popBackStack()
-        is TemplateListSideEffect.NavigateToEditTemplate -> navigateToEditTemplate(it.templateId)
-        is TemplateListSideEffect.NavigateToAddTemplate -> navigateToAddTemplate(it.templateName)
-        is TemplateListSideEffect.ShowSnackBar -> snackBarHostState.showSnackbar(it.message)
+        is PopBackStack -> popBackStack()
+        is NavigateToEditTemplate -> navigateToEditTemplate(it.templateId)
+        is NavigateToAddTemplate -> navigateToAddTemplate(it.templateName)
+        is ShowSnackBar -> snackBarHostState.showSnackbar(it.message)
       }
     }
   }
 
   LaunchedEffect(Unit){
-    viewModel.sendEvent(TemplateListEvent.StartInitialize)
+    viewModel.sendEvent(StartInitialize)
 
     val message = savedStateHandle.get<String>(SNACK_BAR_KEY)
     if (!message.isNullOrEmpty()) {
@@ -73,19 +78,20 @@ fun TemplateListRoute(
     }
   }
 
+  TemplateListDialog(
+    templateListDialogState = templateListDialogState,
+    onClickDismissButton = { viewModel.sendEvent(OnClickDismissButton) }
+  )
+
   TemplateListScreen(
     templateListState = templateListState,
     snackBarHostState = snackBarHostState,
-    onClickBackButton = { viewModel.sendEvent(TemplateListEvent.OnClickBackButton) },
-    onClickTemplate = { templateId -> viewModel.sendEvent(TemplateListEvent.OnClickTemplate(templateId)) },
-    onClickAddButton = { viewModel.sendEvent(TemplateListEvent.OnClickAddButton) },
-    setTemplateName = { templateName -> viewModel.sendEvent(TemplateListEvent.SetTemplateName(templateName)) },
-    onClickDismiss = { viewModel.sendEvent(TemplateListEvent.OnClickDismiss) },
-    onClickConfirm = { viewModel.sendEvent(TemplateListEvent.OnClickConfirm) }
+    onClickBackButton = { viewModel.sendEvent(OnClickBackButton) },
+    onClickTemplate = { templateId -> viewModel.sendEvent(OnClickTemplate(templateId)) },
+    onClickAddButton = { viewModel.sendEvent(OnClickAddButton) }
   )
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun TemplateListScreen(
   templateListState: TemplateListState,
@@ -93,29 +99,10 @@ private fun TemplateListScreen(
   onClickBackButton: () -> Unit = {},
   onClickTemplate: (String) -> Unit = {},
   onClickAddButton: () -> Unit = {},
-  setTemplateName: (String) -> Unit = {},
-  onClickDismiss: () -> Unit = {},
-  onClickConfirm: () -> Unit = {},
 ) {
   Scaffold(
     snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
   ) { padding ->
-    if (templateListState.dialogState) {
-      AlertDialog(
-        onDismissRequest = onClickDismiss,
-        confirmButton = { Button(onClickConfirm, enabled = templateListState.templateName.isNotBlank()) { Text("생성") } },
-        dismissButton = { Button(onClickDismiss) { Text("취소") } },
-        title = { Text("템플릿 생성", style = MaterialTheme.typography.titleLarge) },
-        text = {
-          LunchVoteTextField(
-            text = templateListState.templateName,
-            hintText = "템플릿 이름",
-            onTextChanged = setTemplateName
-          )
-        },
-      )
-    }
-
     if (templateListState.loading) {
       Dialog(onDismissRequest = {  }) { CircularProgressIndicator() }
     } else {

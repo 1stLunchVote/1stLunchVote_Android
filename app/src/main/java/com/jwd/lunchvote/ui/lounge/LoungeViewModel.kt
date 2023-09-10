@@ -39,7 +39,7 @@ class LoungeViewModel @Inject constructor(
     private val checkMemberStatusUseCase: CheckMemberStatusUseCase,
     private val auth: FirebaseAuth,
     savedStateHandle: SavedStateHandle
-): BaseStateViewModel<LoungeState, LoungeEvent, LoungeReduce, LoungeSideEffect>(savedStateHandle) {
+): BaseStateViewModel<LoungeState, LoungeEvent, LoungeReduce, LoungeSideEffect, LoungeDialogState>(savedStateHandle) {
     private val loungeId = savedStateHandle.get<String?>("id").also {
         updateState(LoungeReduce.SetIsOwner(it == null))
     }

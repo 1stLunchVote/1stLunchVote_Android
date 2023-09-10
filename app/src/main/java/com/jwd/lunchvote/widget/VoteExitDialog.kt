@@ -23,45 +23,45 @@ fun VoteExitDialog(
     onDismiss: () -> Unit,
     onExit: () -> Unit
 ){
-    LunchVoteDialog(
-        onDismiss = onDismiss,
-        content = {
-            Image(painter = painterResource(id = R.drawable.ic_warn), contentDescription = "exit_warn")
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Text(
-                stringResource(R.string.exit_dialog_title),
-                style = MaterialTheme.typography.titleLarge.copy(
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = stringResource(id = R.string.vote_exit_alert),
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Spacer(Modifier.weight(1f))
-
-                Button(onDismiss) { Text("취소") }
-
-                Button(
-                    onClick = onExit,
-                ) { Text("나가기") }
-            }
-        }
-    )
+//    LunchVoteDialog(
+//        onDismiss = onDismiss,
+//        content = {
+//            Image(painter = painterResource(id = R.drawable.ic_warn), contentDescription = "exit_warn")
+//
+//            Spacer(modifier = Modifier.height(20.dp))
+//
+//            Text(
+//                stringResource(R.string.exit_dialog_title),
+//                style = MaterialTheme.typography.titleLarge.copy(
+//                    color = MaterialTheme.colorScheme.onPrimaryContainer
+//                )
+//            )
+//
+//            Spacer(modifier = Modifier.height(16.dp))
+//
+//            Text(
+//                text = stringResource(id = R.string.vote_exit_alert),
+//                style = MaterialTheme.typography.bodyMedium.copy(
+//                    color = MaterialTheme.colorScheme.onPrimaryContainer
+//                )
+//            )
+//
+//            Spacer(modifier = Modifier.height(24.dp))
+//
+//            Row(
+//                modifier = Modifier.fillMaxWidth(),
+//                horizontalArrangement = Arrangement.spacedBy(8.dp)
+//            ) {
+//                Spacer(Modifier.weight(1f))
+//
+//                Button(onDismiss) { Text("취소") }
+//
+//                Button(
+//                    onClick = onExit,
+//                ) { Text("나가기") }
+//            }
+//        }
+//    )
 }
 
 @Preview(showBackground = true)

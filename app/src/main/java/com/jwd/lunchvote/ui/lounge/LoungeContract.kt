@@ -27,12 +27,12 @@ class LoungeContract {
 
     sealed interface LoungeEvent: ViewModelContract.Event {
         data class OnEditChat(val chat: String) : LoungeEvent
-        object OnSendChat : LoungeEvent
-        object OnReady : LoungeEvent
-        object OnTryExit : LoungeEvent
-        object OnStart : LoungeEvent
+        data object OnSendChat : LoungeEvent
+        data object OnReady : LoungeEvent
+        data object OnTryExit : LoungeEvent
+        data object OnStart : LoungeEvent
         data class OnClickExit(val exit: Boolean) : LoungeEvent
-        object OnClickInvite : LoungeEvent
+        data object OnClickInvite : LoungeEvent
         data class OnScrolled(val index: Int) : LoungeEvent
     }
 
@@ -52,4 +52,6 @@ class LoungeContract {
         data class NavigateToVote(val loungeId: String) : LoungeSideEffect
         data class CopyToClipboard(val loungeId: String) : LoungeSideEffect
     }
+
+    sealed interface LoungeDialogState: ViewModelContract.DialogState
 }

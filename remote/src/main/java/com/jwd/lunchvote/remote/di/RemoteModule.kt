@@ -1,8 +1,10 @@
 package com.jwd.lunchvote.remote.di
 
+import com.jwd.lunchvote.data.source.remote.FirstVoteDataSource
 import com.jwd.lunchvote.data.source.remote.LoginRemoteDataSource
 import com.jwd.lunchvote.data.source.remote.LoungeRemoteDataSource
 import com.jwd.lunchvote.data.source.remote.TemplateRemoteDataSource
+import com.jwd.lunchvote.remote.source.FirstVoteDataSourceImpl
 import com.jwd.lunchvote.remote.source.LoginRemoteDataSourceImpl
 import com.jwd.lunchvote.remote.source.LoungeRemoteDataSourceImpl
 import com.jwd.lunchvote.remote.source.TemplateRemoteDataSourceImpl
@@ -32,4 +34,10 @@ internal interface RemoteModule {
     fun bindsTemplateRemoteDataSource(
         templateRemoteDataSourceImpl: TemplateRemoteDataSourceImpl
     ): TemplateRemoteDataSource
+
+    @Binds
+    @Singleton
+    fun bindsFirstVoteRemoteDataSource(
+        firstVoteDataSourceImpl: FirstVoteDataSourceImpl
+    ): FirstVoteDataSource
 }

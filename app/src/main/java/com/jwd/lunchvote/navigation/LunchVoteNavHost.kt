@@ -51,7 +51,7 @@ fun LunchVoteNavHost(
                         navHostController.navigate(LunchVoteNavRoute.VoteNavigation.name)
                     },
                     navigateToFirstVote = {
-                        navHostController.navigate(LunchVoteNavRoute.FirstVote.name)
+                        navHostController.navigate(LunchVoteNavRoute.FirstVote.name + "/loungeId"/*TODO*/)
                     },
                     messageFlow = it.savedStateHandle.getStateFlow(SNACK_BAR_KEY, "")
                 )
@@ -122,19 +122,24 @@ fun LunchVoteNavHost(
             route = LunchVoteNavRoute.VoteNavigation.name,
             startDestination = LunchVoteNavRoute.FirstVote.name
         ) {
-            composable(LunchVoteNavRoute.FirstVote.name) {
+            composable(LunchVoteNavRoute.FirstVote.name + "/{loungeId}",
+                arguments = listOf(
+                    navArgument("loungeId") {
+                        type = NavType.StringType
+                        nullable = false
+                    }
+                )
+            ) {
                 FirstVoteRoute(
                     navigateToSecondVote = {
                         navHostController.navigate(LunchVoteNavRoute.SecondVote.name)
                     },
                     popBackStack = {
-
                         navHostController.navigate(LunchVoteNavRoute.Home.name) {
                             popUpTo(navHostController.graph.id) {
                                 inclusive = true
                             }
                         }
-
                         navHostController.currentBackStackEntry?.savedStateHandle?.set(
                             SNACK_BAR_KEY,
                             it
