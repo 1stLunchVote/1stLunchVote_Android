@@ -9,17 +9,14 @@ import kotlinx.parcelize.Parcelize
 data class FoodUIModel (
   val id: String,
   val imageUrl: String,
-  val name: String,
-  val status: FoodStatus = FoodStatus.DEFAULT
+  val name: String
 ): Parcelable {
   constructor(
-    food: Food,
-    status: FoodStatus = FoodStatus.DEFAULT
+    food: Food
   ): this(
     id = food.id,
     imageUrl = food.imageUrl,
-    name = food.name,
-    status = status
+    name = food.name
   )
 }
 
