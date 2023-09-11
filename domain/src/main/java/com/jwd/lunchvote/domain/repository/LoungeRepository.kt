@@ -15,4 +15,5 @@ interface LoungeRepository {
     suspend fun updateReady(uid: String, loungeId: String)
     suspend fun exitLounge(uid: String, loungeId: String)
     fun getMemberStatus(uid: String, loungeId: String) : Flow<MemberStatusType>
+    fun getCurrentLounge(): Flow<String?>
 }

@@ -40,6 +40,9 @@
             </intent-filter>
         </activity>
 
+        <service android:name=".service.TaskMonitorService"
+            android:stopWithTask="false"/>
+
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"

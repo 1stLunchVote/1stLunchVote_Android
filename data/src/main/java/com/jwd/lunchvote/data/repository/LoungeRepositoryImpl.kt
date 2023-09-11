@@ -24,35 +24,37 @@ import javax.inject.Inject
 
 class LoungeRepositoryImpl @Inject constructor(
     private val sendWorkerManager: SendWorkerManager,
-    private val loungeLocalDataSource: LoungeLocalDataSource,
-    private val loungeRemoteDataSource: LoungeRemoteDataSource
+    private val local: LoungeLocalDataSource,
+    private val remote: LoungeRemoteDataSource
 ): LoungeRepository {
     override suspend fun checkLoungeExist(loungeId: String): Boolean {
-        return loungeRemoteDataSource.checkLoungeExist(loungeId)
+        return remote.checkLoungeExist(loungeId)
     }
 
     override suspend fun createLounge(): String {
         val id = UUID.randomUUID().toString()
-        val loungeId = loungeRemoteDataSource.createLounge()
-        loungeRemoteDataSource.sendChat(id, loungeId, null, MessageDataType.CREATE)
+        val loungeId = remote.createLounge()
+        remote.sendChat(id, loungeId, null, MessageDataType.CREATE)
+        local.updateCurrentLounge(loungeId)
         return loungeId
     }
 
     override suspend fun joinLounge(loungeId: String) {
         val id = UUID.randomUUID().toString()
-        loungeRemoteDataSource.joinLounge(loungeId)
-        loungeRemoteDataSource.sendChat(id, loungeId, null, MessageDataType.JOIN)
+        remote.joinLounge(loungeId)
+        remote.sendChat(id, loungeId, null, MessageDataType.JOIN)
+        local.updateCurrentLounge(loungeId)
     }
 
     override fun getMemberList(loungeId: String): Flow<List<Member>> {
-        return loungeLocalDataSource.getMemberList(loungeId)
+        return local.getMemberList(loungeId)
             .filter { it.isNotEmpty() }
             .map { it.map(MemberDataMapper::mapToRight) }
             .onStart { syncMemberList(loungeId) }
     }
 
     override fun getChatList(loungeId: String): Flow<List<LoungeChat>> {
-        return loungeLocalDataSource.getChatList(loungeId)
+        return local.getChatList(loungeId)
             .map{it.map(LoungeChatDataMapper::mapToRight)}
             .filter { it.isNotEmpty() }
             .onStart { syncChatList(loungeId) }
@@ -62,23 +64,24 @@ class LoungeRepositoryImpl @Inject constructor(
     override suspend fun sendChat(loungeId: String, content: String) {
         val id = UUID.randomUUID().toString()
         sendWorkerManager.startSendWork(id, loungeId, content)
-        return loungeLocalDataSource.insertChat(id, loungeId, content, MessageDataType.NORMAL)
+        return local.insertChat(id, loungeId, content, MessageDataType.NORMAL)
     }
 
     override suspend fun updateReady(uid: String, loungeId: String) {
-        loungeLocalDataSource.updateMemberReady(uid, loungeId)
-        loungeRemoteDataSource.updateReady(uid, loungeId)
+        local.updateMemberReady(uid, loungeId)
+        remote.updateReady(uid, loungeId)
     }
 
     override suspend fun exitLounge(uid: String, loungeId: String) {
         val id = UUID.randomUUID().toString()
-        loungeRemoteDataSource.sendChat(id, loungeId, null, MessageDataType.EXIT)
-        loungeRemoteDataSource.exitLounge(uid, loungeId)
-        loungeLocalDataSource.deleteAllChat(loungeId)
+        remote.sendChat(id, loungeId, null, MessageDataType.EXIT)
+        remote.exitLounge(uid, loungeId)
+        local.deleteAllChat(loungeId)
+        local.deleteCurrentLounge()
     }
 
     override fun getMemberStatus(uid: String, loungeId: String): Flow<MemberStatusType>{
-        return loungeRemoteDataSource.getMemberList(loungeId)
+        return remote.getMemberList(loungeId)
             .map {
                 if (it.isEmpty()){
                     MemberStatusType.EXITED
@@ -88,20 +91,24 @@ class LoungeRepositoryImpl @Inject constructor(
             }
     }
 
+    override fun getCurrentLounge(): Flow<String?> {
+        return local.getCurrentLounge()
+    }
+
 
     private suspend fun syncMemberList(loungeId: String){
-        loungeRemoteDataSource.getMemberList(loungeId)
+        remote.getMemberList(loungeId)
             .onEach{
-                loungeLocalDataSource.putMemberList(it, loungeId)
+                local.putMemberList(it, loungeId)
             }
             .launchIn(CoroutineScope(currentCoroutineContext()))
     }
 
     private suspend fun syncChatList(loungeId: String){
-        loungeRemoteDataSource.getChatList(loungeId)
+        remote.getChatList(loungeId)
             .map { it.map(LoungeChatDataMapper::mapToRight) }
             .onEach{
-                loungeLocalDataSource.putChatList(it.map(LoungeChatDataMapper::mapToLeft), loungeId)
+                local.putChatList(it.map(LoungeChatDataMapper::mapToLeft), loungeId)
             }
             .launchIn(CoroutineScope(currentCoroutineContext()))
     }

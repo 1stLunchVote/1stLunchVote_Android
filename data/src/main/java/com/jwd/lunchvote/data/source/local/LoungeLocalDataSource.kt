@@ -15,4 +15,7 @@ interface LoungeLocalDataSource {
     suspend fun deleteChat(loungeId: String)
     suspend fun updateMemberReady(uid: String, loungeId: String)
     suspend fun deleteAllChat(loungeId: String)
+    suspend fun updateCurrentLounge(loungeId: String)
+    suspend fun deleteCurrentLounge()
+    fun getCurrentLounge(): Flow<String?>
 }

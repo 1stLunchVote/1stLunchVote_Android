@@ -40,7 +40,7 @@ dependencies {
     implementationAndroidX()
     implementationCoroutine()
     implementationHilt()
-    implementationRoom()
+    implementationLocal()
     implementationTest()
 
     implementationFirebase()

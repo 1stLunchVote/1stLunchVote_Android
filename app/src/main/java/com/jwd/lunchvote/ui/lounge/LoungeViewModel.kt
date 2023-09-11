@@ -127,6 +127,14 @@ class LoungeViewModel @Inject constructor(
                     }
                     MemberStatusType.EXILED -> {
                         sendSideEffect(LoungeSideEffect.PopBackStack("방장에 의해 추방되었습니다."))
+
+                        CoroutineScope(Dispatchers.IO).launch{
+                            checkJob?.cancel()
+
+                            currentState.loungeId?.let {
+                                exitLoungeUseCase(auth.currentUser?.uid ?: return@launch, it)
+                            }
+                        }
                     }
                     else -> {}
                 }

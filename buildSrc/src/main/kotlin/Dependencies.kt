@@ -45,8 +45,9 @@ object Versions{
     const val Retrofit = "2.9.0"
     const val OkHttp = "4.9.1"
 
-    // Room
+    // Room, DataStore
     const val Room = "2.5.2"
+    const val DataStore = "1.0.0"
 
     // Compose
     const val Compose = "2023.06.01"
@@ -147,6 +148,8 @@ object Libraries{
     const val Kakao = "com.kakao.sdk:v2-all-rx:${Versions.Kakao}"
     const val Timber = "com.jakewharton.timber:timber:${Versions.Timber}"
 
+    const val DataStore = "androidx.datastore:datastore-preferences:${Versions.DataStore}"
+
     object Coil{
         const val Coil = "io.coil-kt:coil-compose:${Versions.Coil}"
         const val CoilLandscapist = "com.github.skydoves:landscapist-coil:${Versions.CoilLandscapist}"
@@ -202,10 +205,11 @@ fun DependencyHandlerScope.implementationRetrofit(){
     )
 }
 
-fun DependencyHandlerScope.implementationRoom(){
+fun DependencyHandlerScope.implementationLocal(){
     implementations(
         Libraries.Room.Room,
-        Libraries.Room.RoomRuntime
+        Libraries.Room.RoomRuntime,
+        Libraries.DataStore
     )
     kapts(
         Libraries.Room.RoomCompiler

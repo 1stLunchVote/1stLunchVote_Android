@@ -1,5 +1,9 @@
 package com.jwd.lunchvote.local.source
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.google.firebase.auth.FirebaseAuth
 import com.jwd.lunchvote.data.di.Dispatcher
 import com.jwd.lunchvote.data.di.LunchVoteDispatcher.IO
@@ -28,6 +32,7 @@ class LoungeLocalDataSourceImpl @Inject constructor(
     private val loungeDao: LoungeDao,
     private val memberDao: MemberDao,
     private val auth: FirebaseAuth,
+    private val dataStore: DataStore<Preferences>,
     @Dispatcher(IO) private val dispatcher: CoroutineDispatcher
 ): LoungeLocalDataSource {
     override fun getChatList(
@@ -101,5 +106,27 @@ class LoungeLocalDataSourceImpl @Inject constructor(
         loungeId: String
     ) = withContext(dispatcher){
         chatDao.deleteAllChat(loungeId)
+    }
+
+    override suspend fun updateCurrentLounge(loungeId: String) {
+        dataStore.edit { pref ->
+            pref[CURRENT_LOUNGE] = loungeId
+        }
+    }
+
+    override suspend fun deleteCurrentLounge() {
+        dataStore.edit {
+            it.remove(CURRENT_LOUNGE)
+        }
+    }
+
+    override fun getCurrentLounge(): Flow<String?> {
+        return dataStore.data.map { pref ->
+            pref[CURRENT_LOUNGE]
+        }
+    }
+
+    companion object {
+        private val CURRENT_LOUNGE = stringPreferencesKey("currentLounge")
     }
 }
