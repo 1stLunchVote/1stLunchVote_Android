@@ -6,6 +6,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.jwd.lunchvote.data.di.Dispatcher
 import com.jwd.lunchvote.data.di.LunchVoteDispatcher.IO
+import com.jwd.lunchvote.data.model.type.MessageDataType
 import com.jwd.lunchvote.data.source.local.LoungeLocalDataSource
 import com.jwd.lunchvote.data.source.remote.LoungeRemoteDataSource
 import dagger.assisted.Assisted
@@ -27,9 +28,11 @@ class SendChatWorker @AssistedInject constructor(
     override suspend fun doWork(): Result = withContext(dispatcher){
         try {
             remoteDataSource.sendChat(
+                workerParams.inputData.getString("id") ?: return@withContext Result.failure(),
                 workerParams.inputData.getString("loungeId") ?: return@withContext Result.failure(),
-                workerParams.inputData.getString("content")
-            ).first()
+                workerParams.inputData.getString("content"),
+                MessageDataType.NORMAL
+            )
 
             Timber.e("서버로 메시지 전송 성공")
             // 서버로 메시지 전송 성공
@@ -40,7 +43,7 @@ class SendChatWorker @AssistedInject constructor(
                 // 시도 횟수 초과 -> 로컬 데이터베이스에서 삭제
                 localDataSource.deleteChat(
                     workerParams.inputData.getString("loungeId") ?: ""
-                ).firstOrNull()
+                )
 
                 Result.failure()
             } else {

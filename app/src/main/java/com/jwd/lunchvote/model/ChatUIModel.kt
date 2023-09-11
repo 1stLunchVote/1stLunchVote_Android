@@ -1,16 +1,17 @@
 package com.jwd.lunchvote.model
 
 import android.os.Parcelable
+import com.jwd.lunchvote.domain.entity.type.MessageType
+import com.jwd.lunchvote.domain.entity.type.SendStatusType
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class ChatUIModel(
     val content: String,
-    val messageType: Int,
+    val messageType: MessageType,
     val isMine: Boolean,
     val sender: String,
     val createdAt: String,
     val profileImage: String?,
-    // 0 = 전송 완료, 1 = 전송 중, 2 = 전송 실패
-    val sendStatus: Int = 0
+    val sendStatus: SendStatusType
 ): Parcelable

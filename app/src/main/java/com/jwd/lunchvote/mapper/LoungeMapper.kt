@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.model.mapper
+package com.jwd.lunchvote.mapper
 
 import com.jwd.lunchvote.domain.entity.LoungeChat
 import com.jwd.lunchvote.domain.entity.Member
@@ -8,12 +8,12 @@ import com.jwd.lunchvote.model.MemberUIModel
 object LoungeMapper {
     fun mapToChat(loungeChat: LoungeChat, isMine: Boolean = false) : ChatUIModel {
         return ChatUIModel(
-            loungeChat.content.orEmpty(),
+            loungeChat.message,
             loungeChat.messageType,
             isMine,
-            loungeChat.sender.orEmpty(),
-            loungeChat.createdAt.orEmpty(),
-            loungeChat.senderProfile,
+            loungeChat.userId,
+            loungeChat.createdAt,
+            loungeChat.userProfile,
             loungeChat.sendStatus
         )
     }

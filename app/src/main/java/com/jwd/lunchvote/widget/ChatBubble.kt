@@ -28,6 +28,7 @@ import coil.compose.AsyncImage
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.core.ui.util.circleShadow
 import com.jwd.lunchvote.core.ui.util.modifyIf
+import com.jwd.lunchvote.domain.entity.type.SendStatusType
 
 @Composable
 fun ChatBubble(
@@ -35,7 +36,7 @@ fun ChatBubble(
     isMine: Boolean = false,
     profileImage: String?,
     isReady: Boolean = false,
-    sendStatus: Int = 0,
+    sendStatus: SendStatusType = SendStatusType.SUCCESS,
     navigateToMember : () -> Unit = {},
     configuration : Configuration = LocalConfiguration.current
 ) {
@@ -46,7 +47,7 @@ fun ChatBubble(
         if (isMine) {
             Spacer(modifier = Modifier.weight(1f))
 
-            if (sendStatus != 0){
+            if (sendStatus == SendStatusType.SENDING) {
                 Text(text = "전송중", style = MaterialTheme.typography.titleSmall)
                 Spacer(modifier = Modifier.width(8.dp))
             }
@@ -111,8 +112,7 @@ fun ChatBubblePreview(){
         ChatBubble(
             message = "안녕하세요",
             isMine = true,
-            profileImage = null,
-            sendStatus = 1
+            profileImage = null
         )
     }
 }

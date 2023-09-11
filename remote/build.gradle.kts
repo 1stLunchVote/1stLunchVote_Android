@@ -36,6 +36,7 @@ android {
 dependencies {
     implementation(project(":data"))
     implementation(project(":domain"))
+    implementation(project(":core:common"))
 
     implementationAndroidX()
     implementationHilt()

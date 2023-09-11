@@ -35,6 +35,7 @@ android {
 
 dependencies {
     implementation(project(":domain"))
+    implementation(project(":core:common"))
 
     implementationAndroidX()
     implementationCoroutine()

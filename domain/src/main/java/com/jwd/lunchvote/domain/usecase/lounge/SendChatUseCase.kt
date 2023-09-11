@@ -6,5 +6,5 @@ import javax.inject.Inject
 class SendChatUseCase @Inject constructor(
     private val repository: LoungeRepository
 ) {
-    operator fun invoke(loungeId: String, content: String) = repository.sendChat(loungeId, content)
+    suspend operator fun invoke(loungeId: String, content: String) = repository.sendChat(loungeId, content)
 }

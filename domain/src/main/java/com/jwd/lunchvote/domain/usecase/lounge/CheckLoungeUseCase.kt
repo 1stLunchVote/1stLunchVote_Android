@@ -6,5 +6,5 @@ import javax.inject.Inject
 class CheckLoungeUseCase @Inject constructor(
     private val loungeRepository: LoungeRepository
 ) {
-    operator fun invoke(loungeId: String) = loungeRepository.checkLoungeExist(loungeId)
+    suspend operator fun invoke(loungeId: String) = loungeRepository.checkLoungeExist(loungeId)
 }
