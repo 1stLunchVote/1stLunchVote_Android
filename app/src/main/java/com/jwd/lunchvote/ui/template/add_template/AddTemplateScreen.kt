@@ -37,8 +37,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.R
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
-import com.jwd.lunchvote.domain.entity.FoodStatus
 import com.jwd.lunchvote.model.FoodUIModel
+import com.jwd.lunchvote.model.enums.FoodStatus
 import com.jwd.lunchvote.ui.template.add_template.AddTemplateContract.AddTemplateEvent
 import com.jwd.lunchvote.ui.template.add_template.AddTemplateContract.AddTemplateSideEffect
 import com.jwd.lunchvote.ui.template.add_template.AddTemplateContract.AddTemplateState
@@ -131,8 +131,8 @@ private fun AddTemplateScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.SpaceBetween
           ) {
-            items(addTemplateState.foodList.filter { it.name.contains(addTemplateState.searchKeyword) }) {food ->
-              FoodItem(food) { onClickFood(food) }
+            items(addTemplateState.foodMap.keys.filter { it.name.contains(addTemplateState.searchKeyword) }) {food ->
+              FoodItem(food, addTemplateState.foodMap[food]!!) { onClickFood(food) }
             }
           }
           Button(
@@ -182,14 +182,23 @@ fun AddTemplateScreenPreview() {
       AddTemplateScreen(
         AddTemplateState(
           name = "학생회 회식 대표 메뉴",
-          foodList = List(20) {
+          foodMap = mapOf(
             FoodUIModel(
-              id = "$it",
+              id = "1",
               imageUrl = "",
-              name = "음식명",
-              status = FoodStatus.DEFAULT
-            )
-          }
+              name = "음식명"
+            ) to FoodStatus.DEFAULT,
+            FoodUIModel(
+              id = "2",
+              imageUrl = "",
+              name = "음식명"
+            ) to FoodStatus.DEFAULT,
+            FoodUIModel(
+              id = "3",
+              imageUrl = "",
+              name = "음식명"
+            ) to FoodStatus.DEFAULT,
+          )
         ),
         snackBarHostState = remember { SnackbarHostState() }
       )

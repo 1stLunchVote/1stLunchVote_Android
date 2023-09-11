@@ -20,21 +20,23 @@ class SecondVoteContract {
     }
 
     sealed interface SecondVoteEvent : ViewModelContract.Event {
-        class OnClickVote(val index: Int) : SecondVoteEvent
-        object OnClickFab : SecondVoteEvent
-        object OnTryExit : SecondVoteEvent
+        data class OnClickVote(val index: Int) : SecondVoteEvent
+        data object OnClickFab : SecondVoteEvent
+        data object OnTryExit : SecondVoteEvent
         data class OnClickExitDialog(val isExit: Boolean): SecondVoteEvent
     }
 
     sealed interface SecondVoteReduce : ViewModelContract.Reduce {
         data class SetVoteList(val voteList: List<SecondVoteTileUIModel>) : SecondVoteReduce
         data class ChangeVoted(val index: Int) : SecondVoteReduce
-        object SetVoteCompleted : SecondVoteReduce
+        data object SetVoteCompleted : SecondVoteReduce
         data class SetExitDialogShown(val isShown: Boolean) : SecondVoteReduce
     }
 
     sealed interface SecondVoteSideEffect : ViewModelContract.SideEffect {
         data class ShowSnackBar(val message: String) : SecondVoteSideEffect
-        object PopBackStack : SecondVoteSideEffect
+        data object PopBackStack : SecondVoteSideEffect
     }
+
+    sealed interface SecondVoteDialogState: ViewModelContract.DialogState
 }

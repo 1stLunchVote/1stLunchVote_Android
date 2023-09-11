@@ -14,75 +14,44 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val checkLoungeUseCase: CheckLoungeUseCase,
-    savedStateHandle: SavedStateHandle
-): BaseStateViewModel<HomeState, HomeEvent, HomeReduce, HomeSideEffect>(savedStateHandle){
-    override fun createInitialState(savedState: Parcelable?): HomeState {
-        return savedState as? HomeState ?: HomeState()
-    }
+  private val checkLoungeUseCase: CheckLoungeUseCase,
+  savedStateHandle: SavedStateHandle
+): BaseStateViewModel<HomeState, HomeEvent, HomeReduce, HomeSideEffect, HomeDialogState>(savedStateHandle){
+  override fun createInitialState(savedState: Parcelable?): HomeState {
+    return savedState as? HomeState ?: HomeState()
+  }
 
-    private fun checkLoungeExist(loungeId: String) {
-        checkLoungeUseCase(loungeId)
-            .onEach {
-                updateState(HomeReduce.DismissJoinDialog)
-
-                if (it){
-                    sendSideEffect(HomeSideEffect.NavigateToLounge(loungeId))
-                }
-                else {
-                    sendSideEffect(HomeSideEffect.ShowSnackBar("존재하지 않는 방입니다."))
-                }
-            }
-            .catch {
-                updateState(HomeReduce.DismissJoinDialog)
-                sendSideEffect(HomeSideEffect.ShowSnackBar("오류가 발생하였습니다."))
-            }
-            .launchIn(viewModelScope)
+  override fun handleEvents(event: HomeEvent) {
+    when(event) {
+      is HomeEvent.OnClickLoungeButton -> sendSideEffect(HomeSideEffect.NavigateToLounge(null))
+      is HomeEvent.OnClickJoinLoungeButton -> toggleDialog(HomeDialogState.JoinDialog {
+        updateState(HomeReduce.UpdateLoading(true))
+        checkLoungeExist(it)
+      })
+      is HomeEvent.OnClickDismissButton -> toggleDialog(null)
+      is HomeEvent.OnClickTemplateButton -> sendSideEffect(HomeSideEffect.NavigateToTemplateList)
+      is HomeEvent.OnClickSettingButton -> sendSideEffect(HomeSideEffect.NavigateToSetting)
+      is HomeEvent.OnClickTipsButton -> sendSideEffect(HomeSideEffect.NavigateToTips)
     }
+  }
 
-    override fun handleEvents(event: HomeEvent) {
-        when(event) {
-            is HomeEvent.OnClickLoungeButton -> {
-                sendSideEffect(HomeSideEffect.NavigateToLounge(null))
-            }
-            is HomeEvent.OnClickJoinLoungeButton -> {
-                updateState(HomeReduce.ShowJoinDialog)
-            }
-            is HomeEvent.SetJoinCode -> {
-                updateState(HomeReduce.UpdateJoinCode(event.code))
-            }
-            is HomeEvent.OnClickDismissButtonOfJoinDialog -> {
-                updateState(HomeReduce.DismissJoinDialog)
-            }
-            is HomeEvent.OnClickConfirmButtonOfJoinDialog -> {
-                checkLoungeExist(event.code)
-            }
-            is HomeEvent.OnClickTemplateButton -> {
-                sendSideEffect(HomeSideEffect.NavigateToTemplateList)
-            }
-            is HomeEvent.OnClickSettingButton -> {
-                sendSideEffect(HomeSideEffect.NavigateToSetting)
-            }
-            is HomeEvent.OnClickTipsButton -> {
-                sendSideEffect(HomeSideEffect.NavigateToTips)
-            }
-        }
+  override fun reduceState(state: HomeState, reduce: HomeReduce): HomeState {
+    return when(reduce) {
+      is HomeReduce.UpdateLoading -> state.copy(loading = reduce.loading)
     }
+  }
 
-    override fun reduceState(state: HomeState, reduce: HomeReduce): HomeState {
-        return when (reduce) {
-            is HomeReduce.ShowJoinDialog -> {
-                state.copy(showJoinDialog = true)
-            }
-            is HomeReduce.UpdateJoinCode -> {
-                state.copy(code = reduce.code)
-            }
-            is HomeReduce.DismissJoinDialog -> {
-                state.copy(showJoinDialog = false)
-            }
-            is HomeReduce.ConfirmJoinDialog -> {
-                state.copy(showJoinDialog = false)
-            }
-        }
-    }
+  private fun checkLoungeExist(loungeId: String) {
+    checkLoungeUseCase(loungeId)
+      .onEach {
+        if (it) sendSideEffect(HomeSideEffect.NavigateToLounge(loungeId))
+        else sendSideEffect(HomeSideEffect.ShowSnackBar("존재하지 않는 방입니다."))
+        updateState(HomeReduce.UpdateLoading(false))
+      }
+      .catch {
+        sendSideEffect(HomeSideEffect.ShowSnackBar("오류가 발생하였습니다."))
+        updateState(HomeReduce.UpdateLoading(false))
+      }
+      .launchIn(viewModelScope)
+  }
 }

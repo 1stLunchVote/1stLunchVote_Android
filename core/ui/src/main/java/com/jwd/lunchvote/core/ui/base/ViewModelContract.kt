@@ -16,4 +16,7 @@ sealed interface ViewModelContract{
 
     // View 에서 처리 (상태 변경 없이 처리 해야 할 것 혹은 외부의 상태 변화)
     interface SideEffect: ViewModelContract
+
+    // Dialog 상태
+    interface DialogState: ViewModelContract
 }
