@@ -1,29 +1,30 @@
 package com.jwd.lunchvote.remote.source
 
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.functions.FirebaseFunctions
 import com.jwd.lunchvote.data.di.Dispatcher
 import com.jwd.lunchvote.data.di.LunchVoteDispatcher.IO
 import com.jwd.lunchvote.data.model.LoungeChatData
+import com.jwd.lunchvote.data.model.MemberData
 import com.jwd.lunchvote.data.model.type.MessageDataType
 import com.jwd.lunchvote.data.source.remote.LoungeRemoteDataSource
-import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.remote.mapper.LoungeChatRemoteMapper
-import com.jwd.lunchvote.remote.mapper.MessageRemoteTypeMapper
+import com.jwd.lunchvote.remote.mapper.MemberRemoteMapper
+import com.jwd.lunchvote.remote.mapper.type.MessageRemoteTypeMapper
 import com.jwd.lunchvote.remote.model.LoungeChatRemote
+import com.jwd.lunchvote.remote.model.MemberRemote
 import com.jwd.lunchvote.remote.util.getValueEventFlow
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import java.util.UUID
 import javax.inject.Inject
 
@@ -36,45 +37,50 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
     override suspend fun checkLoungeExist(
         loungeId: String
     ): Boolean = withContext(dispatcher) {
-        val roomRef = db.getReference("$Room/${loungeId}")
+        val roomRef = db.getReference("$Lounge/${loungeId}")
         roomRef.get().await().exists()
     }
 
     override suspend fun createLounge(): String = withContext(dispatcher) {
-        val roomId = UUID.randomUUID().toString()
+        val user = checkNotNull(auth.currentUser)
+        val loungeId = UUID.randomUUID().toString()
 
-        val roomRef = db.getReference("$Room/${roomId}")
-        auth.currentUser?.let{ user ->
-            roomRef.setValue(mapOf("owner" to user.uid)).await()
+        val joinedAt = ZonedDateTime.now().toString()
 
-            addMember(roomRef, user.uid, user.displayName.toString(), user.photoUrl.toString(), true)
-        }
 
-        return@withContext roomId
+        val roomRef = db.getReference("$Lounge/${loungeId}")
+
+        roomRef.child(Member).child(user.uid).setValue(
+            MemberRemote(
+                user.uid, loungeId, user.displayName.toString(), user.photoUrl.toString(),
+                "joined", true, joinedAt
+            )
+        ).await()
+
+        return@withContext loungeId
     }
 
     override suspend fun joinLounge(loungeId: String) {
         withContext(dispatcher) {
-            val roomRef = db.getReference("$Room/${loungeId}")
+            val roomRef = db.getReference("$Lounge/${loungeId}")
+            val user = checkNotNull(auth.currentUser)
+            val joinedAt = ZonedDateTime.now().toString()
 
-            auth.currentUser?.let { user ->
-                val userExist =
-                    roomRef.child(Member).child(user.uid).get().await().getValue<Member>()
-
-                addMember(
-                    roomRef, user.uid, user.displayName.toString(), user.photoUrl.toString(),
-                    false, userExist?.joinedTime
+            roomRef.child(Member).child(user.uid).setValue(
+                MemberRemote(
+                    user.uid, loungeId, user.displayName.toString(), user.photoUrl.toString(),
+                    "joined", false, joinedAt
                 )
-
-            }
+            ).await()
         }
     }
 
-    override fun getMemberList(loungeId: String): Flow<List<Member>> {
-        val memberRef = db.getReference("$Room/${loungeId}").child(Member)
+    override fun getMemberList(loungeId: String): Flow<List<MemberData>> {
+        val memberRef = db.getReference("$Lounge/${loungeId}").child(Member)
 
-        return memberRef.getValueEventFlow<HashMap<String, Member>>()
-            .map { it.values.toList().sortedBy { m -> m.joinedTime } }.flowOn(dispatcher)
+        return memberRef.getValueEventFlow<HashMap<String, MemberRemote>>()
+            .map { it.values.map(MemberRemoteMapper::mapToRight).sortedBy { member -> member.joinedAt } }
+            .flowOn(dispatcher)
     }
 
     override fun getChatList(loungeId: String): Flow<List<LoungeChatData>> {
@@ -111,43 +117,32 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
         }
     }
 
-    override fun updateReady(
+    override suspend fun updateReady(
         uid: String, loungeId: String
-    ): Flow<Unit> = flow {
-        val readyRef = db.getReference("$Room/${loungeId}").child(Member).child(uid).child(Ready)
-        // 네트워크 연결이 안되어서 오류가 난 경우, 네트워크 연결되면 바로 자동 요청
-        val cur = readyRef.get().await().getValue<Boolean>()
-        readyRef.setValue(cur?.not())
-        emit(Unit)
-    }.flowOn(dispatcher)
+    ) {
+        withContext(dispatcher){
+            val statusRef = db.getReference("$Lounge/${loungeId}").child(Member).child(uid).child(Status)
+            val cur = statusRef.get().await().getValue<String>()
+            statusRef.setValue(if (cur == "joined") "ready" else "joined").await()
+        }
+    }
 
     override suspend fun exitLounge(
         uid: String, loungeId: String
     ){
         withContext(dispatcher){
-            val memberRef = db.getReference("$Room/${loungeId}").child(Member).child(uid)
+            val memberRef = db.getReference("$Lounge/${loungeId}").child(Member).child(uid)
             memberRef.setValue(null).await()
         }
     }
 
-    private fun addMember(
-        roomRef: DatabaseReference, uid: String, displayName: String,
-        photoUrl: String?, isOwner: Boolean, joinedTime: String? = null
-    ) {
-        val currentTime = LocalDateTime.now().toString()
-
-        // 나갔다 들어오면 무조건 준비 상태 false
-        roomRef.child(Member).child(uid).setValue(
-            Member(uid, displayName, photoUrl, false, isOwner, joinedTime ?: currentTime)
-        )
-    }
 
     companion object{
-        const val Room = "rooms"
+        const val Lounge = "Lounge"
         const val Chat = "Chat"
         const val Room_Length = 10
         const val Member = "members"
-        const val Ready = "ready"
+        const val Status = "status"
         const val Chat_Create = "투표 방이 생성되었습니다."
         const val Chat_Join = "님이 입장했습니다."
         const val Chat_Exit = "님이 퇴장했습니다."

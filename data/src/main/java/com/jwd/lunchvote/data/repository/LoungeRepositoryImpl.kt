@@ -1,13 +1,15 @@
 package com.jwd.lunchvote.data.repository
 
-import com.jwd.lunchvote.data.mapper.type.LoungeChatDataMapper
+import com.jwd.lunchvote.data.mapper.LoungeChatDataMapper
+import com.jwd.lunchvote.data.mapper.MemberDataMapper
+import com.jwd.lunchvote.data.mapper.type.MemberStatusDataTypeMapper
 import com.jwd.lunchvote.data.model.type.MessageDataType
 import com.jwd.lunchvote.data.source.local.LoungeLocalDataSource
 import com.jwd.lunchvote.data.source.remote.LoungeRemoteDataSource
 import com.jwd.lunchvote.data.worker.SendWorkerManager
 import com.jwd.lunchvote.domain.entity.LoungeChat
 import com.jwd.lunchvote.domain.entity.Member
-import com.jwd.lunchvote.domain.entity.MemberStatus
+import com.jwd.lunchvote.domain.entity.type.MemberStatusType
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.currentCoroutineContext
@@ -45,6 +47,7 @@ class LoungeRepositoryImpl @Inject constructor(
     override fun getMemberList(loungeId: String): Flow<List<Member>> {
         return loungeLocalDataSource.getMemberList(loungeId)
             .filter { it.isNotEmpty() }
+            .map { it.map(MemberDataMapper::mapToRight) }
             .onStart { syncMemberList(loungeId) }
     }
 
@@ -74,19 +77,14 @@ class LoungeRepositoryImpl @Inject constructor(
         loungeLocalDataSource.deleteAllChat(loungeId)
     }
 
-    override fun getMemberStatus(uid: String, loungeId: String): Flow<MemberStatus>{
+    override fun getMemberStatus(uid: String, loungeId: String): Flow<MemberStatusType>{
         return loungeRemoteDataSource.getMemberList(loungeId)
             .map {
                 if (it.isEmpty()){
-                    MemberStatus.EXITED
+                    MemberStatusType.EXITED
                 }
-                else if (it.find { member -> member.uid == uid } == null) {
-                    // 추방 당한 것
-                    MemberStatus.EXILED
-                }
-                else {
-                    MemberStatus.NORMAL
-                }
+                else it.find { member -> member.id == uid }?.status?.let(MemberStatusDataTypeMapper::mapToRight)
+                    ?: MemberStatusType.EXITED
             }
     }
 

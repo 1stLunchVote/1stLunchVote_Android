@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.remote.mapper
+package com.jwd.lunchvote.remote.mapper.type
 
 import com.jwd.lunchvote.core.common.base.BiMapper
 import com.jwd.lunchvote.data.model.type.MessageDataType

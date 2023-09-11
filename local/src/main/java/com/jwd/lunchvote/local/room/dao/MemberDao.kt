@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.jwd.lunchvote.data.model.type.MemberStatusDataType
 import com.jwd.lunchvote.local.room.entity.MemberEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -18,7 +19,10 @@ interface MemberDao {
     @Query("DELETE FROM MemberTable WHERE loungeId = :loungeId")
     fun deleteAllMember(loungeId: String)
 
+    @Query("SELECT status FROM MemberTable WHERE id = :id AND loungeId = :loungeId")
+    fun getMemberStatus(id: String, loungeId: String): MemberStatusDataType
+
     // 현재 레디값의 반대로 업데이트
-    @Query("UPDATE MemberTable SET ready = NOT ready WHERE uid = :id AND loungeId = :loungeId")
-    fun updateMemberReady(id: String, loungeId: String)
+    @Query("UPDATE MemberTable SET status = :status WHERE id = :id AND loungeId = :loungeId")
+    fun updateMemberReady(id: String, loungeId: String, status: MemberStatusDataType)
 }

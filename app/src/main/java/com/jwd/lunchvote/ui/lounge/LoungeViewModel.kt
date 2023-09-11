@@ -5,7 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
-import com.jwd.lunchvote.domain.entity.MemberStatus
+import com.jwd.lunchvote.domain.entity.type.MemberStatusType
 import com.jwd.lunchvote.domain.usecase.lounge.CheckMemberStatusUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.CreateLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.ExitLoungeUseCase
@@ -111,7 +111,7 @@ class LoungeViewModel @Inject constructor(
         getMemberListUseCase(loungeId)
             .onEach {
                 updateState(LoungeReduce.SetMemberList(it.map { m ->
-                    LoungeMapper.mapToMember(m, m.uid == auth.currentUser?.uid) }
+                    LoungeMapper.mapToMember(m, m.id == auth.currentUser?.uid) }
                 ))
             }
             .launchIn(viewModelScope)
@@ -122,10 +122,10 @@ class LoungeViewModel @Inject constructor(
         checkJob = checkMemberStatusUseCase(auth.currentUser?.uid ?: return, currentState.loungeId ?: return)
             .onEach {
                 when(it){
-                    MemberStatus.EXITED -> {
+                    MemberStatusType.EXITED -> {
                         sendSideEffect(LoungeSideEffect.PopBackStack("방장이 방을 종료하였습니다."))
                     }
-                    MemberStatus.EXILED -> {
+                    MemberStatusType.EXILED -> {
                         sendSideEffect(LoungeSideEffect.PopBackStack("방장에 의해 추방되었습니다."))
                     }
                     else -> {}

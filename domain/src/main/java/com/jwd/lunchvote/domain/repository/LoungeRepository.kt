@@ -2,7 +2,7 @@ package com.jwd.lunchvote.domain.repository
 
 import com.jwd.lunchvote.domain.entity.LoungeChat
 import com.jwd.lunchvote.domain.entity.Member
-import com.jwd.lunchvote.domain.entity.MemberStatus
+import com.jwd.lunchvote.domain.entity.type.MemberStatusType
 import kotlinx.coroutines.flow.Flow
 
 interface LoungeRepository {
@@ -14,5 +14,5 @@ interface LoungeRepository {
     suspend fun sendChat(loungeId: String, content: String)
     suspend fun updateReady(uid: String, loungeId: String)
     suspend fun exitLounge(uid: String, loungeId: String)
-    fun getMemberStatus(uid: String, loungeId: String) : Flow<MemberStatus>
+    fun getMemberStatus(uid: String, loungeId: String) : Flow<MemberStatusType>
 }

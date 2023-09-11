@@ -3,6 +3,7 @@ package com.jwd.lunchvote.remote.mapper
 import com.jwd.lunchvote.core.common.base.Mapper
 import com.jwd.lunchvote.data.model.LoungeChatData
 import com.jwd.lunchvote.data.model.type.SendStatusDataType
+import com.jwd.lunchvote.remote.mapper.type.MessageRemoteTypeMapper
 import com.jwd.lunchvote.remote.model.LoungeChatRemote
 
 internal object LoungeChatRemoteMapper : Mapper<LoungeChatRemote, LoungeChatData> {
