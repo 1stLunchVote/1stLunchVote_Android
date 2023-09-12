@@ -7,6 +7,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.entity.type.MemberStatusType
 import com.jwd.lunchvote.domain.usecase.lounge.CheckMemberStatusUseCase
+import com.jwd.lunchvote.domain.usecase.lounge.ExileMemberUseCase
 import com.jwd.lunchvote.ui.lounge.member.LoungeMemberContract.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
@@ -15,6 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoungeMemberViewModel @Inject constructor(
+    private val exileMemberUseCase: ExileMemberUseCase,
     auth: FirebaseAuth,
     checkMemberStatusUseCase: CheckMemberStatusUseCase,
     savedStateHandle: SavedStateHandle,
@@ -60,11 +62,17 @@ class LoungeMemberViewModel @Inject constructor(
         }
     }
 
+    private fun exileMember(){
+        launch {
+            exileMemberUseCase(memberId, loungeId)
+
+            sendSideEffect(LoungeMemberSideEffect.PopBackStack)
+        }
+    }
+
     override fun handleEvents(event: LoungeMemberEvent) {
         when(event){
-            is LoungeMemberEvent.OnClickExile -> {
-
-            }
+            is LoungeMemberEvent.OnClickExile -> exileMember()
         }
     }
 

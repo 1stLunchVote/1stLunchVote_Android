@@ -8,6 +8,7 @@ import com.jwd.lunchvote.data.di.Dispatcher
 import com.jwd.lunchvote.data.di.LunchVoteDispatcher.IO
 import com.jwd.lunchvote.data.model.LoungeChatData
 import com.jwd.lunchvote.data.model.MemberData
+import com.jwd.lunchvote.data.model.type.MemberStatusDataType
 import com.jwd.lunchvote.data.model.type.MessageDataType
 import com.jwd.lunchvote.data.source.remote.LoungeRemoteDataSource
 import com.jwd.lunchvote.remote.mapper.LoungeChatRemoteMapper
@@ -62,14 +63,15 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
 
     override suspend fun joinLounge(loungeId: String) {
         withContext(dispatcher) {
-            val roomRef = db.getReference("$Lounge/${loungeId}")
             val user = checkNotNull(auth.currentUser)
+
+            val userRef = db.getReference("$Lounge/${loungeId}").child(Member).child(user.uid)
             val joinedAt = ZonedDateTime.now().toString()
 
-            roomRef.child(Member).child(user.uid).setValue(
+            userRef.setValue(
                 MemberRemote(
                     user.uid, loungeId, user.displayName.toString(), user.photoUrl.toString(),
-                    "joined", false, joinedAt
+                    "joined", true, joinedAt
                 )
             ).await()
         }
@@ -79,8 +81,11 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
         val memberRef = db.getReference("$Lounge/${loungeId}").child(Member)
 
         return memberRef.getValueEventFlow<HashMap<String, MemberRemote>>()
-            .map { it.values.map(MemberRemoteMapper::mapToRight).sortedBy { member -> member.joinedAt } }
-            .flowOn(dispatcher)
+            .map {
+                it.values.map(MemberRemoteMapper::mapToRight)
+                    .filter { it.status != MemberStatusDataType.EXILED }
+                    .sortedBy { member -> member.joinedAt }
+            }.flowOn(dispatcher)
     }
 
     override fun getChatList(loungeId: String): Flow<List<LoungeChatData>> {
@@ -133,6 +138,13 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
         withContext(dispatcher){
             val memberRef = db.getReference("$Lounge/${loungeId}").child(Member).child(uid)
             memberRef.setValue(null).await()
+        }
+    }
+
+    override suspend fun exileMember(memberId: String, loungeId: String) {
+        withContext(dispatcher){
+            val statusRef = db.getReference("$Lounge/${loungeId}").child(Member).child(memberId).child(Status)
+            statusRef.setValue("exiled").await()
         }
     }
 

@@ -22,7 +22,7 @@ object LoungeMapper {
     fun mapToMember(member: Member, isMine: Boolean = false) : MemberUIModel {
         return MemberUIModel(
             member.id,
-            member.name,
+            member.name.ifEmpty { "익명" },
             member.profileImage,
             member.status == MemberStatusType.READY,
             member.isOwner,

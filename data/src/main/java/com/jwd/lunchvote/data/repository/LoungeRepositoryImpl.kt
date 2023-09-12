@@ -46,7 +46,6 @@ class LoungeRepositoryImpl @Inject constructor(
 
     override fun getMemberList(loungeId: String): Flow<List<Member>> {
         return local.getMemberList(loungeId)
-            .filter { it.isNotEmpty() }
             .map { it.map(MemberDataMapper::mapToRight) }
             .onStart { syncMemberList(loungeId) }
     }
@@ -77,6 +76,10 @@ class LoungeRepositoryImpl @Inject constructor(
         local.deleteAllChat(loungeId)
     }
 
+    override suspend fun exileMember(memberId: String, loungeId: String) {
+        remote.exileMember(memberId, loungeId)
+    }
+
     override fun getMemberStatus(uid: String, loungeId: String): Flow<MemberStatusType>{
         return remote.getMemberList(loungeId)
             .map {
@@ -84,7 +87,7 @@ class LoungeRepositoryImpl @Inject constructor(
                     MemberStatusType.EXITED
                 }
                 else it.find { member -> member.id == uid }?.status?.let(MemberStatusDataTypeMapper::mapToRight)
-                    ?: MemberStatusType.EXITED
+                    ?: MemberStatusType.EXILED
             }
     }
 

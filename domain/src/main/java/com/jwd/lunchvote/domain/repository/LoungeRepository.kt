@@ -14,5 +14,6 @@ interface LoungeRepository {
     suspend fun sendChat(loungeId: String, content: String)
     suspend fun updateReady(uid: String, loungeId: String)
     suspend fun exitLounge(uid: String, loungeId: String)
+    suspend fun exileMember(memberId: String, loungeId: String)
     fun getMemberStatus(uid: String, loungeId: String) : Flow<MemberStatusType>
 }

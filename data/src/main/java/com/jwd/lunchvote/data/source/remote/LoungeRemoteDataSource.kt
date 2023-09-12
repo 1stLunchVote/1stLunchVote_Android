@@ -14,4 +14,5 @@ interface LoungeRemoteDataSource {
     suspend fun sendChat(id: String, loungeId: String, content: String?, messageType: MessageDataType)
     suspend fun updateReady(uid: String, loungeId: String)
     suspend fun exitLounge(uid: String, loungeId: String)
+    suspend fun exileMember(memberId: String, loungeId: String)
 }
