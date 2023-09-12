@@ -61,6 +61,11 @@ class LoungeMemberViewModel @Inject constructor(
     }
 
     override fun handleEvents(event: LoungeMemberEvent) {
+        when(event){
+            is LoungeMemberEvent.OnClickExile -> {
+
+            }
+        }
     }
 
     companion object{

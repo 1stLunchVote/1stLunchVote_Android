@@ -16,6 +16,7 @@ class LoungeMemberContract {
     }
 
     sealed interface LoungeMemberEvent : ViewModelContract.Event {
+        data object OnClickExile : LoungeMemberEvent
     }
 
     sealed interface LoungeMemberReduce : ViewModelContract.Reduce {

@@ -35,7 +35,6 @@ class LoungeRepositoryImpl @Inject constructor(
         val id = UUID.randomUUID().toString()
         val loungeId = remote.createLounge()
         remote.sendChat(id, loungeId, null, MessageDataType.CREATE)
-        local.updateCurrentLounge(loungeId)
         return loungeId
     }
 
@@ -43,7 +42,6 @@ class LoungeRepositoryImpl @Inject constructor(
         val id = UUID.randomUUID().toString()
         remote.joinLounge(loungeId)
         remote.sendChat(id, loungeId, null, MessageDataType.JOIN)
-        local.updateCurrentLounge(loungeId)
     }
 
     override fun getMemberList(loungeId: String): Flow<List<Member>> {
@@ -77,7 +75,6 @@ class LoungeRepositoryImpl @Inject constructor(
         remote.sendChat(id, loungeId, null, MessageDataType.EXIT)
         remote.exitLounge(uid, loungeId)
         local.deleteAllChat(loungeId)
-        local.deleteCurrentLounge()
     }
 
     override fun getMemberStatus(uid: String, loungeId: String): Flow<MemberStatusType>{
@@ -90,11 +87,6 @@ class LoungeRepositoryImpl @Inject constructor(
                     ?: MemberStatusType.EXITED
             }
     }
-
-    override fun getCurrentLounge(): Flow<String?> {
-        return local.getCurrentLounge()
-    }
-
 
     private suspend fun syncMemberList(loungeId: String){
         remote.getMemberList(loungeId)

@@ -25,19 +25,6 @@ import javax.inject.Singleton
 internal object LocalServiceModule {
     @Singleton
     @Provides
-    fun providePreferencesDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
-        return PreferenceDataStoreFactory.create(
-            corruptionHandler = ReplaceFileCorruptionHandler {
-                it.printStackTrace()
-                emptyPreferences()
-            },
-            scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
-            produceFile = { context.preferencesDataStoreFile(BuildConfig.LIBRARY_PACKAGE_NAME) }
-        )
-    }
-
-    @Singleton
-    @Provides
     fun provideLunchVoteDataBase(@ApplicationContext context: Context) : LunchVoteDataBase {
         return Room.databaseBuilder(context, LunchVoteDataBase::class.java, "lunchvote.db").build()
     }

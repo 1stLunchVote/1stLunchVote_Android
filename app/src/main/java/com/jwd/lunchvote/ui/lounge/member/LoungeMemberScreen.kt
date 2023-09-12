@@ -54,6 +54,7 @@ fun LoungeMemberRoute(
 
     LoungeMemberScreen(
         memberState = memberState,
+        onClickExile = { viewModel.sendEvent(LoungeMemberEvent.OnClickExile)},
         popBackStack = popBackStack
     )
 }
@@ -61,6 +62,7 @@ fun LoungeMemberRoute(
 @Composable
 fun LoungeMemberScreen(
     memberState: LoungeMemberState,
+    onClickExile: () -> Unit = {},
     popBackStack: () -> Unit = {}
 ){
     Scaffold(
@@ -106,7 +108,7 @@ fun LoungeMemberScreen(
             Spacer(modifier = Modifier.weight(1f))
             
             if (memberState.isOwner){
-                TextButton(onClick = { /*TODO*/ }) {
+                TextButton(onClick = onClickExile) {
                     Text(
                         text = stringResource(R.string.lounge_member_exile),
                         style = MaterialTheme.typography.bodyLarge.copy(
