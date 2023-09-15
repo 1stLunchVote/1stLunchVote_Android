@@ -2,6 +2,7 @@ package com.jwd.lunchvote.data.repository
 
 import com.jwd.lunchvote.data.mapper.LoungeChatDataMapper
 import com.jwd.lunchvote.data.mapper.MemberDataMapper
+import com.jwd.lunchvote.data.mapper.type.LoungeStatusDataTypeMapper
 import com.jwd.lunchvote.data.mapper.type.MemberStatusDataTypeMapper
 import com.jwd.lunchvote.data.model.type.MessageDataType
 import com.jwd.lunchvote.data.source.local.LoungeLocalDataSource
@@ -9,6 +10,7 @@ import com.jwd.lunchvote.data.source.remote.LoungeRemoteDataSource
 import com.jwd.lunchvote.data.worker.SendWorkerManager
 import com.jwd.lunchvote.domain.entity.LoungeChat
 import com.jwd.lunchvote.domain.entity.Member
+import com.jwd.lunchvote.domain.entity.type.LoungeStatusType
 import com.jwd.lunchvote.domain.entity.type.MemberStatusType
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import kotlinx.coroutines.CoroutineScope
@@ -57,6 +59,11 @@ class LoungeRepositoryImpl @Inject constructor(
             .onStart { syncChatList(loungeId) }
     }
 
+    override fun getLoungeStatus(loungeId: String): Flow<LoungeStatusType> {
+        return remote.getLoungeStatus(loungeId)
+            .map { LoungeStatusDataTypeMapper.mapToRight(it) }
+    }
+
     // 일반 채팅 메시지 보내는 경우
     override suspend fun sendChat(loungeId: String, content: String) {
         val id = UUID.randomUUID().toString()
@@ -64,9 +71,9 @@ class LoungeRepositoryImpl @Inject constructor(
         return local.insertChat(id, loungeId, content, MessageDataType.NORMAL)
     }
 
-    override suspend fun updateReady(uid: String, loungeId: String) {
+    override suspend fun updateReady(uid: String, loungeId: String, isOwner: Boolean) {
         local.updateMemberReady(uid, loungeId)
-        remote.updateReady(uid, loungeId)
+        remote.updateReady(uid, loungeId, isOwner)
     }
 
     override suspend fun exitLounge(uid: String, loungeId: String) {

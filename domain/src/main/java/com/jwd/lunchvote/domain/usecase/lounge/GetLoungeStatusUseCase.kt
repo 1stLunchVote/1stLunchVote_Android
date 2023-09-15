@@ -2,10 +2,11 @@ package com.jwd.lunchvote.domain.usecase.lounge
 
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import javax.inject.Inject
+import javax.inject.Singleton
 
-class UpdateReadyUseCase @Inject constructor(
+@Singleton
+class GetLoungeStatusUseCase @Inject constructor(
     private val repository: LoungeRepository
 ) {
-    suspend operator fun invoke(uid: String, loungeId: String, isOwner: Boolean = false)
-        = repository.updateReady(uid, loungeId)
+    operator fun invoke(loungeId: String) = repository.getLoungeStatus(loungeId)
 }

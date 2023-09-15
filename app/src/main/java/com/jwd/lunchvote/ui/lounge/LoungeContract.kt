@@ -30,7 +30,6 @@ class LoungeContract {
         data object OnSendChat : LoungeEvent
         data object OnReady : LoungeEvent
         data object OnTryExit : LoungeEvent
-        data object OnStart : LoungeEvent
         data class OnClickExit(val exit: Boolean) : LoungeEvent
         data object OnClickInvite : LoungeEvent
         data class OnScrolled(val index: Int) : LoungeEvent

@@ -8,11 +8,13 @@ import com.jwd.lunchvote.data.di.Dispatcher
 import com.jwd.lunchvote.data.di.LunchVoteDispatcher.IO
 import com.jwd.lunchvote.data.model.LoungeChatData
 import com.jwd.lunchvote.data.model.MemberData
+import com.jwd.lunchvote.data.model.type.LoungeStatusDataType
 import com.jwd.lunchvote.data.model.type.MemberStatusDataType
 import com.jwd.lunchvote.data.model.type.MessageDataType
 import com.jwd.lunchvote.data.source.remote.LoungeRemoteDataSource
 import com.jwd.lunchvote.remote.mapper.LoungeChatRemoteMapper
 import com.jwd.lunchvote.remote.mapper.MemberRemoteMapper
+import com.jwd.lunchvote.remote.mapper.type.LoungeStatusRemoteDataMapper
 import com.jwd.lunchvote.remote.mapper.type.MessageRemoteTypeMapper
 import com.jwd.lunchvote.remote.model.LoungeChatRemote
 import com.jwd.lunchvote.remote.model.MemberRemote
@@ -50,6 +52,8 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
 
 
         val roomRef = db.getReference("$Lounge/${loungeId}")
+
+        roomRef.child(Status).setValue("created")
 
         roomRef.child(Member).child(user.uid).setValue(
             MemberRemote(
@@ -96,6 +100,11 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
             .flowOn(dispatcher)
     }
 
+    override fun getLoungeStatus(loungeId: String): Flow<LoungeStatusDataType> {
+        val roomRef = db.getReference("$Lounge/${loungeId}")
+        return roomRef.getValueEventFlow<String?>().map(LoungeStatusRemoteDataMapper::mapToRight)
+    }
+
     override suspend fun sendChat(
         id: String, loungeId: String, content: String?, type: MessageDataType,
     ) {
@@ -123,12 +132,17 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
     }
 
     override suspend fun updateReady(
-        uid: String, loungeId: String
+        uid: String, loungeId: String, isOwner: Boolean
     ) {
         withContext(dispatcher){
-            val statusRef = db.getReference("$Lounge/${loungeId}").child(Member).child(uid).child(Status)
+            val roomRef = db.getReference("$Lounge/${loungeId}")
+            val statusRef = roomRef.child(Member).child(uid).child(Status)
             val cur = statusRef.get().await().getValue<String>()
             statusRef.setValue(if (cur == "joined") "ready" else "joined").await()
+
+            if (isOwner){
+                roomRef.child(Status).setValue("started").await()
+            }
         }
     }
 
@@ -152,9 +166,9 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
     companion object{
         const val Lounge = "Lounge"
         const val Chat = "Chat"
-        const val Room_Length = 10
         const val Member = "members"
         const val Status = "status"
+        const val Owner = "owner"
         const val Chat_Create = "투표 방이 생성되었습니다."
         const val Chat_Join = "님이 입장했습니다."
         const val Chat_Exit = "님이 퇴장했습니다."

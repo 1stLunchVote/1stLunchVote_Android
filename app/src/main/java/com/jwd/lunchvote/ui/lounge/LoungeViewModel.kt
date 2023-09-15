@@ -5,11 +5,13 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.domain.entity.type.LoungeStatusType
 import com.jwd.lunchvote.domain.entity.type.MemberStatusType
 import com.jwd.lunchvote.domain.usecase.lounge.CheckMemberStatusUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.CreateLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.ExitLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.GetChatListUseCase
+import com.jwd.lunchvote.domain.usecase.lounge.GetLoungeStatusUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.GetMemberListUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.JoinLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.SendChatUseCase
@@ -32,6 +34,7 @@ class LoungeViewModel @Inject constructor(
     private val createLoungeUseCase: CreateLoungeUseCase,
     private val getMemberListUseCase: GetMemberListUseCase,
     private val getChatListUseCase: GetChatListUseCase,
+    private val getLoungeStatusUseCase: GetLoungeStatusUseCase,
     private val updateReadyUseCase: UpdateReadyUseCase,
     private val sendChatUseCase: SendChatUseCase,
     private val exitLoungeUseCase: ExitLoungeUseCase,
@@ -39,6 +42,8 @@ class LoungeViewModel @Inject constructor(
     private val auth: FirebaseAuth,
     savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<LoungeState, LoungeEvent, LoungeReduce, LoungeSideEffect, LoungeDialogState>(savedStateHandle) {
+    // todo : 이미 시작된 방인 경우 뒤로가기 처리 필요
+
     private val loungeId = savedStateHandle.get<String?>(LOUNGE_KEY_ID).also {
         updateState(LoungeReduce.SetIsOwner(it == null))
     }
@@ -116,6 +121,17 @@ class LoungeViewModel @Inject constructor(
             }
             .launchIn(viewModelScope)
 
+        getLoungeStatusUseCase(loungeId)
+            .onEach {
+                when(it){
+                    LoungeStatusType.STARTED -> {
+                        sendSideEffect(LoungeSideEffect.NavigateToVote(loungeId))
+                    }
+                    else -> {}
+                }
+            }
+            .launchIn(viewModelScope)
+
     }
 
     private fun checkMemberStatus(){
@@ -149,11 +165,6 @@ class LoungeViewModel @Inject constructor(
                     auth.currentUser?.uid ?: return@launch,
                     currentState.loungeId ?: return@launch
                 )
-            }.onSuccess {
-                if (currentState.isOwner){
-                    // Todo : Owner가 레디가 되면 다음 화면으로 넘어가기
-
-                }
             }.onFailure {
                 sendSideEffect(LoungeSideEffect.ShowSnackBar(
                     if (currentState.isOwner) "게임 시작 실패" else "준비 상태 변경 실패")
@@ -188,10 +199,6 @@ class LoungeViewModel @Inject constructor(
                     return
                 }
                 updateReady()
-            }
-            is LoungeEvent.OnStart -> {
-                // Todo : Firebase DB에서 게임 시작 연동
-                sendSideEffect(LoungeSideEffect.NavigateToVote(currentState.loungeId ?: return))
             }
             is LoungeEvent.OnTryExit -> {
                 updateState(LoungeReduce.SetExitDialogShown(true))

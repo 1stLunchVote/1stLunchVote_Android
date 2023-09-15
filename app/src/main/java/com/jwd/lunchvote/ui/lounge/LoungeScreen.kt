@@ -124,7 +124,7 @@ fun LoungeRoute(
         onTryExit = { viewModel.sendEvent(LoungeEvent.OnTryExit) },
         onEditChat = { viewModel.sendEvent(LoungeEvent.OnEditChat(it)) },
         onSendChat = { viewModel.sendEvent(LoungeEvent.OnSendChat) },
-        onClickReadyStart = { viewModel.sendEvent(if (loungeState.isOwner) LoungeEvent.OnStart else LoungeEvent.OnReady) },
+        onClickReadyStart = { viewModel.sendEvent(LoungeEvent.OnReady) },
         navigateToMember = navigateToMember,
         onClickInvite = { viewModel.sendEvent(LoungeEvent.OnClickInvite) },
         onScrolled = { viewModel.sendEvent(LoungeEvent.OnScrolled(it)) },
