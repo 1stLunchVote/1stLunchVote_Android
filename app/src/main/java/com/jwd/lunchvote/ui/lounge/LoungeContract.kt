@@ -22,7 +22,7 @@ class LoungeContract {
 
         // 대기방 주인을 제외하고 전부 다 레디 or 주인 아닌 경우 레디 한 경우
         val allReady : Boolean = memberList.filter { !it.isOwner }.all { it.isReady }
-                || (!isOwner && isReady)
+                || (!isOwner && isReady) || (memberList.size == 1 && isOwner)
     }
 
     sealed interface LoungeEvent: ViewModelContract.Event {

@@ -101,7 +101,7 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
     }
 
     override fun getLoungeStatus(loungeId: String): Flow<LoungeStatusDataType> {
-        val roomRef = db.getReference("$Lounge/${loungeId}")
+        val roomRef = db.getReference("$Lounge/${loungeId}").child(Status)
         return roomRef.getValueEventFlow<String?>().map(LoungeStatusRemoteDataMapper::mapToRight)
     }
 

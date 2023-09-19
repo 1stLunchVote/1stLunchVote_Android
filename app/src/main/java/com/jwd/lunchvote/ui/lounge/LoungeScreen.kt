@@ -105,6 +105,12 @@ fun LoungeRoute(
         }
     }
 
+    LaunchedEffect(Unit){
+        viewModel.error.collectLatest {
+            snackBarHostState.showSnackbar("문제가 발생하였습니다.")
+        }
+    }
+
     // 다이얼로그가 보이지 않는 상황 or 키보드 안보일 때 뒤로가기 버튼 누르면 다이얼로그 띄움
     BackHandler(loungeState.exitDialogShown.not() && WindowInsets.isImeVisible.not()) {
         viewModel.sendEvent(LoungeEvent.OnTryExit)
@@ -299,9 +305,8 @@ private fun LoungeMemberList(
     // 6명인 경우 memberList 만
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier.padding(horizontal = 28.dp)
     ){
-        item{ Spacer(modifier = Modifier.width(4.dp)) }
+        item{ Spacer(modifier = Modifier.width(20.dp)) }
 
         items(memberList){ item ->
             Surface(
@@ -368,7 +373,7 @@ private fun LoungeMemberList(
                 ){}
             }
         }
-        item{ Spacer(modifier = Modifier.width(4.dp)) }
+        item{ Spacer(modifier = Modifier.width(20.dp)) }
     }
 }
 
@@ -399,10 +404,10 @@ private fun LoungeLoadingScreen(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun LoungeBottomBar(
-        loungeState: LoungeState,
-        onEditChat: (String) -> Unit = {},
-        onSendChat: () -> Unit = {},
-        onClickReadyStart: () -> Unit = {},
+    loungeState: LoungeState,
+    onEditChat: (String) -> Unit = {},
+    onSendChat: () -> Unit = {},
+    onClickReadyStart: () -> Unit = {},
 ){
     val isTyping by rememberUpdatedState(newValue = WindowInsets.isImeVisible && loungeState.currentChat.isNotBlank())
 

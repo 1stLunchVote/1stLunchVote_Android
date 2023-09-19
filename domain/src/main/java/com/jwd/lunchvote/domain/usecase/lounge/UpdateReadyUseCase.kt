@@ -7,5 +7,5 @@ class UpdateReadyUseCase @Inject constructor(
     private val repository: LoungeRepository
 ) {
     suspend operator fun invoke(uid: String, loungeId: String, isOwner: Boolean = false)
-        = repository.updateReady(uid, loungeId)
+        = repository.updateReady(uid, loungeId, isOwner)
 }

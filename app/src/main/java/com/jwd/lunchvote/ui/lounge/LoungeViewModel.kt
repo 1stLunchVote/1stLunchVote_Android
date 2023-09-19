@@ -2,7 +2,6 @@ package com.jwd.lunchvote.ui.lounge
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.entity.type.LoungeStatusType
@@ -22,8 +21,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
@@ -103,59 +101,64 @@ class LoungeViewModel @Inject constructor(
     }
 
     private fun getLoungeData(loungeId: String){
-        getChatListUseCase(loungeId)
-            .onEach {
-                updateState(
-                    LoungeReduce.SetChatList(it.map { chat ->
-                        LoungeMapper.mapToChat(chat, chat.userId == auth.currentUser?.uid) }
+        launch {
+            getChatListUseCase(loungeId)
+                .collectLatest {
+                    updateState(
+                        LoungeReduce.SetChatList(it.map { chat ->
+                            LoungeMapper.mapToChat(chat, chat.userId == auth.currentUser?.uid) }
+                        )
                     )
-                )
-            }
-            .launchIn(viewModelScope)
-
-        getMemberListUseCase(loungeId)
-            .onEach {
-                updateState(LoungeReduce.SetMemberList(it.map { m ->
-                    LoungeMapper.mapToMember(m, m.id == auth.currentUser?.uid) }
-                ))
-            }
-            .launchIn(viewModelScope)
-
-        getLoungeStatusUseCase(loungeId)
-            .onEach {
-                when(it){
-                    LoungeStatusType.STARTED -> {
-                        sendSideEffect(LoungeSideEffect.NavigateToVote(loungeId))
-                    }
-                    else -> {}
                 }
-            }
-            .launchIn(viewModelScope)
+        }
 
+
+        launch {
+            getMemberListUseCase(loungeId)
+                .collectLatest {
+                    updateState(LoungeReduce.SetMemberList(it.map { m ->
+                        LoungeMapper.mapToMember(m, m.id == auth.currentUser?.uid) }
+                    ))
+                }
+        }
+
+
+        launch {
+            getLoungeStatusUseCase(loungeId)
+                .collectLatest {
+                    when(it){
+                        LoungeStatusType.STARTED -> {
+                            sendSideEffect(LoungeSideEffect.NavigateToVote(loungeId))
+                        }
+                        else -> {}
+                    }
+                }
+        }
     }
 
     private fun checkMemberStatus(){
-        checkJob = checkMemberStatusUseCase(auth.currentUser?.uid ?: return, currentState.loungeId ?: return)
-            .onEach {
-                when(it){
-                    MemberStatusType.EXITED -> {
-                        sendSideEffect(LoungeSideEffect.PopBackStack("방장이 방을 종료하였습니다."))
-                    }
-                    MemberStatusType.EXILED -> {
-                        sendSideEffect(LoungeSideEffect.PopBackStack("방장에 의해 추방되었습니다."))
+        checkJob = launch {
+            checkMemberStatusUseCase(auth.currentUser?.uid ?: return@launch, currentState.loungeId ?: return@launch)
+                .collectLatest {
+                    when(it){
+                        MemberStatusType.EXITED -> {
+                            sendSideEffect(LoungeSideEffect.PopBackStack("방장이 방을 종료하였습니다."))
+                        }
+                        MemberStatusType.EXILED -> {
+                            sendSideEffect(LoungeSideEffect.PopBackStack("방장에 의해 추방되었습니다."))
 
-                        CoroutineScope(Dispatchers.IO).launch{
-                            checkJob?.cancel()
+                            CoroutineScope(Dispatchers.IO).launch{
+                                checkJob?.cancel()
 
-                            currentState.loungeId?.let {
-                                exitLoungeUseCase(auth.currentUser?.uid ?: return@launch, it)
+                                currentState.loungeId?.let {
+                                    exitLoungeUseCase(auth.currentUser?.uid ?: return@launch, it)
+                                }
                             }
                         }
+                        else -> {}
                     }
-                    else -> {}
                 }
-            }
-            .launchIn(viewModelScope)
+        }
     }
 
     private fun updateReady(){
@@ -163,7 +166,8 @@ class LoungeViewModel @Inject constructor(
             runCatching {
                 updateReadyUseCase(
                     auth.currentUser?.uid ?: return@launch,
-                    currentState.loungeId ?: return@launch
+                    currentState.loungeId ?: return@launch,
+                    currentState.isOwner
                 )
             }.onFailure {
                 sendSideEffect(LoungeSideEffect.ShowSnackBar(
