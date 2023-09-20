@@ -127,13 +127,8 @@ fun LoungeRoute(
     LoungeScreen(
         loungeState = loungeState,
         snackBarHostState = snackBarHostState,
-        onTryExit = { viewModel.sendEvent(LoungeEvent.OnTryExit) },
-        onEditChat = { viewModel.sendEvent(LoungeEvent.OnEditChat(it)) },
-        onSendChat = { viewModel.sendEvent(LoungeEvent.OnSendChat) },
-        onClickReadyStart = { viewModel.sendEvent(LoungeEvent.OnReady) },
         navigateToMember = navigateToMember,
-        onClickInvite = { viewModel.sendEvent(LoungeEvent.OnClickInvite) },
-        onScrolled = { viewModel.sendEvent(LoungeEvent.OnScrolled(it)) },
+        onEventAction = viewModel::sendEvent
     )
 }
 
@@ -142,26 +137,24 @@ private fun LoungeScreen(
     loungeState: LoungeState,
     snackBarHostState: SnackbarHostState,
     navigateToMember: (MemberUIModel, String, Boolean) -> Unit = { _, _, _ -> },
-    onTryExit: () -> Unit = {},
-    onEditChat: (String) -> Unit = {},
-    onSendChat: () -> Unit = {},
-    onClickReadyStart: () -> Unit = {},
-    onClickInvite: () -> Unit = {},
-    onScrolled: (Int) -> Unit = {}
+    onEventAction: (LoungeEvent) -> Unit = {}
 ){
     Scaffold(
         topBar = {
             LunchVoteTopBar(
                 title = stringResource(id = R.string.lounge_topbar_title),
-                // 추후에 지워야함
-                popBackStack = onTryExit
+                popBackStack = { onEventAction(LoungeEvent.OnTryExit) }
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         bottomBar = {
             if (loungeState.memberList.isNotEmpty()){
-                LoungeBottomBar(loungeState = loungeState, onEditChat = onEditChat,
-                    onSendChat = onSendChat, onClickReadyStart = onClickReadyStart)
+                LoungeBottomBar(
+                    loungeState = loungeState,
+                    onEditChat = { onEventAction(LoungeEvent.OnEditChat(it)) },
+                    onSendChat = { onEventAction(LoungeEvent.OnSendChat)},
+                    onClickReadyStart = { onEventAction(LoungeEvent.OnReady)}
+                )
             }
         }
     ) { padding ->
@@ -180,8 +173,8 @@ private fun LoungeScreen(
                     .padding(padding),
                 loungeState = loungeState,
                 navigateToMember = navigateToMember,
-                onClickInvite = onClickInvite,
-                onScrolled = onScrolled
+                onClickInvite = { onEventAction(LoungeEvent.OnClickInvite)},
+                onScrolled = { onEventAction(LoungeEvent.OnScrolled(it))}
             )
         }
     }
