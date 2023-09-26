@@ -15,7 +15,8 @@ import com.jwd.lunchvote.domain.usecase.lounge.GetMemberListUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.JoinLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.SendChatUseCase
 import com.jwd.lunchvote.domain.usecase.lounge.UpdateReadyUseCase
-import com.jwd.lunchvote.mapper.LoungeMapper
+import com.jwd.lunchvote.mapper.lounge.ChatUIMapper
+import com.jwd.lunchvote.mapper.lounge.MemberUIMapper
 import com.jwd.lunchvote.ui.lounge.LoungeContract.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -106,7 +107,7 @@ class LoungeViewModel @Inject constructor(
                 .collectLatest {
                     updateState(
                         LoungeReduce.SetChatList(it.map { chat ->
-                            LoungeMapper.mapToChat(chat, chat.userId == auth.currentUser?.uid) }
+                            ChatUIMapper.mapToRight(chat, chat.userId == auth.currentUser?.uid) }
                         )
                     )
                 }
@@ -117,7 +118,7 @@ class LoungeViewModel @Inject constructor(
             getMemberListUseCase(loungeId)
                 .collectLatest {
                     updateState(LoungeReduce.SetMemberList(it.map { m ->
-                        LoungeMapper.mapToMember(m, m.id == auth.currentUser?.uid) }
+                        MemberUIMapper.mapToRight(m, m.id == auth.currentUser?.uid) }
                     ))
                 }
         }
