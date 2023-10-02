@@ -14,11 +14,14 @@ class SettingContract {
 
   sealed interface SettingEvent: ViewModelContract.Event {
     data object OnClickBackButton: SettingEvent
+    data object OnClickEditProfileButton: SettingEvent
+    data object OnClickAlertSettingButton: SettingEvent
+    data object OnClickContactButton: SettingEvent
+    data object OnClickNoticeButton: SettingEvent
+    data object OnClickSuggestButton: SettingEvent
   }
 
-  sealed interface SettingReduce : ViewModelContract.Reduce {
-
-  }
+  sealed interface SettingReduce : ViewModelContract.Reduce
 
   sealed interface SettingSideEffect: ViewModelContract.SideEffect {
     data class PopBackStack(val message: String) : SettingSideEffect

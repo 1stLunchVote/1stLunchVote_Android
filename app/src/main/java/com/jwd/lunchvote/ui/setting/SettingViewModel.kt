@@ -22,12 +22,13 @@ class SettingViewModel @Inject constructor(
   override fun handleEvents(event: SettingEvent) {
     when(event) {
       is SettingEvent.OnClickBackButton -> sendSideEffect(SettingSideEffect.PopBackStack(""))
+      is SettingEvent.OnClickEditProfileButton -> sendSideEffect(SettingSideEffect.ShowSnackBar("프로필 수정"))
+      is SettingEvent.OnClickAlertSettingButton -> sendSideEffect(SettingSideEffect.ShowSnackBar("알림 설정"))
+      is SettingEvent.OnClickContactButton -> sendSideEffect(SettingSideEffect.ShowSnackBar("1:1 문의"))
+      is SettingEvent.OnClickNoticeButton -> sendSideEffect(SettingSideEffect.ShowSnackBar("공지사항 및 이용약관"))
+      is SettingEvent.OnClickSuggestButton -> sendSideEffect(SettingSideEffect.ShowSnackBar("개선 제안하기"))
     }
   }
 
-  override fun reduceState(state: SettingState, reduce: SettingReduce): SettingState {
-    return when(reduce) {
-      else -> state
-    }
-  }
+  override fun reduceState(state: SettingState, reduce: SettingReduce): SettingState = state
 }
