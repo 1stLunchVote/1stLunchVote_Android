@@ -13,6 +13,7 @@ import com.jwd.lunchvote.ui.login.LoginRoute
 import com.jwd.lunchvote.ui.login.register.RegisterEmailRoute
 import com.jwd.lunchvote.ui.lounge.LoungeRoute
 import com.jwd.lunchvote.ui.lounge.member.LoungeMemberRoute
+import com.jwd.lunchvote.ui.setting.SettingRoute
 import com.jwd.lunchvote.ui.template.TemplateListRoute
 import com.jwd.lunchvote.ui.template.add_template.AddTemplateRoute
 import com.jwd.lunchvote.ui.template.edit_template.EditTemplateRoute
@@ -238,6 +239,23 @@ fun LunchVoteNavHost(
                 )
             }
         }
+
+        navigation(
+            route = LunchVoteNavRoute.SettingNavigation.name,
+            startDestination = LunchVoteNavRoute.Setting.name
+        ) {
+            composable(LunchVoteNavRoute.Setting.name) {
+                SettingRoute(
+                    popBackStack = {
+                        navHostController.previousBackStackEntry?.savedStateHandle?.set(
+                            SNACK_BAR_KEY,
+                            it
+                        )
+                        navHostController.popBackStack()
+                    }
+                )
+            }
+        }
     }
 }
 
@@ -247,6 +265,7 @@ enum class LunchVoteNavRoute {
     LoginNavigation,
     HomeNavigation,
     TemplateNavigation,
+    SettingNavigation,
 
     Login,
     Home,
@@ -261,7 +280,8 @@ enum class LunchVoteNavRoute {
     EditTemplate,
     AddTemplate,
 
-    Lounge,
     Setting,
+
+    Lounge,
     Tips
 }
