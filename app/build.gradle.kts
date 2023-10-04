@@ -1,11 +1,10 @@
 plugins {
     id("com.android.application")
     kotlin("android")
-    kotlin("kapt")
     kotlin("plugin.parcelize")
     id("dagger.hilt.android.plugin")
-    id("androidx.navigation.safeargs.kotlin")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -73,6 +72,7 @@ dependencies {
     implementationTest()
     implementationFirebase()
     implementationCoil()
+
 
     implementations(
         Libraries.Timber,

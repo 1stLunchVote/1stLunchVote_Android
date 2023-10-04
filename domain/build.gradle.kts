@@ -1,7 +1,7 @@
 plugins {
     id("java-library")
     kotlin("jvm")
-    kotlin("kapt")
+    id("com.google.devtools.ksp")
 }
 
 java {
