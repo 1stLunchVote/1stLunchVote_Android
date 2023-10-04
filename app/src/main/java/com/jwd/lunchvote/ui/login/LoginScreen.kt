@@ -24,7 +24,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -277,7 +276,7 @@ private fun LoginButtonList(
     Image(
         painter = painterResource(id = R.drawable.bg_kakao_login), 
         contentDescription = "kakao_login",
-        contentScale = ContentScale.FillWidth,
+        contentScale = ContentScale.Fit,
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onKakaoLogin)
@@ -288,7 +287,7 @@ private fun LoginButtonList(
     Image(
         painter = painterResource(id = R.drawable.bg_google_login),
         contentDescription = "google_login",
-        contentScale = ContentScale.FillWidth,
+        contentScale = ContentScale.Fit,
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onGoogleLogin)

@@ -46,6 +46,9 @@ abstract class BaseStateViewModel<S : ViewModelContract.State, E : ViewModelCont
     private val _error: MutableSharedFlow<String> = MutableSharedFlow()
     val error: SharedFlow<String> = _error.asSharedFlow()
 
+    private val _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
     init {
         _events.onEach(::handleEvents)
             .launchIn(viewModelScope)
@@ -66,6 +69,19 @@ abstract class BaseStateViewModel<S : ViewModelContract.State, E : ViewModelCont
             action(this)
         }
     }
+
+    protected inline fun launchWithLoading(crossinline job: suspend () -> Unit) {
+        launch {
+            setLoading(true)
+            job.invoke()
+            setLoading(false)
+        }
+    }
+
+    protected fun setLoading(loading: Boolean) = viewModelScope.launch {
+        _isLoading.emit(loading)
+    }
+
 
     protected fun updateState(reduce: R){
         viewModelScope.launch {

@@ -16,7 +16,7 @@ object MemberStatusRemoteTypeMapper : BiMapper<String?, MemberStatusDataType> {
         return when(from){
             MemberStatusDataType.JOINED -> "joined"
             MemberStatusDataType.READY -> "ready"
-            else -> "exiled"
+            MemberStatusDataType.EXILED -> "exiled"
         }
     }
 }
