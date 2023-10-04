@@ -2,17 +2,20 @@ package com.jwd.lunchvote.domain.repository
 
 import com.jwd.lunchvote.domain.entity.LoungeChat
 import com.jwd.lunchvote.domain.entity.Member
-import com.jwd.lunchvote.domain.entity.MemberStatus
+import com.jwd.lunchvote.domain.entity.type.LoungeStatusType
+import com.jwd.lunchvote.domain.entity.type.MemberStatusType
 import kotlinx.coroutines.flow.Flow
 
 interface LoungeRepository {
-    fun checkLoungeExist(loungeId: String) : Flow<Boolean>
-    fun createLounge() : Flow<String>
-    fun joinLounge(loungeId: String) : Flow<Unit>
+    suspend fun checkLoungeExist(loungeId: String) : Boolean
+    suspend fun createLounge() : String
+    suspend fun joinLounge(loungeId: String)
     fun getMemberList(loungeId: String) : Flow<List<Member>>
     fun getChatList(loungeId: String) : Flow<List<LoungeChat>>
-    fun sendChat(loungeId: String, content: String) : Flow<Unit>
-    fun updateReady(uid: String, loungeId: String) : Flow<Unit>
-    fun exitLounge(uid: String, loungeId: String) : Flow<Unit>
-    fun getMemberStatus(uid: String, loungeId: String) : Flow<MemberStatus>
+    fun getLoungeStatus(loungeId: String) : Flow<LoungeStatusType>
+    suspend fun sendChat(loungeId: String, content: String)
+    suspend fun updateReady(uid: String, loungeId: String, isOwner: Boolean)
+    suspend fun exitLounge(uid: String, loungeId: String)
+    suspend fun exileMember(memberId: String, loungeId: String)
+    fun getMemberStatus(uid: String, loungeId: String) : Flow<MemberStatusType>
 }

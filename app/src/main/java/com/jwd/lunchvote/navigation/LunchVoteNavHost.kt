@@ -1,6 +1,7 @@
 package com.jwd.lunchvote.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -48,7 +49,7 @@ fun LunchVoteNavHost(
                     },
                     navigateToTest = {
                         // todo : 나중에 지우기
-                        navHostController.navigate(LunchVoteNavRoute.VoteNavigation.name)
+                        navHostController.navigate(LunchVoteNavRoute.SecondVote.name)
                     },
                     navigateToFirstVote = {
                         navHostController.navigate(LunchVoteNavRoute.FirstVote.name + "/loungeId"/*TODO*/)
@@ -65,24 +66,25 @@ fun LunchVoteNavHost(
                 )
             ) {
                 LoungeRoute(
-                        navigateToMember = { m, loungeId, isOwner ->
-                            navHostController.navigate(
-                                    LunchVoteNavRoute.LoungeMember.name
-                                            + "?id=${m.uid},loungeId=${loungeId},nickname=${m.nickname},"
-                                            + "profileUrl=${m.profileImage},isOwner=${isOwner}"
-                            )
-                        },
-                        popBackStack = {
-                            navHostController.previousBackStackEntry?.savedStateHandle?.set(
-                                    SNACK_BAR_KEY,
-                                    it
-                            )
-                            navHostController.popBackStack()
-                        },
-                        navigateToFirstVote = {
-                            navHostController.popBackStack()
-                            navHostController.navigate(LunchVoteNavRoute.VoteNavigation.name)
-                        }
+                    navigateToMember = { m, loungeId, isOwner ->
+                        navHostController.navigate(
+                            LunchVoteNavRoute.LoungeMember.name
+                                    + "?id=${m.uid},loungeId=${loungeId},nickname=${m.nickname},"
+                                    + "profileUrl=${m.profileImage},isOwner=${isOwner}"
+                        )
+                    },
+                    popBackStack = {
+                        navHostController.previousBackStackEntry?.savedStateHandle?.set(
+                            SNACK_BAR_KEY,
+                            it
+                        )
+                        navHostController.popBackStack()
+                    },
+                    navigateToFirstVote = {
+                        navHostController.navigate(LunchVoteNavRoute.FirstVote.name + "/loungeId=${it}",
+                            navOptions = NavOptions.Builder().setPopUpTo(LunchVoteNavRoute.Home.name, true).build()
+                        )
+                    }
                 )
             }
 
@@ -116,12 +118,7 @@ fun LunchVoteNavHost(
                     popBackStack = { navHostController.popBackStack() }
                 )
             }
-        }
 
-        navigation(
-            route = LunchVoteNavRoute.VoteNavigation.name,
-            startDestination = LunchVoteNavRoute.FirstVote.name
-        ) {
             composable(LunchVoteNavRoute.FirstVote.name + "/{loungeId}",
                 arguments = listOf(
                     navArgument("loungeId") {
@@ -249,7 +246,6 @@ const val SNACK_BAR_KEY = "message"
 enum class LunchVoteNavRoute {
     LoginNavigation,
     HomeNavigation,
-    VoteNavigation,
     TemplateNavigation,
 
     Login,

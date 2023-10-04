@@ -8,6 +8,7 @@ import com.jwd.lunchvote.domain.usecase.lounge.CheckLoungeUseCase
 import com.jwd.lunchvote.ui.home.HomeContract.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -21,11 +22,16 @@ class HomeViewModel @Inject constructor(
     return savedState as? HomeState ?: HomeState()
   }
 
+  init {
+    isLoading.onEach {
+        updateState(HomeReduce.UpdateLoading(it))
+    }.launchIn(viewModelScope)
+  }
+
   override fun handleEvents(event: HomeEvent) {
     when(event) {
       is HomeEvent.OnClickLoungeButton -> sendSideEffect(HomeSideEffect.NavigateToLounge(null))
       is HomeEvent.OnClickJoinLoungeButton -> toggleDialog(HomeDialogState.JoinDialog {
-        updateState(HomeReduce.UpdateLoading(true))
         checkLoungeExist(it)
       })
       is HomeEvent.OnClickDismissButton -> toggleDialog(null)
@@ -42,16 +48,15 @@ class HomeViewModel @Inject constructor(
   }
 
   private fun checkLoungeExist(loungeId: String) {
-    checkLoungeUseCase(loungeId)
-      .onEach {
-        if (it) sendSideEffect(HomeSideEffect.NavigateToLounge(loungeId))
-        else sendSideEffect(HomeSideEffect.ShowSnackBar("존재하지 않는 방입니다."))
-        updateState(HomeReduce.UpdateLoading(false))
-      }
-      .catch {
-        sendSideEffect(HomeSideEffect.ShowSnackBar("오류가 발생하였습니다."))
-        updateState(HomeReduce.UpdateLoading(false))
-      }
-      .launchIn(viewModelScope)
+    launchWithLoading {
+      runCatching { checkLoungeUseCase(loungeId) }
+        .onSuccess {
+          if (it) sendSideEffect(HomeSideEffect.NavigateToLounge(loungeId))
+          else sendSideEffect(HomeSideEffect.ShowSnackBar("존재하지 않는 방입니다."))
+        }
+        .onFailure {
+          sendSideEffect(HomeSideEffect.ShowSnackBar("오류가 발생하였습니다."))
+        }
+    }
   }
 }

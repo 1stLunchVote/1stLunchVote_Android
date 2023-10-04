@@ -35,11 +35,12 @@ android {
 
 dependencies {
     implementation(project(":domain"))
+    implementation(project(":core:common"))
 
     implementationAndroidX()
     implementationCoroutine()
     implementationHilt()
-    implementationRoom()
+    implementationLocal()
     implementationTest()
 
     implementationFirebase()

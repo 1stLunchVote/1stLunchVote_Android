@@ -3,7 +3,7 @@ package com.jwd.lunchvote.local.room.entity
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.jwd.lunchvote.domain.entity.Member
+import com.jwd.lunchvote.data.model.type.MemberStatusDataType
 
 @Entity(
     tableName = "MemberTable",
@@ -16,23 +16,13 @@ import com.jwd.lunchvote.domain.entity.Member
         )
     ]
 )
+
 data class MemberEntity(
-    @PrimaryKey val uid: String,
+    @PrimaryKey val id: String,
+    val loungeId: String,
+    val name: String,
     val profileImage: String? = null,
-    val nickname: String,
-    val ready: Boolean = false,
-    val owner: Boolean = false,
-    val joinedTime: String,
-    val loungeId: String
-){
-    fun toDomain() : Member {
-        return Member(
-            uid = uid,
-            nickname = nickname,
-            profileImage = profileImage,
-            ready = ready,
-            owner = owner,
-            joinedTime = joinedTime
-        )
-    }
-}
+    val status: MemberStatusDataType,
+    val isOwner: Boolean = false,
+    val joinedAt: String
+)

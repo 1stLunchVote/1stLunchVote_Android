@@ -1,10 +1,13 @@
 package com.jwd.lunchvote.domain.entity
 
+import com.jwd.lunchvote.domain.entity.type.MemberStatusType
+
 data class Member(
-    val uid: String? = null,
-    val nickname: String? = null,
-    val profileImage: String? = null,
-    val ready: Boolean = false,
-    val owner: Boolean = false,
-    val joinedTime: String? = null
+    val id: String,
+    val loungeId: String,
+    val name: String,
+    val profileImage: String?,
+    val status: MemberStatusType,
+    val isOwner: Boolean,
+    val joinedAt: String
 )

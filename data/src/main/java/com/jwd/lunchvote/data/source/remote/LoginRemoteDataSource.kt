@@ -1,9 +1,8 @@
 package com.jwd.lunchvote.data.source.remote
 
-import kotlinx.coroutines.flow.Flow
 
 interface LoginRemoteDataSource {
-    fun getCustomToken(accessToken: String) : Flow<String?>
-    fun signInWithCustomToken(token: String) : Flow<Unit>
+    suspend fun getCustomToken(accessToken: String) : String?
+    suspend fun signInWithCustomToken(token: String)
 //    fun createUserData() : Flow<Unit>
 }

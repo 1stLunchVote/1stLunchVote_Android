@@ -6,5 +6,5 @@ import javax.inject.Inject
 class JoinLoungeUseCase @Inject constructor(
     private val repository: LoungeRepository
 ) {
-    operator fun invoke(loungeId: String) = repository.joinLounge(loungeId)
+    suspend operator fun invoke(loungeId: String) = repository.joinLounge(loungeId)
 }

@@ -45,8 +45,9 @@ object Versions{
     const val Retrofit = "2.9.0"
     const val OkHttp = "4.9.1"
 
-    // Room
-    const val Room = "2.5.1"
+    // Room, DataStore
+    const val Room = "2.5.2"
+    const val DataStore = "1.0.0"
 
     // Compose
     const val Compose = "2023.06.01"
@@ -142,11 +143,12 @@ object Libraries{
         const val Room = "androidx.room:room-ktx:${Versions.Room}"
         const val RoomCompiler = "androidx.room:room-compiler:${Versions.Room}"
         const val RoomRuntime = "androidx.room:room-runtime:${Versions.Room}"
-        const val RoomPaging = "androidx.room:room-paging:${Versions.Room}"
     }
 
     const val Kakao = "com.kakao.sdk:v2-all-rx:${Versions.Kakao}"
     const val Timber = "com.jakewharton.timber:timber:${Versions.Timber}"
+
+    const val DataStore = "androidx.datastore:datastore-preferences:${Versions.DataStore}"
 
     object Coil{
         const val Coil = "io.coil-kt:coil-compose:${Versions.Coil}"
@@ -203,11 +205,11 @@ fun DependencyHandlerScope.implementationRetrofit(){
     )
 }
 
-fun DependencyHandlerScope.implementationRoom(){
+fun DependencyHandlerScope.implementationLocal(){
     implementations(
         Libraries.Room.Room,
         Libraries.Room.RoomRuntime,
-        Libraries.Room.RoomPaging
+        Libraries.DataStore
     )
     kapts(
         Libraries.Room.RoomCompiler

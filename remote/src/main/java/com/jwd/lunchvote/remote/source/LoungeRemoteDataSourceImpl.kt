@@ -1,32 +1,34 @@
 package com.jwd.lunchvote.remote.source
 
-import android.content.res.Resources.NotFoundException
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.functions.FirebaseFunctions
 import com.jwd.lunchvote.data.di.Dispatcher
 import com.jwd.lunchvote.data.di.LunchVoteDispatcher.IO
+import com.jwd.lunchvote.data.model.LoungeChatData
+import com.jwd.lunchvote.data.model.MemberData
+import com.jwd.lunchvote.data.model.type.LoungeStatusDataType
+import com.jwd.lunchvote.data.model.type.MemberStatusDataType
+import com.jwd.lunchvote.data.model.type.MessageDataType
 import com.jwd.lunchvote.data.source.remote.LoungeRemoteDataSource
-import com.jwd.lunchvote.data.util.createRandomString
-import com.jwd.lunchvote.domain.entity.LoungeChat
-import com.jwd.lunchvote.domain.entity.Member
+import com.jwd.lunchvote.remote.mapper.LoungeChatRemoteMapper
+import com.jwd.lunchvote.remote.mapper.MemberRemoteMapper
+import com.jwd.lunchvote.remote.mapper.type.LoungeStatusRemoteDataMapper
+import com.jwd.lunchvote.remote.mapper.type.MessageRemoteTypeMapper
+import com.jwd.lunchvote.remote.model.LoungeChatRemote
+import com.jwd.lunchvote.remote.model.MemberRemote
 import com.jwd.lunchvote.remote.util.getValueEventFlow
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
-import timber.log.Timber
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
+import java.util.UUID
 import javax.inject.Inject
 
 class LoungeRemoteDataSourceImpl @Inject constructor(
@@ -35,117 +37,138 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
     private val db: FirebaseDatabase,
     @Dispatcher(IO) private val dispatcher: CoroutineDispatcher
 ) : LoungeRemoteDataSource {
-    override fun checkLoungeExist(
+    override suspend fun checkLoungeExist(
         loungeId: String
-    ): Flow<Boolean> = flow {
-        val roomRef = db.getReference("$Room/${loungeId}")
-        emit(roomRef.get().await().exists())
-
-    }.flowOn(dispatcher)
-
-    override fun createLounge(): Flow<String?> = callbackFlow {
-        val roomId = createRandomString(Room_Length)
-
-        val roomRef = db.getReference("$Room/${roomId}")
-        auth.currentUser?.let{ user ->
-            roomRef.setValue(mapOf("owner" to user.uid))
-                .addOnSuccessListener {
-                    trySend(roomId)
-                }
-                .addOnFailureListener {
-                    Timber.e(it)
-                    trySend(null)
-                }
-            addMember(roomRef, user.uid, user.displayName.toString(), user.photoUrl.toString(), true)
-        }
-        awaitClose()
-    }.flowOn(dispatcher)
-
-    override fun joinLounge(loungeId: String): Flow<Unit?> = flow {
-        val roomRef = db.getReference("$Room/${loungeId}")
-
-        auth.currentUser?.let {user ->
-            val userExist = roomRef.child(Member).child(user.uid).get().await().getValue<Member>()
-
-            addMember(roomRef, user.uid, user.displayName.toString(), user.photoUrl.toString(), false, userExist?.joinedTime)
-
-            emit(if(userExist != null) null else Unit)
-        }
-    }.flowOn(dispatcher)
-
-    override fun getMemberList(loungeId: String): Flow<List<Member>> {
-        val memberRef = db.getReference("$Room/${loungeId}").child(Member)
-
-        return memberRef.getValueEventFlow<HashMap<String, Member>>()
-            .map { it.values.toList().sortedBy { m -> m.joinedTime } }.flowOn(dispatcher)
+    ): Boolean = withContext(dispatcher) {
+        val roomRef = db.getReference("$Lounge/${loungeId}")
+        roomRef.get().await().exists()
     }
 
-    override fun getChatList(loungeId: String): Flow<List<LoungeChat>> {
-        val chatRef = db.getReference("$Room/${loungeId}").child(Chat)
+    override suspend fun createLounge(): String = withContext(dispatcher) {
+        val user = checkNotNull(auth.currentUser)
+        val loungeId = UUID.randomUUID().toString()
 
-        return chatRef.getValueEventFlow<ArrayList<LoungeChat>>().flowOn(dispatcher)
+        val joinedAt = ZonedDateTime.now().toString()
+
+
+        val roomRef = db.getReference("$Lounge/${loungeId}")
+
+        roomRef.child(Status).setValue("created")
+
+        roomRef.child(Member).child(user.uid).setValue(
+            MemberRemote(
+                user.uid, loungeId, user.displayName.toString(), user.photoUrl.toString(),
+                "joined", true, joinedAt
+            )
+        ).await()
+
+        return@withContext loungeId
     }
 
-    override fun sendChat(
-        loungeId: String, content: String?, messageType: Int
-    ): Flow<Unit> = flow {
-        val name = auth.currentUser?.displayName?.ifBlank { "익명" }
-        val chatContent = content ?: when (messageType) {
-            1 -> Chat_Create
-            2 -> "$name $Chat_Join"
-            else -> "$name $Chat_Exit"
+    override suspend fun joinLounge(loungeId: String) {
+        withContext(dispatcher) {
+            val user = checkNotNull(auth.currentUser)
+
+            val userRef = db.getReference("$Lounge/${loungeId}").child(Member).child(user.uid)
+            val joinedAt = ZonedDateTime.now().toString()
+
+            userRef.setValue(
+                MemberRemote(
+                    user.uid, loungeId, user.displayName.toString(), user.photoUrl.toString(),
+                    "joined", true, joinedAt
+                )
+            ).await()
         }
+    }
 
-        val data = JSONObject().apply {
-            put("loungeId", loungeId)
-            put("sender", auth.currentUser?.uid)
-            put("senderProfile", auth.currentUser?.photoUrl.toString())
-            put("content", chatContent)
-            put("createdAt", LocalDateTime.now().toString())
-            put("messageType", messageType)
-        }
+    override fun getMemberList(loungeId: String): Flow<List<MemberData>> {
+        val memberRef = db.getReference("$Lounge/${loungeId}").child(Member)
 
-        functions.getHttpsCallable("sendChat").call(data).await()
-        emit(Unit)
+        return memberRef.getValueEventFlow<HashMap<String, MemberRemote>>()
+            .map {
+                it.values.map(MemberRemoteMapper::mapToRight)
+                    .filter { it.status != MemberStatusDataType.EXILED }
+                    .sortedBy { member -> member.joinedAt }
+            }.flowOn(dispatcher)
+    }
 
-    }.flowOn(dispatcher)
+    override fun getChatList(loungeId: String): Flow<List<LoungeChatData>> {
+        val chatRef = db.getReference(Chat).child(loungeId)
 
-    override fun updateReady(
-        uid: String, loungeId: String
-    ): Flow<Unit> = flow {
-        val readyRef = db.getReference("$Room/${loungeId}").child(Member).child(uid).child(Ready)
-        // 네트워크 연결이 안되어서 오류가 난 경우, 네트워크 연결되면 바로 자동 요청
-        val cur = readyRef.get().await().getValue<Boolean>()
-        readyRef.setValue(cur?.not())
-        emit(Unit)
-    }.flowOn(dispatcher)
+        return chatRef.getValueEventFlow<HashMap<String, LoungeChatRemote>>()
+            .map { it.values.map(LoungeChatRemoteMapper::mapToRight).sortedBy { chat -> chat.createdAt } }
+            .flowOn(dispatcher)
+    }
 
-    override fun exitLounge(
-        uid: String, loungeId: String
-    ): Flow<Unit> = flow {
-        val memberRef = db.getReference("$Room/${loungeId}").child(Member).child(uid)
-        memberRef.setValue(null).await()
-        emit(Unit)
-    }.flowOn(dispatcher)
+    override fun getLoungeStatus(loungeId: String): Flow<LoungeStatusDataType> {
+        val roomRef = db.getReference("$Lounge/${loungeId}").child(Status)
+        return roomRef.getValueEventFlow<String?>().map(LoungeStatusRemoteDataMapper::mapToRight)
+    }
 
-    private fun addMember(
-        roomRef: DatabaseReference, uid: String, displayName: String,
-        photoUrl: String?, isOwner: Boolean, joinedTime: String? = null
+    override suspend fun sendChat(
+        id: String, loungeId: String, content: String?, type: MessageDataType,
     ) {
-        val currentTime = LocalDateTime.now().toString()
+        withContext(dispatcher) {
+            val name = auth.currentUser?.displayName?.ifBlank { "익명" }
+            val messageType = type.let(MessageRemoteTypeMapper::mapToLeft)
+            val chatContent = content ?: when (messageType) {
+                1 -> Chat_Create
+                2 -> "$name $Chat_Join"
+                else -> "$name $Chat_Exit"
+            }
 
-        // 나갔다 들어오면 무조건 준비 상태 false
-        roomRef.child(Member).child(uid).setValue(
-            Member(uid, displayName, photoUrl, false, isOwner, joinedTime ?: currentTime)
-        )
+            val data = JSONObject().apply {
+                put("id", id)
+                put("loungeId", loungeId)
+                put("userId", auth.currentUser?.uid)
+                put("userProfile", auth.currentUser?.photoUrl.toString())
+                put("message", chatContent)
+                put("type", messageType)
+                put("createdAt", LocalDateTime.now().toString())
+            }
+
+            functions.getHttpsCallable("sendChat").call(data).await()
+        }
     }
+
+    override suspend fun updateReady(
+        uid: String, loungeId: String, isOwner: Boolean
+    ) {
+        withContext(dispatcher){
+            val roomRef = db.getReference("$Lounge/${loungeId}")
+            val statusRef = roomRef.child(Member).child(uid).child(Status)
+            val cur = statusRef.get().await().getValue<String>()
+            statusRef.setValue(if (cur == "joined") "ready" else "joined").await()
+
+            if (isOwner){
+                roomRef.child(Status).setValue("started").await()
+            }
+        }
+    }
+
+    override suspend fun exitLounge(
+        uid: String, loungeId: String
+    ){
+        withContext(dispatcher){
+            val memberRef = db.getReference("$Lounge/${loungeId}").child(Member).child(uid)
+            memberRef.setValue(null).await()
+        }
+    }
+
+    override suspend fun exileMember(memberId: String, loungeId: String) {
+        withContext(dispatcher){
+            val statusRef = db.getReference("$Lounge/${loungeId}").child(Member).child(memberId).child(Status)
+            statusRef.setValue("exiled").await()
+        }
+    }
+
 
     companion object{
-        const val Room = "rooms"
-        const val Room_Length = 10
+        const val Lounge = "Lounge"
+        const val Chat = "Chat"
         const val Member = "members"
-        const val Ready = "ready"
-        const val Chat = "chats"
+        const val Status = "status"
+        const val Owner = "owner"
         const val Chat_Create = "투표 방이 생성되었습니다."
         const val Chat_Join = "님이 입장했습니다."
         const val Chat_Exit = "님이 퇴장했습니다."

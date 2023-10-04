@@ -6,10 +6,8 @@ import com.jwd.lunchvote.data.di.Dispatcher
 import com.jwd.lunchvote.data.di.LunchVoteDispatcher.IO
 import com.jwd.lunchvote.data.source.remote.LoginRemoteDataSource
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -18,7 +16,7 @@ class LoginRemoteDataSourceImpl @Inject constructor(
     private val auth: FirebaseAuth,
     @Dispatcher(IO) private val dispatcher: CoroutineDispatcher
 ): LoginRemoteDataSource {
-    override fun getCustomToken(accessToken: String): Flow<String?> = flow {
+    override suspend fun getCustomToken(accessToken: String): String? = withContext(dispatcher){
         val data = JSONObject()
         data.put("accessToken", accessToken)
 
@@ -26,34 +24,12 @@ class LoginRemoteDataSourceImpl @Inject constructor(
             .call(data)
             .await()
 
-        emit(res.data as String)
+        return@withContext res.data as String?
+    }
 
-    }.flowOn(dispatcher)
-
-    override fun signInWithCustomToken(token: String): Flow<Unit> = flow {
-        auth.signInWithCustomToken(token).await()
-
-        emit(Unit)
-    }.flowOn(dispatcher)
-
-//    override fun createUserData(): Flow<Unit> = callbackFlow {
-//        val user = auth.currentUser ?: throw Exception("User is not signed in")
-//
-//        if (!db.getReference("users/${user.uid}").get().await().exists()){
-//            db.getReference("users/${user.uid}")
-//                .setValue(mapOf("nickName" to user.displayName, "email" to user.email,
-//                    "profileImage" to user.photoUrl.toString()))
-//                .addOnSuccessListener {
-//                    Timber.e("User created")
-//                    trySend(Unit)
-//                }
-//                .addOnFailureListener {
-//                    throw it
-//                }
-//        } else {
-//            Timber.e("User already exists")
-//            trySend(Unit)
-//        }
-//        awaitClose()
-//    }.flowOn(dispatcher)
+    override suspend fun signInWithCustomToken(token: String) {
+        withContext(dispatcher){
+            auth.signInWithCustomToken(token).await()
+        }
+    }
 }

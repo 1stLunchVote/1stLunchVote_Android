@@ -21,7 +21,7 @@ fun HomeDialog(
 ) {
   when (homeDialogState) {
     is HomeDialogState.JoinDialog -> {
-      var code by remember { mutableStateOf("KqND4zmJ59") }
+      var code by remember { mutableStateOf("test") }
 
       LunchVoteDialog(
         title = "투표 방 참여하기",

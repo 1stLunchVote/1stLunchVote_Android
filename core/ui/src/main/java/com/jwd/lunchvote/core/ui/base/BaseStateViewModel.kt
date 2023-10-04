@@ -4,10 +4,15 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -38,6 +43,12 @@ abstract class BaseStateViewModel<S : ViewModelContract.State, E : ViewModelCont
     private val _dialogState = MutableStateFlow<DS?>(null)
     val dialogState : StateFlow<DS?> = _dialogState.asStateFlow()
 
+    private val _error: MutableSharedFlow<String> = MutableSharedFlow()
+    val error: SharedFlow<String> = _error.asSharedFlow()
+
+    private val _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
     init {
         _events.onEach(::handleEvents)
             .launchIn(viewModelScope)
@@ -46,6 +57,29 @@ abstract class BaseStateViewModel<S : ViewModelContract.State, E : ViewModelCont
                 stateHandler[STATE_KEY] = state.toParcelable()
             }
         }.launchIn(viewModelScope)
+    }
+
+    val ceh = CoroutineExceptionHandler { _, throwable ->
+        throwable.printStackTrace()
+        setError(throwable.message ?: "")
+    }
+
+    inline fun launch(crossinline action: suspend CoroutineScope.() -> Unit): Job {
+        return viewModelScope.launch(ceh) {
+            action(this)
+        }
+    }
+
+    protected inline fun launchWithLoading(crossinline job: suspend () -> Unit) {
+        launch {
+            setLoading(true)
+            job.invoke()
+            setLoading(false)
+        }
+    }
+
+    protected fun setLoading(loading: Boolean) = viewModelScope.launch {
+        _isLoading.emit(loading)
     }
 
 
@@ -71,6 +105,10 @@ abstract class BaseStateViewModel<S : ViewModelContract.State, E : ViewModelCont
         viewModelScope.launch {
             _dialogState.value = dialogState
         }
+    }
+
+    protected fun setError(errorMsg: String) = viewModelScope.launch {
+        _error.emit(errorMsg)
     }
 
     abstract fun handleEvents(event: E)

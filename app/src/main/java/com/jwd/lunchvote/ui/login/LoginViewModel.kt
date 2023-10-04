@@ -10,9 +10,7 @@ import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.usecase.login.KakaoLoginUseCase
 import com.jwd.lunchvote.ui.login.LoginContract.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -39,15 +37,16 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun kakaoLogin(accessToken: String){
-        kakaoLoginUseCase(accessToken)
-            .onEach {
+        viewModelScope.launch {
+            runCatching {
+                kakaoLoginUseCase(accessToken)
+            }.onSuccess {
                 sendSideEffect(LoginSideEffect.NavigateToHome)
-            }
-            .catch {
+            }.onFailure {
                 Timber.e("login error : $it")
                 onLoginFailure("로그인에 실패하였습니다.")
             }
-            .launchIn(viewModelScope)
+        }
     }
 
     override fun handleEvents(event: LoginEvent) {

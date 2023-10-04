@@ -5,8 +5,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
-import com.jwd.lunchvote.domain.entity.MemberStatus
+import com.jwd.lunchvote.domain.entity.type.MemberStatusType
 import com.jwd.lunchvote.domain.usecase.lounge.CheckMemberStatusUseCase
+import com.jwd.lunchvote.domain.usecase.lounge.ExileMemberUseCase
 import com.jwd.lunchvote.ui.lounge.member.LoungeMemberContract.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
@@ -15,15 +16,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoungeMemberViewModel @Inject constructor(
+    private val exileMemberUseCase: ExileMemberUseCase,
     auth: FirebaseAuth,
     checkMemberStatusUseCase: CheckMemberStatusUseCase,
     savedStateHandle: SavedStateHandle,
 ): BaseStateViewModel<LoungeMemberState, LoungeMemberEvent, LoungeMemberReduce, LoungeMemberSideEffect, LoungeMemberDialogState>(savedStateHandle){
-    private val memberId = checkNotNull(savedStateHandle.get<String?>("id"))
-    private val loungeId = checkNotNull(savedStateHandle.get<String?>("loungeId"))
-    private val nickname = checkNotNull(savedStateHandle.get<String?>("nickname"))
-    private val profileUrl = savedStateHandle.get<String?>("profileUrl")
-    private val isOwner = savedStateHandle["isOwner"] ?: false
+    private val memberId = checkNotNull(savedStateHandle.get<String?>(MEMBER_EXTRA_KEY))
+    private val loungeId = checkNotNull(savedStateHandle.get<String?>(LOUNGE_EXTRA_KEY))
+    private val nickname = checkNotNull(savedStateHandle.get<String?>(NICKNAME_EXTRA_KEY))
+    private val profileUrl = savedStateHandle.get<String?>(PROFILE_URL_EXTRA_KEY)
+    private val isOwner = savedStateHandle[IS_OWNER_EXTRA_KEY] ?: false
 
     override fun createInitialState(savedState: Parcelable?): LoungeMemberState {
         return savedState as? LoungeMemberState ?: LoungeMemberState()
@@ -35,7 +37,7 @@ class LoungeMemberViewModel @Inject constructor(
         checkMemberStatusUseCase(auth.currentUser?.uid!!, loungeId)
             .onEach {
                 when(it){
-                    MemberStatus.EXILED, MemberStatus.EXITED ->{
+                    MemberStatusType.EXILED, MemberStatusType.EXITED ->{
                         sendSideEffect(LoungeMemberSideEffect.PopBackStack)
                     }
                     else -> {}
@@ -60,7 +62,25 @@ class LoungeMemberViewModel @Inject constructor(
         }
     }
 
+    private fun exileMember(){
+        launch {
+            exileMemberUseCase(memberId, loungeId)
+
+            sendSideEffect(LoungeMemberSideEffect.PopBackStack)
+        }
+    }
+
     override fun handleEvents(event: LoungeMemberEvent) {
-        TODO("Not yet implemented")
+        when(event){
+            is LoungeMemberEvent.OnClickExile -> exileMember()
+        }
+    }
+
+    companion object{
+        private const val MEMBER_EXTRA_KEY = "id"
+        private const val LOUNGE_EXTRA_KEY = "loungeId"
+        private const val NICKNAME_EXTRA_KEY = "nickname"
+        private const val PROFILE_URL_EXTRA_KEY = "profileUrl"
+        private const val IS_OWNER_EXTRA_KEY = "isOwner"
     }
 }

@@ -1,116 +1,116 @@
 package com.jwd.lunchvote.data.repository
 
+import com.jwd.lunchvote.data.mapper.LoungeChatDataMapper
+import com.jwd.lunchvote.data.mapper.MemberDataMapper
+import com.jwd.lunchvote.data.mapper.type.LoungeStatusDataTypeMapper
+import com.jwd.lunchvote.data.mapper.type.MemberStatusDataTypeMapper
+import com.jwd.lunchvote.data.model.type.MessageDataType
 import com.jwd.lunchvote.data.source.local.LoungeLocalDataSource
 import com.jwd.lunchvote.data.source.remote.LoungeRemoteDataSource
 import com.jwd.lunchvote.data.worker.SendWorkerManager
 import com.jwd.lunchvote.domain.entity.LoungeChat
 import com.jwd.lunchvote.domain.entity.Member
-import com.jwd.lunchvote.domain.entity.MemberStatus
+import com.jwd.lunchvote.domain.entity.type.LoungeStatusType
+import com.jwd.lunchvote.domain.entity.type.MemberStatusType
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
-import timber.log.Timber
-import java.time.LocalDateTime
+import java.util.UUID
 import javax.inject.Inject
 
 class LoungeRepositoryImpl @Inject constructor(
     private val sendWorkerManager: SendWorkerManager,
-    private val loungeLocalDataSource: LoungeLocalDataSource,
-    private val loungeRemoteDataSource: LoungeRemoteDataSource
+    private val local: LoungeLocalDataSource,
+    private val remote: LoungeRemoteDataSource
 ): LoungeRepository {
-    override fun checkLoungeExist(loungeId: String): Flow<Boolean> {
-        return loungeRemoteDataSource.checkLoungeExist(loungeId)
+    override suspend fun checkLoungeExist(loungeId: String): Boolean {
+        return remote.checkLoungeExist(loungeId)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override fun createLounge(): Flow<String> {
-        return loungeRemoteDataSource.createLounge().map {
-            it ?: throw Exception("Failed to create lounge")
-        }.flatMapMerge {id ->
-            loungeRemoteDataSource.sendChat(id, null, 1).map { id }
-        }
+    override suspend fun createLounge(): String {
+        val id = UUID.randomUUID().toString()
+        val loungeId = remote.createLounge()
+        remote.sendChat(id, loungeId, null, MessageDataType.CREATE)
+        return loungeId
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override fun joinLounge(loungeId: String): Flow<Unit> {
-        return loungeRemoteDataSource.joinLounge(loungeId).flatMapMerge {
-            loungeRemoteDataSource.sendChat(loungeId, null, 2)
-        }
+    override suspend fun joinLounge(loungeId: String) {
+        val id = UUID.randomUUID().toString()
+        remote.joinLounge(loungeId)
+        remote.sendChat(id, loungeId, null, MessageDataType.JOIN)
     }
 
     override fun getMemberList(loungeId: String): Flow<List<Member>> {
-        return loungeLocalDataSource.getMemberList(loungeId)
-            .filter { it.isNotEmpty() }
+        return local.getMemberList(loungeId)
+            .map { it.map(MemberDataMapper::mapToRight) }
             .onStart { syncMemberList(loungeId) }
     }
 
     override fun getChatList(loungeId: String): Flow<List<LoungeChat>> {
-        Timber.e(LocalDateTime.now().toString())
-        return loungeLocalDataSource.getChatList(loungeId)
-            .filter {
-                it.isNotEmpty()
-            }
+        return local.getChatList(loungeId)
+            .map{it.map(LoungeChatDataMapper::mapToRight)}
+            .filter { it.isNotEmpty() }
             .onStart { syncChatList(loungeId) }
     }
 
-    override fun sendChat(loungeId: String, content: String): Flow<Unit> {
-        sendWorkerManager.startSendWork(loungeId, content)
-        return loungeLocalDataSource.insertChat(loungeId, content, 0)
+    override fun getLoungeStatus(loungeId: String): Flow<LoungeStatusType> {
+        return remote.getLoungeStatus(loungeId)
+            .map { LoungeStatusDataTypeMapper.mapToRight(it) }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override fun updateReady(uid: String, loungeId: String): Flow<Unit> {
-        return loungeLocalDataSource.updateMemberReady(uid, loungeId)
-            .flatMapMerge {
-                loungeRemoteDataSource.updateReady(uid, loungeId)
-            }
+    // 일반 채팅 메시지 보내는 경우
+    override suspend fun sendChat(loungeId: String, content: String) {
+        val id = UUID.randomUUID().toString()
+        sendWorkerManager.startSendWork(id, loungeId, content)
+        return local.insertChat(id, loungeId, content, MessageDataType.NORMAL)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override fun exitLounge(uid: String, loungeId: String): Flow<Unit> {
-        return loungeRemoteDataSource.exitLounge(uid, loungeId)
-            .flatMapMerge {
-                loungeRemoteDataSource.sendChat(loungeId, null, 3)
-            }
+    override suspend fun updateReady(uid: String, loungeId: String, isOwner: Boolean) {
+        local.updateMemberReady(uid, loungeId)
+        remote.updateReady(uid, loungeId, isOwner)
     }
 
-    override fun getMemberStatus(uid: String, loungeId: String): Flow<MemberStatus>{
-        return loungeRemoteDataSource.getMemberList(loungeId)
+    override suspend fun exitLounge(uid: String, loungeId: String) {
+        val id = UUID.randomUUID().toString()
+        remote.sendChat(id, loungeId, null, MessageDataType.EXIT)
+        remote.exitLounge(uid, loungeId)
+        local.deleteAllChat(loungeId)
+    }
+
+    override suspend fun exileMember(memberId: String, loungeId: String) {
+        remote.exileMember(memberId, loungeId)
+    }
+
+    override fun getMemberStatus(uid: String, loungeId: String): Flow<MemberStatusType>{
+        return remote.getMemberList(loungeId)
             .map {
                 if (it.isEmpty()){
-                    MemberStatus.EXITED
+                    MemberStatusType.EXITED
                 }
-                else if (it.find { member -> member.uid == uid } == null) {
-                    // 추방 당한 것
-                    MemberStatus.EXILED
-                }
-                else {
-                    MemberStatus.NORMAL
-                }
+                else it.find { member -> member.id == uid }?.status?.let(MemberStatusDataTypeMapper::mapToRight)
+                    ?: MemberStatusType.EXILED
             }
     }
 
     private suspend fun syncMemberList(loungeId: String){
-        loungeRemoteDataSource.getMemberList(loungeId)
+        remote.getMemberList(loungeId)
             .onEach{
-                loungeLocalDataSource.putMemberList(it, loungeId)
+                local.putMemberList(it, loungeId)
             }
             .launchIn(CoroutineScope(currentCoroutineContext()))
     }
 
     private suspend fun syncChatList(loungeId: String){
-        loungeRemoteDataSource.getChatList(loungeId)
+        remote.getChatList(loungeId)
+            .map { it.map(LoungeChatDataMapper::mapToRight) }
             .onEach{
-                loungeLocalDataSource.putChatList(it, loungeId)
+                local.putChatList(it.map(LoungeChatDataMapper::mapToLeft), loungeId)
             }
             .launchIn(CoroutineScope(currentCoroutineContext()))
     }

@@ -6,5 +6,6 @@ import javax.inject.Inject
 class UpdateReadyUseCase @Inject constructor(
     private val repository: LoungeRepository
 ) {
-    operator fun invoke(uid: String, loungeId: String) = repository.updateReady(uid, loungeId)
+    suspend operator fun invoke(uid: String, loungeId: String, isOwner: Boolean = false)
+        = repository.updateReady(uid, loungeId, isOwner)
 }
