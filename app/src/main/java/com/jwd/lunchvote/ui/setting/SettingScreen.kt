@@ -31,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -67,7 +68,13 @@ fun SettingRoute(
   SettingScreen(
     snackBarHostState = snackBarHostState,
     settingState = settingState,
-    onClickBackButton = { viewModel.handleEvents(SettingEvent.OnClickBackButton) }
+    onClickBackButton = { viewModel.handleEvents(SettingEvent.OnClickBackButton) },
+    onClickEditProfileButton = { viewModel.handleEvents(SettingEvent.OnClickEditProfileButton) },
+    onClickAlertSettingButton = { viewModel.handleEvents(SettingEvent.OnClickAlertSettingButton) },
+    onClickContactButton = { viewModel.handleEvents(SettingEvent.OnClickContactButton) },
+    onClickNoticeButton = { viewModel.handleEvents(SettingEvent.OnClickNoticeButton) },
+    onClickSuggestButton = { viewModel.handleEvents(SettingEvent.OnClickSuggestButton) },
+    onClickLogoutButton = { viewModel.handleEvents(SettingEvent.OnClickLogoutButton) }
   )
 }
 
@@ -81,6 +88,7 @@ fun SettingScreen(
   onClickContactButton: () -> Unit = {},
   onClickNoticeButton: () -> Unit = {},
   onClickSuggestButton: () -> Unit = {},
+  onClickLogoutButton: () -> Unit = {},
   context: Context = LocalContext.current
 ) {
   Scaffold(
@@ -155,6 +163,23 @@ fun SettingScreen(
             color = MaterialTheme.colorScheme.outline
           )
         }
+      }
+      Box(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(vertical = 24.dp),
+        contentAlignment = Alignment.Center
+      ) {
+        Text(
+          "로그아웃",
+          modifier = Modifier.clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null
+          ) { onClickLogoutButton() },
+          style = MaterialTheme.typography.titleMedium,
+          color = MaterialTheme.colorScheme.error,
+          textDecoration = TextDecoration.Underline
+        )
       }
     }
   }

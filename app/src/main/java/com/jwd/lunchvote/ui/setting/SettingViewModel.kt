@@ -27,6 +27,7 @@ class SettingViewModel @Inject constructor(
       is SettingEvent.OnClickContactButton -> sendSideEffect(SettingSideEffect.ShowSnackBar("1:1 문의"))
       is SettingEvent.OnClickNoticeButton -> sendSideEffect(SettingSideEffect.ShowSnackBar("공지사항 및 이용약관"))
       is SettingEvent.OnClickSuggestButton -> sendSideEffect(SettingSideEffect.ShowSnackBar("개선 제안하기"))
+      is SettingEvent.OnClickLogoutButton -> sendSideEffect(SettingSideEffect.ShowSnackBar("로그아웃"))
     }
   }
 

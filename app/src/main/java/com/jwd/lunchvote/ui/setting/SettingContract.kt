@@ -19,6 +19,7 @@ class SettingContract {
     data object OnClickContactButton: SettingEvent
     data object OnClickNoticeButton: SettingEvent
     data object OnClickSuggestButton: SettingEvent
+    data object OnClickLogoutButton: SettingEvent
   }
 
   sealed interface SettingReduce : ViewModelContract.Reduce
