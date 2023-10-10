@@ -1,6 +1,8 @@
 package com.jwd.lunchvote.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -18,12 +20,18 @@ import com.jwd.lunchvote.ui.template.add_template.AddTemplateRoute
 import com.jwd.lunchvote.ui.template.edit_template.EditTemplateRoute
 import com.jwd.lunchvote.ui.vote.first.FirstVoteRoute
 import com.jwd.lunchvote.ui.vote.second.SecondVoteRoute
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 
 @Composable
 fun LunchVoteNavHost(
-    beforeLogin : Boolean
+    beforeLogin : Boolean,
+    navHostController: NavHostController = rememberNavController(),
+    scope: CoroutineScope = rememberCoroutineScope()
 ) {
-    val navHostController = rememberNavController()
+    val snackChannel = Channel<String>()
 
     NavHost(navController = navHostController,
         startDestination = if (beforeLogin) LunchVoteNavRoute.LoginNavigation.name else LunchVoteNavRoute.HomeNavigation.name
@@ -54,7 +62,7 @@ fun LunchVoteNavHost(
                     navigateToFirstVote = {
                         navHostController.navigate(LunchVoteNavRoute.FirstVote.name + "/loungeId"/*TODO*/)
                     },
-                    messageFlow = it.savedStateHandle.getStateFlow(SNACK_BAR_KEY, "")
+                    messageFlow = snackChannel.receiveAsFlow()
                 )
             }
             composable(LunchVoteNavRoute.Lounge.name + "?id={id}",
@@ -74,10 +82,7 @@ fun LunchVoteNavHost(
                         )
                     },
                     popBackStack = {
-                        navHostController.previousBackStackEntry?.savedStateHandle?.set(
-                            SNACK_BAR_KEY,
-                            it
-                        )
+                        scope.launch { snackChannel.send(it) }
                         navHostController.popBackStack()
                     },
                     navigateToFirstVote = {
@@ -132,31 +137,26 @@ fun LunchVoteNavHost(
                         navHostController.navigate(LunchVoteNavRoute.SecondVote.name)
                     },
                     popBackStack = {
+                        scope.launch { snackChannel.send(it) }
+
                         navHostController.navigate(LunchVoteNavRoute.Home.name) {
                             popUpTo(navHostController.graph.id) {
                                 inclusive = true
                             }
                         }
-                        navHostController.currentBackStackEntry?.savedStateHandle?.set(
-                            SNACK_BAR_KEY,
-                            it
-                        )
                     }
                 )
             }
             composable(LunchVoteNavRoute.SecondVote.name){
                 SecondVoteRoute(
                     popBackStack = {
+                        scope.launch { snackChannel.send(it) }
+
                         navHostController.navigate(LunchVoteNavRoute.Home.name) {
                             popUpTo(navHostController.graph.id) {
                                 inclusive = true
                             }
                         }
-
-                        navHostController.currentBackStackEntry?.savedStateHandle?.set(
-                            SNACK_BAR_KEY,
-                            it
-                        )
                     }
                 )
             }
@@ -189,10 +189,7 @@ fun LunchVoteNavHost(
             ) {
                 EditTemplateRoute(
                     popBackStack = {
-                        navHostController.previousBackStackEntry?.savedStateHandle?.set(
-                            SNACK_BAR_KEY,
-                            it
-                        )
+                        scope.launch { snackChannel.send(it) }
                         navHostController.popBackStack()
                     }
                 )
@@ -207,10 +204,7 @@ fun LunchVoteNavHost(
             ) {
                 AddTemplateRoute(
                     popBackStack = {
-                        navHostController.previousBackStackEntry?.savedStateHandle?.set(
-                            SNACK_BAR_KEY,
-                            it
-                        )
+                        scope.launch { snackChannel.send(it) }
                         navHostController.popBackStack()
                     }
                 )

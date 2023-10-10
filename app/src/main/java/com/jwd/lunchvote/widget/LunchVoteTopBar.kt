@@ -20,7 +20,7 @@ import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 fun LunchVoteTopBar(
   title: String,
   navIconVisible: Boolean = true,
-  popBackStack: () -> Unit,
+  popBackStack: () -> Unit = {},
   actions: @Composable RowScope.() -> Unit = { }
 ){
   CenterAlignedTopAppBar(

@@ -21,6 +21,7 @@ object Versions{
     const val SplashScreen = "1.0.1"
     const val Timber = "5.0.1"
     const val Secret = "2.0.1"
+    const val Ksp = "1.9.0-1.0.13"
 
     // Hilt
     const val Hilt = "2.47"
@@ -191,7 +192,7 @@ fun DependencyHandlerScope.implementationHilt(){
         Libraries.Hilt.AndroidHilt,
         Libraries.Hilt.HiltWork
     )
-    kapts(
+    ksps(
         Libraries.Hilt.HiltCompiler,
         Libraries.Hilt.AndroidHiltCompiler
     )
@@ -211,7 +212,7 @@ fun DependencyHandlerScope.implementationLocal(){
         Libraries.Room.RoomRuntime,
         Libraries.DataStore
     )
-    kapts(
+    ksps(
         Libraries.Room.RoomCompiler
     )
 }
@@ -266,5 +267,11 @@ fun DependencyHandlerScope.implementations(vararg notations: Any) {
 fun DependencyHandlerScope.kapts(vararg notations: Any) {
     notations.forEach {
         add("kapt", it)
+    }
+}
+
+fun DependencyHandlerScope.ksps(vararg notations: Any) {
+    notations.forEach {
+        add("ksp", it)
     }
 }
