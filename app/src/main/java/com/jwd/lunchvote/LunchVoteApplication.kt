@@ -13,23 +13,22 @@ import javax.inject.Inject
 @HiltAndroidApp
 class LunchVoteApplication : Application(), Configuration.Provider{
 
-    @Inject lateinit var workerFactory: HiltWorkerFactory
-    override fun onCreate() {
-        super.onCreate()
+  @Inject lateinit var workerFactory: HiltWorkerFactory
 
-        FirebaseApp.initializeApp(applicationContext)
+  override fun onCreate() {
+    super.onCreate()
 
-        KakaoSdk.init(applicationContext, BuildConfig.KAKAO_NATIVE_APP_KEY)
+    FirebaseApp.initializeApp(applicationContext)
+    KakaoSdk.init(applicationContext, BuildConfig.KAKAO_NATIVE_APP_KEY)
 
-        if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
-        }
-
-        Timber.tag("keyHash").e(Utility.getKeyHash(applicationContext))
+    if (BuildConfig.DEBUG) {
+      Timber.plant(Timber.DebugTree())
+      Timber.tag("keyHash").e(Utility.getKeyHash(applicationContext))
     }
+  }
 
-    override fun getWorkManagerConfiguration(): Configuration
-        = Configuration.Builder()
-            .setWorkerFactory(workerFactory)
-            .build()
+  override val workManagerConfiguration: Configuration
+    get() = Configuration.Builder()
+      .setWorkerFactory(workerFactory)
+      .build()
 }

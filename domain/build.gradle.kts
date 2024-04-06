@@ -1,7 +1,7 @@
 plugins {
-    id("java-library")
-    kotlin("jvm")
-    id("com.google.devtools.ksp")
+    id(libs.plugins.library.java.get().pluginId)
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.ksp)
 }
 
 java {
@@ -10,8 +10,6 @@ java {
 }
 
 dependencies{
-    implementations(
-        Libraries.Coroutine.Coroutine,
-        Libraries.JavaX.Inject
-    )
+    implementation(libs.coroutines)
+    implementation(libs.inject)
 }

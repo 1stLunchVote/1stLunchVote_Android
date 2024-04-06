@@ -1,15 +1,15 @@
 plugins {
-    id("com.android.library")
-    kotlin("android")
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.library)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
 }
 
 android {
-    namespace = Apps.ApplicationId + ".core.ui"
-    compileSdk = Apps.CompileSdk
+    namespace = libs.versions.applicationId.get() + ".core.ui"
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = Apps.MinSdk
+        minSdk = libs.versions.minSdk.get().toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -43,12 +43,10 @@ android {
 }
 
 dependencies {
-    implementationAndroidX()
-    implementationCoroutine()
-    implementationTest()
-    implementationCompose()
+    implementation(libs.bundles.android)
+    implementation(libs.bundles.test)
+    implementation(libs.bundles.coroutines)
 
-    implementations(
-        "androidx.compose.ui:ui-tooling:1.4.3",
-    )
+    implementation(platform(libs.compose))
+    implementation(libs.bundles.compose)
 }
