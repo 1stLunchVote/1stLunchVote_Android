@@ -1,0 +1,130 @@
+[versions]
+compileSdk = "34"
+minSdk = "26"
+targetSdk = "34"
+versionCode = "1"
+versionName = "1.0"
+applicationId = "com.jwd.lunchvote"
+
+android = "8.2.0"
+activity = "1.8.2"
+appcompat = "1.6.1"
+core = "1.10.1"
+material = "1.9.0"
+constraintLayout = "2.1.4"
+lifecycle = "2.6.1"
+navigation = "2.6.0"
+workManager = "2.8.1"
+splashScreen = "1.0.1"
+
+junit = "4.13.2"
+ext = "1.1.5"
+espresso = "3.5.1"
+mockk = "1.13.5"
+test = "1.5.0"
+slf4j = "2.0.7"
+
+javax = "1"
+coroutines = "1.7.2"
+
+composeBom = "2023.06.01"
+composeHilt = "1.0.0"
+composeLifecycle = "2.6.1"
+composeConstraintLayout = "1.0.1"
+
+hilt = "2.47"
+androidXHilt = "1.0.0"
+
+timber = "5.0.1"
+kakao = "2.14.0"
+
+firebase = "32.2.0"
+firebaseGms = "4.3.15"
+firebaseGmsAuth = "20.6.0"
+firebaseAuth = "22.1.0"
+firebaseFunctions = "20.3.1"
+
+retrofit = "2.9.0"
+okHttp = "4.9.1"
+
+room = "2.5.2"
+dataStore = "1.0.0"
+
+coil = "2.4.0"
+coilLandscapist = "1.4.7"
+
+kotlin = "1.9.0"
+secret = "2.0.1"
+ksp = "1.9.0-1.0.13"
+
+[libraries]
+activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
+appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+core = { group = "androidx.core", name = "core-ktx", version.ref = "core" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+constraintLayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintLayout" }
+lifecycle = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
+lifecycle-viewModel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
+navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
+navigation-ui = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigation" }
+workManager = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workManager" }
+splashScreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashScreen" }
+
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+ext = { group = "androidx.test.ext", name = "junit", version.ref = "ext" }
+espresso = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+androidMockk = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
+test = { group = "androidx.test", name = "core", version.ref = "test" }
+test_coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
+slf4j = { group = "org.slf4j", name = "slf4j-simple", version.ref = "slf4j" }
+
+javax = { group = "javax.inject", name = "javax.inject", version.ref = "javax" }
+coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+
+compose = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+compose-material = { group = "androidx.compose.material3", name = "material3", version.ref = "composeBom" }
+compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "composeBom" }
+compose-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "composeBom" }
+compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "composeBom" }
+compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "composeBom" }
+compose-hilt = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "composeHilt" }
+compose-lifecycle = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "composeLifecycle" }
+compose-constraintLayout = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "composeConstraintLayout" }
+
+hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+android-hilt = { group = "androidx.hilt", name = "hilt-lifecycle-viewmodel", version.ref = "androidXHilt" }
+
+timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+kakao = { group = "com.kakao.sdk", name = "v2-all-rx", version.ref = "kakao" }
+
+firebase = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase" }
+firebase-database = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebase" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebase" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuth" }
+firebase-functions = { group = "com.google.firebase", name = "firebase-functions-ktx", version.ref = "firebaseFunctions" }
+firebase-gmsAuth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "firebaseGmsAuth" }
+
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+okHttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okHttp" }
+
+room = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+dataStore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "dataStore" }
+
+coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
+coil-landscapist = { group = "com.github.skydoves", name = "landscapist-coil", version.ref = "coilLandscapist" }
+
+gms = { group = "com.google.gms", name = "google-services", version.ref = "firebaseGms" }
+androidGradle = { group = "com.android.tools.build", name = "gradle", version.ref = "android" }
+
+[plugins]
+application = { id = "com.android.application", version.ref = "android" }
+library = { id = "com.android.library", version.ref = "android" }
+kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+secrets = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secret" }
