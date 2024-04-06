@@ -80,6 +80,7 @@ test_coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-
 slf4j = { group = "org.slf4j", name = "slf4j-simple", version.ref = "slf4j" }
 
 javax = { group = "javax.inject", name = "javax.inject", version.ref = "javax" }
+
 coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 
@@ -94,7 +95,10 @@ compose-lifecycle = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-
 compose-constraintLayout = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "composeConstraintLayout" }
 
 hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
-android-hilt = { group = "androidx.hilt", name = "hilt-lifecycle-viewmodel", version.ref = "androidXHilt" }
+hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
+hilt-android = { group = "androidx.hilt", name = "hilt-common", version.ref = "androidXHilt" }
+hilt-android-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "androidXHilt" }
+hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "androidXHilt" }
 
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 kakao = { group = "com.kakao.sdk", name = "v2-all-rx", version.ref = "kakao" }
@@ -120,10 +124,22 @@ coil-landscapist = { group = "com.github.skydoves", name = "landscapist-coil", v
 gms = { group = "com.google.gms", name = "google-services", version.ref = "firebaseGms" }
 androidGradle = { group = "com.android.tools.build", name = "gradle", version.ref = "android" }
 
+[bundles]
+android = ["activity", "appcompat", "core", "material", "constraintLayout", "lifecycle", "navigation", "workManager", "splashScreen"]
+test = ["junit", "ext", "espresso", "mockk", "androidMockk", "test", "test_coroutines", "slf4j"]
+hilt = ["hilt", "hilt-android", "hilt-work"]
+hilt-compiler = ["hilt-compiler", "hilt-android-compiler"]
+coroutines = ["coroutines", "coroutines-android"]
+compose = ["compose-material", "compose-foundation", "compose-ui", "compose-ui-tooling", "compose-ui-tooling-preview", "compose-hilt", "compose-lifecycle", "compose-constraintLayout"]
+firebase = ["firebase-database", "firebase-firestore", "firebase-auth", "firebase-functions", "firebase-gmsAuth"]
+room = ["room", "room-runtime", "dataStore"]
+coil = ["coil", "coil-landscapist"]
+
 [plugins]
 application = { id = "com.android.application", version.ref = "android" }
 library = { id = "com.android.library", version.ref = "android" }
-kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize",  version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

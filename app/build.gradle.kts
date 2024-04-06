@@ -1,22 +1,22 @@
 plugins {
-    id("com.android.application")
-    kotlin("android")
-    kotlin("plugin.parcelize")
-    id("dagger.hilt.android.plugin")
-    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.secrets)
 }
 
 android {
-    namespace = Apps.ApplicationId
-    compileSdk = Apps.CompileSdk
+    namespace = libs.versions.applicationId.get()
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = Apps.ApplicationId
-        minSdk = Apps.MinSdk
-        targetSdk = Apps.CompileSdk
-        versionCode = Apps.VersionCode
-        versionName = Apps.VersionName
+        applicationId = libs.versions.applicationId.get()
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
+        versionCode = libs.versions.versionCode.get().toInt()
+        versionName = libs.versions.versionName.get()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -65,22 +65,26 @@ dependencies {
     implementation(project(":local"))
     implementation(project(":remote"))
 
-    implementationAndroidX()
-    implementationCompose()
-    implementationCoroutine()
-    implementationHilt()
-    implementationTest()
-    implementationFirebase()
-    implementationCoil()
+    implementation(libs.bundles.android)
+    implementation(libs.bundles.test)
 
+    implementation(libs.bundles.hilt)
+    ksp(libs.bundles.hilt.compiler)
 
-    implementations(
-        Libraries.Timber,
-        Libraries.Firebase.Auth,
-        Libraries.Firebase.GmsAuth,
-        Libraries.Firebase.Function,
-        Libraries.Kakao
-    )
+    implementation(libs.bundles.coroutines)
+    implementation(libs.bundles.compose)
+
+    implementation(libs.bundles.room)
+    ksp(libs.room.compiler)
+
+    implementation(libs.bundles.coil)
+
+    implementation(libs.timber)
+    implementation(libs.kakao)
+
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.gmsAuth)
+    implementation(libs.firebase.functions)
 }
 
 apply(plugin = "com.google.gms.google-services")
