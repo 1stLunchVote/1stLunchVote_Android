@@ -28,6 +28,7 @@ import com.jwd.lunchvote.core.ui.theme.colorSuccess
 import com.jwd.lunchvote.core.ui.util.circleShadow
 import com.jwd.lunchvote.model.enums.FoodStatus
 import com.jwd.lunchvote.model.FoodUIModel
+import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 
 @Composable
@@ -49,7 +50,7 @@ fun FoodItem(
       modifier = if (status == FoodStatus.DISLIKE) Modifier.alpha(0.5f) else Modifier
     ) {
       CoilImage(
-        food.imageUrl,
+        imageModel = { food.imageUrl },
         modifier = Modifier
           .size(100.dp)
           .let {
@@ -65,7 +66,9 @@ fun FoodItem(
               else -> it
             }
           },
-        contentScale = ContentScale.Crop,
+        imageOptions = ImageOptions(
+          contentScale = ContentScale.Crop
+        ),
         previewPlaceholder = R.drawable.ic_food_image_temp
       )
       if (status == FoodStatus.DISLIKE) {
