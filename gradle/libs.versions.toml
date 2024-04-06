@@ -12,7 +12,7 @@ appcompat = "1.6.1"
 core = "1.10.1"
 material = "1.9.0"
 constraintLayout = "2.1.4"
-lifecycle = "2.6.1"
+lifecycle = "2.7.0"
 navigation = "2.6.0"
 workManager = "2.8.1"
 splashScreen = "1.0.1"
@@ -38,7 +38,7 @@ androidXHilt = "1.0.0"
 timber = "5.0.1"
 kakao = "2.14.0"
 
-firebase = "32.2.0"
+firebaseBom = "32.2.0"
 firebaseGms = "4.3.15"
 firebaseGmsAuth = "20.6.0"
 firebaseAuth = "22.1.0"
@@ -58,7 +58,6 @@ secret = "2.0.1"
 ksp = "1.9.0-1.0.13"
 
 [libraries]
-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 core = { group = "androidx.core", name = "core-ktx", version.ref = "core" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
@@ -79,19 +78,19 @@ test = { group = "androidx.test", name = "core", version.ref = "test" }
 test_coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 slf4j = { group = "org.slf4j", name = "slf4j-simple", version.ref = "slf4j" }
 
-javax = { group = "javax.inject", name = "javax.inject", version.ref = "javax" }
+inject = { group = "javax.inject", name = "javax.inject", version.ref = "javax" }
 
 coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 
 compose = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
-compose-material = { group = "androidx.compose.material3", name = "material3", version.ref = "composeBom" }
-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "composeBom" }
-compose-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "composeBom" }
-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "composeBom" }
-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "composeBom" }
+compose-material = { group = "androidx.compose.material3", name = "material3" }
+compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
+compose-ui = { group = "androidx.compose.ui", name = "ui" }
+compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 compose-hilt = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "composeHilt" }
-compose-lifecycle = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "composeLifecycle" }
+compose-lifecycle = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "composeLifecycle" }
 compose-constraintLayout = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "composeConstraintLayout" }
 
 hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
@@ -103,9 +102,9 @@ hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "androi
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 kakao = { group = "com.kakao.sdk", name = "v2-all-rx", version.ref = "kakao" }
 
-firebase = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase" }
-firebase-database = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebase" }
-firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebase" }
+firebase = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-database = { group = "com.google.firebase", name = "firebase-database-ktx" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore-ktx" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuth" }
 firebase-functions = { group = "com.google.firebase", name = "firebase-functions-ktx", version.ref = "firebaseFunctions" }
 firebase-gmsAuth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "firebaseGmsAuth" }
@@ -113,31 +112,33 @@ firebase-gmsAuth = { group = "com.google.android.gms", name = "play-services-aut
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 okHttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okHttp" }
 
-room = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+
 dataStore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "dataStore" }
 
-coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
+coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 coil-landscapist = { group = "com.github.skydoves", name = "landscapist-coil", version.ref = "coilLandscapist" }
 
 gms = { group = "com.google.gms", name = "google-services", version.ref = "firebaseGms" }
 androidGradle = { group = "com.android.tools.build", name = "gradle", version.ref = "android" }
 
 [bundles]
-android = ["activity", "appcompat", "core", "material", "constraintLayout", "lifecycle", "navigation", "workManager", "splashScreen"]
+android = ["appcompat", "core", "material", "constraintLayout", "lifecycle", "lifecycle-viewModel", "navigation", "navigation-ui", "workManager", "splashScreen"]
 test = ["junit", "ext", "espresso", "mockk", "androidMockk", "test", "test_coroutines", "slf4j"]
 hilt = ["hilt", "hilt-android", "hilt-work"]
 hilt-compiler = ["hilt-compiler", "hilt-android-compiler"]
 coroutines = ["coroutines", "coroutines-android"]
 compose = ["compose-material", "compose-foundation", "compose-ui", "compose-ui-tooling", "compose-ui-tooling-preview", "compose-hilt", "compose-lifecycle", "compose-constraintLayout"]
 firebase = ["firebase-database", "firebase-firestore", "firebase-auth", "firebase-functions", "firebase-gmsAuth"]
-room = ["room", "room-runtime", "dataStore"]
+room = ["room", "room-runtime"]
 coil = ["coil", "coil-landscapist"]
 
 [plugins]
 application = { id = "com.android.application", version.ref = "android" }
 library = { id = "com.android.library", version.ref = "android" }
+library-java = { id = "java-library" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize",  version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }

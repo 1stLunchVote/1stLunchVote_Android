@@ -1,16 +1,16 @@
 plugins {
-    id("com.android.library")
-    kotlin("android")
-    id("dagger.hilt.android.plugin")
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.library)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
 }
 
 android {
-    namespace = Apps.ApplicationId + ".local"
-    compileSdk = Apps.CompileSdk
+    namespace = libs.versions.applicationId.get() + ".local"
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = Apps.MinSdk
+        minSdk = libs.versions.minSdk.get().toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -41,11 +41,16 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":core:common"))
 
-    implementationAndroidX()
-    implementationHilt()
-    implementationLocal()
-    implementations(
-        Libraries.Timber,
-        Libraries.Firebase.Auth
-    )
+    implementation(libs.bundles.android)
+
+    implementation(libs.bundles.hilt)
+    ksp(libs.bundles.hilt.compiler)
+
+    implementation(libs.bundles.room)
+    ksp(libs.room.compiler)
+    implementation(libs.dataStore)
+
+    implementation(libs.timber)
+
+    implementation(libs.firebase.auth)
 }

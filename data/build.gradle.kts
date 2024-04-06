@@ -1,16 +1,16 @@
 plugins {
-    id("com.android.library")
-    kotlin("android")
-    id("dagger.hilt.android.plugin")
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.library)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
 }
 
 android {
-    namespace = Apps.ApplicationId + ".data"
-    compileSdk = Apps.CompileSdk
+    namespace = libs.versions.applicationId.get() + ".data"
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = Apps.MinSdk
+        minSdk = libs.versions.minSdk.get().toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -37,18 +37,23 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":core:common"))
 
-    implementationAndroidX()
-    implementationCoroutine()
-    implementationHilt()
-    implementationLocal()
-    implementationTest()
+    implementation(libs.bundles.android)
+    implementation(libs.bundles.test)
 
-    implementationFirebase()
-    implementations(
-        Libraries.Timber,
-        Libraries.Firebase.Auth,
-        Libraries.Firebase.GmsAuth,
-        Libraries.Firebase.Function,
-        Libraries.Firebase.DataBase
-    )
+    implementation(libs.bundles.hilt)
+    ksp(libs.bundles.hilt.compiler)
+
+    implementation(libs.bundles.coroutines)
+
+    implementation(platform(libs.compose))
+    implementation(libs.bundles.compose)
+
+    implementation(libs.bundles.room)
+    ksp(libs.room.compiler)
+    implementation(libs.dataStore)
+
+    implementation(platform(libs.firebase))
+    implementation(libs.bundles.firebase)
+
+    implementation(libs.timber)
 }

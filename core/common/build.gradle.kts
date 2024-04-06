@@ -1,15 +1,15 @@
 plugins {
-    id("com.android.library")
-    kotlin("android")
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.library)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
 }
 
 android {
-    namespace = Apps.ApplicationId + ".core.common"
-    compileSdk = Apps.CompileSdk
+    namespace = libs.versions.applicationId.get() + ".core.common"
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = Apps.MinSdk
+        minSdk = libs.versions.minSdk.get().toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -43,7 +43,9 @@ android {
 }
 
 dependencies {
-    implementationCoroutine()
-    implementationTest()
-    implementationCompose()
+    implementation(libs.bundles.coroutines)
+    implementation(libs.bundles.test)
+
+    implementation(platform(libs.compose))
+    implementation(libs.bundles.compose)
 }
