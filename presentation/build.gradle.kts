@@ -1,17 +1,20 @@
 plugins {
-  alias(libs.plugins.library)
+  alias(libs.plugins.application)
   alias(libs.plugins.kotlin.android)
+  alias(libs.plugins.kotlin.parcelize)
+  alias(libs.plugins.hilt)
+  alias(libs.plugins.ksp)
+  alias(libs.plugins.secrets)
 }
 
 android {
-  namespace = "com.jwd.lunchvote.presentation"
-  compileSdk = 34
+  namespace = libs.versions.applicationId.get() + ".presentation"
+  compileSdk = libs.versions.compileSdk.get().toInt()
 
   defaultConfig {
-    minSdk = 24
+    minSdk = libs.versions.minSdk.get().toInt()
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    consumerProguardFiles("consumer-rules.pro")
   }
 
   buildTypes {
@@ -20,21 +23,52 @@ android {
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
   }
+  buildFeatures {
+    compose = true
+    buildConfig = true
+  }
+  composeOptions {
+    kotlinCompilerExtensionVersion = "1.5.0"
+  }
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
   }
   kotlinOptions {
-    jvmTarget = "1.8"
+    jvmTarget = "17"
   }
 }
 
 dependencies {
+  implementation(project(":core:ui"))
+  implementation(project(":core:test"))
+  implementation(project(":domain"))
+  implementation(project(":data"))
+  implementation(project(":local"))
+  implementation(project(":remote"))
 
-  implementation(libs.core)
-  implementation(libs.appcompat)
-  implementation(libs.material)
-  testImplementation(libs.junit)
-  androidTestImplementation(libs.ext)
-  androidTestImplementation(libs.espresso)
+  implementation(libs.bundles.android)
+  implementation(libs.bundles.test)
+
+  implementation(libs.bundles.hilt)
+  ksp(libs.bundles.hilt.compiler)
+
+  implementation(libs.bundles.coroutines)
+
+  implementation(platform(libs.compose))
+  implementation(libs.bundles.compose)
+
+  implementation(libs.bundles.room)
+  ksp(libs.room.compiler)
+
+  implementation(libs.dataStore)
+
+  implementation(libs.bundles.coil)
+
+  implementation(libs.timber)
+  implementation(libs.kakao)
+
+  implementation(libs.firebase.auth)
+  implementation(libs.firebase.gmsAuth)
+  implementation(libs.firebase.functions)
 }
