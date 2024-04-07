@@ -61,6 +61,7 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:test"))
     implementation(project(":domain"))
+    implementation(project(":presentation"))
     implementation(project(":data"))
     implementation(project(":local"))
     implementation(project(":remote"))
