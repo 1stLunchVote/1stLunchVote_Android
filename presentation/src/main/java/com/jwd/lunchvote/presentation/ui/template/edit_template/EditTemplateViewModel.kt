@@ -7,7 +7,7 @@ import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.entity.Template
 import com.jwd.lunchvote.domain.usecase.template.DeleteTemplateUseCase
 import com.jwd.lunchvote.domain.usecase.template.EditTemplateUseCase
-import com.jwd.lunchvote.domain.usecase.template.GetFoodsUseCase
+import com.jwd.lunchvote.domain.usecase.template.GetFoodListUseCase
 import com.jwd.lunchvote.domain.usecase.template.GetTemplateUseCase
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EditTemplateViewModel @Inject constructor(
-  private val getFoodsUseCase: GetFoodsUseCase,
+  private val getFoodListUseCase: GetFoodListUseCase,
   private val getTemplateUseCase: GetTemplateUseCase,
   private val editTemplateUseCase: EditTemplateUseCase,
   private val deleteTemplateUseCase: DeleteTemplateUseCase,
@@ -89,7 +89,7 @@ class EditTemplateViewModel @Inject constructor(
   private suspend fun initialize(templateId: String) {
     updateState(EditTemplateReduce.UpdateLoading(true))
 
-    val foodList = getFoodsUseCase.invoke()
+    val foodList = getFoodListUseCase.invoke()
     val template = getTemplateUseCase.invoke(templateId)
     updateState(
       EditTemplateReduce.Initialize(

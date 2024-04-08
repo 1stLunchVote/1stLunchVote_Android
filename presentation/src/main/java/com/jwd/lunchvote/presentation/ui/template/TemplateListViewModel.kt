@@ -4,7 +4,7 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
-import com.jwd.lunchvote.domain.usecase.template.GetTemplatesUseCase
+import com.jwd.lunchvote.domain.usecase.template.GetTemplateListUseCase
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.ui.template.TemplateListContract.TemplateListDialogState
 import com.jwd.lunchvote.presentation.ui.template.TemplateListContract.TemplateListEvent
@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TemplateListViewModel @Inject constructor(
-  private val getTemplatesUseCase: GetTemplatesUseCase,
+  private val getTemplateListUseCase: GetTemplateListUseCase,
   savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<TemplateListState, TemplateListEvent, TemplateListReduce, TemplateListSideEffect, TemplateListDialogState>(savedStateHandle){
   override fun createInitialState(savedState: Parcelable?): TemplateListState {
@@ -57,7 +57,7 @@ class TemplateListViewModel @Inject constructor(
     updateState(TemplateListReduce.UpdateLoading(true))
 
     val userId = "PIRjtPnKcmJfNbSNIidD"   // TODO: 임시
-    val templateList = getTemplatesUseCase.invoke(userId)
+    val templateList = getTemplateListUseCase.invoke(userId)
     updateState(
       TemplateListReduce.Initialize(
         TemplateListState(

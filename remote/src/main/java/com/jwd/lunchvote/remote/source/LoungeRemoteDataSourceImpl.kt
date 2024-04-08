@@ -4,8 +4,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.functions.FirebaseFunctions
-import com.jwd.lunchvote.data.di.Dispatcher
-import com.jwd.lunchvote.data.di.LunchVoteDispatcher.IO
 import com.jwd.lunchvote.data.model.LoungeChatData
 import com.jwd.lunchvote.data.model.MemberData
 import com.jwd.lunchvote.data.model.type.LoungeStatusDataType
@@ -35,7 +33,7 @@ class LoungeRemoteDataSourceImpl @Inject constructor(
     private val functions: FirebaseFunctions,
     private val auth: FirebaseAuth,
     private val db: FirebaseDatabase,
-    @Dispatcher(IO) private val dispatcher: CoroutineDispatcher
+    private val dispatcher: CoroutineDispatcher
 ) : LoungeRemoteDataSource {
     override suspend fun checkLoungeExist(
         loungeId: String

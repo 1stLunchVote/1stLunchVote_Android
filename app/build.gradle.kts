@@ -87,9 +87,8 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.kakao)
 
-    implementation(libs.firebase.auth)
-    implementation(libs.firebase.gmsAuth)
-    implementation(libs.firebase.functions)
+    implementation(platform(libs.firebase))
+    implementation(libs.bundles.firebase)
 }
 
 apply(plugin = "com.google.gms.google-services")

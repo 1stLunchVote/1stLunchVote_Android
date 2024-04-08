@@ -1,12 +1,9 @@
-package com.jwd.lunchvote.remote.di
+package com.jwd.lunchvote.di
 
-import androidx.compose.ui.input.key.Key.Companion.F
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.core.FirestoreClient
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.functions.FirebaseFunctions
-import com.google.firebase.ktx.Firebase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,6 +13,10 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object FirebaseModule {
+    @Provides
+    @Singleton
+    fun provideFirebaseAuth() = FirebaseAuth.getInstance()
+
     @Provides
     @Singleton
     fun provideFirebaseFunctions() = FirebaseFunctions.getInstance("asia-northeast3")

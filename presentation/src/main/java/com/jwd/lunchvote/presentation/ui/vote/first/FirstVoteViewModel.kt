@@ -4,8 +4,6 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
-import com.jwd.lunchvote.data.di.Dispatcher
-import com.jwd.lunchvote.data.di.LunchVoteDispatcher.IO
 import com.jwd.lunchvote.domain.usecase.first_vote.GetFoodListUseCase
 import com.jwd.lunchvote.domain.usecase.first_vote.GetTemplateListUseCase
 import com.jwd.lunchvote.presentation.model.FoodUIModel
@@ -18,7 +16,6 @@ import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteR
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteSideEffect
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,8 +23,7 @@ import javax.inject.Inject
 class FirstVoteViewModel @Inject constructor(
   savedStateHandle: SavedStateHandle,
   private val getFoodListUseCase: GetFoodListUseCase,
-  private val getTemplateListUseCase: GetTemplateListUseCase,
-  @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher
+  private val getTemplateListUseCase: GetTemplateListUseCase
 ): BaseStateViewModel<FirstVoteState, FirstVoteEvent, FirstVoteReduce, FirstVoteSideEffect, FirstVoteDialogState>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): FirstVoteState =
     savedState as? FirstVoteState ?: FirstVoteState()

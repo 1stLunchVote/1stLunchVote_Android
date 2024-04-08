@@ -1,13 +1,11 @@
 package com.jwd.lunchvote.data.source.remote
 
-import com.jwd.lunchvote.domain.entity.Food
-import com.jwd.lunchvote.domain.entity.Template
+import com.jwd.lunchvote.data.model.TemplateData
 
-interface TemplateRemoteDataSource {
-  suspend fun getFoods(): List<Food>
-  suspend fun getTemplates(userId: String): List<Template>
-  suspend fun addTemplate(template: Template): Template
-  suspend fun getTemplate(id: String): Template
-  suspend fun editTemplate(template: Template): Template
-  suspend fun deleteTemplate(id: String): Unit
+interface TemplateDataSource {
+  suspend fun getTemplateList(userId: String): List<TemplateData>
+  suspend fun addTemplate(template: TemplateData): TemplateData
+  suspend fun getTemplate(id: String): TemplateData
+  suspend fun editTemplate(template: TemplateData): TemplateData
+  suspend fun deleteTemplate(id: String)
 }

@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.entity.Template
 import com.jwd.lunchvote.domain.usecase.template.AddTemplateUseCase
-import com.jwd.lunchvote.domain.usecase.template.GetFoodsUseCase
+import com.jwd.lunchvote.domain.usecase.template.GetFoodListUseCase
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.enums.FoodStatus
 import com.jwd.lunchvote.presentation.model.updateFoodMap
@@ -22,7 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AddTemplateViewModel @Inject constructor(
   private val addTemplateUseCase: AddTemplateUseCase,
-  private val getFoodsUseCase: GetFoodsUseCase,
+  private val getFoodListUseCase: GetFoodListUseCase,
   savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<AddTemplateState, AddTemplateEvent, AddTemplateReduce, AddTemplateSideEffect, AddTemplateDialogState>(savedStateHandle){
   override fun createInitialState(savedState: Parcelable?): AddTemplateState {
@@ -74,7 +74,7 @@ class AddTemplateViewModel @Inject constructor(
   private suspend fun initialize(templateName: String) {
     updateState(AddTemplateReduce.UpdateLoading(true))
 
-    val foodList = getFoodsUseCase.invoke()
+    val foodList = getFoodListUseCase.invoke()
     updateState(
       AddTemplateReduce.Initialize(
         AddTemplateState(
