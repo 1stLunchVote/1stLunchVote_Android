@@ -4,26 +4,22 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.jwd.lunchvote.data.di.Dispatcher
-import com.jwd.lunchvote.data.di.LunchVoteDispatcher.IO
 import com.jwd.lunchvote.data.model.type.MessageDataType
 import com.jwd.lunchvote.data.source.local.LoungeLocalDataSource
 import com.jwd.lunchvote.data.source.remote.LoungeRemoteDataSource
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @HiltWorker
 class SendChatWorker @AssistedInject constructor(
-    @Assisted private val context: Context,
-    @Assisted private val workerParams: WorkerParameters,
-    @Dispatcher(IO) private val dispatcher: CoroutineDispatcher,
-    private val remoteDataSource: LoungeRemoteDataSource,
-    private val localDataSource: LoungeLocalDataSource
+  @Assisted private val context: Context,
+  @Assisted private val workerParams: WorkerParameters,
+  private val dispatcher: CoroutineDispatcher,
+  private val remoteDataSource: LoungeRemoteDataSource,
+  private val localDataSource: LoungeLocalDataSource
 ): CoroutineWorker(context, workerParams){
     override suspend fun doWork(): Result = withContext(dispatcher){
         try {

@@ -1,29 +1,33 @@
 package com.jwd.lunchvote.data.repository
 
-import com.jwd.lunchvote.data.source.remote.TemplateRemoteDataSource
+import com.jwd.lunchvote.data.mapper.asData
+import com.jwd.lunchvote.data.mapper.asDomain
+import com.jwd.lunchvote.data.source.remote.FoodDataSource
+import com.jwd.lunchvote.data.source.remote.TemplateDataSource
 import com.jwd.lunchvote.domain.entity.Food
 import com.jwd.lunchvote.domain.entity.Template
 import com.jwd.lunchvote.domain.repository.TemplateRepository
 import javax.inject.Inject
 
 class TemplateRepositoryImpl @Inject constructor(
-  private val templateRemoteDataSource: TemplateRemoteDataSource
+  private val foodDataSource: FoodDataSource,
+  private val templateDataSource: TemplateDataSource
 ): TemplateRepository {
-  override suspend fun getFoods(): List<Food> =
-    templateRemoteDataSource.getFoods()
+  override suspend fun getFoodList(): List<Food> =
+    foodDataSource.getFoodList().map { it.asDomain() }
 
-  override suspend fun getTemplates(userId: String): List<Template> =
-    templateRemoteDataSource.getTemplates(userId)
+  override suspend fun getTemplateList(userId: String): List<Template> =
+    templateDataSource.getTemplateList(userId).map { it.asDomain() }
 
   override suspend fun addTemplate(template: Template): Template =
-    templateRemoteDataSource.addTemplate(template)
+    templateDataSource.addTemplate(template.asData()).asDomain()
 
   override suspend fun getTemplate(id: String): Template =
-    templateRemoteDataSource.getTemplate(id)
+    templateDataSource.getTemplate(id).asDomain()
 
   override suspend fun editTemplate(template: Template): Template =
-    templateRemoteDataSource.editTemplate(template)
+    templateDataSource.editTemplate(template.asData()).asDomain()
 
-  override suspend fun deleteTemplate(id: String): Unit =
-    templateRemoteDataSource.deleteTemplate(id)
+  override suspend fun deleteTemplate(id: String) =
+    templateDataSource.deleteTemplate(id)
 }

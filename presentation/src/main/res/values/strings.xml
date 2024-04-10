@@ -1,0 +1,58 @@
+<resources>
+    <string name="app_name">제1회점심메뉴총선거</string>
+
+    <!-- LoginFragment-->
+    <string name="login_email_hint">이메일</string>
+    <string name="login_password_hint">비밀번호</string>
+    <string name="login_btn">로그인</string>
+    <string name="login_register_guide">계정이 없으신가요?</string>
+    <string name="login_register_btn"><u>회원가입</u></string>
+
+    <!-- HomeScreen -->
+    <string name="home_banner_title">지금 사람들은 뭘 먹고 싶을까?</string>
+    <string name="home_banner_score">%d%%의 사람들이 선택</string>
+    <string name="home_start_btn">투표 생성하기</string>
+    <string name="home_join_btn">투표 참여하기</string>
+    <string name="home_template_btn">템플릿 사전 설정하기</string>
+    <string name="home_tips_btn">투표 방법이 궁금하신가요?</string>
+    <string name="home_join_code_hint">초대 코드</string>
+
+    <!-- RegisterEmailScreen -->
+    <string name="register_email_title">먼저 이메일을 확인할게요.</string>
+    <string name="register_email_content">가입된 이메일인지 확인해볼게요!</string>
+    <string name="register_email_confirm_btn">이메일 확인하기</string>
+
+    <!-- LoungeScreen -->
+    <string name="lounge_topbar_title">투표 대기방</string>
+    <string name="lounge_create_loading">방을 생성중입니다\n잠시만 기다려주세요</string>
+    <string name="lounge_join_loading">방에 접속중입니다\n잠시만 기다려주세요</string>
+    <string name="lounge_ready_btn">준비</string>
+    <string name="lounge_start_btn">시작</string>
+    <string name="lounge_exit_dialog_title">정말 나가시겠습니까?</string>
+    <string name="lounge_exit_dialog_owner_content">방장이 방을 나갈 경우, 투표 대기방이 사라지게 됩니다.</string>
+    <string name="lounge_exit_dialog_member_content">방을 나갈 경우, 초대 코드를 입력하면 다시 들어올 수 있습니다.</string>
+
+    <!-- LoungeMemberScreen -->
+    <string name="lounge_member_topbar_title">참여자 정보방</string>
+    <string name="lounge_member_exile">추방하기</string>
+    <string name="lounge_member_anonymous_nickname">익명 참가자</string>
+
+    <!-- SecondVoteScreen -->
+    <string name="second_vote_fab">투표 완료</string>
+    <string name="second_vote_back_fab">다시 투표하기</string>
+    <string name="second_vote_complete_wait">다른 참가자 대기중..</string>
+    <string name="second_vote_complete_content">명이 투표 완료했습니다!</string>
+    <!-- FirstVoteScreen -->
+    <string name="first_vote_title">1차 투표</string>
+    <string name="first_vote_hint_text">검색</string>
+
+    <string name="exit_dialog_title">투표 나가기</string>
+    <string name="exit_from_vote">투표 방에서 나왔습니다.</string>
+    <string name="vote_exit_alert">투표에서 나가면 다시 돌아올 수 없으며,\n투표를 한 경우 투표 결과에 반영됩니다.</string>
+
+    <!-- ResultScreen -->
+    <string name="result_toolbar_title">투표 결과</string>
+    <string name="result_title">오늘의 메뉴는 ..</string>
+
+    <string name="default_web_client_id">id</string>
+</resources>

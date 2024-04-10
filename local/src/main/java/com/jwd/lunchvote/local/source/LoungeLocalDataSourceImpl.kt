@@ -1,8 +1,6 @@
 package com.jwd.lunchvote.local.source
 
 import com.google.firebase.auth.FirebaseAuth
-import com.jwd.lunchvote.data.di.Dispatcher
-import com.jwd.lunchvote.data.di.LunchVoteDispatcher.IO
 import com.jwd.lunchvote.data.model.LoungeChatData
 import com.jwd.lunchvote.data.model.MemberData
 import com.jwd.lunchvote.data.model.type.MemberStatusDataType
@@ -28,7 +26,7 @@ class LoungeLocalDataSourceImpl @Inject constructor(
     private val loungeDao: LoungeDao,
     private val memberDao: MemberDao,
     private val auth: FirebaseAuth,
-    @Dispatcher(IO) private val dispatcher: CoroutineDispatcher
+    private val dispatcher: CoroutineDispatcher
 ): LoungeLocalDataSource {
     override fun getChatList(
         loungeId: String,
