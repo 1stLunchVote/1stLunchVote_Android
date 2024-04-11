@@ -28,6 +28,4 @@ class SettingContract {
     data class PopBackStack(val message: String) : SettingSideEffect
     data class ShowSnackBar(val message: String) : SettingSideEffect
   }
-
-  sealed interface SettingDialogState: ViewModelContract.DialogState
 }
