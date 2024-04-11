@@ -21,7 +21,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jwd.lunchvote.core.common.base.error.UnimplementedError
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.ui.login.register.RegisterEmailContract.RegisterEmailEvent
@@ -44,7 +43,7 @@ fun RegisterEmailRoute(
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
       when (it) {
-        is RegisterEmailSideEffect.NavigateToRegisterPassword -> throw UnimplementedError
+        is RegisterEmailSideEffect.NavigateToRegisterPassword -> throw NotImplementedError()
         is RegisterEmailSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
       }
     }

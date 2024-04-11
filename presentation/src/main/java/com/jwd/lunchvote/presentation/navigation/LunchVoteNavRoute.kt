@@ -31,7 +31,9 @@ enum class LunchVoteNavRoute(
   HomeJoinDialog,
   TemplateListAddDialog,
   EditTemplateDeleteDialog,
-  EditTemplateConfirmDialog
+  EditTemplateConfirmDialog,
+  VoteExitDialog,
+  FirstVoteTemplateDialog,
 }
 
 internal val LunchVoteNavRoute.route: String

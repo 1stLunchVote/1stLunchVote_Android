@@ -5,6 +5,7 @@ import com.jwd.lunchvote.core.ui.base.ViewModelContract
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.model.enums.FoodStatus
+import com.jwd.lunchvote.presentation.util.UiText
 import kotlinx.parcelize.Parcelize
 
 class FirstVoteContract {
@@ -28,7 +29,6 @@ class FirstVoteContract {
     data class SetSearchKeyword(val searchKeyword: String): FirstVoteEvent
     data object OnClickFinishButton: FirstVoteEvent
     data object OnClickExitButton: FirstVoteEvent
-    object OnClickDismissButton: FirstVoteEvent
   }
 
   sealed interface FirstVoteReduce: ViewModelContract.Reduce {
@@ -42,12 +42,10 @@ class FirstVoteContract {
   }
 
   sealed interface FirstVoteSideEffect: ViewModelContract.SideEffect {
-    data object PopBackStack: FirstVoteSideEffect
     data object NavigateToSecondVote: FirstVoteSideEffect
-  }
-
-  sealed interface FirstVoteDialogState: ViewModelContract.DialogState {
-    data class SelectTemplateDialog(val templateList: List<TemplateUIModel>, val selectTemplate: (TemplateUIModel?) -> Unit): FirstVoteDialogState
-    data class VoteExitDialogState(val onClickConfirmButton: () -> Unit): FirstVoteDialogState
+    data object OpenTemplateDialog: FirstVoteSideEffect
+    data object OpenVoteExitDialog: FirstVoteSideEffect
+    data object PopBackStack: FirstVoteSideEffect
+    data class ShowSnackBar(val message: UiText): FirstVoteSideEffect
   }
 }

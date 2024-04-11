@@ -6,7 +6,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.jwd.lunchvote.core.common.base.error.LoginError
-import com.jwd.lunchvote.core.common.base.error.UnimplementedError
 import com.jwd.lunchvote.core.common.base.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.usecase.login.KakaoLoginUseCase
@@ -35,7 +34,7 @@ class LoginViewModel @Inject constructor(
     when (event) {
       is LoginEvent.OnChangeEmail -> updateState(LoginReduce.UpdateEmail(event.email))
       is LoginEvent.OnChangePassword -> updateState(LoginReduce.UpdatePassword(event.password))
-      is LoginEvent.OnClickEmailLoginButton -> throw UnimplementedError
+      is LoginEvent.OnClickEmailLoginButton -> throw NotImplementedError()
       is LoginEvent.OnClickRegisterButton -> sendSideEffect(LoginSideEffect.NavigateToRegisterEmail)
       is LoginEvent.OnClickKakaoLoginButton -> {
         setLoading(true)

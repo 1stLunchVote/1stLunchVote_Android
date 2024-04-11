@@ -48,7 +48,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun AddTemplateRoute(
   popBackStack: () -> Unit,
-  showSnackbar: suspend (String) -> Unit,
+  showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: AddTemplateViewModel = hiltViewModel(),
   context: Context = LocalContext.current
@@ -60,7 +60,7 @@ fun AddTemplateRoute(
     viewModel.sideEffect.collectLatest {
       when(it){
         is AddTemplateSideEffect.PopBackStack -> popBackStack()
-        is AddTemplateSideEffect.ShowSnackBar -> showSnackbar(it.message.asString(context))
+        is AddTemplateSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
       }
     }
   }
