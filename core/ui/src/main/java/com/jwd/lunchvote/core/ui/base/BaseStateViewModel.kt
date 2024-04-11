@@ -46,11 +46,11 @@ abstract class BaseStateViewModel<S : ViewModelContract.State, E : ViewModelCont
     }
   }
 
-  private val _isLoading: Channel<Boolean> = Channel()
-  val isLoading = _isLoading.receiveAsFlow()
+  private val _isLoading = MutableStateFlow(false)
+  val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
   fun setLoading(isLoading: Boolean) {
     viewModelScope.launch {
-      _isLoading.send(isLoading)
+      _isLoading.emit(isLoading)
     }
   }
 

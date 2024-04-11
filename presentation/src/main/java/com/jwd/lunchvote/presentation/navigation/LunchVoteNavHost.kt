@@ -150,16 +150,15 @@ fun LunchVoteNavHost(
     }
     composable(LunchVoteNavRoute.Login) {
       LoginRoute(
-        navigateToHome = {
-          navController.navigateWithPop(LunchVoteNavRoute.Home)
-        },
-        navigateToRegisterEmail = {
-          navController.navigate(LunchVoteNavRoute.RegisterEmail)
-        }
+        navigateToHome = { navController.navigateWithPop(LunchVoteNavRoute.Home) },
+        navigateToRegisterEmail = { navController.navigate(LunchVoteNavRoute.RegisterEmail) },
+        showSnackBar = showSnackBar
       )
     }
     composable(LunchVoteNavRoute.RegisterEmail){
-      RegisterEmailRoute()
+      RegisterEmailRoute(
+        showSnackBar = showSnackBar
+      )
     }
     composable(LunchVoteNavRoute.Setting) {
       SettingRoute(

@@ -41,6 +41,7 @@ import com.jwd.lunchvote.presentation.ui.login.LoginContract.LoginEvent
 import com.jwd.lunchvote.presentation.ui.login.LoginContract.LoginSideEffect
 import com.jwd.lunchvote.presentation.ui.login.LoginContract.LoginState
 import com.jwd.lunchvote.presentation.util.login
+import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.kakao.sdk.user.UserApiClient
 import kotlinx.coroutines.flow.collectLatest
@@ -55,6 +56,7 @@ fun LoginRoute(
   context: Context = LocalContext.current,
 ) {
   val loginState by viewModel.viewState.collectAsStateWithLifecycle()
+  val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
 //    val googleSignInClient by lazy {
 //      val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -93,7 +95,8 @@ fun LoginRoute(
     }
   }
 
-  LoginScreen(
+  if (isLoading) LoadingScreen()
+  else LoginScreen(
     loginState = loginState,
     modifier = modifier,
     onEmailChanged = { viewModel.sendEvent(LoginEvent.OnChangeEmail(it)) },
