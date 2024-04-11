@@ -42,7 +42,6 @@ fun TemplateListRoute(
   navigateToEditTemplate: (String?) -> Unit,
   navigateToAddTemplate: (String) -> Unit,
   popBackStack: () -> Unit,
-  savedStateHandle: SavedStateHandle,
   viewModel: TemplateListViewModel = hiltViewModel()
 ){
   val templateListState : TemplateListState by viewModel.viewState.collectAsStateWithLifecycle()
