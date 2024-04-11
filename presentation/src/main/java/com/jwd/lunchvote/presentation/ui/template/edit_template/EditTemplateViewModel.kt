@@ -3,6 +3,7 @@ package com.jwd.lunchvote.presentation.ui.template.edit_template
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.jwd.lunchvote.core.common.base.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.entity.Template
 import com.jwd.lunchvote.domain.usecase.template.DeleteTemplateUseCase
@@ -13,11 +14,11 @@ import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.model.enums.FoodStatus
 import com.jwd.lunchvote.presentation.model.updateFoodMap
-import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateDialogState
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateEvent
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateReduce
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateSideEffect
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateState
+import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,7 +30,7 @@ class EditTemplateViewModel @Inject constructor(
   private val editTemplateUseCase: EditTemplateUseCase,
   private val deleteTemplateUseCase: DeleteTemplateUseCase,
   savedStateHandle: SavedStateHandle
-): BaseStateViewModel<EditTemplateState, EditTemplateEvent, EditTemplateReduce, EditTemplateSideEffect, EditTemplateDialogState>(savedStateHandle){
+): BaseStateViewModel<EditTemplateState, EditTemplateEvent, EditTemplateReduce, EditTemplateSideEffect>(savedStateHandle){
   override fun createInitialState(savedState: Parcelable?): EditTemplateState {
     return savedState as? EditTemplateState ?: EditTemplateState()
   }
@@ -42,24 +43,15 @@ class EditTemplateViewModel @Inject constructor(
   override fun handleEvents(event: EditTemplateEvent) {
     when(event) {
       is EditTemplateEvent.StartInitialize -> viewModelScope.launch { initialize(event.templateId) }
-      is EditTemplateEvent.OnClickBackButton -> sendSideEffect(EditTemplateSideEffect.PopBackStack())
+      is EditTemplateEvent.OnClickBackButton -> sendSideEffect(EditTemplateSideEffect.PopBackStack)
       is EditTemplateEvent.SetSearchKeyword -> updateState(
         EditTemplateReduce.UpdateSearchKeyword(
           event.searchKeyword
         )
       )
       is EditTemplateEvent.OnClickFood -> updateState(EditTemplateReduce.UpdateFoodStatus(event.food))
-      is EditTemplateEvent.OnClickSaveButton -> toggleDialog(
-        EditTemplateDialogState.EditTemplateConfirm(
-          onClickConfirm = { viewModelScope.launch { save() } }
-        )
-      )
-      is EditTemplateEvent.OnClickDeleteButton -> toggleDialog(
-        EditTemplateDialogState.DeleteTemplateConfirm(
-          onClickConfirm = { viewModelScope.launch { delete() } }
-        )
-      )
-      is EditTemplateEvent.OnClickDialogDismiss -> toggleDialog(null)
+      is EditTemplateEvent.OnClickSaveButton -> sendSideEffect(EditTemplateSideEffect.OpenConfirmDialog)
+      is EditTemplateEvent.OnClickDeleteButton -> sendSideEffect(EditTemplateSideEffect.OpenDeleteDialog)
     }
   }
 
@@ -84,6 +76,10 @@ class EditTemplateViewModel @Inject constructor(
         )
       }
     }
+  }
+
+  override fun handleErrors(error: Throwable) {
+    sendSideEffect(EditTemplateSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
   }
 
   private suspend fun initialize(templateId: String) {
@@ -122,13 +118,15 @@ class EditTemplateViewModel @Inject constructor(
         dislike = currentState.dislikeList.map { it.name }
       )
     )
-    sendSideEffect(EditTemplateSideEffect.PopBackStack("템플릿이 수정되었습니다."))
+    sendSideEffect(EditTemplateSideEffect.ShowSnackBar(UiText.DynamicString("템플릿이 수정되었습니다.")))
+    sendSideEffect(EditTemplateSideEffect.PopBackStack)
   }
 
   private suspend fun delete() {
     updateState(EditTemplateReduce.UpdateLoading(true))
 
     deleteTemplateUseCase.invoke(currentState.template.id)
-    sendSideEffect(EditTemplateSideEffect.PopBackStack("템플릿이 삭제되었습니다."))
+    sendSideEffect(EditTemplateSideEffect.ShowSnackBar(UiText.DynamicString("템플릿이 삭제되었습니다.")))
+    sendSideEffect(EditTemplateSideEffect.PopBackStack)
   }
 }

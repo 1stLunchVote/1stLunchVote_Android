@@ -35,18 +35,19 @@ fun LunchVoteDialog(
   title: String,
   dismissText: String,
   onDismiss: () -> Unit,
-  dismissEnabled: Boolean = true,
   confirmText: String,
   onConfirm: () -> Unit,
+  modifier: Modifier = Modifier,
+  dismissEnabled: Boolean = true,
   confirmEnabled: Boolean = true,
   icon: @Composable (() -> Unit)? = null,
   content: @Composable ColumnScope.() -> Unit,
 ) {
   Dialog(
-    onDismissRequest = onDismiss,
+    onDismissRequest = onDismiss
   ) {
     Column(
-      modifier = Modifier
+      modifier = modifier
         .fillMaxWidth()
         .background(MaterialTheme.colorScheme.background, RoundedCornerShape(28.dp))
         .border(2.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(28.dp)),

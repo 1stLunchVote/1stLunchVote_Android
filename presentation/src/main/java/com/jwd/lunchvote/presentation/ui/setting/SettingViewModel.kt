@@ -2,8 +2,8 @@ package com.jwd.lunchvote.presentation.ui.setting
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
+import com.jwd.lunchvote.core.common.base.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
-import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingDialogState
 import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingEvent
 import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingReduce
 import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingSideEffect
@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingViewModel @Inject constructor(
   savedStateHandle: SavedStateHandle
-): BaseStateViewModel<SettingState, SettingEvent, SettingReduce, SettingSideEffect, SettingDialogState>(savedStateHandle) {
+): BaseStateViewModel<SettingState, SettingEvent, SettingReduce, SettingSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): SettingState {
     return savedState as? SettingState ?: SettingState()
   }
@@ -32,4 +32,8 @@ class SettingViewModel @Inject constructor(
   }
 
   override fun reduceState(state: SettingState, reduce: SettingReduce): SettingState = state
+
+  override fun handleErrors(error: Throwable) {
+    sendSideEffect(SettingSideEffect.ShowSnackBar(error.message ?: UnknownError.UNKNOWN))
+  }
 }

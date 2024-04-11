@@ -3,18 +3,18 @@ package com.jwd.lunchvote.presentation.ui.vote.first
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.jwd.lunchvote.core.common.base.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.usecase.first_vote.GetFoodListUseCase
 import com.jwd.lunchvote.domain.usecase.first_vote.GetTemplateListUseCase
 import com.jwd.lunchvote.presentation.model.FoodUIModel
-import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.model.enums.FoodStatus
 import com.jwd.lunchvote.presentation.model.updateFoodMap
-import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteDialogState
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteEvent
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteReduce
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteSideEffect
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteState
+import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -24,7 +24,7 @@ class FirstVoteViewModel @Inject constructor(
   savedStateHandle: SavedStateHandle,
   private val getFoodListUseCase: GetFoodListUseCase,
   private val getTemplateListUseCase: GetTemplateListUseCase
-): BaseStateViewModel<FirstVoteState, FirstVoteEvent, FirstVoteReduce, FirstVoteSideEffect, FirstVoteDialogState>(savedStateHandle) {
+): BaseStateViewModel<FirstVoteState, FirstVoteEvent, FirstVoteReduce, FirstVoteSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): FirstVoteState =
     savedState as? FirstVoteState ?: FirstVoteState()
 
@@ -38,17 +38,8 @@ class FirstVoteViewModel @Inject constructor(
       is FirstVoteEvent.StartInitialize -> viewModelScope.launch { initialize(event.loungeId) }
       is FirstVoteEvent.OnClickFood -> updateState(FirstVoteReduce.UpdateFoodStatus(event.food))
       is FirstVoteEvent.SetSearchKeyword -> updateState(FirstVoteReduce.UpdateSearchKeyword(event.searchKeyword))
-      is FirstVoteEvent.OnClickFinishButton -> toggleDialog(
-        FirstVoteDialogState.VoteExitDialogState {
-          updateState(FirstVoteReduce.UpdateFinished(true))
-        }
-      )
-      is FirstVoteEvent.OnClickExitButton -> toggleDialog(
-        FirstVoteDialogState.VoteExitDialogState {
-          sendSideEffect(FirstVoteSideEffect.PopBackStack)
-        }
-      )
-      is FirstVoteEvent.OnClickDismissButton -> toggleDialog(null)
+      is FirstVoteEvent.OnClickFinishButton -> throw NotImplementedError()
+      is FirstVoteEvent.OnClickExitButton -> throw NotImplementedError()
     }
   }
 
@@ -78,6 +69,10 @@ class FirstVoteViewModel @Inject constructor(
     }
   }
 
+  override fun handleErrors(error: Throwable) {
+    sendSideEffect(FirstVoteSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+  }
+
   private suspend fun initialize(loungeId: String) {
     updateState(FirstVoteReduce.UpdateLoading(true))
 
@@ -97,30 +92,30 @@ class FirstVoteViewModel @Inject constructor(
       )
     )
 
-    toggleDialog(
-      FirstVoteDialogState.SelectTemplateDialog(
-        templateList = templateList.map { TemplateUIModel(it) },
-        selectTemplate = { template ->
-          updateState(
-            FirstVoteReduce.Initialize(
-              FirstVoteState(
-                loading = false,
-                foodMap = foodList.associate {
-                  FoodUIModel(it) to when (it.name) {
-                    in template?.like ?: emptyList() -> FoodStatus.LIKE
-                    in template?.dislike ?: emptyList() -> FoodStatus.DISLIKE
-                    else -> FoodStatus.DEFAULT
-                  }
-                },
-                likeList = foodList.filter { (template?.like ?: emptyList()).contains(it.name) }.map { FoodUIModel(it) },
-                dislikeList = foodList.filter { (template?.dislike ?: emptyList()).contains(it.name) }.map { FoodUIModel(it) },
-                totalMember = 3,
-                endedMember = 1
-              )
-            )
-          )
-        }
-      )
-    )
+//    toggleDialog(
+//      FirstVoteDialogState.SelectTemplateDialog(
+//        templateList = templateList.map { TemplateUIModel(it) },
+//        selectTemplate = { template ->
+//          updateState(
+//            FirstVoteReduce.Initialize(
+//              FirstVoteState(
+//                loading = false,
+//                foodMap = foodList.associate {
+//                  FoodUIModel(it) to when (it.name) {
+//                    in template?.like ?: emptyList() -> FoodStatus.LIKE
+//                    in template?.dislike ?: emptyList() -> FoodStatus.DISLIKE
+//                    else -> FoodStatus.DEFAULT
+//                  }
+//                },
+//                likeList = foodList.filter { (template?.like ?: emptyList()).contains(it.name) }.map { FoodUIModel(it) },
+//                dislikeList = foodList.filter { (template?.dislike ?: emptyList()).contains(it.name) }.map { FoodUIModel(it) },
+//                totalMember = 3,
+//                endedMember = 1
+//              )
+//            )
+//          )
+//        }
+//      )
+//    )
   }
 }

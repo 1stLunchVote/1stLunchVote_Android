@@ -1,5 +1,6 @@
 package com.jwd.lunchvote.presentation.ui.home
 
+import android.content.Context
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,17 +19,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
-import androidx.compose.material3.FabPosition
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -40,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -53,10 +50,8 @@ import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeEvent
 import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeSideEffect
 import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeState
-import com.jwd.lunchvote.presentation.widget.LoadingDialog
-import kotlinx.coroutines.flow.Flow
+import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filter
 
 @Composable
 fun HomeRoute(
@@ -66,13 +61,14 @@ fun HomeRoute(
   navigateToTips: () -> Unit,
   navigateToTest: () -> Unit,
   navigateToFirstVote: () -> Unit,
-  messageFlow: Flow<String>,
-  viewModel: HomeViewModel = hiltViewModel()
+  openJoinDialog: () -> Unit,
+  showSnackBar: suspend (String) -> Unit,
+  modifier: Modifier = Modifier,
+  viewModel: HomeViewModel = hiltViewModel(),
+  context: Context = LocalContext.current
 ){
   val homeState by viewModel.viewState.collectAsStateWithLifecycle()
-  val homeDialogState by viewModel.dialogState.collectAsStateWithLifecycle()
-
-  val snackBarHostState = remember { SnackbarHostState() }
+  val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect){
     viewModel.sideEffect.collectLatest {
@@ -81,93 +77,71 @@ fun HomeRoute(
         is HomeSideEffect.NavigateToTemplateList -> navigateToTemplateList()
         is HomeSideEffect.NavigateToSetting -> navigateToSetting()
         is HomeSideEffect.NavigateToTips -> navigateToTips()
-        is HomeSideEffect.ShowSnackBar -> snackBarHostState.showSnackbar(it.message)
+        is HomeSideEffect.OpenJoinDialog -> openJoinDialog()
+        is HomeSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
       }
     }
   }
 
-  LaunchedEffect(Unit){
-    messageFlow.filter { it.isNotEmpty() }.collectLatest {
-      snackBarHostState.showSnackbar(it)
-    }
-  }
-
-  HomeDialog(
-    homeDialogState = homeDialogState,
-    onClickDismissButton = { viewModel.sendEvent(HomeEvent.OnClickDismissButton) }
-  )
-
-  HomeScreen(
+  if (isLoading) LoadingScreen()
+  else HomeScreen(
     homeState = homeState,
-    snackBarHostState = snackBarHostState,
+    modifier = modifier,
     onClickLoungeButton = { viewModel.sendEvent(HomeEvent.OnClickLoungeButton) },
     onClickJoinLoungeButton = { viewModel.sendEvent(HomeEvent.OnClickJoinLoungeButton) },
     onClickTemplateButton = { viewModel.sendEvent(HomeEvent.OnClickTemplateButton) },
     onClickSettingButton = { viewModel.sendEvent(HomeEvent.OnClickSettingButton) },
-    onClickTipsButton = { viewModel.sendEvent(HomeEvent.OnClickTipsButton) },
-    onClickTest = navigateToTest,
-    onClickFirstVote = navigateToFirstVote
+    onClickTipsButton = { viewModel.sendEvent(HomeEvent.OnClickTipsButton) }
   )
+
+  Row {
+    Button(onClick = navigateToFirstVote) {
+      Text("1차 투표 테스트")
+    }
+    Button(onClick = navigateToTest) {
+      Text(text = "2차 투표 화면 테스트")
+    }
+  }
 }
 
 @Composable
 private fun HomeScreen(
   homeState: HomeState,
-  snackBarHostState: SnackbarHostState,
+  modifier: Modifier = Modifier,
   onClickLoungeButton: () -> Unit = {},
   onClickJoinLoungeButton: () -> Unit = {},
   onClickTemplateButton: () -> Unit = {},
   onClickSettingButton: () -> Unit = {},
-  onClickTipsButton: () -> Unit = {},
-  onClickTest: () -> Unit = {},
-  onClickFirstVote: () -> Unit = {}
+  onClickTipsButton: () -> Unit = {}
 ){
-  if (homeState.loading) LoadingDialog()
-  Scaffold(
-    snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
-    // todo : 2차 투표 화면 테스트를 위한 fab
-    floatingActionButtonPosition = FabPosition.Center,
-    floatingActionButton = {
-      Row {
-        Button(onClick = onClickFirstVote) {
-          Text("1차 투표 테스트")
-        }
-        Button(onClick = onClickTest) {
-          Text(text = "2차 투표 화면 테스트")
-        }
-      }
-    }
-  ) { padding ->
-    Column(
+  Column(
+    modifier = Modifier
+      .fillMaxSize()
+      .padding(horizontal = 32.dp),
+    horizontalAlignment = CenterHorizontally
+  ) {
+    Image(
+      painterResource(R.drawable.ic_logo),
+      null,
       modifier = Modifier
-        .fillMaxSize()
-        .padding(padding)
-        .padding(horizontal = 32.dp),
-      horizontalAlignment = CenterHorizontally
-    ) {
-      Image(
-        painterResource(R.drawable.ic_logo),
-        null,
-        modifier = Modifier
-          .size(48.dp)
-          .align(CenterHorizontally)
-      )
-      FoodTrendChart(
-        Modifier.padding(top = 40.dp, bottom = 40.dp)
-      )
-      HomeDivider(
-        Modifier
-          .fillMaxWidth()
-          .padding(vertical = 24.dp)
-      )
-      HomeButtonSet(
-        onClickLoungeButton = onClickLoungeButton,
-        onClickJoinLoungeButton = onClickJoinLoungeButton,
-        onClickTemplateButton = onClickTemplateButton,
-        onClickSettingButton = onClickSettingButton,
-        onClickTipsButton = onClickTipsButton,
-      )
-    }
+        .size(48.dp)
+        .align(CenterHorizontally)
+    )
+    FoodTrendChart(
+      Modifier.padding(top = 40.dp, bottom = 40.dp)
+    )
+    HomeDivider(
+      Modifier
+        .fillMaxWidth()
+        .padding(vertical = 24.dp)
+    )
+    HomeButtonSet(
+      onClickLoungeButton = onClickLoungeButton,
+      onClickJoinLoungeButton = onClickJoinLoungeButton,
+      onClickTemplateButton = onClickTemplateButton,
+      onClickSettingButton = onClickSettingButton,
+      onClickTipsButton = onClickTipsButton,
+    )
   }
 }
 
@@ -258,7 +232,7 @@ fun HomeDivider(
       painterResource(R.drawable.ic_triangle),
       null
     )
-    Divider(
+    HorizontalDivider(
       modifier = Modifier.weight(1f),
       thickness = 2.dp,
       color = MaterialTheme.colorScheme.primary
@@ -266,8 +240,7 @@ fun HomeDivider(
     Image(
       painterResource(R.drawable.ic_triangle),
       null,
-      modifier = Modifier
-        .graphicsLayer(rotationZ = 180f)
+      modifier = Modifier.graphicsLayer(rotationZ = 180f)
     )
   }
 }
@@ -399,8 +372,7 @@ fun HomeButtonSet(
 fun HomeScreenPreview() {
   LunchVoteTheme {
     HomeScreen(
-      homeState = HomeState(),
-      snackBarHostState = remember { SnackbarHostState() }
+      HomeState()
     )
   }
 }
