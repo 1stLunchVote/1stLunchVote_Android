@@ -26,85 +26,88 @@ import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 
 @Composable
 fun ResultRoute(
-    viewModel: ResultViewModel = hiltViewModel()
-){
-    val state: ResultState by viewModel.viewState.collectAsStateWithLifecycle()
+  viewModel: ResultViewModel = hiltViewModel()
+) {
+  val state: ResultState by viewModel.viewState.collectAsStateWithLifecycle()
 
-    ResultScreen(
-        state = state,
-        onEventAction = viewModel::sendEvent
-    )
+  ResultScreen(
+    state = state,
+    onEventAction = viewModel::sendEvent
+  )
 }
 
 @Composable
 private fun ResultScreen(
-    state: ResultState,
-    onEventAction: (ResultEvent) -> Unit = {}
-){
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = {
-            LunchVoteTopBar(
-                title = stringResource(id = R.string.result_toolbar_title),
-                navIconVisible = false
-            )
-        },
-    ) {padding ->
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .padding(padding)) {
-            ConstraintLayout(
-                modifier = Modifier
-                    .padding(padding)
-                    .align(Alignment.Center)
-            ){
-                val (text, image, ratio, name, button) = createRefs()
+  state: ResultState,
+  onEventAction: (ResultEvent) -> Unit = {}
+) {
+  Scaffold(
+    modifier = Modifier.fillMaxSize(),
+    topBar = {
+      LunchVoteTopBar(
+        title = stringResource(id = R.string.result_toolbar_title),
+        navIconVisible = false
+      )
+    },
+  ) { padding ->
+    Box(
+      modifier = Modifier
+          .fillMaxSize()
+          .padding(padding)
+    ) {
+      ConstraintLayout(
+        modifier = Modifier
+            .padding(padding)
+            .align(Alignment.Center)
+      ) {
+        val (text, image, ratio, name, button) = createRefs()
 
-                Text(text = stringResource(id = R.string.result_title),
-                    modifier = Modifier.constrainAs(text) {
-                        top.linkTo(parent.top)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    },
-                    style = MaterialTheme.typography.bodyLarge
-                )
+        Text(
+          text = stringResource(id = R.string.result_title),
+          modifier = Modifier.constrainAs(text) {
+            top.linkTo(parent.top)
+            start.linkTo(parent.start)
+            end.linkTo(parent.end)
+          },
+          style = MaterialTheme.typography.bodyLarge
+        )
 
-                AsyncImage(
-                    model = state.image,
-                    contentDescription = "menu_image",
-                    modifier = Modifier
-                        .size(156.dp)
-                        .constrainAs(image) {
-                            top.linkTo(text.bottom, margin = 8.dp)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                        }
-                )
+        AsyncImage(
+          model = state.image,
+          contentDescription = "menu_image",
+          modifier = Modifier
+              .size(156.dp)
+              .constrainAs(image) {
+                  top.linkTo(text.bottom, margin = 8.dp)
+                  start.linkTo(parent.start)
+                  end.linkTo(parent.end)
+              }
+        )
 
-                Text(
-                    text = state.name,
-                    modifier = Modifier.constrainAs(name) {
-                        top.linkTo(image.bottom, margin = 48.dp)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    },
-                    style = MaterialTheme.typography.headlineSmall
-                )
-            }
-        }
-
+        Text(
+          text = state.name,
+          modifier = Modifier.constrainAs(name) {
+            top.linkTo(image.bottom, margin = 48.dp)
+            start.linkTo(parent.start)
+            end.linkTo(parent.end)
+          },
+          style = MaterialTheme.typography.headlineSmall
+        )
+      }
     }
+
+  }
 }
 
 @Preview(showSystemUi = true)
 @Composable
-private fun ResultScreenPreview(){
-    LunchVoteTheme {
-        ResultScreen(
-            ResultState(
-                image = "",
-                name = "치킨"
-            )
-        )
-    }
+private fun ResultScreenPreview() {
+  LunchVoteTheme {
+    ResultScreen(
+      ResultState(
+        image = "",
+        name = "치킨"
+      )
+    )
+  }
 }
