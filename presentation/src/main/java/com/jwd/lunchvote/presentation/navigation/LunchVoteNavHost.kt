@@ -17,6 +17,7 @@ import com.jwd.lunchvote.presentation.ui.login.register.RegisterEmailRoute
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeRoute
 import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberRoute
 import com.jwd.lunchvote.presentation.ui.setting.SettingRoute
+import com.jwd.lunchvote.presentation.ui.template.TemplateAddDialog
 import com.jwd.lunchvote.presentation.ui.template.TemplateListRoute
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateRoute
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateRoute
@@ -106,12 +107,14 @@ fun LunchVoteNavHost(
         },
         navigateToFirstVote = { loungeId ->
           navController.navigate(LunchVoteNavRoute.FirstVote, loungeId)
-        }
+        },
+        showSnackBar = showSnackBar
       )
     }
     composable(LunchVoteNavRoute.LoungeMember) {
       LoungeMemberRoute(
-        popBackStack = { navController.popBackStack() }
+        popBackStack = { navController.popBackStack() },
+        showSnackBar = showSnackBar
       )
     }
     composable(LunchVoteNavRoute.FirstVote) {
@@ -132,10 +135,9 @@ fun LunchVoteNavHost(
         navigateToEditTemplate = { templateId ->
           navController.navigate(LunchVoteNavRoute.EditTemplate, templateId)
         },
-        navigateToAddTemplate = { templateName ->
-          navController.navigate(LunchVoteNavRoute.AddTemplate, templateName)
-        },
-        popBackStack = { navController.popBackStack() }
+        openAddDialog = { navController.navigate(LunchVoteNavRoute.TemplateAddDialog) },
+        popBackStack = { navController.popBackStack() },
+        showSnackBar = showSnackBar
       )
     }
     composable(LunchVoteNavRoute.EditTemplate) {
@@ -171,6 +173,14 @@ fun LunchVoteNavHost(
         onClickDismissButton = { navController.popBackStack() },
         onClickConfirmButton = { code ->
           // TODO: 코드 활용해서 Lounge 입장 대기 화면 띄우기
+        }
+      )
+    }
+    dialog(LunchVoteNavRoute.TemplateAddDialog) {
+      TemplateAddDialog(
+        popBackStack = { navController.popBackStack() },
+        navigateToAddTemplate = { templateName ->
+          navController.navigate(LunchVoteNavRoute.AddTemplate, templateName)
         }
       )
     }
