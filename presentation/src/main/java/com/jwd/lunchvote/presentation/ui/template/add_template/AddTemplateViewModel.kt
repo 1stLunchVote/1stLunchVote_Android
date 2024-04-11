@@ -3,6 +3,7 @@ package com.jwd.lunchvote.presentation.ui.template.add_template
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.jwd.lunchvote.core.common.base.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.entity.Template
 import com.jwd.lunchvote.domain.usecase.template.AddTemplateUseCase
@@ -10,11 +11,11 @@ import com.jwd.lunchvote.domain.usecase.template.GetFoodListUseCase
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.enums.FoodStatus
 import com.jwd.lunchvote.presentation.model.updateFoodMap
-import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateDialogState
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateEvent
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateReduce
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateSideEffect
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateState
+import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -24,7 +25,7 @@ class AddTemplateViewModel @Inject constructor(
   private val addTemplateUseCase: AddTemplateUseCase,
   private val getFoodListUseCase: GetFoodListUseCase,
   savedStateHandle: SavedStateHandle
-): BaseStateViewModel<AddTemplateState, AddTemplateEvent, AddTemplateReduce, AddTemplateSideEffect, AddTemplateDialogState>(savedStateHandle){
+): BaseStateViewModel<AddTemplateState, AddTemplateEvent, AddTemplateReduce, AddTemplateSideEffect>(savedStateHandle){
   override fun createInitialState(savedState: Parcelable?): AddTemplateState {
     return savedState as? AddTemplateState ?: AddTemplateState()
   }
@@ -37,7 +38,7 @@ class AddTemplateViewModel @Inject constructor(
   override fun handleEvents(event: AddTemplateEvent) {
     when(event) {
       is AddTemplateEvent.StartInitialize -> viewModelScope.launch { initialize(event.templateName) }
-      is AddTemplateEvent.OnClickBackButton -> sendSideEffect(AddTemplateSideEffect.PopBackStack())
+      is AddTemplateEvent.OnClickBackButton -> sendSideEffect(AddTemplateSideEffect.PopBackStack)
       is AddTemplateEvent.OnClickFood -> updateState(AddTemplateReduce.UpdateFoodStatus(event.food))
       is AddTemplateEvent.SetSearchKeyword -> updateState(
         AddTemplateReduce.UpdateSearchKeyword(
@@ -71,6 +72,10 @@ class AddTemplateViewModel @Inject constructor(
     }
   }
 
+  override fun handleErrors(error: Throwable) {
+    sendSideEffect(AddTemplateSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+  }
+
   private suspend fun initialize(templateName: String) {
     updateState(AddTemplateReduce.UpdateLoading(true))
 
@@ -98,6 +103,7 @@ class AddTemplateViewModel @Inject constructor(
         dislike = currentState.dislikeList.map { it.name },
       )
     )
-    sendSideEffect(AddTemplateSideEffect.PopBackStack("템플릿이 저장되었습니다."))
+    sendSideEffect(AddTemplateSideEffect.ShowSnackBar(UiText.DynamicString("템플릿이 저장되었습니다.")))
+    sendSideEffect(AddTemplateSideEffect.PopBackStack)
   }
 }

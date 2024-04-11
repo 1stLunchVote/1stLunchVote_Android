@@ -4,6 +4,7 @@ import android.os.Parcelable
 import com.jwd.lunchvote.core.ui.base.ViewModelContract
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.enums.FoodStatus
+import com.jwd.lunchvote.presentation.util.UiText
 import kotlinx.parcelize.Parcelize
 
 class AddTemplateContract {
@@ -35,9 +36,7 @@ class AddTemplateContract {
   }
 
   sealed interface AddTemplateSideEffect: ViewModelContract.SideEffect {
-    data class PopBackStack(val message: String = ""): AddTemplateSideEffect
-    data class ShowSnackBar(val message: String) : AddTemplateSideEffect
+    data object PopBackStack: AddTemplateSideEffect
+    data class ShowSnackBar(val message: UiText) : AddTemplateSideEffect
   }
-
-  sealed interface AddTemplateDialogState: ViewModelContract.DialogState
 }
