@@ -73,7 +73,7 @@ abstract class BaseStateViewModel<S : ViewModelContract.State, E : ViewModelCont
     setLoading(false)
   }
 
-  inline fun launch(crossinline action: suspend CoroutineScope.() -> Unit, hasLoading: Boolean = false): Job =
+  inline fun launch(hasLoading: Boolean = false, crossinline action: suspend CoroutineScope.() -> Unit): Job =
     viewModelScope.launch(ceh) {
       if (hasLoading) setLoading(true)
       action(this)

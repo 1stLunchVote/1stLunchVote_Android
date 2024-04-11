@@ -1,23 +1,16 @@
 package com.jwd.lunchvote.presentation.navigation
 
-import android.content.Context
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import androidx.navigation.NavOptions
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
-import androidx.navigation.compose.navigation
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import com.jwd.lunchvote.presentation.ui.home.HomeJoinDialog
 import com.jwd.lunchvote.presentation.ui.home.HomeRoute
 import com.jwd.lunchvote.presentation.ui.login.LoginRoute
 import com.jwd.lunchvote.presentation.ui.login.register.RegisterEmailRoute
@@ -29,10 +22,6 @@ import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateRoute
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateRoute
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteRoute
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteRoute
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
 
 @Composable
 fun LunchVoteNavHost(
@@ -75,8 +64,6 @@ fun LunchVoteNavHost(
     content = content
   )
 
-  val snackChannel = Channel<String>()
-
   NavHost(
     navController = navController,
     startDestination = startDestination,
@@ -84,27 +71,30 @@ fun LunchVoteNavHost(
   ) {
     composable(LunchVoteNavRoute.Home) {
       HomeRoute(
-        navigateToLounge = { id ->
-          val query = if (id != null) "?id=$id" else ""
-          navController.navigate(LunchVoteNavRoute.Lounge.name + query)
+        navigateToLounge = { loungeId ->
+          loungeId?.let { navController.navigate(LunchVoteNavRoute.Lounge, loungeId) }
+            ?: navController.navigate(LunchVoteNavRoute.Lounge)
         },
         navigateToTemplateList = {
-          navController.navigate(LunchVoteNavRoute.TemplateList.name)
+          navController.navigate(LunchVoteNavRoute.TemplateList)
         },
         navigateToSetting = {
-          navController.navigate(LunchVoteNavRoute.Setting.name)
+          navController.navigate(LunchVoteNavRoute.Setting)
         },
         navigateToTips = {
-          navController.navigate(LunchVoteNavRoute.Tips.name)
+          navController.navigate(LunchVoteNavRoute.Tips)
         },
         navigateToTest = {
           // todo : 나중에 지우기
-          navController.navigate(LunchVoteNavRoute.SecondVote.name)
+          navController.navigate(LunchVoteNavRoute.SecondVote)
         },
         navigateToFirstVote = {
-          navController.navigate(LunchVoteNavRoute.FirstVote.name + "/loungeId"/*TODO*/)
+          navController.navigate(LunchVoteNavRoute.FirstVote, "loungeId"/*TODO*/)
         },
-        messageFlow = snackChannel.receiveAsFlow()
+        openJoinDialog = {
+          navController.navigate(LunchVoteNavRoute.HomeJoinDialog)
+        },
+        showSnackBar = showSnackBar
       )
     }
     composable(LunchVoteNavRoute.Lounge) {
@@ -174,6 +164,15 @@ fun LunchVoteNavHost(
     composable(LunchVoteNavRoute.Setting) {
       SettingRoute(
         popBackStack = { navController.popBackStack() }
+      )
+    }
+
+    dialog(LunchVoteNavRoute.HomeJoinDialog) {
+      HomeJoinDialog(
+        onClickDismissButton = { navController.popBackStack() },
+        onClickConfirmButton = { code ->
+          // TODO: 코드 활용해서 Lounge 입장 대기 화면 띄우기
+        }
       )
     }
   }

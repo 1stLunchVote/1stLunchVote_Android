@@ -26,7 +26,9 @@ enum class LunchVoteNavRoute(
   Setting,
 
   Lounge(args = listOf("id" to NavType.StringType)),
-  Tips
+  Tips,
+
+  HomeJoinDialog
 }
 
 internal val LunchVoteNavRoute.route: String
