@@ -1,7 +1,6 @@
 package com.jwd.lunchvote.presentation.ui.template.edit_template
 
 import android.os.Parcelable
-import com.jwd.lunchvote.core.ui.base.ViewModelContract.DialogState
 import com.jwd.lunchvote.core.ui.base.ViewModelContract.Event
 import com.jwd.lunchvote.core.ui.base.ViewModelContract.Reduce
 import com.jwd.lunchvote.core.ui.base.ViewModelContract.SideEffect
@@ -10,6 +9,7 @@ import com.jwd.lunchvote.domain.entity.Template
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.model.enums.FoodStatus
+import com.jwd.lunchvote.presentation.util.UiText
 import kotlinx.parcelize.Parcelize
 
 class EditTemplateContract {
@@ -32,7 +32,6 @@ class EditTemplateContract {
     data class OnClickFood(val food: FoodUIModel): EditTemplateEvent
     data object OnClickSaveButton: EditTemplateEvent
     data object OnClickDeleteButton: EditTemplateEvent
-    data object OnClickDialogDismiss: EditTemplateEvent
   }
 
   sealed interface EditTemplateReduce : Reduce {
@@ -43,12 +42,9 @@ class EditTemplateContract {
   }
 
   sealed interface EditTemplateSideEffect: SideEffect {
-    data class PopBackStack(val message: String = ""): EditTemplateSideEffect
-    data class ShowSnackBar(val message: String) : EditTemplateSideEffect
-  }
-
-  sealed interface EditTemplateDialogState: DialogState {
-    data class DeleteTemplateConfirm(val onClickConfirm: () -> Unit): EditTemplateDialogState
-    data class EditTemplateConfirm(val onClickConfirm: () -> Unit): EditTemplateDialogState
+    data object OpenDeleteDialog: EditTemplateSideEffect
+    data object OpenConfirmDialog: EditTemplateSideEffect
+    data object PopBackStack: EditTemplateSideEffect
+    data class ShowSnackBar(val message: UiText) : EditTemplateSideEffect
   }
 }

@@ -135,14 +135,17 @@ fun LunchVoteNavHost(
         navigateToEditTemplate = { templateId ->
           navController.navigate(LunchVoteNavRoute.EditTemplate, templateId)
         },
-        openAddDialog = { navController.navigate(LunchVoteNavRoute.TemplateAddDialog) },
+        openAddDialog = { navController.navigate(LunchVoteNavRoute.TemplateListAddDialog) },
         popBackStack = { navController.popBackStack() },
         showSnackBar = showSnackBar
       )
     }
     composable(LunchVoteNavRoute.EditTemplate) {
       EditTemplateRoute(
-        popBackStack = { navController.popBackStack() }
+        openDeleteDialog = { navController.navigate(LunchVoteNavRoute.EditTemplateDeleteDialog) },
+        openConfirmDialog = { navController.navigate(LunchVoteNavRoute.EditTemplateConfirmDialog) },
+        popBackStack = { navController.popBackStack() },
+        showSnackBar = showSnackBar
       )
     }
     composable(LunchVoteNavRoute.AddTemplate) {
@@ -176,13 +179,19 @@ fun LunchVoteNavHost(
         }
       )
     }
-    dialog(LunchVoteNavRoute.TemplateAddDialog) {
+    dialog(LunchVoteNavRoute.TemplateListAddDialog) {
       TemplateAddDialog(
         popBackStack = { navController.popBackStack() },
         navigateToAddTemplate = { templateName ->
           navController.navigate(LunchVoteNavRoute.AddTemplate, templateName)
         }
       )
+    }
+    dialog(LunchVoteNavRoute.EditTemplateDeleteDialog) {
+
+    }
+    dialog(LunchVoteNavRoute.EditTemplateConfirmDialog) {
+
     }
   }
 }
