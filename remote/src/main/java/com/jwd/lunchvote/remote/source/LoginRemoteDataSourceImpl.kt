@@ -10,24 +10,25 @@ import org.json.JSONObject
 import javax.inject.Inject
 
 class LoginRemoteDataSourceImpl @Inject constructor(
-    private val functions: FirebaseFunctions,
-    private val auth: FirebaseAuth,
-    private val dispatcher: CoroutineDispatcher
-): LoginRemoteDataSource {
-    override suspend fun getCustomToken(accessToken: String): String? = withContext(dispatcher){
-        val data = JSONObject()
-        data.put("accessToken", accessToken)
+  private val functions: FirebaseFunctions,
+  private val auth: FirebaseAuth,
+  private val dispatcher: CoroutineDispatcher
+) : LoginRemoteDataSource {
 
-        val res = functions.getHttpsCallable("kakaoToken")
-            .call(data)
-            .await()
+  override suspend fun getCustomToken(accessToken: String): String? = withContext(dispatcher) {
+    val data = JSONObject()
+    data.put("accessToken", accessToken)
 
-        return@withContext res.data as String?
+    val res = functions.getHttpsCallable("kakaoToken")
+      .call(data)
+      .await()
+
+    return@withContext res.data as String?
+  }
+
+  override suspend fun signInWithCustomToken(token: String) {
+    withContext(dispatcher) {
+      auth.signInWithCustomToken(token).await()
     }
-
-    override suspend fun signInWithCustomToken(token: String) {
-        withContext(dispatcher){
-            auth.signInWithCustomToken(token).await()
-        }
-    }
+  }
 }

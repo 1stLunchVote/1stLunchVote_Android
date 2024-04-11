@@ -3,42 +3,39 @@ package com.jwd.lunchvote.presentation.ui.login
 import android.os.Parcelable
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.jwd.lunchvote.core.ui.base.ViewModelContract
+import com.jwd.lunchvote.presentation.util.UiText
 import kotlinx.parcelize.Parcelize
 
 class LoginContract {
-    @Parcelize
-    data class LoginState(
-        val email: String = "",
-        val password: String = "",
-        val isLoading: Boolean = false
-    ) : ViewModelContract.State, Parcelable{
-        override fun toParcelable(): Parcelable = this
-    }
+  @Parcelize
+  data class LoginState(
+    val email: String = "",
+    val password: String = ""
+  ) : ViewModelContract.State, Parcelable {
+    override fun toParcelable(): Parcelable = this
+  }
 
-    sealed interface LoginEvent : ViewModelContract.Event {
-        data class SetEmail(val email: String) : LoginEvent
-        data class SetPwd(val pwd: String) : LoginEvent
-        data object OnClickEmailLogin : LoginEvent
-        data object OnClickGoogleLogin : LoginEvent
-        data object OnClickKakaoLogin : LoginEvent
-        class ProcessGoogleLogin(val account: GoogleSignInAccount) : LoginEvent
-        class ProcessKakaoLogin(val accessToken: String) : LoginEvent
-        class OnLoginFailure(val canceled: Boolean = false) : LoginEvent
+  sealed interface LoginEvent : ViewModelContract.Event {
+    data class OnChangeEmail(val email: String) : LoginEvent
+    data class OnChangePassword(val password: String) : LoginEvent
+    data object OnClickEmailLoginButton : LoginEvent
+    data object OnClickRegisterButton : LoginEvent
+    data object OnClickKakaoLoginButton : LoginEvent
+    data object OnClickGoogleLoginButton : LoginEvent
+    data class ProcessKakaoLogin(val accessToken: String) : LoginEvent
+    data class ProcessGoogleLogin(val account: GoogleSignInAccount) : LoginEvent
+  }
 
-    }
+  sealed interface LoginReduce : ViewModelContract.Reduce {
+    data class UpdateEmail(val email: String) : LoginReduce
+    data class UpdatePassword(val password: String) : LoginReduce
+  }
 
-    sealed interface LoginReduce : ViewModelContract.Reduce {
-        class UpdateEmail(val email: String) : LoginReduce
-        class UpdatePwd(val pwd: String) : LoginReduce
-        class UpdateLoading(val isLoading: Boolean) : LoginReduce
-    }
-
-    sealed interface LoginSideEffect : ViewModelContract.SideEffect {
-        data object NavigateToHome : LoginSideEffect
-        data object LaunchGoogleLogin : LoginSideEffect
-        data object LaunchKakaoLogin : LoginSideEffect
-        class ShowSnackBar(val message: String) : LoginSideEffect
-    }
-
-    sealed interface LoginDialogState: ViewModelContract.DialogState
+  sealed interface LoginSideEffect : ViewModelContract.SideEffect {
+    data object NavigateToHome : LoginSideEffect
+    data object NavigateToRegisterEmail : LoginSideEffect
+    data object LaunchGoogleLogin : LoginSideEffect
+    data object LaunchKakaoLogin : LoginSideEffect
+    data class ShowSnackBar(val message: UiText) : LoginSideEffect
+  }
 }

@@ -63,6 +63,7 @@ fun HomeRoute(
   navigateToFirstVote: () -> Unit,
   openJoinDialog: () -> Unit,
   showSnackBar: suspend (String) -> Unit,
+  modifier: Modifier = Modifier,
   viewModel: HomeViewModel = hiltViewModel(),
   context: Context = LocalContext.current
 ){
@@ -85,6 +86,7 @@ fun HomeRoute(
   if (isLoading) LoadingScreen()
   else HomeScreen(
     homeState = homeState,
+    modifier = modifier,
     onClickLoungeButton = { viewModel.sendEvent(HomeEvent.OnClickLoungeButton) },
     onClickJoinLoungeButton = { viewModel.sendEvent(HomeEvent.OnClickJoinLoungeButton) },
     onClickTemplateButton = { viewModel.sendEvent(HomeEvent.OnClickTemplateButton) },
@@ -105,6 +107,7 @@ fun HomeRoute(
 @Composable
 private fun HomeScreen(
   homeState: HomeState,
+  modifier: Modifier = Modifier,
   onClickLoungeButton: () -> Unit = {},
   onClickJoinLoungeButton: () -> Unit = {},
   onClickTemplateButton: () -> Unit = {},
