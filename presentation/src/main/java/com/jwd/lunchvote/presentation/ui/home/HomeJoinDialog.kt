@@ -31,7 +31,7 @@ fun HomeJoinDialog(
     LunchVoteTextField(
       text = code,
       hintText = "초대 코드",
-      onTextChanged = { code = it },
+      onTextChange = { code = it },
     )
   }
 }

@@ -110,7 +110,7 @@ private fun AddTemplateScreen(
         modifier = Modifier.fillMaxWidth(),
         text = addTemplateState.searchKeyword,
         hintText = stringResource(R.string.first_vote_hint_text),
-        onTextChanged = setSearchKeyword,
+        onTextChange = setSearchKeyword,
         textFieldType = TextFieldType.Search
       )
       LazyVerticalGrid(

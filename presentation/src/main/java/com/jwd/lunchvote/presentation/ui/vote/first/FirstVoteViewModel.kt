@@ -38,8 +38,8 @@ class FirstVoteViewModel @Inject constructor(
       is FirstVoteEvent.StartInitialize -> viewModelScope.launch { initialize(event.loungeId) }
       is FirstVoteEvent.OnClickFood -> updateState(FirstVoteReduce.UpdateFoodStatus(event.food))
       is FirstVoteEvent.SetSearchKeyword -> updateState(FirstVoteReduce.UpdateSearchKeyword(event.searchKeyword))
-      is FirstVoteEvent.OnClickFinishButton -> throw NotImplementedError()
-      is FirstVoteEvent.OnClickExitButton -> throw NotImplementedError()
+      is FirstVoteEvent.OnClickFinishButton -> launch(false) { throw NotImplementedError() }
+      is FirstVoteEvent.OnClickExitButton -> launch(false) { throw NotImplementedError() }
     }
   }
 

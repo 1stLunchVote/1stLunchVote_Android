@@ -4,30 +4,32 @@
     <!-- LoginFragment-->
     <string name="login_email_hint">이메일</string>
     <string name="login_password_hint">비밀번호</string>
-    <string name="login_btn">로그인</string>
+    <string name="login_button">로그인</string>
     <string name="login_register_guide">계정이 없으신가요?</string>
-    <string name="login_register_btn"><u>회원가입</u></string>
+    <string name="login_register_button"><u>회원가입</u></string>
+    <string name="login_kakao_button">카카오 로그인</string>
+    <string name="login_google_button">Google 계정으로 로그인</string>
 
     <!-- HomeScreen -->
     <string name="home_banner_title">지금 사람들은 뭘 먹고 싶을까?</string>
     <string name="home_banner_score">%d%%의 사람들이 선택</string>
-    <string name="home_start_btn">투표 생성하기</string>
-    <string name="home_join_btn">투표 참여하기</string>
-    <string name="home_template_btn">템플릿 사전 설정하기</string>
-    <string name="home_tips_btn">투표 방법이 궁금하신가요?</string>
+    <string name="home_start_button">투표 생성하기</string>
+    <string name="home_join_button">투표 참여하기</string>
+    <string name="home_template_button">템플릿 사전 설정하기</string>
+    <string name="home_tips_button">투표 방법이 궁금하신가요?</string>
     <string name="home_join_code_hint">초대 코드</string>
 
     <!-- RegisterEmailScreen -->
     <string name="register_email_title">먼저 이메일을 확인할게요.</string>
     <string name="register_email_content">가입된 이메일인지 확인해볼게요!</string>
-    <string name="register_email_confirm_btn">이메일 확인하기</string>
+    <string name="register_email_confirm_button">이메일 확인하기</string>
 
     <!-- LoungeScreen -->
     <string name="lounge_topbar_title">투표 대기방</string>
     <string name="lounge_create_loading">방을 생성중입니다\n잠시만 기다려주세요</string>
     <string name="lounge_join_loading">방에 접속중입니다\n잠시만 기다려주세요</string>
-    <string name="lounge_ready_btn">준비</string>
-    <string name="lounge_start_btn">시작</string>
+    <string name="lounge_ready_button">준비</string>
+    <string name="lounge_start_button">시작</string>
     <string name="lounge_exit_dialog_title">정말 나가시겠습니까?</string>
     <string name="lounge_exit_dialog_owner_content">방장이 방을 나갈 경우, 투표 대기방이 사라지게 됩니다.</string>
     <string name="lounge_exit_dialog_member_content">방을 나갈 경우, 초대 코드를 입력하면 다시 들어올 수 있습니다.</string>
@@ -54,5 +56,5 @@
     <string name="result_toolbar_title">투표 결과</string>
     <string name="result_title">오늘의 메뉴는 ..</string>
 
-    <string name="default_web_client_id">id</string>
+    <string name="default_web_client_id">865155786423-o5doff8vas3949mfb7cvf8llhflutd5i.apps.googleusercontent.com</string>
 </resources>

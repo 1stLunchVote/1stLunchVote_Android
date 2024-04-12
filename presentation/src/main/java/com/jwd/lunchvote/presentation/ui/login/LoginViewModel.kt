@@ -32,18 +32,12 @@ class LoginViewModel @Inject constructor(
 
   override fun handleEvents(event: LoginEvent) {
     when (event) {
-      is LoginEvent.OnChangeEmail -> updateState(LoginReduce.UpdateEmail(event.email))
-      is LoginEvent.OnChangePassword -> updateState(LoginReduce.UpdatePassword(event.password))
-      is LoginEvent.OnClickEmailLoginButton -> throw NotImplementedError()
+      is LoginEvent.OnEmailChange -> updateState(LoginReduce.UpdateEmail(event.email))
+      is LoginEvent.OnPasswordChange -> updateState(LoginReduce.UpdatePassword(event.password))
+      is LoginEvent.OnClickEmailLoginButton -> throwError(NotImplementedError())
       is LoginEvent.OnClickRegisterButton -> sendSideEffect(LoginSideEffect.NavigateToRegisterEmail)
-      is LoginEvent.OnClickKakaoLoginButton -> {
-        setLoading(true)
-        sendSideEffect(LoginSideEffect.LaunchKakaoLogin)
-      }
-      is LoginEvent.OnClickGoogleLoginButton -> {
-        setLoading(true)
-        sendSideEffect(LoginSideEffect.LaunchGoogleLogin)
-      }
+      is LoginEvent.OnClickKakaoLoginButton -> sendSideEffect(LoginSideEffect.LaunchKakaoLogin)
+      is LoginEvent.OnClickGoogleLoginButton -> sendSideEffect(LoginSideEffect.LaunchGoogleLogin)
       is LoginEvent.ProcessKakaoLogin -> kakaoLogin(event.accessToken)
       is LoginEvent.ProcessGoogleLogin -> googleLogin(event.account)
     }
@@ -58,9 +52,6 @@ class LoginViewModel @Inject constructor(
 
   override fun handleErrors(error: Throwable) {
     sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
-    when (error) {
-      is ClientError -> if (error.reason == ClientErrorCause.Cancelled) throw LoginError.LoginCanceled
-    }
   }
 
   private fun googleLogin(account: GoogleSignInAccount) {
@@ -71,24 +62,21 @@ class LoginViewModel @Inject constructor(
         sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.DynamicString("로그인에 성공했습니다.")))
         sendSideEffect(LoginSideEffect.NavigateToHome)
       } else {
-        throw LoginError.LoginFailure
+        throwError(LoginError.LoginFailure)
       }
     }
   }
 
   private fun kakaoLogin(accessToken: String) {
     UserApiClient.instance.me { user, error ->
-      when {
-        error != null -> throw error
-        user == null -> throw LoginError.NoUser
-        else -> launch {
-          runCatching {
+      launch {
+        when {
+          error != null -> throw error
+          user == null -> throw LoginError.NoUser
+          else -> {
             kakaoLoginUseCase(accessToken)
-          }.onSuccess {
             sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.DynamicString("로그인에 성공했습니다.")))
             sendSideEffect(LoginSideEffect.NavigateToHome)
-          }.onFailure {
-            throw LoginError.LoginFailure
           }
         }
       }

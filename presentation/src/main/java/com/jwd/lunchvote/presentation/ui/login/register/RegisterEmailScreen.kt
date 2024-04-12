@@ -29,6 +29,7 @@ import com.jwd.lunchvote.presentation.ui.login.register.RegisterEmailContract.Re
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @Composable
 fun RegisterEmailRoute(
@@ -43,7 +44,7 @@ fun RegisterEmailRoute(
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
       when (it) {
-        is RegisterEmailSideEffect.NavigateToRegisterPassword -> throw NotImplementedError()
+        is RegisterEmailSideEffect.NavigateToRegisterPassword -> viewModel.throwError(NotImplementedError())
         is RegisterEmailSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
       }
     }
@@ -84,7 +85,7 @@ private fun RegisterEmailScreen(
     LunchVoteTextField(
       text = emailState.email,
       hintText = "이메일",
-      onTextChanged = onChangeEmail,
+      onTextChange = onChangeEmail,
       modifier = Modifier.fillMaxWidth()
     )
     Spacer(Modifier.weight(1f))
@@ -93,7 +94,7 @@ private fun RegisterEmailScreen(
       enabled = emailState.email.isNotBlank(),
       modifier = Modifier.align(Alignment.CenterHorizontally)
     ) {
-      Text(text = stringResource(R.string.register_email_confirm_btn))
+      Text(text = stringResource(R.string.register_email_confirm_button))
     }
     Spacer(Modifier.height(64.dp))
   }

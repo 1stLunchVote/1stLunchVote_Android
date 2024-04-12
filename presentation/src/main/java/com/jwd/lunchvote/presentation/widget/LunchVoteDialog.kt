@@ -114,7 +114,7 @@ fun LunchVoteDialogPreview(){
         LunchVoteTextField(
           text = "",
           hintText = "초대 코드",
-          onTextChanged = {}
+          onTextChange = {}
         )
       }
     )

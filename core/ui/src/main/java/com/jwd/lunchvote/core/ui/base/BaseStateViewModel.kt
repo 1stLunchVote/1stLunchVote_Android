@@ -40,7 +40,7 @@ abstract class BaseStateViewModel<S : ViewModelContract.State, E : ViewModelCont
 
   private val _error: Channel<Throwable> = Channel()
   val error: Flow<Throwable> = _error.receiveAsFlow()
-  private fun throwError(error: Throwable) {
+  fun throwError(error: Throwable) {
     viewModelScope.launch {
       _error.send(error)
     }
