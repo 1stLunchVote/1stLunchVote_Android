@@ -9,9 +9,10 @@ class LoginRepositoryImpl @Inject constructor(
   private val loginRemoteDataSource: LoginRemoteDataSource
 ) : LoginRepository {
 
-  override suspend fun onKakaoLogin(accessToken: String) {
-    loginRemoteDataSource.getCustomToken(accessToken)?.let{ customToken ->
-      loginRemoteDataSource.signInWithCustomToken(customToken)
-    } ?: throw LoginError.CustomTokenFailed
+  override suspend fun getCustomToken(accessToken: String): String =
+    loginRemoteDataSource.getCustomToken(accessToken)
+
+  override suspend fun signInWithCustomToken(token: String) {
+    loginRemoteDataSource.signInWithCustomToken(token)
   }
 }

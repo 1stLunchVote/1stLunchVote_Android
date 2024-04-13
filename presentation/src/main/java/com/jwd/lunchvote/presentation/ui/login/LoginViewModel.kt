@@ -2,6 +2,7 @@ package com.jwd.lunchvote.presentation.ui.login
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
+import androidx.test.core.app.ActivityScenario.launch
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
@@ -56,16 +57,14 @@ class LoginViewModel @Inject constructor(
     val credential = GoogleAuthProvider.getCredential(account.idToken, null)
 
     auth.signInWithCredential(credential).addOnCompleteListener { task ->
-      if (task.isSuccessful) {
-        sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.DynamicString("로그인에 성공했습니다.")))
-        sendSideEffect(LoginSideEffect.NavigateToHome)
-      } else {
-        throwError(LoginError.LoginFailure)
-      }
+      if (task.isSuccessful) loginSuccess()
+      else throwError(LoginError.LoginFailure)
     }
   }
 
   private fun kakaoLogin(accessToken: String) {
+    setLoading(true)
+
     UserApiClient.instance.me { user, error ->
       launch {
         when {
@@ -73,11 +72,15 @@ class LoginViewModel @Inject constructor(
           user == null -> throw LoginError.NoUser
           else -> {
             kakaoLoginUseCase(accessToken)
-            sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.DynamicString("로그인에 성공했습니다.")))
-            sendSideEffect(LoginSideEffect.NavigateToHome)
+            loginSuccess()
           }
         }
       }
     }
+  }
+
+  private fun loginSuccess() {
+    sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.DynamicString("로그인에 성공했습니다.")))
+    sendSideEffect(LoginSideEffect.NavigateToHome)
   }
 }

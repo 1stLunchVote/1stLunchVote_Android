@@ -1,5 +1,6 @@
 package com.jwd.lunchvote.domain.repository
 
 interface LoginRepository {
-    suspend fun onKakaoLogin(accessToken: String)
+  suspend fun getCustomToken(accessToken: String): String
+  suspend fun signInWithCustomToken(token: String)
 }
