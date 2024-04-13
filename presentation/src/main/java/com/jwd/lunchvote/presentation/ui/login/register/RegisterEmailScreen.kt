@@ -29,7 +29,6 @@ import com.jwd.lunchvote.presentation.ui.login.register.RegisterEmailContract.Re
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 
 @Composable
 fun RegisterEmailRoute(

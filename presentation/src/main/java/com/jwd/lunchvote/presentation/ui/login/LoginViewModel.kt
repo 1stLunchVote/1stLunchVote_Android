@@ -14,8 +14,6 @@ import com.jwd.lunchvote.presentation.ui.login.LoginContract.LoginReduce
 import com.jwd.lunchvote.presentation.ui.login.LoginContract.LoginSideEffect
 import com.jwd.lunchvote.presentation.ui.login.LoginContract.LoginState
 import com.jwd.lunchvote.presentation.util.UiText
-import com.kakao.sdk.common.model.ClientError
-import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
