@@ -2,6 +2,7 @@ package com.jwd.lunchvote.presentation.ui.login
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
+import androidx.test.core.app.ActivityScenario.launch
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
@@ -14,8 +15,6 @@ import com.jwd.lunchvote.presentation.ui.login.LoginContract.LoginReduce
 import com.jwd.lunchvote.presentation.ui.login.LoginContract.LoginSideEffect
 import com.jwd.lunchvote.presentation.ui.login.LoginContract.LoginState
 import com.jwd.lunchvote.presentation.util.UiText
-import com.kakao.sdk.common.model.ClientError
-import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -32,18 +31,12 @@ class LoginViewModel @Inject constructor(
 
   override fun handleEvents(event: LoginEvent) {
     when (event) {
-      is LoginEvent.OnChangeEmail -> updateState(LoginReduce.UpdateEmail(event.email))
-      is LoginEvent.OnChangePassword -> updateState(LoginReduce.UpdatePassword(event.password))
-      is LoginEvent.OnClickEmailLoginButton -> throw NotImplementedError()
+      is LoginEvent.OnEmailChange -> updateState(LoginReduce.UpdateEmail(event.email))
+      is LoginEvent.OnPasswordChange -> updateState(LoginReduce.UpdatePassword(event.password))
+      is LoginEvent.OnClickEmailLoginButton -> throwError(NotImplementedError())
       is LoginEvent.OnClickRegisterButton -> sendSideEffect(LoginSideEffect.NavigateToRegisterEmail)
-      is LoginEvent.OnClickKakaoLoginButton -> {
-        setLoading(true)
-        sendSideEffect(LoginSideEffect.LaunchKakaoLogin)
-      }
-      is LoginEvent.OnClickGoogleLoginButton -> {
-        setLoading(true)
-        sendSideEffect(LoginSideEffect.LaunchGoogleLogin)
-      }
+      is LoginEvent.OnClickKakaoLoginButton -> sendSideEffect(LoginSideEffect.LaunchKakaoLogin)
+      is LoginEvent.OnClickGoogleLoginButton -> sendSideEffect(LoginSideEffect.LaunchGoogleLogin)
       is LoginEvent.ProcessKakaoLogin -> kakaoLogin(event.accessToken)
       is LoginEvent.ProcessGoogleLogin -> googleLogin(event.account)
     }
@@ -58,40 +51,36 @@ class LoginViewModel @Inject constructor(
 
   override fun handleErrors(error: Throwable) {
     sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
-    when (error) {
-      is ClientError -> if (error.reason == ClientErrorCause.Cancelled) throw LoginError.LoginCanceled
-    }
   }
 
   private fun googleLogin(account: GoogleSignInAccount) {
     val credential = GoogleAuthProvider.getCredential(account.idToken, null)
 
     auth.signInWithCredential(credential).addOnCompleteListener { task ->
-      if (task.isSuccessful) {
-        sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.DynamicString("로그인에 성공했습니다.")))
-        sendSideEffect(LoginSideEffect.NavigateToHome)
-      } else {
-        throw LoginError.LoginFailure
-      }
+      if (task.isSuccessful) loginSuccess()
+      else throwError(LoginError.LoginFailure)
     }
   }
 
   private fun kakaoLogin(accessToken: String) {
+    setLoading(true)
+
     UserApiClient.instance.me { user, error ->
-      when {
-        error != null -> throw error
-        user == null -> throw LoginError.NoUser
-        else -> launch {
-          runCatching {
+      launch {
+        when {
+          error != null -> throw error
+          user == null -> throw LoginError.NoUser
+          else -> {
             kakaoLoginUseCase(accessToken)
-          }.onSuccess {
-            sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.DynamicString("로그인에 성공했습니다.")))
-            sendSideEffect(LoginSideEffect.NavigateToHome)
-          }.onFailure {
-            throw LoginError.LoginFailure
+            loginSuccess()
           }
         }
       }
     }
+  }
+
+  private fun loginSuccess() {
+    sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.DynamicString("로그인에 성공했습니다.")))
+    sendSideEffect(LoginSideEffect.NavigateToHome)
   }
 }

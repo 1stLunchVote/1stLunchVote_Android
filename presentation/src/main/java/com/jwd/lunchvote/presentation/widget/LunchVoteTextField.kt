@@ -8,7 +8,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalFocusManager
@@ -21,96 +20,104 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LunchVoteTextField(
-    modifier: Modifier = Modifier,
-    text: String,
-    hintText: String,
-    textFieldType: TextFieldType = TextFieldType.Default,
-    maxLines: Int = 1,
-    keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-    onTextChanged: (String) -> Unit,
-    keyboardEnterNext: Boolean = false,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-    focusManager : FocusManager = LocalFocusManager.current,
-    keyboardController: SoftwareKeyboardController? = LocalSoftwareKeyboardController.current
-){
-    if (textFieldType == TextFieldType.Search) {
-        OutlinedTextField(
-            modifier = modifier,
-            label = { Text(text = hintText) },
-            value = text,
-            maxLines = maxLines,
-            colors = OutlinedTextFieldDefaults.colors(
-                unfocusedLabelColor = MaterialTheme.colorScheme.outlineVariant,
-            ),
-            onValueChange = onTextChanged,
-            keyboardOptions = keyboardOptions,
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    if(keyboardEnterNext){
-                        KeyboardActions.Default.onNext
-                    } else {
-                        KeyboardActions.Default.onDone
-                        focusManager.clearFocus()
-                        keyboardController?.hide()
-                    }
-                }
-            ),
-            visualTransformation = visualTransformation,
-            singleLine = maxLines == 1,
-            leadingIcon = {
-                Image(painterResource(R.drawable.ic_search), null)
-            }
-        )
-    } else {
-        OutlinedTextField(
-            modifier = modifier,
-            label = { Text(text = hintText) },
-            value = text,
-            maxLines = maxLines,
-            colors = OutlinedTextFieldDefaults.colors(
-                unfocusedLabelColor = MaterialTheme.colorScheme.outlineVariant,
-            ),
-            onValueChange = onTextChanged,
-            keyboardOptions = keyboardOptions,
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    if(keyboardEnterNext){
-                        KeyboardActions.Default.onNext
-                    } else {
-                        KeyboardActions.Default.onDone
-                        focusManager.clearFocus()
-                        keyboardController?.hide()
-                    }
-                }
-            ),
-            visualTransformation = visualTransformation,
-            singleLine = maxLines == 1
-        )
-    }
+  text: String,
+  onTextChange: (String) -> Unit,
+  hintText: String,
+  modifier: Modifier = Modifier,
+  enabled: Boolean = true,
+  textFieldType: TextFieldType = TextFieldType.Default,
+  visualTransformation: VisualTransformation = VisualTransformation.None,
+  keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+  maxLines: Int = 1,
+  focusManager: FocusManager = LocalFocusManager.current,
+  keyboardController: SoftwareKeyboardController? = LocalSoftwareKeyboardController.current
+) {
+  if (textFieldType == TextFieldType.Search) {
+    OutlinedTextField(
+      value = text,
+      onValueChange = onTextChange,
+      modifier = modifier,
+      enabled = enabled,
+      label = { Text(hintText) },
+      leadingIcon = {
+        Image(painterResource(R.drawable.ic_search), null)
+      },
+      colors = OutlinedTextFieldDefaults.colors(
+        unfocusedLabelColor = MaterialTheme.colorScheme.outlineVariant,
+      ),
+      visualTransformation = visualTransformation,
+      keyboardOptions = keyboardOptions,
+      keyboardActions = KeyboardActions(
+        onDone = {
+          if (keyboardOptions.imeAction == ImeAction.Next) {
+            KeyboardActions.Default.onNext
+          } else {
+            KeyboardActions.Default.onDone
+            focusManager.clearFocus()
+            keyboardController?.hide()
+          }
+        }
+      ),
+      singleLine = maxLines == 1,
+      maxLines = maxLines
+    )
+  } else {
+    OutlinedTextField(
+      value = text,
+      onValueChange = onTextChange,
+      modifier = modifier,
+      enabled = enabled,
+      label = { Text(hintText) },
+      colors = OutlinedTextFieldDefaults.colors(
+        unfocusedLabelColor = MaterialTheme.colorScheme.outlineVariant,
+      ),
+      visualTransformation = visualTransformation,
+      keyboardOptions = keyboardOptions,
+      keyboardActions = KeyboardActions(
+        onDone = {
+          if (keyboardOptions.imeAction == ImeAction.Next) {
+            KeyboardActions.Default.onNext
+          } else {
+            KeyboardActions.Default.onDone
+            focusManager.clearFocus()
+            keyboardController?.hide()
+          }
+        }
+      ),
+      singleLine = maxLines == 1,
+      maxLines = maxLines
+    )
+  }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Preview(showBackground = true)
 @Composable
 fun LunchVoteDefaultTextFieldPreview() {
-    LunchVoteTheme {
-        LunchVoteTextField(text = "", hintText = "hint", onTextChanged = {})
-    }
+  LunchVoteTheme {
+    LunchVoteTextField(
+      text = "",
+      onTextChange = {},
+      hintText = "hint"
+    )
+  }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Preview(showBackground = true)
 @Composable
 fun LunchVoteSearchTextFieldPreview() {
-    LunchVoteTheme {
-        LunchVoteTextField(text = "", hintText = "hint", textFieldType = TextFieldType.Search, onTextChanged = {})
-    }
+  LunchVoteTheme {
+    LunchVoteTextField(
+      text = "",
+      onTextChange = {},
+      hintText = "hint",
+      textFieldType = TextFieldType.Search
+    )
+  }
 }
 
-enum class TextFieldType{
-    Default,
-    Search
+enum class TextFieldType {
+  Default,
+  Search
 }

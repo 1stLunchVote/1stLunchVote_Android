@@ -2,6 +2,7 @@ package com.jwd.lunchvote.remote.source
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.functions.FirebaseFunctions
+import com.jwd.lunchvote.core.common.base.error.LoginError
 import com.jwd.lunchvote.data.source.remote.LoginRemoteDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.tasks.await
@@ -12,22 +13,28 @@ import javax.inject.Inject
 class LoginRemoteDataSourceImpl @Inject constructor(
   private val functions: FirebaseFunctions,
   private val auth: FirebaseAuth,
-  private val dispatcher: CoroutineDispatcher
+  private val ioDispatcher: CoroutineDispatcher
 ) : LoginRemoteDataSource {
 
-  override suspend fun getCustomToken(accessToken: String): String? = withContext(dispatcher) {
-    val data = JSONObject()
-    data.put("accessToken", accessToken)
-
-    val res = functions.getHttpsCallable("kakaoToken")
-      .call(data)
-      .await()
-
-    return@withContext res.data as String?
+  companion object {
+    private const val FUNCTION_KAKAO_TOKEN = "kakaoToken"
   }
 
-  override suspend fun signInWithCustomToken(token: String) {
-    withContext(dispatcher) {
+  override suspend fun getCustomToken(
+    accessToken: String
+  ): String = withContext(ioDispatcher) {
+    val data = JSONObject().apply { put("accessToken", accessToken) }
+    
+    functions.getHttpsCallable(FUNCTION_KAKAO_TOKEN)
+      .call(data)
+      .await()
+      .data as String? ?: throw LoginError.CustomTokenFailed
+  }
+
+  override suspend fun signInWithCustomToken(
+    token: String
+  ) {
+    withContext(ioDispatcher) {
       auth.signInWithCustomToken(token).await()
     }
   }

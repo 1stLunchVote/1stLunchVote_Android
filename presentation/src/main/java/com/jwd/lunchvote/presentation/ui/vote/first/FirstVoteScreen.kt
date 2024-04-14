@@ -118,7 +118,7 @@ fun FirstVoteScreen(
         .padding(horizontal = 24.dp),
       text = firstVoteState.searchKeyword,
       hintText = stringResource(R.string.first_vote_hint_text),
-      onTextChanged = setSearchKeyword,
+      onTextChange = setSearchKeyword,
       textFieldType = TextFieldType.Search
     )
     LazyVerticalGrid(

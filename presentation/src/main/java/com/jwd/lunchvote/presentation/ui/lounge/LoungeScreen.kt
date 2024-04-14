@@ -422,7 +422,7 @@ private fun LoungeBottomBar(
         border = BorderStroke(width = 2.dp, color = Color.Black),
       ) {
         Text(
-          text = stringResource(id = if (loungeState.isOwner) R.string.lounge_start_btn else R.string.lounge_ready_btn),
+          text = stringResource(id = if (loungeState.isOwner) R.string.lounge_start_button else R.string.lounge_ready_button),
           style = buttonTextStyle,
           modifier = Modifier
             .clickable {

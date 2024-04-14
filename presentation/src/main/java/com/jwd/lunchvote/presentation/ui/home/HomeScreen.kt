@@ -273,7 +273,7 @@ fun HomeButtonSet(
           .clickable { onClickLoungeButton() }
       ) {
         Text(
-          stringResource(R.string.home_start_btn),
+          stringResource(R.string.home_start_button),
           modifier = Modifier.padding(top = 16.dp, start = 24.dp),
           style = MaterialTheme.typography.titleMedium,
           color = MaterialTheme.colorScheme.onPrimary
@@ -292,7 +292,7 @@ fun HomeButtonSet(
           .clickable { onClickJoinLoungeButton() }
       ) {
         Text(
-          stringResource(R.string.home_join_btn),
+          stringResource(R.string.home_join_button),
           modifier = Modifier.padding(top = 16.dp, start = 24.dp),
           style = MaterialTheme.typography.titleMedium,
           color = MaterialTheme.colorScheme.primary
@@ -313,7 +313,7 @@ fun HomeButtonSet(
       contentAlignment = Alignment.TopEnd
     ) {
       Text(
-        stringResource(R.string.home_template_btn),
+        stringResource(R.string.home_template_button),
         modifier = Modifier.padding(top = 16.dp, end = 24.dp),
         style = MaterialTheme.typography.titleMedium,
         color = MaterialTheme.colorScheme.primary
@@ -353,7 +353,7 @@ fun HomeButtonSet(
       ) {
         val text = createRef()
         Text(
-          stringResource(R.string.home_tips_btn),
+          stringResource(R.string.home_tips_button),
           modifier = Modifier.constrainAs(text) {
             top.linkTo(parent.top)
             bottom.linkTo(parent.bottom)

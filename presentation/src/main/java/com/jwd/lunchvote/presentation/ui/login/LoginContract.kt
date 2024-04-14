@@ -16,8 +16,8 @@ class LoginContract {
   }
 
   sealed interface LoginEvent : ViewModelContract.Event {
-    data class OnChangeEmail(val email: String) : LoginEvent
-    data class OnChangePassword(val password: String) : LoginEvent
+    data class OnEmailChange(val email: String) : LoginEvent
+    data class OnPasswordChange(val password: String) : LoginEvent
     data object OnClickEmailLoginButton : LoginEvent
     data object OnClickRegisterButton : LoginEvent
     data object OnClickKakaoLoginButton : LoginEvent

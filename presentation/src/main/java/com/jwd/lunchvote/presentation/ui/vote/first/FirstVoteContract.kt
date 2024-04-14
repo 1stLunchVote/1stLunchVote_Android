@@ -3,7 +3,6 @@ package com.jwd.lunchvote.presentation.ui.vote.first
 import android.os.Parcelable
 import com.jwd.lunchvote.core.ui.base.ViewModelContract
 import com.jwd.lunchvote.presentation.model.FoodUIModel
-import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.model.enums.FoodStatus
 import com.jwd.lunchvote.presentation.util.UiText
 import kotlinx.parcelize.Parcelize

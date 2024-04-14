@@ -27,7 +27,7 @@ fun TemplateAddDialog(
       LunchVoteTextField(
         text = templateName,
         hintText = "템플릿 이름",
-        onTextChanged = { templateName = it },
+        onTextChange = { templateName = it },
       )
     }
   )
