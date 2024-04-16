@@ -27,7 +27,11 @@ class HomeJoinViewModel @Inject constructor(
     }
   }
 
-  override fun reduceState(state: HomeJoinState, reduce: HomeJoinReduce): HomeJoinState = state
+  override fun reduceState(state: HomeJoinState, reduce: HomeJoinReduce): HomeJoinState {
+    return when(reduce) {
+      is HomeJoinReduce.UpdateLoungeId -> state.copy(loungeId = reduce.loungeId)
+    }
+  }
 
   override fun handleErrors(error: Throwable) {
     sendSideEffect(HomeJoinSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))

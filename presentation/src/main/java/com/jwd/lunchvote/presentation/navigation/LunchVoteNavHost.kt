@@ -177,9 +177,9 @@ fun LunchVoteNavHost(
 
     dialog(LunchVoteNavRoute.HomeJoinDialog) {
       HomeJoinDialog(
-        onClickDismissButton = { navController.popBackStack() },
-        onClickConfirmButton = { code ->
-          // TODO: 코드 활용해서 Lounge 입장 대기 화면 띄우기
+        popBackStack = { navController.popBackStack() },
+        navigateToLounge = { loungeId ->
+          navController.navigate(LunchVoteNavRoute.Lounge, loungeId)
         }
       )
     }

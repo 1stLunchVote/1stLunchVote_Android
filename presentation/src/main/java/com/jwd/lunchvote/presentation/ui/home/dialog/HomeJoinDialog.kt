@@ -1,6 +1,8 @@
 package com.jwd.lunchvote.presentation.ui.home.dialog
 
 import android.content.Context
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -19,19 +21,20 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun HomeJoinDialog(
   modifier: Modifier = Modifier,
-  onClickDismissButton: () -> Unit = {},
-  onClickConfirmButton: (String) -> Unit = {},
+  popBackStack: () -> Unit = {},
+  navigateToLounge: (String) -> Unit = {},
   showSnackBar: suspend (String) -> Unit = {},
   viewModel: HomeJoinViewModel = hiltViewModel(),
   context: Context = LocalContext.current
 ) {
   val homeJoinState by viewModel.viewState.collectAsStateWithLifecycle()
+  val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
       when (it) {
-        is HomeJoinSideEffect.PopBackStack -> onClickDismissButton()
-        is HomeJoinSideEffect.NavigateToLounge -> onClickConfirmButton(it.loungeId)
+        is HomeJoinSideEffect.PopBackStack -> popBackStack()
+        is HomeJoinSideEffect.NavigateToLounge -> navigateToLounge(it.loungeId)
         is HomeJoinSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
       }
     }
@@ -40,17 +43,21 @@ fun HomeJoinDialog(
   LunchVoteDialog(
     title = "투표 방 참여하기",
     dismissText = "취소",
-    onDismiss = onClickDismissButton,
+    onDismiss = { viewModel.sendEvent(HomeJoinEvent.OnClickDismissButton) },
     confirmText = "참여",
     onConfirm = { viewModel.sendEvent(HomeJoinEvent.OnClickConfirmButton) },
     modifier = modifier,
     confirmEnabled = homeJoinState.loungeId.isNotBlank()
   ) {
-    LunchVoteTextField(
-      text = homeJoinState.loungeId,
-      hintText = "초대 코드",
-      onTextChange = { viewModel.sendEvent(HomeJoinEvent.OnLoungeIdChange(it)) }
-    )
+    if (isLoading) {
+      Text("로딩 중...")
+    } else {
+      LunchVoteTextField(
+        text = homeJoinState.loungeId,
+        onTextChange = { viewModel.sendEvent(HomeJoinEvent.OnLoungeIdChange(it)) },
+        hintText = "초대 코드"
+      )
+    }
   }
 }
 
@@ -58,9 +65,6 @@ fun HomeJoinDialog(
 @Composable
 private fun HomeJoinDialogPreview() {
   LunchVoteTheme {
-    HomeJoinDialog(
-      onClickDismissButton = {},
-      onClickConfirmButton = {}
-    )
+    HomeJoinDialog()
   }
 }

@@ -115,7 +115,7 @@ private fun HomeScreen(
   onClickTipsButton: () -> Unit = {}
 ){
   Column(
-    modifier = Modifier
+    modifier = modifier
       .fillMaxSize()
       .padding(horizontal = 32.dp),
     horizontalAlignment = CenterHorizontally
