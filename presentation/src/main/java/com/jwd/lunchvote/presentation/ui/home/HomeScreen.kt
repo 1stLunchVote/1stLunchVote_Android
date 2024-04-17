@@ -177,15 +177,17 @@ private fun FoodTrendChart(
         modifier = Modifier
           .size(160.dp)
           .clip(CircleShape)
-          .border(4.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape)
+          .border(4.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape),
+        previewPlaceholder = R.drawable.ic_food_image_temp
       )
     }
+    Gap(height = 16.dp)
     Text(
       foodTrend.name,
       style = MaterialTheme.typography.titleMedium,
       color = MaterialTheme.colorScheme.primary
     )
-    Gap(height = 4.dp)
+    Gap(height = 8.dp)
     Text(
       text = stringResource(R.string.home_banner_score, foodTrendRatio.toInt()),
       style = MaterialTheme.typography.bodySmall,
@@ -384,7 +386,12 @@ private fun HomeButtonSet(
 private fun HomeScreenPreview() {
   ScreenPreview {
     HomeScreen(
-      HomeState()
+      HomeState(
+        foodTrend = FoodUIModel(
+          name = "햄버거"
+        ),
+        foodTrendRatio = 80f
+      )
     )
   }
 }
