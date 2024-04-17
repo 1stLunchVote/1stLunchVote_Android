@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.core.common.base.error
+package com.jwd.lunchvote.core.common.error
 
 interface LoungeError {
 

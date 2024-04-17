@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.core.common.base
+package com.jwd.lunchvote.core.common.mapper
 
 interface BiMapper<LEFT, RIGHT> {
     fun mapToRight (from: LEFT): RIGHT
