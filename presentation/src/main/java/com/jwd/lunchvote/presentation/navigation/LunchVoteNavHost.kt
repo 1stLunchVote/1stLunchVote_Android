@@ -72,9 +72,8 @@ fun LunchVoteNavHost(
   ) {
     composable(LunchVoteNavRoute.Home) {
       HomeRoute(
-        navigateToLounge = { loungeId ->
-          loungeId?.let { navController.navigate(LunchVoteNavRoute.Lounge, loungeId) }
-            ?: navController.navigate(LunchVoteNavRoute.Lounge)
+        navigateToLounge = {
+          navController.navigate(LunchVoteNavRoute.Lounge)
         },
         navigateToTemplateList = {
           navController.navigate(LunchVoteNavRoute.TemplateList)

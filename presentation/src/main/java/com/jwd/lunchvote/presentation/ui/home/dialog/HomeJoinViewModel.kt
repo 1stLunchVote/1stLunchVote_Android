@@ -5,7 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.jwd.lunchvote.core.common.error.LoungeError
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
-import com.jwd.lunchvote.domain.usecase.lounge.CheckLoungeUseCase
+import com.jwd.lunchvote.domain.usecase.CheckLoungeUseCase
 import com.jwd.lunchvote.presentation.ui.home.dialog.HomeJoinContract.HomeJoinEvent
 import com.jwd.lunchvote.presentation.ui.home.dialog.HomeJoinContract.HomeJoinReduce
 import com.jwd.lunchvote.presentation.ui.home.dialog.HomeJoinContract.HomeJoinSideEffect

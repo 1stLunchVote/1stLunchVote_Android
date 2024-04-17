@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -45,17 +44,21 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeEvent
 import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeSideEffect
 import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeState
+import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
+import com.jwd.lunchvote.presentation.widget.Screen
+import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import com.skydoves.landscapist.coil.CoilImage
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun HomeRoute(
-  navigateToLounge: (String?) -> Unit,
+  navigateToLounge: () -> Unit,
   navigateToTemplateList: () -> Unit,
   navigateToSetting: () -> Unit,
   navigateToTips: () -> Unit,
@@ -73,7 +76,7 @@ fun HomeRoute(
   LaunchedEffect(viewModel.sideEffect){
     viewModel.sideEffect.collectLatest {
       when(it){
-        is HomeSideEffect.NavigateToLounge -> navigateToLounge(it.loungeId)
+        is HomeSideEffect.NavigateToLounge -> navigateToLounge()
         is HomeSideEffect.NavigateToTemplateList -> navigateToTemplateList()
         is HomeSideEffect.NavigateToSetting -> navigateToSetting()
         is HomeSideEffect.NavigateToTips -> navigateToTips()
@@ -114,11 +117,8 @@ private fun HomeScreen(
   onClickSettingButton: () -> Unit = {},
   onClickTipsButton: () -> Unit = {}
 ){
-  Column(
-    modifier = modifier
-      .fillMaxSize()
-      .padding(horizontal = 32.dp),
-    horizontalAlignment = CenterHorizontally
+  Screen(
+    modifier = modifier.padding(horizontal = 32.dp)
   ) {
     Image(
       painterResource(R.drawable.ic_logo),
@@ -127,26 +127,35 @@ private fun HomeScreen(
         .size(48.dp)
         .align(CenterHorizontally)
     )
+    Gap(minHeight = 36.dp)
     FoodTrendChart(
-      Modifier.padding(top = 40.dp, bottom = 40.dp)
+      foodTrend = homeState.foodTrend,
+      foodTrendRatio = homeState.foodTrendRatio,
+      modifier = Modifier.align(CenterHorizontally)
     )
+    Gap(minHeight = 36.dp)
     HomeDivider(
-      Modifier
-        .fillMaxWidth()
-        .padding(vertical = 24.dp)
+      modifier = Modifier.fillMaxWidth()
     )
+    Gap(height = 24.dp)
     HomeButtonSet(
+      modifier = Modifier.fillMaxWidth(),
       onClickLoungeButton = onClickLoungeButton,
       onClickJoinLoungeButton = onClickJoinLoungeButton,
       onClickTemplateButton = onClickTemplateButton,
       onClickSettingButton = onClickSettingButton,
       onClickTipsButton = onClickTipsButton,
     )
+    Gap(height = 64.dp)
   }
 }
 
 @Composable
-fun FoodTrendChart(modifier: Modifier = Modifier) {
+private fun FoodTrendChart(
+  foodTrend: FoodUIModel,
+  foodTrendRatio: Float,
+  modifier: Modifier = Modifier
+) {
   Column(
     modifier = modifier,
     horizontalAlignment = CenterHorizontally
@@ -155,15 +164,16 @@ fun FoodTrendChart(modifier: Modifier = Modifier) {
       stringResource(R.string.home_banner_title),
       style = MaterialTheme.typography.titleMedium
     )
-    Spacer(Modifier.height(16.dp))
+    Gap(height = 24.dp)
     Box(
       modifier = Modifier.size(192.dp),
       contentAlignment = Center
     ) {
-      CircularChart()
-      Image(
-        painterResource(R.drawable.ic_food_image_temp),
-        null,
+      CircularChart(
+        foodTrendRatio = foodTrendRatio
+      )
+      CoilImage(
+        imageModel = { foodTrend.imageUrl },
         modifier = Modifier
           .size(160.dp)
           .clip(CircleShape)
@@ -171,13 +181,13 @@ fun FoodTrendChart(modifier: Modifier = Modifier) {
       )
     }
     Text(
-      "햄버거",
+      foodTrend.name,
       style = MaterialTheme.typography.titleMedium,
       color = MaterialTheme.colorScheme.primary
     )
-    Spacer(Modifier.height(4.dp))
+    Gap(height = 4.dp)
     Text(
-      text = stringResource(R.string.home_banner_score, 36),
+      text = stringResource(R.string.home_banner_score, foodTrendRatio.toInt()),
       style = MaterialTheme.typography.bodySmall,
       color = MaterialTheme.colorScheme.outline
     )
@@ -185,17 +195,18 @@ fun FoodTrendChart(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun CircularChart(
-  value: Float = 36f,
-  color: Color = MaterialTheme.colorScheme.primary,
-  backgroundCircleColor: Color = MaterialTheme.colorScheme.background,
+private fun CircularChart(
+  foodTrendRatio: Float,
+  modifier: Modifier = Modifier,
   size: Dp = 192.dp,
-  thickness: Dp = 8.dp
+  thickness: Dp = 8.dp,
+  color: Color = MaterialTheme.colorScheme.primary,
+  backgroundCircleColor: Color = MaterialTheme.colorScheme.background
 ) {
-  val sweepAngle = 360 * value / 100
+  val sweepAngle = 360 * foodTrendRatio / 100
 
   Canvas(
-    modifier = Modifier
+    modifier = modifier
       .size(size)
   ) {
     val arcRadius = size.toPx()
@@ -220,7 +231,7 @@ fun CircularChart(
 }
 
 @Composable
-fun HomeDivider(
+private fun HomeDivider(
   modifier: Modifier = Modifier
 ) {
   Row(
@@ -246,7 +257,8 @@ fun HomeDivider(
 }
 
 @Composable
-fun HomeButtonSet(
+private fun HomeButtonSet(
+  modifier: Modifier = Modifier,
   onClickLoungeButton: () -> Unit = {},
   onClickJoinLoungeButton: () -> Unit = {},
   onClickTemplateButton: () -> Unit = {},
@@ -254,7 +266,7 @@ fun HomeButtonSet(
   onClickTipsButton: () -> Unit = {},
 ) {
   Column(
-    modifier = Modifier.fillMaxWidth(),
+    modifier = modifier,
     verticalArrangement = Arrangement.spacedBy(16.dp)
   ) {
     Row(
@@ -367,10 +379,10 @@ fun HomeButtonSet(
   }
 }
 
-@Preview(showBackground = false, showSystemUi = true)
+@Preview
 @Composable
-fun HomeScreenPreview() {
-  LunchVoteTheme {
+private fun HomeScreenPreview() {
+  ScreenPreview {
     HomeScreen(
       HomeState()
     )

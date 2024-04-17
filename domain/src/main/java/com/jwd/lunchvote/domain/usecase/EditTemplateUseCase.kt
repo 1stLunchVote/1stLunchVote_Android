@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.domain.usecase.template
+package com.jwd.lunchvote.domain.usecase
 
 import com.jwd.lunchvote.domain.entity.Template
 import com.jwd.lunchvote.domain.repository.TemplateRepository

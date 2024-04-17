@@ -3,7 +3,7 @@ package com.jwd.lunchvote
 import android.os.Parcelable
 import com.google.firebase.auth.FirebaseAuth
 import com.jwd.lunchvote.core.test.base.BaseStateViewModelTest
-import com.jwd.lunchvote.domain.usecase.login.KakaoLoginUseCase
+import com.jwd.lunchvote.domain.usecase.KakaoLoginUseCase
 import com.jwd.lunchvote.ui.login.LoginContract
 import com.jwd.lunchvote.ui.login.LoginViewModel
 import io.mockk.every

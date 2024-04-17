@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.presentation.mapper.lounge
+package com.jwd.lunchvote.presentation.mapper
 
 import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.entity.type.MemberStatusType

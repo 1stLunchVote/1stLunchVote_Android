@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.presentation.mapper.lounge
+package com.jwd.lunchvote.presentation.mapper
 
 import com.jwd.lunchvote.domain.entity.LoungeChat
 import com.jwd.lunchvote.presentation.model.ChatUIModel

@@ -2,12 +2,16 @@ package com.jwd.lunchvote.presentation.ui.home
 
 import android.os.Parcelable
 import com.jwd.lunchvote.core.ui.base.ViewModelContract
+import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.util.UiText
 import kotlinx.parcelize.Parcelize
 
 class HomeContract {
   @Parcelize
-  class HomeState : ViewModelContract.State, Parcelable
+  data class HomeState(
+    val foodTrend: FoodUIModel = FoodUIModel(),
+    val foodTrendRatio: Float = 0f
+  ) : ViewModelContract.State, Parcelable
 
   sealed interface HomeEvent : ViewModelContract.Event {
     data object OnClickLoungeButton : HomeEvent
@@ -17,10 +21,13 @@ class HomeContract {
     data object OnClickTipsButton : HomeEvent
   }
 
-  sealed interface HomeReduce : ViewModelContract.Reduce
+  sealed interface HomeReduce : ViewModelContract.Reduce {
+    data class UpdateFoodTrend(val foodTrend: FoodUIModel) : HomeReduce
+    data class UpdateFoodTrendRatio(val foodTrendRatio: Float) : HomeReduce
+  }
 
   sealed interface HomeSideEffect : ViewModelContract.SideEffect {
-    data class NavigateToLounge(val loungeId: String?) : HomeSideEffect
+    data object NavigateToLounge : HomeSideEffect
     data object NavigateToTemplateList : HomeSideEffect
     data object NavigateToSetting : HomeSideEffect
     data object NavigateToTips : HomeSideEffect

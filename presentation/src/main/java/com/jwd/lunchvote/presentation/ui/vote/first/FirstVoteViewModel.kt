@@ -5,9 +5,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
-import com.jwd.lunchvote.domain.usecase.first_vote.GetFoodListUseCase
-import com.jwd.lunchvote.domain.usecase.first_vote.GetTemplateListUseCase
-import com.jwd.lunchvote.presentation.model.FoodUIModel
+import com.jwd.lunchvote.domain.usecase.GetFoodListUseCase
+import com.jwd.lunchvote.domain.usecase.GetTemplateListUseCase
+import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.enums.FoodStatus
 import com.jwd.lunchvote.presentation.model.updateFoodMap
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteEvent
@@ -77,13 +77,13 @@ class FirstVoteViewModel @Inject constructor(
     updateState(FirstVoteReduce.UpdateLoading(true))
 
     val userId = "PIRjtPnKcmJfNbSNIidD"   // TODO: 임시
-    val foodList = getFoodListUseCase.invoke()
+    val foodList = getFoodListUseCase.invoke().map { it.asUI() }
     val templateList = getTemplateListUseCase.invoke(userId)
 
     updateState(
       FirstVoteReduce.Initialize(
         FirstVoteState(
-          foodMap = foodList.associate { FoodUIModel(it) to FoodStatus.DEFAULT },
+          foodMap = foodList.associateWith { FoodStatus.DEFAULT },
           likeList = emptyList(),
           dislikeList = emptyList(),
           totalMember = 3,

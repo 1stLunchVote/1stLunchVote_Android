@@ -7,8 +7,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.entity.type.MemberStatusType
-import com.jwd.lunchvote.domain.usecase.lounge.CheckMemberStatusUseCase
-import com.jwd.lunchvote.domain.usecase.lounge.ExileMemberUseCase
+import com.jwd.lunchvote.domain.usecase.CheckMemberStatusUseCase
+import com.jwd.lunchvote.domain.usecase.ExileMemberUseCase
 import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberContract.LoungeMemberEvent
 import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberContract.LoungeMemberReduce
 import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberContract.LoungeMemberSideEffect

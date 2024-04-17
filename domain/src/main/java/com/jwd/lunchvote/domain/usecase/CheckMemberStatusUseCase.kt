@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.domain.usecase.lounge
+package com.jwd.lunchvote.domain.usecase
 
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import kotlinx.coroutines.flow.map

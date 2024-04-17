@@ -2,14 +2,13 @@ package com.jwd.lunchvote.presentation.ui.login
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import androidx.test.core.app.ActivityScenario.launch
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
-import com.jwd.lunchvote.domain.usecase.login.KakaoLoginUseCase
+import com.jwd.lunchvote.domain.usecase.KakaoLoginUseCase
 import com.jwd.lunchvote.presentation.ui.login.LoginContract.LoginEvent
 import com.jwd.lunchvote.presentation.ui.login.LoginContract.LoginReduce
 import com.jwd.lunchvote.presentation.ui.login.LoginContract.LoginSideEffect
