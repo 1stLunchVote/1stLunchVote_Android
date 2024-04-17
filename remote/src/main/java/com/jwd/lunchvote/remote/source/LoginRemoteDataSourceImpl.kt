@@ -2,7 +2,7 @@ package com.jwd.lunchvote.remote.source
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.functions.FirebaseFunctions
-import com.jwd.lunchvote.core.common.base.error.LoginError
+import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.data.source.remote.LoginRemoteDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.tasks.await

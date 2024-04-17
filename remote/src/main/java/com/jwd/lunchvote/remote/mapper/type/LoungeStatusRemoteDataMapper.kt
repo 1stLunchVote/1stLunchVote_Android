@@ -1,6 +1,6 @@
 package com.jwd.lunchvote.remote.mapper.type
 
-import com.jwd.lunchvote.core.common.base.Mapper
+import com.jwd.lunchvote.core.common.mapper.Mapper
 import com.jwd.lunchvote.data.model.type.LoungeStatusDataType
 
 internal object LoungeStatusRemoteDataMapper : Mapper<String?, LoungeStatusDataType> {

@@ -1,6 +1,6 @@
 package com.jwd.lunchvote.remote.mapper.type
 
-import com.jwd.lunchvote.core.common.base.BiMapper
+import com.jwd.lunchvote.core.common.mapper.BiMapper
 import com.jwd.lunchvote.data.model.type.MemberStatusDataType
 
 object MemberStatusRemoteTypeMapper : BiMapper<String?, MemberStatusDataType> {

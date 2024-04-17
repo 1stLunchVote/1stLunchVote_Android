@@ -1,6 +1,6 @@
 package com.jwd.lunchvote.data.mapper.type
 
-import com.jwd.lunchvote.core.common.base.Mapper
+import com.jwd.lunchvote.core.common.mapper.Mapper
 import com.jwd.lunchvote.data.model.type.LoungeStatusDataType
 import com.jwd.lunchvote.domain.entity.type.LoungeStatusType
 
