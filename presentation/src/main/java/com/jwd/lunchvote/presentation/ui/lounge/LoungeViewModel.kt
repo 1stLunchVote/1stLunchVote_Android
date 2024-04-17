@@ -3,9 +3,9 @@ package com.jwd.lunchvote.presentation.ui.lounge
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import com.google.firebase.auth.FirebaseAuth
-import com.jwd.lunchvote.core.common.base.error.LoginError
-import com.jwd.lunchvote.core.common.base.error.LoungeError
-import com.jwd.lunchvote.core.common.base.error.UnknownError
+import com.jwd.lunchvote.core.common.error.LoginError
+import com.jwd.lunchvote.core.common.error.LoungeError
+import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.entity.type.LoungeStatusType
 import com.jwd.lunchvote.domain.entity.type.MemberStatusType

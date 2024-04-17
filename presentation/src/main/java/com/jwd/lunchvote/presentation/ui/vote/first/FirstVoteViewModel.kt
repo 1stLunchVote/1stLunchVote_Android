@@ -3,7 +3,7 @@ package com.jwd.lunchvote.presentation.ui.vote.first
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.jwd.lunchvote.core.common.base.error.UnknownError
+import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.usecase.first_vote.GetFoodListUseCase
 import com.jwd.lunchvote.domain.usecase.first_vote.GetTemplateListUseCase

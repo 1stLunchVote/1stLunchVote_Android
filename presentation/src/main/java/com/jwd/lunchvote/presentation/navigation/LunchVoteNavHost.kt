@@ -180,7 +180,8 @@ fun LunchVoteNavHost(
         popBackStack = { navController.popBackStack() },
         navigateToLounge = { loungeId ->
           navController.navigate(LunchVoteNavRoute.Lounge, loungeId)
-        }
+        },
+        showSnackBar = showSnackBar
       )
     }
     dialog(LunchVoteNavRoute.TemplateListAddDialog) {

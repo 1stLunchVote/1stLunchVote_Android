@@ -2,10 +2,14 @@ package com.jwd.lunchvote.presentation.ui.home.dialog
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import com.jwd.lunchvote.core.common.base.error.UnknownError
+import com.jwd.lunchvote.core.common.error.LoungeError
+import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.usecase.lounge.CheckLoungeUseCase
-import com.jwd.lunchvote.presentation.ui.home.dialog.HomeJoinContract.*
+import com.jwd.lunchvote.presentation.ui.home.dialog.HomeJoinContract.HomeJoinEvent
+import com.jwd.lunchvote.presentation.ui.home.dialog.HomeJoinContract.HomeJoinReduce
+import com.jwd.lunchvote.presentation.ui.home.dialog.HomeJoinContract.HomeJoinSideEffect
+import com.jwd.lunchvote.presentation.ui.home.dialog.HomeJoinContract.HomeJoinState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -35,15 +39,15 @@ class HomeJoinViewModel @Inject constructor(
 
   override fun handleErrors(error: Throwable) {
     sendSideEffect(HomeJoinSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+    when(error) {
+      is LoungeError.NoLounge -> sendSideEffect(HomeJoinSideEffect.PopBackStack)
+    }
   }
 
   private suspend fun checkLoungeExist() {
     val isAvailable = checkLoungeUseCase(currentState.loungeId)
-    if (isAvailable) {
-      sendSideEffect(HomeJoinSideEffect.NavigateToLounge(currentState.loungeId))
-    } else {
-      sendSideEffect(HomeJoinSideEffect.ShowSnackBar(UiText.DynamicString("존재하지 않는 방입니다.")))
-      sendSideEffect(HomeJoinSideEffect.PopBackStack)
-    }
+
+    if (isAvailable) sendSideEffect(HomeJoinSideEffect.NavigateToLounge(currentState.loungeId))
+    else throw LoungeError.NoLounge
   }
 }
