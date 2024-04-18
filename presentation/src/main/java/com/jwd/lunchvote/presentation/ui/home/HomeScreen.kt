@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -25,8 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Center
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -41,7 +38,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
@@ -125,13 +121,13 @@ private fun HomeScreen(
       null,
       modifier = Modifier
         .size(48.dp)
-        .align(CenterHorizontally)
+        .align(Alignment.CenterHorizontally)
     )
     Gap(minHeight = 36.dp)
     FoodTrendChart(
       foodTrend = homeState.foodTrend,
       foodTrendRatio = homeState.foodTrendRatio,
-      modifier = Modifier.align(CenterHorizontally)
+      modifier = Modifier.align(Alignment.CenterHorizontally)
     )
     Gap(minHeight = 36.dp)
     HomeDivider(
@@ -158,7 +154,7 @@ private fun FoodTrendChart(
 ) {
   Column(
     modifier = modifier,
-    horizontalAlignment = CenterHorizontally
+    horizontalAlignment = Alignment.CenterHorizontally
   ) {
     Text(
       stringResource(R.string.home_banner_title),
@@ -167,7 +163,7 @@ private fun FoodTrendChart(
     Gap(height = 24.dp)
     Box(
       modifier = Modifier.size(192.dp),
-      contentAlignment = Center
+      contentAlignment = Alignment.Center
     ) {
       CircularChart(
         foodTrendRatio = foodTrendRatio
@@ -267,6 +263,8 @@ private fun HomeButtonSet(
   onClickSettingButton: () -> Unit = {},
   onClickTipsButton: () -> Unit = {},
 ) {
+  val buttonShape = RoundedCornerShape(16.dp)
+
   Column(
     modifier = modifier,
     verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -279,11 +277,8 @@ private fun HomeButtonSet(
         modifier = Modifier
           .weight(1f)
           .height(128.dp)
-          .clip(RoundedCornerShape(16.dp))
-          .background(
-            MaterialTheme.colorScheme.primary,
-            RoundedCornerShape(16.dp)
-          )
+          .clip(buttonShape)
+          .background(MaterialTheme.colorScheme.primary)
           .clickable { onClickLoungeButton() }
       ) {
         Text(
@@ -297,12 +292,8 @@ private fun HomeButtonSet(
         modifier = Modifier
           .weight(1f)
           .height(128.dp)
-          .clip(RoundedCornerShape(16.dp))
-          .border(
-            2.dp,
-            MaterialTheme.colorScheme.primary,
-            RoundedCornerShape(16.dp)
-          )
+          .clip(buttonShape)
+          .border(2.dp, MaterialTheme.colorScheme.primary, buttonShape)
           .clickable { onClickJoinLoungeButton() }
       ) {
         Text(
@@ -317,12 +308,8 @@ private fun HomeButtonSet(
       modifier = Modifier
         .fillMaxWidth()
         .height(64.dp)
-        .clip(RoundedCornerShape(16.dp))
-        .border(
-          2.dp,
-          MaterialTheme.colorScheme.primary,
-          RoundedCornerShape(16.dp)
-        )
+        .clip(buttonShape)
+        .border(2.dp, MaterialTheme.colorScheme.primary, buttonShape)
         .clickable { onClickTemplateButton() },
       contentAlignment = Alignment.TopEnd
     ) {
@@ -340,39 +327,28 @@ private fun HomeButtonSet(
       Box(
         modifier = Modifier
           .size(52.dp)
-          .clip(RoundedCornerShape(16.dp))
-          .background(
-            MaterialTheme.colorScheme.outline,
-            RoundedCornerShape(16.dp)
-          )
+          .clip(buttonShape)
+          .background(MaterialTheme.colorScheme.outline)
           .clickable { onClickSettingButton() },
-        contentAlignment = Center
+        contentAlignment = Alignment.Center
       ) {
         Image(
           painterResource(R.drawable.ic_gear),
-          null
+          "Setting Button"
         )
       }
-      ConstraintLayout(
+      Box(
         modifier = Modifier
           .weight(1f)
           .height(52.dp)
-          .clip(RoundedCornerShape(16.dp))
-          .border(
-            2.dp,
-            MaterialTheme.colorScheme.outline,
-            RoundedCornerShape(16.dp)
-          )
-          .clickable { onClickTipsButton() }
+          .clip(buttonShape)
+          .border(2.dp, MaterialTheme.colorScheme.outline, buttonShape)
+          .clickable { onClickTipsButton() },
+        contentAlignment = Alignment.CenterEnd
       ) {
-        val text = createRef()
         Text(
           stringResource(R.string.home_tips_button),
-          modifier = Modifier.constrainAs(text) {
-            top.linkTo(parent.top)
-            bottom.linkTo(parent.bottom)
-            end.linkTo(parent.end, margin = 24.dp)
-          },
+          modifier = Modifier.padding(end = 24.dp),
           style = MaterialTheme.typography.titleSmall,
           color = MaterialTheme.colorScheme.outline
         )
