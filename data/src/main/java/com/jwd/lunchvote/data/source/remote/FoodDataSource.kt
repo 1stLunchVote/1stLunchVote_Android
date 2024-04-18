@@ -4,4 +4,5 @@ import com.jwd.lunchvote.data.model.FoodData
 
 interface FoodDataSource {
   suspend fun getFoodList(): List<FoodData>
+  suspend fun getFoodTrend(): Pair<FoodData, Float>
 }

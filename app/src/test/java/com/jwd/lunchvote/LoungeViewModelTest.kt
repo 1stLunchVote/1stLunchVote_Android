@@ -4,10 +4,10 @@ import android.os.Parcelable
 import com.google.firebase.auth.FirebaseAuth
 import com.jwd.lunchvote.core.test.base.BaseStateViewModelTest
 import com.jwd.lunchvote.domain.entity.Member
-import com.jwd.lunchvote.domain.usecase.lounge.CreateLoungeUseCase
-import com.jwd.lunchvote.domain.usecase.lounge.GetChatListUseCase
-import com.jwd.lunchvote.domain.usecase.lounge.GetMemberListUseCase
-import com.jwd.lunchvote.domain.usecase.lounge.JoinLoungeUseCase
+import com.jwd.lunchvote.domain.usecase.CreateLoungeUseCase
+import com.jwd.lunchvote.domain.usecase.GetChatListUseCase
+import com.jwd.lunchvote.domain.usecase.GetMemberListUseCase
+import com.jwd.lunchvote.domain.usecase.JoinLoungeUseCase
 import com.jwd.lunchvote.model.MemberUIModel
 import com.jwd.lunchvote.ui.lounge.LoungeViewModel
 import io.mockk.every

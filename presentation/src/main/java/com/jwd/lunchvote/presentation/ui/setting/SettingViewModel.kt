@@ -2,7 +2,7 @@ package com.jwd.lunchvote.presentation.ui.setting
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import com.jwd.lunchvote.core.common.base.error.UnknownError
+import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingEvent
 import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingReduce

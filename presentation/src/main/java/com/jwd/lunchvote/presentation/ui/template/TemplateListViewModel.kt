@@ -2,9 +2,9 @@ package com.jwd.lunchvote.presentation.ui.template
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import com.jwd.lunchvote.core.common.base.error.UnknownError
+import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
-import com.jwd.lunchvote.domain.usecase.template.GetTemplateListUseCase
+import com.jwd.lunchvote.domain.usecase.GetTemplateListUseCase
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.ui.template.TemplateListContract.TemplateListEvent
 import com.jwd.lunchvote.presentation.ui.template.TemplateListContract.TemplateListReduce

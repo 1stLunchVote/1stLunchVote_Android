@@ -1,7 +1,7 @@
 package com.jwd.lunchvote.presentation.util
 
 import android.content.Context
-import com.jwd.lunchvote.core.common.base.error.LoginError
+import com.jwd.lunchvote.core.common.error.LoginError
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause

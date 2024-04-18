@@ -3,12 +3,12 @@ package com.jwd.lunchvote.presentation.ui.template.add_template
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.jwd.lunchvote.core.common.base.error.UnknownError
+import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.entity.Template
-import com.jwd.lunchvote.domain.usecase.template.AddTemplateUseCase
-import com.jwd.lunchvote.domain.usecase.template.GetFoodListUseCase
-import com.jwd.lunchvote.presentation.model.FoodUIModel
+import com.jwd.lunchvote.domain.usecase.AddTemplateUseCase
+import com.jwd.lunchvote.domain.usecase.GetFoodListUseCase
+import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.enums.FoodStatus
 import com.jwd.lunchvote.presentation.model.updateFoodMap
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateEvent
@@ -79,13 +79,13 @@ class AddTemplateViewModel @Inject constructor(
   private suspend fun initialize(templateName: String) {
     updateState(AddTemplateReduce.UpdateLoading(true))
 
-    val foodList = getFoodListUseCase.invoke()
+    val foodList = getFoodListUseCase.invoke().map { it.asUI() }
     updateState(
       AddTemplateReduce.Initialize(
         AddTemplateState(
           loading = false,
           name = templateName,
-          foodMap = foodList.associate { FoodUIModel(it) to FoodStatus.DEFAULT }
+          foodMap = foodList.associateWith { FoodStatus.DEFAULT }
         )
       )
     )

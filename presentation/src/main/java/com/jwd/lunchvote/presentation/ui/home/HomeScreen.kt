@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,8 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Center
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -42,20 +38,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeEvent
 import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeSideEffect
 import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeState
+import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
+import com.jwd.lunchvote.presentation.widget.Screen
+import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import com.skydoves.landscapist.coil.CoilImage
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun HomeRoute(
-  navigateToLounge: (String?) -> Unit,
+  navigateToLounge: () -> Unit,
   navigateToTemplateList: () -> Unit,
   navigateToSetting: () -> Unit,
   navigateToTips: () -> Unit,
@@ -73,7 +72,7 @@ fun HomeRoute(
   LaunchedEffect(viewModel.sideEffect){
     viewModel.sideEffect.collectLatest {
       when(it){
-        is HomeSideEffect.NavigateToLounge -> navigateToLounge(it.loungeId)
+        is HomeSideEffect.NavigateToLounge -> navigateToLounge()
         is HomeSideEffect.NavigateToTemplateList -> navigateToTemplateList()
         is HomeSideEffect.NavigateToSetting -> navigateToSetting()
         is HomeSideEffect.NavigateToTips -> navigateToTips()
@@ -114,70 +113,79 @@ private fun HomeScreen(
   onClickSettingButton: () -> Unit = {},
   onClickTipsButton: () -> Unit = {}
 ){
-  Column(
-    modifier = Modifier
-      .fillMaxSize()
-      .padding(horizontal = 32.dp),
-    horizontalAlignment = CenterHorizontally
+  Screen(
+    modifier = modifier.padding(horizontal = 32.dp)
   ) {
     Image(
       painterResource(R.drawable.ic_logo),
       null,
       modifier = Modifier
         .size(48.dp)
-        .align(CenterHorizontally)
+        .align(Alignment.CenterHorizontally)
     )
+    Gap(minHeight = 36.dp)
     FoodTrendChart(
-      Modifier.padding(top = 40.dp, bottom = 40.dp)
+      foodTrend = homeState.foodTrend,
+      foodTrendRatio = homeState.foodTrendRatio,
+      modifier = Modifier.align(Alignment.CenterHorizontally)
     )
+    Gap(minHeight = 36.dp)
     HomeDivider(
-      Modifier
-        .fillMaxWidth()
-        .padding(vertical = 24.dp)
+      modifier = Modifier.fillMaxWidth()
     )
+    Gap(height = 24.dp)
     HomeButtonSet(
+      modifier = Modifier.fillMaxWidth(),
       onClickLoungeButton = onClickLoungeButton,
       onClickJoinLoungeButton = onClickJoinLoungeButton,
       onClickTemplateButton = onClickTemplateButton,
       onClickSettingButton = onClickSettingButton,
       onClickTipsButton = onClickTipsButton,
     )
+    Gap(height = 64.dp)
   }
 }
 
 @Composable
-fun FoodTrendChart(modifier: Modifier = Modifier) {
+private fun FoodTrendChart(
+  foodTrend: FoodUIModel,
+  foodTrendRatio: Float,
+  modifier: Modifier = Modifier
+) {
   Column(
     modifier = modifier,
-    horizontalAlignment = CenterHorizontally
+    horizontalAlignment = Alignment.CenterHorizontally
   ) {
     Text(
       stringResource(R.string.home_banner_title),
       style = MaterialTheme.typography.titleMedium
     )
-    Spacer(Modifier.height(16.dp))
+    Gap(height = 24.dp)
     Box(
       modifier = Modifier.size(192.dp),
-      contentAlignment = Center
+      contentAlignment = Alignment.Center
     ) {
-      CircularChart()
-      Image(
-        painterResource(R.drawable.ic_food_image_temp),
-        null,
+      CircularChart(
+        foodTrendRatio = foodTrendRatio
+      )
+      CoilImage(
+        imageModel = { foodTrend.imageUrl },
         modifier = Modifier
           .size(160.dp)
           .clip(CircleShape)
-          .border(4.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape)
+          .border(4.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape),
+        previewPlaceholder = R.drawable.ic_food_image_temp
       )
     }
+    Gap(height = 16.dp)
     Text(
-      "햄버거",
+      foodTrend.name,
       style = MaterialTheme.typography.titleMedium,
       color = MaterialTheme.colorScheme.primary
     )
-    Spacer(Modifier.height(4.dp))
+    Gap(height = 8.dp)
     Text(
-      text = stringResource(R.string.home_banner_score, 36),
+      text = stringResource(R.string.home_banner_score, foodTrendRatio.toInt()),
       style = MaterialTheme.typography.bodySmall,
       color = MaterialTheme.colorScheme.outline
     )
@@ -185,17 +193,18 @@ fun FoodTrendChart(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun CircularChart(
-  value: Float = 36f,
-  color: Color = MaterialTheme.colorScheme.primary,
-  backgroundCircleColor: Color = MaterialTheme.colorScheme.background,
+private fun CircularChart(
+  foodTrendRatio: Float,
+  modifier: Modifier = Modifier,
   size: Dp = 192.dp,
-  thickness: Dp = 8.dp
+  thickness: Dp = 8.dp,
+  color: Color = MaterialTheme.colorScheme.primary,
+  backgroundCircleColor: Color = MaterialTheme.colorScheme.background
 ) {
-  val sweepAngle = 360 * value / 100
+  val sweepAngle = 360 * foodTrendRatio / 100
 
   Canvas(
-    modifier = Modifier
+    modifier = modifier
       .size(size)
   ) {
     val arcRadius = size.toPx()
@@ -220,7 +229,7 @@ fun CircularChart(
 }
 
 @Composable
-fun HomeDivider(
+private fun HomeDivider(
   modifier: Modifier = Modifier
 ) {
   Row(
@@ -246,15 +255,18 @@ fun HomeDivider(
 }
 
 @Composable
-fun HomeButtonSet(
+private fun HomeButtonSet(
+  modifier: Modifier = Modifier,
   onClickLoungeButton: () -> Unit = {},
   onClickJoinLoungeButton: () -> Unit = {},
   onClickTemplateButton: () -> Unit = {},
   onClickSettingButton: () -> Unit = {},
   onClickTipsButton: () -> Unit = {},
 ) {
+  val buttonShape = RoundedCornerShape(16.dp)
+
   Column(
-    modifier = Modifier.fillMaxWidth(),
+    modifier = modifier,
     verticalArrangement = Arrangement.spacedBy(16.dp)
   ) {
     Row(
@@ -265,11 +277,8 @@ fun HomeButtonSet(
         modifier = Modifier
           .weight(1f)
           .height(128.dp)
-          .clip(RoundedCornerShape(16.dp))
-          .background(
-            MaterialTheme.colorScheme.primary,
-            RoundedCornerShape(16.dp)
-          )
+          .clip(buttonShape)
+          .background(MaterialTheme.colorScheme.primary)
           .clickable { onClickLoungeButton() }
       ) {
         Text(
@@ -283,12 +292,8 @@ fun HomeButtonSet(
         modifier = Modifier
           .weight(1f)
           .height(128.dp)
-          .clip(RoundedCornerShape(16.dp))
-          .border(
-            2.dp,
-            MaterialTheme.colorScheme.primary,
-            RoundedCornerShape(16.dp)
-          )
+          .clip(buttonShape)
+          .border(2.dp, MaterialTheme.colorScheme.primary, buttonShape)
           .clickable { onClickJoinLoungeButton() }
       ) {
         Text(
@@ -303,12 +308,8 @@ fun HomeButtonSet(
       modifier = Modifier
         .fillMaxWidth()
         .height(64.dp)
-        .clip(RoundedCornerShape(16.dp))
-        .border(
-          2.dp,
-          MaterialTheme.colorScheme.primary,
-          RoundedCornerShape(16.dp)
-        )
+        .clip(buttonShape)
+        .border(2.dp, MaterialTheme.colorScheme.primary, buttonShape)
         .clickable { onClickTemplateButton() },
       contentAlignment = Alignment.TopEnd
     ) {
@@ -326,39 +327,28 @@ fun HomeButtonSet(
       Box(
         modifier = Modifier
           .size(52.dp)
-          .clip(RoundedCornerShape(16.dp))
-          .background(
-            MaterialTheme.colorScheme.outline,
-            RoundedCornerShape(16.dp)
-          )
+          .clip(buttonShape)
+          .background(MaterialTheme.colorScheme.outline)
           .clickable { onClickSettingButton() },
-        contentAlignment = Center
+        contentAlignment = Alignment.Center
       ) {
         Image(
           painterResource(R.drawable.ic_gear),
-          null
+          "Setting Button"
         )
       }
-      ConstraintLayout(
+      Box(
         modifier = Modifier
           .weight(1f)
           .height(52.dp)
-          .clip(RoundedCornerShape(16.dp))
-          .border(
-            2.dp,
-            MaterialTheme.colorScheme.outline,
-            RoundedCornerShape(16.dp)
-          )
-          .clickable { onClickTipsButton() }
+          .clip(buttonShape)
+          .border(2.dp, MaterialTheme.colorScheme.outline, buttonShape)
+          .clickable { onClickTipsButton() },
+        contentAlignment = Alignment.CenterEnd
       ) {
-        val text = createRef()
         Text(
           stringResource(R.string.home_tips_button),
-          modifier = Modifier.constrainAs(text) {
-            top.linkTo(parent.top)
-            bottom.linkTo(parent.bottom)
-            end.linkTo(parent.end, margin = 24.dp)
-          },
+          modifier = Modifier.padding(end = 24.dp),
           style = MaterialTheme.typography.titleSmall,
           color = MaterialTheme.colorScheme.outline
         )
@@ -367,12 +357,17 @@ fun HomeButtonSet(
   }
 }
 
-@Preview(showBackground = false, showSystemUi = true)
+@Preview
 @Composable
-fun HomeScreenPreview() {
-  LunchVoteTheme {
+private fun HomeScreenPreview() {
+  ScreenPreview {
     HomeScreen(
-      HomeState()
+      HomeState(
+        foodTrend = FoodUIModel(
+          name = "햄버거"
+        ),
+        foodTrendRatio = 80f
+      )
     )
   }
 }

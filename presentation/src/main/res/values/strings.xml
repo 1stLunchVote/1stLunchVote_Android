@@ -56,5 +56,13 @@
     <string name="result_toolbar_title">투표 결과</string>
     <string name="result_title">오늘의 메뉴는 ..</string>
 
+    <!-- HomeJoinDialog -->
+    <string name="home_join_dialog_title">투표 방 참여하기</string>
+    <string name="home_join_dialog_hint_text">초대 코드</string>
+    <string name="home_join_dialog_dismiss_button">취소</string>
+    <string name="home_join_dialog_confirm_button">참여</string>
+    <string name="home_join_dialog_loading">로딩 중…</string>
+
+
     <string name="default_web_client_id">865155786423-o5doff8vas3949mfb7cvf8llhflutd5i.apps.googleusercontent.com</string>
 </resources>

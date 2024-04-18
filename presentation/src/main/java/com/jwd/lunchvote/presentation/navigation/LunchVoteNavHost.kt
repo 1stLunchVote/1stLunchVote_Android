@@ -10,7 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
-import com.jwd.lunchvote.presentation.ui.home.HomeJoinDialog
+import com.jwd.lunchvote.presentation.ui.home.dialog.HomeJoinDialog
 import com.jwd.lunchvote.presentation.ui.home.HomeRoute
 import com.jwd.lunchvote.presentation.ui.login.LoginRoute
 import com.jwd.lunchvote.presentation.ui.login.register.RegisterEmailRoute
@@ -72,9 +72,8 @@ fun LunchVoteNavHost(
   ) {
     composable(LunchVoteNavRoute.Home) {
       HomeRoute(
-        navigateToLounge = { loungeId ->
-          loungeId?.let { navController.navigate(LunchVoteNavRoute.Lounge, loungeId) }
-            ?: navController.navigate(LunchVoteNavRoute.Lounge)
+        navigateToLounge = {
+          navController.navigate(LunchVoteNavRoute.Lounge)
         },
         navigateToTemplateList = {
           navController.navigate(LunchVoteNavRoute.TemplateList)
@@ -177,10 +176,11 @@ fun LunchVoteNavHost(
 
     dialog(LunchVoteNavRoute.HomeJoinDialog) {
       HomeJoinDialog(
-        onClickDismissButton = { navController.popBackStack() },
-        onClickConfirmButton = { code ->
-          // TODO: 코드 활용해서 Lounge 입장 대기 화면 띄우기
-        }
+        popBackStack = { navController.popBackStack() },
+        navigateToLounge = { loungeId ->
+          navController.navigate(LunchVoteNavRoute.Lounge, loungeId)
+        },
+        showSnackBar = showSnackBar
       )
     }
     dialog(LunchVoteNavRoute.TemplateListAddDialog) {

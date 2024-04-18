@@ -7,7 +7,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 
 enum class LunchVoteNavRoute(
-  val args: List<Pair<String, NavType<*>>> = emptyList(),
+  val arguments: List<NamedNavArgument> = emptyList(),
   val links: List<String> = emptyList(),
 ) {
   Login,
@@ -25,7 +25,14 @@ enum class LunchVoteNavRoute(
 
   Setting,
 
-  Lounge(args = listOf("id" to NavType.StringType)),
+  Lounge(
+    arguments = listOf(
+      navArgument("id") {
+        type = NavType.StringType
+        nullable = true
+      }
+    )
+  ),
   Tips,
 
   HomeJoinDialog,
@@ -37,13 +44,10 @@ enum class LunchVoteNavRoute(
 }
 
 internal val LunchVoteNavRoute.route: String
-  get() = this.name + this.args.joinToString { "?${it.first}={${it.first}}" }
+  get() = this.name + this.arguments.joinToString { "?${it.name}={${it.name}}" }
 
 internal fun LunchVoteNavRoute.routeWithArgs(arguments: List<Any?>): String =
-  this.name + this.args.zip(arguments) { key, value -> "?${key.first}=$value" }.joinToString()
-
-internal val LunchVoteNavRoute.arguments: List<NamedNavArgument>
-  get() = this.args.map { (key, navType) -> navArgument(key) { type = navType } }
+  this.name + this.arguments.zip(arguments) { key, value -> "?${key.name}=$value" }.joinToString()
 
 internal val LunchVoteNavRoute.deepLinks: List<NavDeepLink>
   get() = this.links.map { navDeepLink { uriPattern = it } }

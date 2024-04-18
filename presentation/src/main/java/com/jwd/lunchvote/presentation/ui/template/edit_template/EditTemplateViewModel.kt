@@ -3,14 +3,14 @@ package com.jwd.lunchvote.presentation.ui.template.edit_template
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.jwd.lunchvote.core.common.base.error.UnknownError
+import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.entity.Template
-import com.jwd.lunchvote.domain.usecase.template.DeleteTemplateUseCase
-import com.jwd.lunchvote.domain.usecase.template.EditTemplateUseCase
-import com.jwd.lunchvote.domain.usecase.template.GetFoodListUseCase
-import com.jwd.lunchvote.domain.usecase.template.GetTemplateUseCase
-import com.jwd.lunchvote.presentation.model.FoodUIModel
+import com.jwd.lunchvote.domain.usecase.DeleteTemplateUseCase
+import com.jwd.lunchvote.domain.usecase.EditTemplateUseCase
+import com.jwd.lunchvote.domain.usecase.GetFoodListUseCase
+import com.jwd.lunchvote.domain.usecase.GetTemplateUseCase
+import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.model.enums.FoodStatus
 import com.jwd.lunchvote.presentation.model.updateFoodMap
@@ -85,22 +85,21 @@ class EditTemplateViewModel @Inject constructor(
   private suspend fun initialize(templateId: String) {
     updateState(EditTemplateReduce.UpdateLoading(true))
 
-    val foodList = getFoodListUseCase.invoke()
+    val foodList = getFoodListUseCase.invoke().map { it.asUI() }
     val template = getTemplateUseCase.invoke(templateId)
     updateState(
       EditTemplateReduce.Initialize(
         EditTemplateState(
           template = TemplateUIModel(template),
-          foodMap = foodList.associate {
-            FoodUIModel(it) to when (it.name) {
+          foodMap = foodList.associateWith {
+            when (it.name) {
               in template.like -> FoodStatus.LIKE
               in template.dislike -> FoodStatus.DISLIKE
               else -> FoodStatus.DEFAULT
             }
           },
-          likeList = foodList.filter { template.like.contains(it.name) }.map { FoodUIModel(it) },
+          likeList = foodList.filter { template.like.contains(it.name) },
           dislikeList = foodList.filter { template.dislike.contains(it.name) }
-            .map { FoodUIModel(it) }
         )
       )
     )

@@ -1,6 +1,6 @@
 package com.jwd.lunchvote.local.room.mapper
 
-import com.jwd.lunchvote.core.common.base.BiMapper
+import com.jwd.lunchvote.core.common.mapper.BiMapper
 import com.jwd.lunchvote.data.model.LoungeChatData
 import com.jwd.lunchvote.local.room.entity.ChatEntity
 

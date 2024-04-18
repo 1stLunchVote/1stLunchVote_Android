@@ -1,6 +1,6 @@
 package com.jwd.lunchvote.data.mapper
 
-import com.jwd.lunchvote.core.common.base.BiMapper
+import com.jwd.lunchvote.core.common.mapper.BiMapper
 import com.jwd.lunchvote.data.mapper.type.MessageDataTypeMapper
 import com.jwd.lunchvote.data.mapper.type.SendStatusDataTypeMapper
 import com.jwd.lunchvote.data.model.LoungeChatData

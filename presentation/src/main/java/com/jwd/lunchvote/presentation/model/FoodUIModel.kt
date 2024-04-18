@@ -7,18 +7,10 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class FoodUIModel (
-  val id: String,
-  val imageUrl: String,
-  val name: String
-): Parcelable {
-  constructor(
-    food: Food
-  ): this(
-    id = food.id,
-    imageUrl = food.imageUrl,
-    name = food.name
-  )
-}
+  val id: String = "",
+  val imageUrl: String = "",
+  val name: String = ""
+): Parcelable
 
 fun Map<FoodUIModel, FoodStatus>.updateFoodMap(food: FoodUIModel): Map<FoodUIModel, FoodStatus> =
   this.toMutableMap().apply { this[food] = this[food]?.nextStatus() ?: FoodStatus.DEFAULT }
