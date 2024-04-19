@@ -171,9 +171,7 @@ fun EditTemplateScreenPreview() {
           ) to FoodStatus.DEFAULT,
         ),
         template = TemplateUIModel(
-          Template(
-            name = "스트레스 받을 때(매운 음식)"
-          )
+          name = "스트레스 받을 때(매운 음식)"
         )
       )
     )

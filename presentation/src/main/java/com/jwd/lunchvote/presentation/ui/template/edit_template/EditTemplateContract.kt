@@ -16,7 +16,7 @@ class EditTemplateContract {
   @Parcelize
   data class EditTemplateState(
     val loading: Boolean = false,
-    val template: TemplateUIModel = TemplateUIModel(Template()),
+    val template: TemplateUIModel = TemplateUIModel(),
     val foodMap: Map<FoodUIModel, FoodStatus> = emptyMap(),
     val likeList: List<FoodUIModel> = emptyList(),
     val dislikeList: List<FoodUIModel> = emptyList(),

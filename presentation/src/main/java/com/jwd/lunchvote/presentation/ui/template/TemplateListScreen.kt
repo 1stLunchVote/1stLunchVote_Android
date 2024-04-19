@@ -2,8 +2,6 @@ package com.jwd.lunchvote.presentation.ui.template
 
 import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,7 +11,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
@@ -21,21 +18,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.ui.template.TemplateListContract.TemplateListEvent
 import com.jwd.lunchvote.presentation.ui.template.TemplateListContract.TemplateListSideEffect
 import com.jwd.lunchvote.presentation.ui.template.TemplateListContract.TemplateListState
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
+import com.jwd.lunchvote.presentation.widget.Screen
+import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.TemplateListButton
 import com.jwd.lunchvote.presentation.widget.TemplateListItem
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun TemplateListRoute(
+  popBackStack: () -> Unit,
   navigateToEditTemplate: (String?) -> Unit,
   openAddDialog: () -> Unit,
-  popBackStack: () -> Unit,
   showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: TemplateListViewModel = hiltViewModel(),
@@ -60,11 +58,7 @@ fun TemplateListRoute(
     templateListState = templateListState,
     modifier = modifier,
     onClickBackButton = { viewModel.sendEvent(TemplateListEvent.OnClickBackButton) },
-    onClickTemplate = { templateId -> viewModel.sendEvent(
-      TemplateListEvent.OnClickTemplate(
-        templateId
-      )
-    ) },
+    onClickTemplate = { viewModel.sendEvent(TemplateListEvent.OnClickTemplate(it)) },
     onClickAddButton = { viewModel.sendEvent(TemplateListEvent.OnClickAddButton) }
   )
 }
@@ -77,15 +71,17 @@ private fun TemplateListScreen(
   onClickTemplate: (String) -> Unit = {},
   onClickAddButton: () -> Unit = {},
 ) {
-  Column(
-    modifier = modifier.fillMaxSize(),
-    horizontalAlignment = CenterHorizontally
+  Screen(
+    modifier = modifier,
+    topAppBar = {
+      LunchVoteTopBar(
+        title = "템플릿 목록",
+        navIconVisible = true,
+        popBackStack = onClickBackButton
+      )
+    },
+    scrollable = false
   ) {
-    LunchVoteTopBar(
-      title = "템플릿 목록",
-      navIconVisible = true,
-      popBackStack = onClickBackButton
-    )
     LazyColumn(
       modifier = Modifier
         .fillMaxWidth()
@@ -116,10 +112,10 @@ private fun TemplateListScreen(
   }
 }
 
-@Preview(showSystemUi = true)
+@Preview
 @Composable
-fun TemplateListScreenPreview() {
-  LunchVoteTheme {
+private fun TemplateListScreenPreview() {
+  ScreenPreview {
     TemplateListScreen(
       TemplateListState()
     )

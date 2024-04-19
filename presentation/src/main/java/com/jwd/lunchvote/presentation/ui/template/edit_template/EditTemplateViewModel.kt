@@ -86,11 +86,11 @@ class EditTemplateViewModel @Inject constructor(
     updateState(EditTemplateReduce.UpdateLoading(true))
 
     val foodList = getFoodListUseCase.invoke().map { it.asUI() }
-    val template = getTemplateUseCase.invoke(templateId)
+    val template = getTemplateUseCase.invoke(templateId).asUI()
     updateState(
       EditTemplateReduce.Initialize(
         EditTemplateState(
-          template = TemplateUIModel(template),
+          template = template,
           foodMap = foodList.associateWith {
             when (it.name) {
               in template.like -> FoodStatus.LIKE

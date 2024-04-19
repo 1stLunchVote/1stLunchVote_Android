@@ -24,7 +24,7 @@ class TemplateListContract {
   }
 
   sealed interface TemplateListReduce : Reduce {
-    data class Initialize(val state: TemplateListState): TemplateListReduce
+    data class UpdateTemplateList(val templateList: List<TemplateUIModel>): TemplateListReduce
   }
 
   sealed interface TemplateListSideEffect: SideEffect {
