@@ -17,7 +17,7 @@ import com.jwd.lunchvote.presentation.ui.login.register.RegisterEmailRoute
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeRoute
 import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberRoute
 import com.jwd.lunchvote.presentation.ui.setting.SettingRoute
-import com.jwd.lunchvote.presentation.ui.template.TemplateAddDialog
+import com.jwd.lunchvote.presentation.ui.template.dialog.TemplateAddDialog
 import com.jwd.lunchvote.presentation.ui.template.TemplateListRoute
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateRoute
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateRoute
