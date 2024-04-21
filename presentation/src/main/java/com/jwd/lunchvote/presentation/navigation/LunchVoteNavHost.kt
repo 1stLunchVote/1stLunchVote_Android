@@ -17,9 +17,9 @@ import com.jwd.lunchvote.presentation.ui.login.register.RegisterEmailRoute
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeRoute
 import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberRoute
 import com.jwd.lunchvote.presentation.ui.setting.SettingRoute
-import com.jwd.lunchvote.presentation.ui.template.dialog.TemplateAddDialog
 import com.jwd.lunchvote.presentation.ui.template.TemplateListRoute
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateRoute
+import com.jwd.lunchvote.presentation.ui.template.dialog.TemplateListAddDialog
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateRoute
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteRoute
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteRoute
@@ -184,11 +184,12 @@ fun LunchVoteNavHost(
       )
     }
     dialog(LunchVoteNavRoute.TemplateListAddDialog) {
-      TemplateAddDialog(
+      TemplateListAddDialog(
         popBackStack = { navController.popBackStack() },
         navigateToAddTemplate = { templateName ->
           navController.navigate(LunchVoteNavRoute.AddTemplate, templateName)
-        }
+        },
+        showSnackBar = showSnackBar
       )
     }
     dialog(LunchVoteNavRoute.EditTemplateDeleteDialog) {
@@ -199,5 +200,3 @@ fun LunchVoteNavHost(
     }
   }
 }
-
-const val SNACK_BAR_KEY = "message"

@@ -21,7 +21,13 @@ enum class LunchVoteNavRoute(
 
   TemplateList,
   EditTemplate,
-  AddTemplate,
+  AddTemplate(
+    arguments = listOf(
+      navArgument("templateName") {
+        type = NavType.StringType
+      }
+    )
+  ),
 
   Setting,
 
