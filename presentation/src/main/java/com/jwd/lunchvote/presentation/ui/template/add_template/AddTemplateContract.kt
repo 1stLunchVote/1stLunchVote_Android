@@ -10,7 +10,6 @@ import kotlinx.parcelize.Parcelize
 class AddTemplateContract {
   @Parcelize
   data class AddTemplateState(
-    val loading: Boolean = false,
     val name: String = "",
     val foodMap: Map<FoodUIModel, FoodStatus> = emptyMap(),
     val likeList: List<FoodUIModel> = emptyList(),
@@ -21,16 +20,15 @@ class AddTemplateContract {
   }
 
   sealed interface AddTemplateEvent: ViewModelContract.Event {
-    data class StartInitialize(val templateName: String): AddTemplateEvent
     data object OnClickBackButton: AddTemplateEvent
     data class OnClickFood(val food: FoodUIModel): AddTemplateEvent
-    data class SetSearchKeyword(val searchKeyword: String): AddTemplateEvent
+    data class OnSearchKeywordChanged(val searchKeyword: String): AddTemplateEvent
     data object OnClickAddButton: AddTemplateEvent
   }
 
   sealed interface AddTemplateReduce : ViewModelContract.Reduce {
-    data class UpdateLoading(val loading: Boolean): AddTemplateReduce
-    data class Initialize(val state: AddTemplateState): AddTemplateReduce
+    data class UpdateName(val name: String): AddTemplateReduce
+    data class UpdateFoodMap(val foodMap: Map<FoodUIModel, FoodStatus>): AddTemplateReduce
     data class UpdateFoodStatus(val food: FoodUIModel): AddTemplateReduce
     data class UpdateSearchKeyword(val searchKeyword: String): AddTemplateReduce
   }
