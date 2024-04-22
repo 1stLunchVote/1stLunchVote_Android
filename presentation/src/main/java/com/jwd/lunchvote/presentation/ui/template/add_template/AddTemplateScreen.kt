@@ -38,10 +38,13 @@ import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContra
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateSideEffect
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateState
 import com.jwd.lunchvote.presentation.widget.FoodItem
+import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
+import com.jwd.lunchvote.presentation.widget.Screen
+import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.TextFieldType
 import kotlinx.coroutines.flow.collectLatest
 
@@ -85,110 +88,109 @@ private fun AddTemplateScreen(
   setSearchKeyword: (String) -> Unit = {},
   onClickAddButton: () -> Unit = {}
 ) {
-  Column(
-    modifier = modifier.fillMaxSize(),
-    horizontalAlignment = CenterHorizontally
+  Screen(
+    modifier = modifier,
+    topAppBar = {
+      LunchVoteTopBar(
+        title = "템플릿 생성",
+        navIconVisible = true,
+        popBackStack = onClickBackButton
+      )
+    },
+    scrollable = false
   ) {
-    LunchVoteTopBar(
-      title = "템플릿 생성",
-      navIconVisible = true,
-      popBackStack = onClickBackButton
-    )
-    Column(
+    Gap(height = 16.dp)
+    TemplateTitle(
+      name = addTemplateState.name,
+      like = addTemplateState.likeList.size,
+      dislike = addTemplateState.dislikeList.size,
       modifier = Modifier
         .fillMaxWidth()
-        .padding(top = 16.dp, start = 24.dp, end = 24.dp, bottom = 24.dp),
-      verticalArrangement = Arrangement.spacedBy(16.dp),
-      horizontalAlignment = CenterHorizontally
+        .padding(horizontal = 24.dp)
+    )
+    Gap(height = 16.dp)
+    LunchVoteTextField(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 24.dp),
+      text = addTemplateState.searchKeyword,
+      hintText = stringResource(R.string.first_vote_hint_text),
+      onTextChange = setSearchKeyword,
+      textFieldType = TextFieldType.Search
+    )
+    Gap(height = 16.dp)
+    LazyVerticalGrid(
+      columns = GridCells.Fixed(3),
+      modifier = Modifier
+        .fillMaxWidth()
+        .weight(1f)
+        .padding(horizontal = 24.dp),
+      verticalArrangement = Arrangement.spacedBy(8.dp),
+      horizontalArrangement = Arrangement.SpaceBetween
     ) {
-      TemplateTitle(
-        addTemplateState.name,
-        addTemplateState.likeList.size,
-        addTemplateState.dislikeList.size
-      )
-      LunchVoteTextField(
-        modifier = Modifier.fillMaxWidth(),
-        text = addTemplateState.searchKeyword,
-        hintText = stringResource(R.string.first_vote_hint_text),
-        onTextChange = setSearchKeyword,
-        textFieldType = TextFieldType.Search
-      )
-      LazyVerticalGrid(
-        columns = GridCells.Fixed(3),
-        modifier = Modifier
-          .fillMaxWidth()
-          .weight(1f),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-      ) {
-        items(addTemplateState.foodMap.keys.filter { it.name.contains(addTemplateState.searchKeyword) }) {food ->
-          FoodItem(food, addTemplateState.foodMap[food]!!) { onClickFood(food) }
-        }
-      }
-      Button(
-        onClick = onClickAddButton,
-        enabled = addTemplateState.likeList.isNotEmpty() || addTemplateState.dislikeList.isNotEmpty()
-      ) {
-        Text("템플릿 생성")
+      items(addTemplateState.foodMap.keys.filter { it.name.contains(addTemplateState.searchKeyword) }) {food ->
+        FoodItem(food, addTemplateState.foodMap[food]!!) { onClickFood(food) }
       }
     }
+    Gap(height = 16.dp)
+    Button(
+      onClick = onClickAddButton,
+      enabled = addTemplateState.likeList.isNotEmpty() || addTemplateState.dislikeList.isNotEmpty()
+    ) {
+      Text("템플릿 생성")
+    }
+    Gap(height = 24.dp)
   }
 }
 
 @Composable
-fun TemplateTitle(
+private fun TemplateTitle(
   name: String,
   like: Int,
-  dislike: Int
+  dislike: Int,
+  modifier: Modifier = Modifier
 ) {
   val shape = RoundedCornerShape(8.dp)
-  Box(
-    modifier = Modifier
-      .fillMaxWidth()
+
+  Column(
+    modifier = modifier
       .clip(shape)
       .background(MaterialTheme.colorScheme.background, shape)
       .border(BorderStroke(2.dp, MaterialTheme.colorScheme.outlineVariant), shape)
+      .padding(vertical = 20.dp),
+    verticalArrangement = Arrangement.spacedBy(8.dp),
+    horizontalAlignment = CenterHorizontally
   ) {
-    Column(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 20.dp),
-      verticalArrangement = Arrangement.spacedBy(8.dp),
-      horizontalAlignment = CenterHorizontally
-    ) {
-      Text(name, style = MaterialTheme.typography.bodyLarge)
-      LikeDislike(like, dislike)
-    }
+    Text(name, style = MaterialTheme.typography.bodyLarge)
+    LikeDislike(like, dislike)
   }
 }
 
-@Preview(showSystemUi = true)
+@Preview
 @Composable
-fun AddTemplateScreenPreview() {
-  LunchVoteTheme {
-    Surface {
-      AddTemplateScreen(
-        AddTemplateState(
-          name = "학생회 회식 대표 메뉴",
-          foodMap = mapOf(
-            FoodUIModel(
-              id = "1",
-              imageUrl = "",
-              name = "음식명"
-            ) to FoodStatus.DEFAULT,
-            FoodUIModel(
-              id = "2",
-              imageUrl = "",
-              name = "음식명"
-            ) to FoodStatus.DEFAULT,
-            FoodUIModel(
-              id = "3",
-              imageUrl = "",
-              name = "음식명"
-            ) to FoodStatus.DEFAULT,
-          )
+private fun AddTemplateScreenPreview() {
+  ScreenPreview {
+    AddTemplateScreen(
+      AddTemplateState(
+        name = "학생회 회식 대표 메뉴",
+        foodMap = mapOf(
+          FoodUIModel(
+            id = "1",
+            imageUrl = "",
+            name = "음식명"
+          ) to FoodStatus.DEFAULT,
+          FoodUIModel(
+            id = "2",
+            imageUrl = "",
+            name = "음식명"
+          ) to FoodStatus.DEFAULT,
+          FoodUIModel(
+            id = "3",
+            imageUrl = "",
+            name = "음식명"
+          ) to FoodStatus.DEFAULT,
         )
       )
-    }
+    )
   }
 }
