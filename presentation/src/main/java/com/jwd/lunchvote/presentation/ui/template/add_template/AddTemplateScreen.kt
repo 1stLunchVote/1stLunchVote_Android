@@ -99,47 +99,50 @@ private fun AddTemplateScreen(
     },
     scrollable = false
   ) {
-    Gap(height = 16.dp)
-    TemplateTitle(
-      name = addTemplateState.name,
-      like = addTemplateState.likeList.size,
-      dislike = addTemplateState.dislikeList.size,
+    Column(
       modifier = Modifier
         .fillMaxWidth()
         .padding(horizontal = 24.dp)
-    )
-    Gap(height = 16.dp)
-    LunchVoteTextField(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 24.dp),
-      text = addTemplateState.searchKeyword,
-      hintText = stringResource(R.string.first_vote_hint_text),
-      onTextChange = setSearchKeyword,
-      textFieldType = TextFieldType.Search
-    )
-    Gap(height = 16.dp)
-    LazyVerticalGrid(
-      columns = GridCells.Fixed(3),
-      modifier = Modifier
-        .fillMaxWidth()
-        .weight(1f)
-        .padding(horizontal = 24.dp),
-      verticalArrangement = Arrangement.spacedBy(8.dp),
-      horizontalArrangement = Arrangement.SpaceBetween
+        .padding(top = 16.dp, bottom = 24.dp),
+      verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-      items(addTemplateState.foodMap.keys.filter { it.name.contains(addTemplateState.searchKeyword) }) {food ->
-        FoodItem(food, addTemplateState.foodMap[food]!!) { onClickFood(food) }
+      TemplateTitle(
+        name = addTemplateState.name,
+        like = addTemplateState.likeList.size,
+        dislike = addTemplateState.dislikeList.size,
+        modifier = Modifier.fillMaxWidth()
+      )
+      LunchVoteTextField(
+        text = addTemplateState.searchKeyword,
+        onTextChange = setSearchKeyword,
+        hintText = stringResource(R.string.first_vote_hint_text),
+        modifier = Modifier.fillMaxWidth(),
+        textFieldType = TextFieldType.Search
+      )
+      LazyVerticalGrid(
+        columns = GridCells.Fixed(3),
+        modifier = Modifier
+          .fillMaxWidth()
+          .weight(1f),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+      ) {
+        val filteredFoodList = addTemplateState.foodMap.keys.filter { it.name.contains(addTemplateState.searchKeyword) }
+        items(filteredFoodList) {food ->
+          FoodItem(
+            food = food,
+            status = addTemplateState.foodMap[food] ?: FoodStatus.DEFAULT
+          ) { onClickFood(food) }
+        }
+      }
+      Button(
+        onClick = onClickAddButton,
+        modifier = Modifier.align(CenterHorizontally),
+        enabled = addTemplateState.likeList.isNotEmpty() || addTemplateState.dislikeList.isNotEmpty()
+      ) {
+        Text("템플릿 생성")
       }
     }
-    Gap(height = 16.dp)
-    Button(
-      onClick = onClickAddButton,
-      enabled = addTemplateState.likeList.isNotEmpty() || addTemplateState.dislikeList.isNotEmpty()
-    ) {
-      Text("템플릿 생성")
-    }
-    Gap(height = 24.dp)
   }
 }
 
