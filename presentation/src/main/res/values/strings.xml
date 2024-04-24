@@ -65,6 +65,7 @@
     <string name="add_template_title">템플릿 생성</string>
     <string name="add_template_hint_text">검색</string>
     <string name="add_template_add_button">템플릿 생성</string>
+    <string name="add_template_add_snackbar">템플릿이 저장되었습니다.</string>
 
     <!-- HomeJoinDialog -->
     <string name="home_join_dialog_title">투표 방 참여하기</string>

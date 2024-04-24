@@ -6,6 +6,7 @@ import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.usecase.AddTemplateUseCase
 import com.jwd.lunchvote.domain.usecase.GetFoodListUseCase
+import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
@@ -92,7 +93,7 @@ class AddTemplateViewModel @Inject constructor(
 
     addTemplateUseCase.invoke(template.asDomain())
 
-    sendSideEffect(AddTemplateSideEffect.ShowSnackBar(UiText.DynamicString("템플릿이 저장되었습니다.")))
+    sendSideEffect(AddTemplateSideEffect.ShowSnackBar(UiText.StringResource(R.string.add_template_add_snackbar)))
     sendSideEffect(AddTemplateSideEffect.PopBackStack)
   }
 }
