@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -88,7 +89,7 @@ private fun TemplateListScreen(
     modifier = modifier,
     topAppBar = {
       LunchVoteTopBar(
-        title = "템플릿 목록",
+        title = stringResource(R.string.template_list_title),
         navIconVisible = true,
         popBackStack = onClickBackButton
       )
@@ -104,7 +105,7 @@ private fun TemplateListScreen(
       if (templateListState.templateList.isEmpty()) {
         item {
           Text(
-            "템플릿이 사전 설정되어 있지 않습니다.\n하단의 [+] 버튼을 눌러 템플릿을 추가해주세요.",
+            stringResource(R.string.template_list_no_template),
             modifier = Modifier
               .fillMaxWidth()
               .padding(vertical = 20.dp),

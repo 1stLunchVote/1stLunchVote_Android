@@ -5,9 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -16,7 +14,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,7 +27,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.enums.FoodStatus
@@ -38,7 +34,6 @@ import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContra
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateSideEffect
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateState
 import com.jwd.lunchvote.presentation.widget.FoodItem
-import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
@@ -92,7 +87,7 @@ private fun AddTemplateScreen(
     modifier = modifier,
     topAppBar = {
       LunchVoteTopBar(
-        title = "템플릿 생성",
+        title = stringResource(R.string.add_template_title),
         navIconVisible = true,
         popBackStack = onClickBackButton
       )
@@ -115,7 +110,7 @@ private fun AddTemplateScreen(
       LunchVoteTextField(
         text = addTemplateState.searchKeyword,
         onTextChange = setSearchKeyword,
-        hintText = stringResource(R.string.first_vote_hint_text),
+        hintText = stringResource(R.string.add_template_hint_text),
         modifier = Modifier.fillMaxWidth(),
         textFieldType = TextFieldType.Search
       )
@@ -128,6 +123,7 @@ private fun AddTemplateScreen(
         horizontalArrangement = Arrangement.SpaceBetween
       ) {
         val filteredFoodList = addTemplateState.foodMap.keys.filter { it.name.contains(addTemplateState.searchKeyword) }
+
         items(filteredFoodList) {food ->
           FoodItem(
             food = food,
@@ -140,7 +136,7 @@ private fun AddTemplateScreen(
         modifier = Modifier.align(CenterHorizontally),
         enabled = addTemplateState.likeList.isNotEmpty() || addTemplateState.dislikeList.isNotEmpty()
       ) {
-        Text("템플릿 생성")
+        Text(stringResource(R.string.add_template_add_button))
       }
     }
   }
@@ -164,7 +160,10 @@ private fun TemplateTitle(
     verticalArrangement = Arrangement.spacedBy(8.dp),
     horizontalAlignment = CenterHorizontally
   ) {
-    Text(name, style = MaterialTheme.typography.bodyLarge)
+    Text(
+      name,
+      style = MaterialTheme.typography.bodyLarge
+    )
     LikeDislike(like, dislike)
   }
 }
