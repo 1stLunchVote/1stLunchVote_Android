@@ -15,7 +15,6 @@ import kotlinx.parcelize.Parcelize
 class EditTemplateContract {
   @Parcelize
   data class EditTemplateState(
-    val loading: Boolean = false,
     val template: TemplateUIModel = TemplateUIModel(),
     val foodMap: Map<FoodUIModel, FoodStatus> = emptyMap(),
     val likeList: List<FoodUIModel> = emptyList(),
@@ -35,16 +34,15 @@ class EditTemplateContract {
   }
 
   sealed interface EditTemplateReduce : Reduce {
-    data class UpdateLoading(val loading: Boolean): EditTemplateReduce
     data class Initialize(val state: EditTemplateState): EditTemplateReduce
     data class UpdateSearchKeyword(val searchKeyword: String): EditTemplateReduce
     data class UpdateFoodStatus(val food: FoodUIModel): EditTemplateReduce
   }
 
   sealed interface EditTemplateSideEffect: SideEffect {
+    data object PopBackStack: EditTemplateSideEffect
     data object OpenDeleteDialog: EditTemplateSideEffect
     data object OpenConfirmDialog: EditTemplateSideEffect
-    data object PopBackStack: EditTemplateSideEffect
     data class ShowSnackBar(val message: UiText) : EditTemplateSideEffect
   }
 }

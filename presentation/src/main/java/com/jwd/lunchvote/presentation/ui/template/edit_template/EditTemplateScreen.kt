@@ -45,6 +45,8 @@ import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
+import com.jwd.lunchvote.presentation.widget.Screen
+import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.TextFieldType
 import kotlinx.coroutines.flow.collectLatest
 
@@ -64,9 +66,9 @@ fun EditTemplateRoute(
   LaunchedEffect(viewModel.sideEffect){
     viewModel.sideEffect.collectLatest {
       when(it){
+        is EditTemplateSideEffect.PopBackStack -> popBackStack()
         is EditTemplateSideEffect.OpenDeleteDialog -> openDeleteDialog()
         is EditTemplateSideEffect.OpenConfirmDialog -> openConfirmDialog()
-        is EditTemplateSideEffect.PopBackStack -> popBackStack()
         is EditTemplateSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
       }
     }
@@ -94,40 +96,39 @@ private fun EditTemplateScreen(
   onClickSaveButton: () -> Unit = {},
   onClickDeleteButton: () -> Unit = {}
 ) {
-  Column(
-    modifier = modifier.fillMaxSize(),
-    horizontalAlignment = CenterHorizontally
-  ) {
-    LunchVoteTopBar(
-      title = "템플릿 편집",
-      navIconVisible = true,
-      popBackStack = onClickBackButton,
-      actions = {
-        IconButton(onClickDeleteButton) {
-          Icon(
-            imageVector = Icons.Outlined.Delete,
-            contentDescription = "delete",
-          )
+  Screen(
+    modifier = modifier,
+    topAppBar = {
+      LunchVoteTopBar(
+        title = "템플릿 편집",
+        navIconVisible = true,
+        popBackStack = onClickBackButton,
+        actions = {
+          IconButton(onClickDeleteButton) {
+            Icon(Icons.Outlined.Delete, "delete",)
+          }
         }
-      }
-    )
+      )
+    }
+  ) {
     Column(
       modifier = Modifier
         .fillMaxWidth()
-        .padding(top = 16.dp, start = 24.dp, end = 24.dp, bottom = 24.dp),
-      verticalArrangement = Arrangement.spacedBy(16.dp),
-      horizontalAlignment = CenterHorizontally
+        .padding(horizontal = 24.dp)
+        .padding(top = 16.dp, bottom = 24.dp),
+      verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
       TemplateTitle(
-        editTemplateState.template.name,
-        editTemplateState.likeList.size,
-        editTemplateState.dislikeList.size
+        name = editTemplateState.template.name,
+        like = editTemplateState.likeList.size,
+        dislike = editTemplateState.dislikeList.size,
+        modifier = Modifier.fillMaxWidth()
       )
       LunchVoteTextField(
-        modifier = Modifier.fillMaxWidth(),
         text = editTemplateState.searchKeyword,
-        hintText = stringResource(R.string.first_vote_hint_text),
         onTextChange = setSearchKeyword,
+        hintText = stringResource(R.string.edit_template_hint_text),
+        modifier = Modifier.fillMaxWidth(),
         textFieldType = TextFieldType.Search
       )
       LazyVerticalGrid(
@@ -138,15 +139,21 @@ private fun EditTemplateScreen(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
       ) {
-        items(editTemplateState.foodMap.keys.filter { it.name.contains(editTemplateState.searchKeyword) }) {food ->
-          FoodItem(food, editTemplateState.foodMap[food]!!) { onClickFood(food) }
+        val filteredFoodList = editTemplateState.foodMap.keys.filter { it.name.contains(editTemplateState.searchKeyword) }
+
+        items(filteredFoodList) {food ->
+          FoodItem(
+            food = food,
+            status = editTemplateState.foodMap[food] ?: FoodStatus.DEFAULT
+          ) { onClickFood(food) }
         }
       }
       Button(
         onClick = onClickSaveButton,
+        modifier = Modifier.align(CenterHorizontally),
         enabled = editTemplateState.likeList.isNotEmpty() || editTemplateState.dislikeList.isNotEmpty()
       ) {
-        Text("템플릿 수정")
+        Text(stringResource(R.string.edit_template_save_button))
       }
     }
   }
@@ -170,15 +177,18 @@ private fun TemplateTitle(
     verticalArrangement = Arrangement.spacedBy(8.dp),
     horizontalAlignment = CenterHorizontally
   ) {
-    Text(name, style = MaterialTheme.typography.bodyLarge)
+    Text(
+      name,
+      style = MaterialTheme.typography.bodyLarge
+    )
     LikeDislike(like, dislike)
   }
 }
 
-@Preview(showSystemUi = true)
+@Preview
 @Composable
-fun EditTemplateScreenPreview() {
-  LunchVoteTheme {
+private fun EditTemplateScreenPreview() {
+  ScreenPreview {
     EditTemplateScreen(
       editTemplateState = EditTemplateState(
         foodMap = mapOf(

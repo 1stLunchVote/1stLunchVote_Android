@@ -67,6 +67,12 @@
     <string name="add_template_add_button">템플릿 생성</string>
     <string name="add_template_add_snackbar">템플릿이 저장되었습니다.</string>
 
+    <!-- EditTemplateScreen -->
+    <string name="edit_template_title">템플릿 생성</string>
+    <string name="edit_template_hint_text">검색</string>
+    <string name="edit_template_save_button">템플릿 수정</string>
+    <string name="edit_template_save_snackbar">템플릿이 수정되었습니다.</string>
+
     <!-- HomeJoinDialog -->
     <string name="home_join_dialog_title">투표 방 참여하기</string>
     <string name="home_join_dialog_hint_text">초대 코드</string>

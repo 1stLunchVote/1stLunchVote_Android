@@ -57,7 +57,6 @@ class EditTemplateViewModel @Inject constructor(
 
   override fun reduceState(state: EditTemplateState, reduce: EditTemplateReduce): EditTemplateState {
     return when (reduce) {
-      is EditTemplateReduce.UpdateLoading -> state.copy(loading = reduce.loading)
       is EditTemplateReduce.Initialize -> reduce.state
       is EditTemplateReduce.UpdateSearchKeyword -> state.copy(searchKeyword = reduce.searchKeyword)
       is EditTemplateReduce.UpdateFoodStatus -> when (reduce.food) {
@@ -83,8 +82,6 @@ class EditTemplateViewModel @Inject constructor(
   }
 
   private suspend fun initialize(templateId: String) {
-    updateState(EditTemplateReduce.UpdateLoading(true))
-
     val foodList = getFoodListUseCase.invoke().map { it.asUI() }
     val template = getTemplateUseCase.invoke(templateId).asUI()
     updateState(
@@ -106,8 +103,6 @@ class EditTemplateViewModel @Inject constructor(
   }
 
   private suspend fun save() {
-    updateState(EditTemplateReduce.UpdateLoading(true))
-
     editTemplateUseCase.invoke(
       Template(
         id = currentState.template.id,
@@ -122,8 +117,6 @@ class EditTemplateViewModel @Inject constructor(
   }
 
   private suspend fun delete() {
-    updateState(EditTemplateReduce.UpdateLoading(true))
-
     deleteTemplateUseCase.invoke(currentState.template.id)
     sendSideEffect(EditTemplateSideEffect.ShowSnackBar(UiText.DynamicString("템플릿이 삭제되었습니다.")))
     sendSideEffect(EditTemplateSideEffect.PopBackStack)
