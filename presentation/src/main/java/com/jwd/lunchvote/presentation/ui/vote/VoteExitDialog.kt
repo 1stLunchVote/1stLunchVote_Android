@@ -19,9 +19,9 @@ fun VoteExitDialog(
   LunchVoteDialog(
     title = "투표를 종료하시겠습니까?",
     dismissText = "취소",
-    onDismiss = popBackStack,
+    onDismissRequest = popBackStack,
     confirmText = "나가기",
-    onConfirm = navigateToHome,
+    onConfirmation = navigateToHome,
     modifier = modifier,
     icon = {
       Icon(

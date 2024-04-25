@@ -24,9 +24,9 @@ fun VoteExitDialog(
     LunchVoteDialog(
         title = "정말 나가시겠습니까?",
         dismissText = "취소",
-        onDismiss = onDismiss,
+        onDismissRequest = onDismiss,
         confirmText = "나가기",
-        onConfirm = onExit,
+        onConfirmation = onExit,
         icon = {
             Icon(
                 imageVector = Icons.Rounded.Warning,

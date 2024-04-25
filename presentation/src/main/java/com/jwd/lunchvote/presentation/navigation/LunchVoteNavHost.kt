@@ -144,8 +144,6 @@ fun LunchVoteNavHost(
     }
     composable(LunchVoteNavRoute.EditTemplate) {
       EditTemplateRoute(
-        openDeleteDialog = { navController.navigate(LunchVoteNavRoute.EditTemplateDeleteDialog) },
-        openConfirmDialog = { navController.navigate(LunchVoteNavRoute.EditTemplateConfirmDialog) },
         popBackStack = { navController.popBackStack() },
         showSnackBar = showSnackBar
       )
@@ -191,12 +189,6 @@ fun LunchVoteNavHost(
         },
         showSnackBar = showSnackBar
       )
-    }
-    dialog(LunchVoteNavRoute.EditTemplateDeleteDialog) {
-
-    }
-    dialog(LunchVoteNavRoute.EditTemplateConfirmDialog) {
-
     }
   }
 }

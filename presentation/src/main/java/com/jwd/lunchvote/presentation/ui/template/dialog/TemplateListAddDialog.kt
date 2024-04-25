@@ -42,9 +42,9 @@ fun TemplateListAddDialog(
   LunchVoteDialog(
     title = stringResource(R.string.template_list_add_dialog_title),
     dismissText = stringResource(R.string.template_list_add_dialog_dismiss_button),
-    onDismiss = { viewModel.sendEvent(TemplateListAddEvent.OnClickDismissButton) },
+    onDismissRequest = { viewModel.sendEvent(TemplateListAddEvent.OnClickDismissButton) },
     confirmText = stringResource(R.string.template_list_add_dialog_confirm_button),
-    onConfirm = { viewModel.sendEvent(TemplateListAddEvent.OnClickConfirmButton) },
+    onConfirmation = { viewModel.sendEvent(TemplateListAddEvent.OnClickConfirmButton) },
     modifier = modifier,
     confirmEnabled = templateListAddState.templateName.isNotBlank()
   ) {

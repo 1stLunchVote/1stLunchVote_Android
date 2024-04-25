@@ -68,10 +68,20 @@
     <string name="add_template_add_snackbar">템플릿이 저장되었습니다.</string>
 
     <!-- EditTemplateScreen -->
-    <string name="edit_template_title">템플릿 생성</string>
+    <string name="edit_template_title">템플릿 편집</string>
     <string name="edit_template_hint_text">검색</string>
     <string name="edit_template_save_button">템플릿 수정</string>
     <string name="edit_template_save_snackbar">템플릿이 수정되었습니다.</string>
+    <!-- EditTemplateConfirmDialog -->
+    <string name="edit_template_confirm_title">템플릿 수정</string>
+    <string name="edit_template_confirm_content">템플릿을 수정하시겠습니까?</string>
+    <string name="edit_template_confirm_cancel_button">취소</string>
+    <string name="edit_template_confirm_confirm_button">수정</string>
+    <!-- EditTemplateDeleteDialog -->
+    <string name="edit_template_delete_title">템플릿 수정</string>
+    <string name="edit_template_delete_content">템플릿을 삭제하시겠습니까?</string>
+    <string name="edit_template_delete_cancel_button">취소</string>
+    <string name="edit_template_delete_confirm_button">삭제</string>
 
     <!-- HomeJoinDialog -->
     <string name="home_join_dialog_title">투표 방 참여하기</string>

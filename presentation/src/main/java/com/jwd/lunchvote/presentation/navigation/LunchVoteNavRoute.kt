@@ -20,7 +20,13 @@ enum class LunchVoteNavRoute(
   SecondVote,
 
   TemplateList,
-  EditTemplate,
+  EditTemplate(
+    arguments = listOf(
+      navArgument("templateId") {
+        type = NavType.StringType
+      }
+    )
+  ),
   AddTemplate(
     arguments = listOf(
       navArgument("templateName") {
@@ -43,8 +49,6 @@ enum class LunchVoteNavRoute(
 
   HomeJoinDialog,
   TemplateListAddDialog,
-  EditTemplateDeleteDialog,
-  EditTemplateConfirmDialog,
   VoteExitDialog,
   FirstVoteTemplateDialog,
 }

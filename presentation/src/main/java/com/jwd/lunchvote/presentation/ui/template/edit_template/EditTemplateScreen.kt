@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -32,7 +31,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
@@ -49,11 +47,10 @@ import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.TextFieldType
 import kotlinx.coroutines.flow.collectLatest
+import timber.log.Timber
 
 @Composable
 fun EditTemplateRoute(
-  openDeleteDialog: () -> Unit,
-  openConfirmDialog: () -> Unit,
   popBackStack: () -> Unit,
   showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
@@ -62,15 +59,31 @@ fun EditTemplateRoute(
 ){
   val editTemplateState by viewModel.viewState.collectAsStateWithLifecycle()
   val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+  val dialogState by viewModel.dialogState.collectAsStateWithLifecycle()
 
-  LaunchedEffect(viewModel.sideEffect){
+  LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
       when(it){
         is EditTemplateSideEffect.PopBackStack -> popBackStack()
-        is EditTemplateSideEffect.OpenDeleteDialog -> openDeleteDialog()
-        is EditTemplateSideEffect.OpenConfirmDialog -> openConfirmDialog()
+        is EditTemplateSideEffect.OpenDeleteDialog -> viewModel.setDialogState(EditTemplateContract.DELETE_DIALOG)
+        is EditTemplateSideEffect.OpenConfirmDialog -> viewModel.setDialogState(EditTemplateContract.CONFIRM_DIALOG)
         is EditTemplateSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
       }
+    }
+  }
+
+  when(dialogState) {
+    EditTemplateContract.CONFIRM_DIALOG -> {
+      EditTemplateConfirmDialog(
+        onDismissRequest = { viewModel.sendEvent(EditTemplateEvent.OnClickCancelButtonConfirmDialog) },
+        onConfirmation = { viewModel.sendEvent(EditTemplateEvent.OnClickConfirmButtonConfirmDialog) }
+      )
+    }
+    EditTemplateContract.DELETE_DIALOG -> {
+      EditTemplateDeleteDialog(
+        onDismissRequest = { viewModel.sendEvent(EditTemplateEvent.OnClickCancelButtonDeleteDialog) },
+        onConfirmation = { viewModel.sendEvent(EditTemplateEvent.OnClickDeleteButtonDeleteDialog) }
+      )
     }
   }
 
@@ -100,12 +113,12 @@ private fun EditTemplateScreen(
     modifier = modifier,
     topAppBar = {
       LunchVoteTopBar(
-        title = "템플릿 편집",
+        title = stringResource(R.string.edit_template_title),
         navIconVisible = true,
         popBackStack = onClickBackButton,
         actions = {
           IconButton(onClickDeleteButton) {
-            Icon(Icons.Outlined.Delete, "delete",)
+            Icon(Icons.Outlined.Delete, "delete")
           }
         }
       )
