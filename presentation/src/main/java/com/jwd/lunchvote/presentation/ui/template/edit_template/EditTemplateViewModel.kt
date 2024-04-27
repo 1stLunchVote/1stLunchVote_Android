@@ -9,6 +9,7 @@ import com.jwd.lunchvote.domain.usecase.DeleteTemplateUseCase
 import com.jwd.lunchvote.domain.usecase.EditTemplateUseCase
 import com.jwd.lunchvote.domain.usecase.GetFoodListUseCase
 import com.jwd.lunchvote.domain.usecase.GetTemplateUseCase
+import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
@@ -25,7 +26,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -131,14 +131,14 @@ class EditTemplateViewModel @Inject constructor(
       ).asDomain()
     )
 
-    sendSideEffect(EditTemplateSideEffect.ShowSnackBar(UiText.DynamicString("템플릿이 수정되었습니다.")))
+    sendSideEffect(EditTemplateSideEffect.ShowSnackBar(UiText.StringResource(R.string.edit_template_save_snackbar)))
     sendSideEffect(EditTemplateSideEffect.PopBackStack)
   }
 
   private suspend fun delete() {
     deleteTemplateUseCase(currentState.template.id)
 
-    sendSideEffect(EditTemplateSideEffect.ShowSnackBar(UiText.DynamicString("템플릿이 삭제되었습니다.")))
+    sendSideEffect(EditTemplateSideEffect.ShowSnackBar(UiText.StringResource(R.string.edit_template_delete_snackbar)))
     sendSideEffect(EditTemplateSideEffect.PopBackStack)
   }
 }
