@@ -14,6 +14,7 @@ import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.model.enums.FoodStatus
 import com.jwd.lunchvote.presentation.model.updateFoodMap
+import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateEvent
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateReduce
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateSideEffect
@@ -99,7 +100,7 @@ class EditTemplateViewModel @Inject constructor(
   }
 
   private suspend fun initialize() {
-    val templateId = checkNotNull(savedStateHandle.get<String>("templateId"))
+    val templateId = checkNotNull(savedStateHandle.get<String>(LunchVoteNavRoute.EditTemplate.arguments.first().name))
     val template = getTemplateUseCase(templateId).asUI()
 
     val foodList = getFoodListUseCase().map { it.asUI() }

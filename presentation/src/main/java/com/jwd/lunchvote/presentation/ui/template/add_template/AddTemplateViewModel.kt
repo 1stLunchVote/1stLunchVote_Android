@@ -77,7 +77,7 @@ class AddTemplateViewModel @Inject constructor(
     val name = checkNotNull(savedStateHandle.get<String>(LunchVoteNavRoute.AddTemplate.arguments.first().name))
     updateState(AddTemplateReduce.UpdateName(name))
 
-    val foodList = getFoodListUseCase.invoke()
+    val foodList = getFoodListUseCase()
     val foodMap = foodList.associate { it.asUI() to FoodStatus.DEFAULT }
     updateState(AddTemplateReduce.UpdateFoodMap(foodMap))
   }
@@ -91,7 +91,7 @@ class AddTemplateViewModel @Inject constructor(
       dislike = currentState.dislikeList.map { it.name },
     )
 
-    addTemplateUseCase.invoke(template.asDomain())
+    addTemplateUseCase(template.asDomain())
 
     sendSideEffect(AddTemplateSideEffect.ShowSnackBar(UiText.StringResource(R.string.add_template_add_snackbar)))
     sendSideEffect(AddTemplateSideEffect.PopBackStack)
