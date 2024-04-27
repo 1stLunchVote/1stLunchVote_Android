@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -126,7 +127,7 @@ private fun EditTemplateScreen(
   ) {
     Column(
       modifier = Modifier
-        .fillMaxWidth()
+        .fillMaxSize()
         .padding(horizontal = 24.dp)
         .padding(top = 16.dp, bottom = 24.dp),
       verticalArrangement = Arrangement.spacedBy(16.dp)

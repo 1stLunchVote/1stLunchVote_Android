@@ -86,10 +86,7 @@ fun LunchVoteDialog(
           }
           Spacer(Modifier.width(8.dp))
           Button(
-            onClick = {
-              onConfirmation()
-              onDismissRequest()
-            },
+            onClick = onConfirmation,
             enabled = confirmEnabled
           ) {
             Text(confirmText)
