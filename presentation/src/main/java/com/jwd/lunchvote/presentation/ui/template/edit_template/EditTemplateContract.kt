@@ -5,7 +5,6 @@ import com.jwd.lunchvote.core.ui.base.ViewModelContract.Event
 import com.jwd.lunchvote.core.ui.base.ViewModelContract.Reduce
 import com.jwd.lunchvote.core.ui.base.ViewModelContract.SideEffect
 import com.jwd.lunchvote.core.ui.base.ViewModelContract.State
-import com.jwd.lunchvote.domain.entity.Template
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.model.enums.FoodStatus

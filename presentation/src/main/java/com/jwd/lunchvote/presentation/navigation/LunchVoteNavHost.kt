@@ -10,8 +10,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
-import com.jwd.lunchvote.presentation.ui.home.dialog.HomeJoinDialog
 import com.jwd.lunchvote.presentation.ui.home.HomeRoute
+import com.jwd.lunchvote.presentation.ui.home.dialog.HomeJoinDialog
 import com.jwd.lunchvote.presentation.ui.login.LoginRoute
 import com.jwd.lunchvote.presentation.ui.login.register.RegisterEmailRoute
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeRoute
