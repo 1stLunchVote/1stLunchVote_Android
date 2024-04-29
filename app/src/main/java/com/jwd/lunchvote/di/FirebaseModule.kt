@@ -1,6 +1,7 @@
 package com.jwd.lunchvote.di
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.OAuthProvider
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
@@ -15,17 +16,26 @@ import javax.inject.Singleton
 internal object FirebaseModule {
     @Provides
     @Singleton
-    fun provideFirebaseAuth() = FirebaseAuth.getInstance()
+    fun provideFirebaseAuth(): FirebaseAuth =
+        FirebaseAuth.getInstance()
 
     @Provides
     @Singleton
-    fun provideFirebaseFunctions() = FirebaseFunctions.getInstance("asia-northeast3")
+    fun provideFirebaseFunctions(): FirebaseFunctions =
+        FirebaseFunctions.getInstance("asia-northeast3")
 
     @Provides
     @Singleton
-    fun provideFirebaseDatabase() = FirebaseDatabase.getInstance()
+    fun provideFirebaseDatabase(): FirebaseDatabase =
+        FirebaseDatabase.getInstance()
 
     @Provides
     @Singleton
-    fun provideFireStore() = FirebaseFirestore.getInstance()
+    fun provideFireStore(): FirebaseFirestore =
+        FirebaseFirestore.getInstance()
+
+    @Provides
+    @Singleton
+    fun provideOAuthProvider(): OAuthProvider.Builder =
+        OAuthProvider.newBuilder("oidc.lunchvote")
 }

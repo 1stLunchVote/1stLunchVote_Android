@@ -54,6 +54,6 @@ private fun <T> Continuation<T>.resumeTokenOrException(token: T?, error: Throwab
   } else if (token != null) {
     resume(token)
   } else {
-    resumeWithException(LoginError.AccessTokenFailed)
+    resumeWithException(LoginError.TokenFailed)
   }
 }

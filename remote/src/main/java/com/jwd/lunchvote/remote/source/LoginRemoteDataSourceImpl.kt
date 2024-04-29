@@ -1,9 +1,12 @@
 package com.jwd.lunchvote.remote.source
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.OAuthProvider
+import com.google.firebase.auth.oAuthCredential
 import com.google.firebase.functions.FirebaseFunctions
 import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.data.source.remote.LoginRemoteDataSource
+import com.kakao.sdk.user.UserApiClient
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -37,5 +40,18 @@ class LoginRemoteDataSourceImpl @Inject constructor(
     withContext(ioDispatcher) {
       auth.signInWithCustomToken(token).await()
     }
+  }
+
+  override suspend fun signInWithIdToken(
+    idToken: String
+  ): String {
+    val credential = oAuthCredential("oidc.lunchvote") {
+      setIdToken(idToken)
+    }
+
+    return auth
+      .signInWithCredential(credential)
+      .await()
+      .user?.uid ?: throw LoginError.LoginFailure
   }
 }

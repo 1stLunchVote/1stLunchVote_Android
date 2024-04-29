@@ -95,7 +95,7 @@ fun LoginRoute(
         is LoginSideEffect.LaunchKakaoLogin -> {
           try {
             val oAuthToken = UserApiClient.login(context)
-            viewModel.sendEvent(LoginEvent.ProcessKakaoLogin(oAuthToken.accessToken))
+            viewModel.sendEvent(LoginEvent.ProcessKakaoLogin(oAuthToken))
           } catch (error: Throwable) {
             if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
               viewModel.throwError(LoginError.LoginCanceled)
