@@ -7,7 +7,7 @@ import com.jwd.lunchvote.remote.model.UserRemote
 object UserRemoteMapper: BiMapper<UserRemote, UserData> {
   override fun mapToRight(from: UserRemote): UserData {
     return UserData(
-      id = from.id,
+      id = "",
       email = from.email,
       name = from.name,
       profileImageUrl = from.profileImageUrl,
@@ -17,7 +17,6 @@ object UserRemoteMapper: BiMapper<UserRemote, UserData> {
 
   override fun mapToLeft(from: UserData): UserRemote {
     return UserRemote(
-      id = from.id,
       email = from.email,
       name = from.name,
       profileImageUrl = from.profileImageUrl,

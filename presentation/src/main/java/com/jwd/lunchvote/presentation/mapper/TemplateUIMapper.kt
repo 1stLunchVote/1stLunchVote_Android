@@ -11,7 +11,9 @@ object TemplateUIMapper: BiMapper<TemplateUIModel, Template> {
       userId = from.userId,
       name = from.name,
       like = from.like,
-      dislike = from.dislike
+      dislike = from.dislike,
+      createdAt = from.createdAt,
+      deletedAt = from.deletedAt
     )
   }
 
@@ -21,7 +23,9 @@ object TemplateUIMapper: BiMapper<TemplateUIModel, Template> {
       userId = from.userId,
       name = from.name,
       like = from.like,
-      dislike = from.dislike
+      dislike = from.dislike,
+      createdAt = from.createdAt,
+      deletedAt = from.deletedAt
     )
   }
 }
