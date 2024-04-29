@@ -4,6 +4,7 @@ import android.os.Parcelable
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.jwd.lunchvote.core.ui.base.ViewModelContract
 import com.jwd.lunchvote.presentation.util.UiText
+import com.kakao.sdk.auth.model.OAuthToken
 import kotlinx.parcelize.Parcelize
 
 class LoginContract {
@@ -22,7 +23,7 @@ class LoginContract {
     data object OnClickRegisterButton : LoginEvent
     data object OnClickKakaoLoginButton : LoginEvent
     data object OnClickGoogleLoginButton : LoginEvent
-    data class ProcessKakaoLogin(val accessToken: String) : LoginEvent
+    data class ProcessKakaoLogin(val oAuthToken: OAuthToken) : LoginEvent
     data class ProcessGoogleLogin(val account: GoogleSignInAccount) : LoginEvent
   }
 

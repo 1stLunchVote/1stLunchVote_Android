@@ -9,6 +9,7 @@
     <string name="login_register_button"><u>회원가입</u></string>
     <string name="login_kakao_button">카카오 로그인</string>
     <string name="login_google_button">Google 계정으로 로그인</string>
+    <string name="login_success_snackbar">로그인에 성공했습니다.</string>
 
     <!-- HomeScreen -->
     <string name="home_banner_title">지금 사람들은 뭘 먹고 싶을까?</string>

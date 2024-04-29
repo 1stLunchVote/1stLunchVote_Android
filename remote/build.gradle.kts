@@ -44,6 +44,8 @@ dependencies {
 
     implementation(libs.timber)
 
+    implementation(libs.kakao)
+
     implementation(platform(libs.firebase))
     implementation(libs.bundles.firebase)
 }

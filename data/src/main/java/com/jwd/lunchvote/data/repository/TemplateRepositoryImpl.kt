@@ -19,8 +19,8 @@ class TemplateRepositoryImpl @Inject constructor(
   override suspend fun getTemplateList(userId: String): List<Template> =
     templateDataSource.getTemplateList(userId).map { it.asDomain() }
 
-  override suspend fun addTemplate(template: Template): Template =
-    templateDataSource.addTemplate(template.asData()).asDomain()
+  override suspend fun addTemplate(template: Template): String =
+    templateDataSource.addTemplate(template.asData())
 
   override suspend fun getTemplate(id: String): Template =
     templateDataSource.getTemplate(id).asDomain()

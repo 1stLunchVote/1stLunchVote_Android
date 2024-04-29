@@ -5,6 +5,7 @@ import com.google.firebase.firestore.Query
 import com.jwd.lunchvote.data.model.TemplateData
 import com.jwd.lunchvote.data.source.remote.TemplateDataSource
 import com.jwd.lunchvote.remote.mapper.asData
+import com.jwd.lunchvote.remote.mapper.asRemote
 import com.jwd.lunchvote.remote.model.TemplateRemote
 import kotlinx.coroutines.tasks.await
 import java.time.LocalDateTime
@@ -16,7 +17,6 @@ class TemplateDataSourceImpl @Inject constructor(
 
   companion object {
     const val TEMPLATE_PATH = "Template"
-    const val COLUMN_ID = "id"
     const val COLUMN_USER_ID = "userId"
     const val COLUMN_NAME = "name"
     const val COLUMN_LIKE = "like"
@@ -36,19 +36,18 @@ class TemplateDataSourceImpl @Inject constructor(
       .get()
       .await()
       .documents
-      .map { it.toObject(TemplateRemote::class.java)?.asData() ?: throw Exception("TODO ERROR") }
+      .map { it.toObject(TemplateRemote::class.java)?.asData(it.id) ?: throw Exception("TODO ERROR") }
       .sortedByDescending { it.createdAt }
 
   override suspend fun addTemplate(
     template: TemplateData
-  ): TemplateData =
-    fireStore
-      .collection(TEMPLATE_PATH)
-      .add(template)
-      .await()
-      .get()
-      .await()
-      .toObject(TemplateRemote::class.java)?.asData() ?: throw Exception("TODO ERROR")
+  ): String = fireStore
+    .collection(TEMPLATE_PATH)
+    .add(template.asRemote())
+    .await()
+    .get()
+    .await()
+    .id
 
   override suspend fun getTemplate(
     id: String
@@ -58,7 +57,7 @@ class TemplateDataSourceImpl @Inject constructor(
       .document(id)
       .get()
       .await()
-      .toObject(TemplateRemote::class.java)?.asData() ?: throw Exception("TODO ERROR")
+      .toObject(TemplateRemote::class.java)?.asData(id) ?: throw Exception("TODO ERROR")
 
   override suspend fun editTemplate(
     template: TemplateData
@@ -66,7 +65,7 @@ class TemplateDataSourceImpl @Inject constructor(
     fireStore
       .collection(TEMPLATE_PATH)
       .document(template.id)
-      .set(template)
+      .set(template.asRemote())
       .await()
 
     return template

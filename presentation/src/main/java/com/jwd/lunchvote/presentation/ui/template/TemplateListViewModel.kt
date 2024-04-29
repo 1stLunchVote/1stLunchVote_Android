@@ -2,6 +2,8 @@ package com.jwd.lunchvote.presentation.ui.template
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
+import com.google.firebase.auth.FirebaseAuth
+import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.usecase.GetTemplateListUseCase
@@ -17,6 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TemplateListViewModel @Inject constructor(
   private val getTemplateListUseCase: GetTemplateListUseCase,
+  private val auth: FirebaseAuth,
   savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<TemplateListState, TemplateListEvent, TemplateListReduce, TemplateListSideEffect>(savedStateHandle){
   override fun createInitialState(savedState: Parcelable?): TemplateListState {
@@ -48,7 +51,7 @@ class TemplateListViewModel @Inject constructor(
   }
 
   private suspend fun initialize() {
-    val userId = "PIRjtPnKcmJfNbSNIidD"   // TODO: 임시
+    val userId = auth.currentUser?.uid ?: throw LoginError.NoUser
     val templateList = getTemplateListUseCase(userId).map { it.asUI() }
 
     updateState(TemplateListReduce.UpdateTemplateList(templateList))

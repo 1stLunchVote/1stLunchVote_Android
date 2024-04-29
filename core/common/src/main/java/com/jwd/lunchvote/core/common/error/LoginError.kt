@@ -16,9 +16,9 @@ interface LoginError {
     override val message: String = "유저 정보를 확인할 수 없습니다. 다시 로그인해주세요."
   }
 
-  data object AccessTokenFailed : Throwable() {
-    private fun readResolve(): Any = AccessTokenFailed
-    override val message: String = "카카오 액세스 토큰을 발급받지 못했습니다."
+  data object TokenFailed : Throwable() {
+    private fun readResolve(): Any = TokenFailed
+    override val message: String = "토큰을 발급받지 못했습니다."
   }
 
   data object NoKakaoToken : Throwable() {
@@ -27,7 +27,7 @@ interface LoginError {
   }
 
   data object CustomTokenFailed : Throwable() {
-    private fun readResolve(): Any = AccessTokenFailed
+    private fun readResolve(): Any = CustomTokenFailed
     override val message: String = "커스텀 토큰을 발급받지 못했습니다."
   }
 }

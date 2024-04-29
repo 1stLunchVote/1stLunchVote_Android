@@ -2,6 +2,8 @@ package com.jwd.lunchvote.presentation.ui.template.add_template
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
+import com.google.firebase.auth.FirebaseAuth
+import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.usecase.AddTemplateUseCase
@@ -25,6 +27,7 @@ import javax.inject.Inject
 class AddTemplateViewModel @Inject constructor(
   private val addTemplateUseCase: AddTemplateUseCase,
   private val getFoodListUseCase: GetFoodListUseCase,
+  private val auth: FirebaseAuth,
   private val savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<AddTemplateState, AddTemplateEvent, AddTemplateReduce, AddTemplateSideEffect>(savedStateHandle){
   override fun createInitialState(savedState: Parcelable?): AddTemplateState {
@@ -83,7 +86,7 @@ class AddTemplateViewModel @Inject constructor(
   }
 
   private suspend fun addTemplate() {
-    val userId = "PIRjtPnKcmJfNbSNIidD"   // TODO: 임시
+    val userId = auth.currentUser?.uid ?: throw LoginError.NoUser
     val template = TemplateUIModel(
       userId = userId,
       name = currentState.name,

@@ -47,7 +47,6 @@ dependencies {
   implementation(project(":domain"))
   implementation(project(":data"))
   implementation(project(":local"))
-  implementation(project(":remote"))
 
   implementation(libs.bundles.android)
   implementation(libs.bundles.test)
