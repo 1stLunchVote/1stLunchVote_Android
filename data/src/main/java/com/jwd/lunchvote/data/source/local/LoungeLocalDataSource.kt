@@ -3,7 +3,6 @@ package com.jwd.lunchvote.data.source.local
 import com.jwd.lunchvote.data.model.LoungeChatData
 import com.jwd.lunchvote.data.model.MemberData
 import com.jwd.lunchvote.data.model.type.MessageDataType
-import com.jwd.lunchvote.domain.entity.Member
 import kotlinx.coroutines.flow.Flow
 
 interface LoungeLocalDataSource {

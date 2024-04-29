@@ -1,6 +1,5 @@
 package com.jwd.lunchvote.data.repository
 
-import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.data.source.remote.LoginRemoteDataSource
 import com.jwd.lunchvote.domain.repository.LoginRepository
 import javax.inject.Inject

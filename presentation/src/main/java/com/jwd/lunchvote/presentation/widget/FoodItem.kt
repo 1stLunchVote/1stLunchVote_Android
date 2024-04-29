@@ -35,10 +35,11 @@ import com.skydoves.landscapist.coil.CoilImage
 fun FoodItem(
   food: FoodUIModel,
   status: FoodStatus,
-  onClick: () -> Unit = {}
+  modifier: Modifier = Modifier,
+  onClick: () -> Unit
 ) {
   Column(
-    modifier = Modifier.clickable(
+    modifier = modifier.clickable(
       interactionSource = remember{ MutableInteractionSource() },
       indication = null,
       onClick = onClick
@@ -104,7 +105,8 @@ fun FoodItemDefaultPreview(){
           imageUrl = "",
           name = "햄버거"
         ),
-        status = FoodStatus.DEFAULT
+        status = FoodStatus.DEFAULT,
+        onClick = {}
       )
       FoodItem(
         FoodUIModel(
@@ -112,7 +114,8 @@ fun FoodItemDefaultPreview(){
           imageUrl = "",
           name = "햄버거"
         ),
-        status = FoodStatus.LIKE
+        status = FoodStatus.LIKE,
+        onClick = {}
       )
       FoodItem(
         FoodUIModel(
@@ -120,7 +123,8 @@ fun FoodItemDefaultPreview(){
           imageUrl = "",
           name = "햄버거"
         ),
-        status = FoodStatus.DISLIKE
+        status = FoodStatus.DISLIKE,
+        onClick = {}
       )
     }
   }

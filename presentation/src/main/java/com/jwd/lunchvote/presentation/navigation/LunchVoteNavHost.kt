@@ -10,16 +10,16 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
-import com.jwd.lunchvote.presentation.ui.home.dialog.HomeJoinDialog
 import com.jwd.lunchvote.presentation.ui.home.HomeRoute
+import com.jwd.lunchvote.presentation.ui.home.dialog.HomeJoinDialog
 import com.jwd.lunchvote.presentation.ui.login.LoginRoute
 import com.jwd.lunchvote.presentation.ui.login.register.RegisterEmailRoute
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeRoute
 import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberRoute
 import com.jwd.lunchvote.presentation.ui.setting.SettingRoute
-import com.jwd.lunchvote.presentation.ui.template.TemplateAddDialog
 import com.jwd.lunchvote.presentation.ui.template.TemplateListRoute
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateRoute
+import com.jwd.lunchvote.presentation.ui.template.dialog.TemplateListAddDialog
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateRoute
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteRoute
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteRoute
@@ -144,8 +144,6 @@ fun LunchVoteNavHost(
     }
     composable(LunchVoteNavRoute.EditTemplate) {
       EditTemplateRoute(
-        openDeleteDialog = { navController.navigate(LunchVoteNavRoute.EditTemplateDeleteDialog) },
-        openConfirmDialog = { navController.navigate(LunchVoteNavRoute.EditTemplateConfirmDialog) },
         popBackStack = { navController.popBackStack() },
         showSnackBar = showSnackBar
       )
@@ -184,20 +182,13 @@ fun LunchVoteNavHost(
       )
     }
     dialog(LunchVoteNavRoute.TemplateListAddDialog) {
-      TemplateAddDialog(
+      TemplateListAddDialog(
         popBackStack = { navController.popBackStack() },
         navigateToAddTemplate = { templateName ->
           navController.navigate(LunchVoteNavRoute.AddTemplate, templateName)
-        }
+        },
+        showSnackBar = showSnackBar
       )
-    }
-    dialog(LunchVoteNavRoute.EditTemplateDeleteDialog) {
-
-    }
-    dialog(LunchVoteNavRoute.EditTemplateConfirmDialog) {
-
     }
   }
 }
-
-const val SNACK_BAR_KEY = "message"

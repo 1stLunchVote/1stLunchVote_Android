@@ -33,9 +33,9 @@ import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 fun LunchVoteDialog(
   title: String,
   dismissText: String,
-  onDismiss: () -> Unit,
+  onDismissRequest: () -> Unit,
   confirmText: String,
-  onConfirm: () -> Unit,
+  onConfirmation: () -> Unit,
   modifier: Modifier = Modifier,
   dismissEnabled: Boolean = true,
   confirmEnabled: Boolean = true,
@@ -43,7 +43,7 @@ fun LunchVoteDialog(
   content: @Composable ColumnScope.() -> Unit,
 ) {
   Dialog(
-    onDismissRequest = onDismiss
+    onDismissRequest = onDismissRequest
   ) {
     Column(
       modifier = modifier
@@ -79,14 +79,14 @@ fun LunchVoteDialog(
           horizontalArrangement = Arrangement.End
         ) {
           Button(
-            onClick = onDismiss,
+            onClick = onDismissRequest,
             enabled = dismissEnabled
           ) {
             Text(dismissText)
           }
           Spacer(Modifier.width(8.dp))
           Button(
-            onClick = onConfirm,
+            onClick = onConfirmation,
             enabled = confirmEnabled
           ) {
             Text(confirmText)
@@ -99,14 +99,14 @@ fun LunchVoteDialog(
 
 @Preview
 @Composable
-fun LunchVoteDialogPreview(){
+private fun LunchVoteDialogPreview(){
   LunchVoteTheme {
     LunchVoteDialog(
       title = "투표 방 참여하기",
       dismissText = "취소",
-      onDismiss = {},
+      onDismissRequest = {},
       confirmText = "참여",
-      onConfirm = {},
+      onConfirmation = {},
       confirmEnabled = false,
       content = {
         LunchVoteTextField(
@@ -121,14 +121,14 @@ fun LunchVoteDialogPreview(){
 
 @Preview
 @Composable
-fun LunchVoteIconDialogPreview(){
+private fun LunchVoteIconDialogPreview(){
   LunchVoteTheme {
     LunchVoteDialog(
       title = "정말 나가시겠습니까?",
       dismissText = "취소",
-      onDismiss = {},
+      onDismissRequest = {},
       confirmText = "나가기",
-      onConfirm = {},
+      onConfirmation = {},
       icon = {
         Icon(
           imageVector = Icons.Rounded.Warning,

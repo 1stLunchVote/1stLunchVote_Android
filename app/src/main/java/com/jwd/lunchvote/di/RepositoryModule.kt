@@ -5,13 +5,11 @@ import com.jwd.lunchvote.data.repository.HomeRepositoryImpl
 import com.jwd.lunchvote.data.repository.LoginRepositoryImpl
 import com.jwd.lunchvote.data.repository.LoungeRepositoryImpl
 import com.jwd.lunchvote.data.repository.TemplateRepositoryImpl
-import com.jwd.lunchvote.data.source.remote.TemplateDataSource
 import com.jwd.lunchvote.domain.repository.FirstVoteRepository
 import com.jwd.lunchvote.domain.repository.HomeRepository
 import com.jwd.lunchvote.domain.repository.LoginRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.TemplateRepository
-import com.jwd.lunchvote.remote.source.TemplateDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

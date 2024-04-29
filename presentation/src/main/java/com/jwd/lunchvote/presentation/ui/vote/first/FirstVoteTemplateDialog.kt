@@ -27,9 +27,9 @@ fun FirstVoteTemplateDialog(
   LunchVoteDialog(
     title = "템플릿을 선택해주세요.",
     dismissText = "건너뛰기",
-    onDismiss = popBackStack,
+    onDismissRequest = popBackStack,
     confirmText = "선택",
-    onConfirm = {
+    onConfirmation = {
       // TODO: 적용 필요
       /*firstVoteDialogState.selectTemplate(chosenTemplate)
       onClickDismissButton()*/

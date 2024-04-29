@@ -44,9 +44,9 @@ fun HomeJoinDialog(
   LunchVoteDialog(
     title = stringResource(R.string.home_join_dialog_title),
     dismissText = stringResource(R.string.home_join_dialog_dismiss_button),
-    onDismiss = { viewModel.sendEvent(HomeJoinEvent.OnClickDismissButton) },
+    onDismissRequest = { viewModel.sendEvent(HomeJoinEvent.OnClickDismissButton) },
     confirmText = stringResource(R.string.home_join_dialog_confirm_button),
-    onConfirm = { viewModel.sendEvent(HomeJoinEvent.OnClickConfirmButton) },
+    onConfirmation = { viewModel.sendEvent(HomeJoinEvent.OnClickConfirmButton) },
     modifier = modifier,
     confirmEnabled = homeJoinState.loungeId.isNotBlank()
   ) {
