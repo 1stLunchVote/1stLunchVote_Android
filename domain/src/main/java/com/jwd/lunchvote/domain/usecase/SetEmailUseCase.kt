@@ -6,7 +6,7 @@ import javax.inject.Inject
 class SetEmailUseCase @Inject constructor(
   private val preferenceRepository: PreferenceRepository
 ) {
-  operator fun invoke(email: String) {
+  operator fun invoke(email: String?) {
     preferenceRepository.email = email
   }
 }

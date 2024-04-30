@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun PasswordRoute(
+  navigateToHome: () -> Unit,
   navigateToNickname: () -> Unit,
   showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
@@ -44,6 +45,7 @@ fun PasswordRoute(
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
       when (it) {
+        is PasswordSideEffect.NavigateToHome -> navigateToHome()
         is PasswordSideEffect.NavigateToNickname -> navigateToNickname()
         is PasswordSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
       }
@@ -74,7 +76,7 @@ private fun PasswordScreen(
     ConstraintLayout(
       modifier = Modifier.fillMaxSize()
     ) {
-      val (title, description, inputColumn, nextButton) = createRefs()
+      val (title, email, description, inputColumn, nextButton) = createRefs()
 
       val formatError = state.password.isNotEmpty() && (state.password.length < 10 || state.password.length > 20)
       val confirmError = state.password.isNotEmpty() && state.passwordConfirm.isNotEmpty() && state.password != state.passwordConfirm
@@ -85,9 +87,20 @@ private fun PasswordScreen(
           .fillMaxWidth()
           .padding(horizontal = 24.dp)
           .constrainAs(title) {
-            bottom.linkTo(description.top, 32.dp)
+            bottom.linkTo(email.top, 4.dp)
           },
         style = MaterialTheme.typography.titleLarge
+      )
+      Text(
+        text = stringResource(R.string.password_email, state.email),
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 24.dp)
+          .constrainAs(email) {
+            bottom.linkTo(description.top, 32.dp)
+          },
+        color = MaterialTheme.colorScheme.outline,
+        style = MaterialTheme.typography.bodySmall
       )
       Text(
         text = stringResource(R.string.password_description),
@@ -160,7 +173,9 @@ private fun PasswordScreen(
 private fun Preview1() {
   ScreenPreview {
     PasswordScreen(
-      PasswordState()
+      PasswordState(
+        email = "email@email.com"
+      )
     )
   }
 }
@@ -171,6 +186,7 @@ private fun Preview2() {
   ScreenPreview {
     PasswordScreen(
       PasswordState(
+        email = "email@email.com",
         password = "password"
       )
     )
@@ -183,6 +199,7 @@ private fun Preview3() {
   ScreenPreview {
     PasswordScreen(
       PasswordState(
+        email = "email@email.com",
         password = "password123",
         passwordConfirm = "password124"
       )
@@ -196,6 +213,7 @@ private fun Preview4() {
   ScreenPreview {
     PasswordScreen(
       PasswordState(
+        email = "email@email.com",
         password = "password123",
         passwordConfirm = "password123"
       )

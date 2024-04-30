@@ -8,6 +8,7 @@ import kotlinx.parcelize.Parcelize
 class PasswordContract {
   @Parcelize
   data class PasswordState(
+    val email: String = "",
     val password: String = "",
     val passwordConfirm: String = ""
   ) : ViewModelContract.State, Parcelable {
@@ -21,11 +22,13 @@ class PasswordContract {
   }
 
   sealed interface PasswordReduce : ViewModelContract.Reduce {
+    data class UpdateEmail(val email: String) : PasswordReduce
     data class UpdatePassword(val password: String) : PasswordReduce
     data class UpdatePasswordConfirm(val passwordConfirm: String) : PasswordReduce
   }
 
   sealed interface PasswordSideEffect : ViewModelContract.SideEffect {
+    data object NavigateToHome : PasswordSideEffect
     data class NavigateToNickname(val email: String, val password: String) : PasswordSideEffect
     data class ShowSnackBar(val message: UiText) : PasswordSideEffect
   }

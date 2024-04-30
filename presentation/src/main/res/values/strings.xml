@@ -23,6 +23,7 @@
 
     <!-- PasswordScreen -->
     <string name="password_title">본인인증이 완료되었습니다!</string>
+    <string name="password_email">인증된 이메일: %s</string>
     <string name="password_description">로그인에 사용할 비밀번호를 입력해주세요.\n10~20자 이내로 설정해주세요.</string>
     <string name="password_password_hint">비밀번호 입력</string>
     <string name="password_password_confirm_hint">비밀번호 확인</string>
