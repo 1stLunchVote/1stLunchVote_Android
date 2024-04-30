@@ -33,8 +33,8 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun PasswordRoute(
-  navigateToHome: () -> Unit,
-  navigateToNickname: () -> Unit,
+  navigateToLogin: () -> Unit,
+  navigateToNickname: (String, String) -> Unit,
   showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: PasswordViewModel = hiltViewModel(),
@@ -45,8 +45,8 @@ fun PasswordRoute(
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
       when (it) {
-        is PasswordSideEffect.NavigateToHome -> navigateToHome()
-        is PasswordSideEffect.NavigateToNickname -> navigateToNickname()
+        is PasswordSideEffect.NavigateToLogin -> navigateToLogin()
+        is PasswordSideEffect.NavigateToNickname -> navigateToNickname(it.email, it.password)
         is PasswordSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
       }
     }

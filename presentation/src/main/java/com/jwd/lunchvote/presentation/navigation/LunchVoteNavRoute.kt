@@ -14,7 +14,16 @@ enum class LunchVoteNavRoute(
   Login,
   EmailVerification,
   Password,
-  Nickname,
+  Nickname(
+    arguments = listOf(
+      navArgument("email") {
+        type = NavType.StringType
+      },
+      navArgument("password") {
+        type = NavType.StringType
+      }
+    )
+  ),
 
   Home,
   LoungeMember,

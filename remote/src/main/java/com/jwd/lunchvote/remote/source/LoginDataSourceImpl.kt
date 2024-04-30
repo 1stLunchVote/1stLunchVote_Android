@@ -16,6 +16,26 @@ class LoginDataSourceImpl @Inject constructor(
     const val PROVIDER_ID = "oidc.lunchvote"
   }
 
+  override suspend fun signInWithEmailAndPassword(
+    email: String,
+    password: String
+  ): String {
+    return auth
+      .signInWithEmailAndPassword(email, password)
+      .await()
+      .user?.uid ?: throw LoginError.LoginFailure
+  }
+
+  override suspend fun createUserWithEmailAndPassword(
+    email: String,
+    password: String
+  ): String {
+    return auth
+      .createUserWithEmailAndPassword(email, password)
+      .await()
+      .user?.uid ?: throw LoginError.LoginFailure
+  }
+
   override suspend fun signInWithGoogleIdToken(
     idToken: String
   ): String {

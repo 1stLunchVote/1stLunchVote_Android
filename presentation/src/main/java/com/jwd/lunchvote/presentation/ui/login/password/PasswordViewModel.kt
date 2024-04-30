@@ -13,7 +13,6 @@ import com.jwd.lunchvote.presentation.ui.login.password.PasswordContract.Passwor
 import com.jwd.lunchvote.presentation.ui.login.password.PasswordContract.PasswordState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -51,7 +50,7 @@ class PasswordViewModel @Inject constructor(
   override fun handleErrors(error: Throwable) {
     sendSideEffect(PasswordSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
     when (error) {
-      is LoginError.NoEmail -> sendSideEffect(PasswordSideEffect.NavigateToHome)
+      is LoginError.NoEmail -> sendSideEffect(PasswordSideEffect.NavigateToLogin)
     }
   }
 

@@ -87,8 +87,10 @@ fun LunchVoteNavHost(
     }
     composable(LunchVoteNavRoute.Password) {
       PasswordRoute(
-        navigateToHome = { navController.navigateWithPop(LunchVoteNavRoute.Home) },
-        navigateToNickname = { navController.navigateWithPop(LunchVoteNavRoute.Nickname) },
+        navigateToLogin = { navController.navigateWithPop(LunchVoteNavRoute.Login) },
+        navigateToNickname = { email, password ->
+          navController.navigateWithPop(LunchVoteNavRoute.Nickname, email, password)
+        },
         showSnackBar = showSnackBar
       )
     }
