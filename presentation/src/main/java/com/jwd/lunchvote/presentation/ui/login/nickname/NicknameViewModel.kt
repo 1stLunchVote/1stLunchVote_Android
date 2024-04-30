@@ -2,6 +2,7 @@ package com.jwd.lunchvote.presentation.ui.login.nickname
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.usecase.CreateUserUseCase
@@ -11,7 +12,6 @@ import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.model.UserUIModel
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
-import com.jwd.lunchvote.presentation.ui.login.LoginContract
 import com.jwd.lunchvote.presentation.ui.login.nickname.NicknameContract.NicknameEvent
 import com.jwd.lunchvote.presentation.ui.login.nickname.NicknameContract.NicknameReduce
 import com.jwd.lunchvote.presentation.ui.login.nickname.NicknameContract.NicknameSideEffect
@@ -45,7 +45,10 @@ class NicknameViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(NicknameSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+    when (error) {
+      is FirebaseAuthUserCollisionException -> sendSideEffect(NicknameSideEffect.ShowSnackBar(UiText.StringResource(R.string.nickname_user_collision_error_snackbar)))
+      else -> sendSideEffect(NicknameSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+    }
   }
 
   private suspend fun signUp() {
@@ -62,6 +65,7 @@ class NicknameViewModel @Inject constructor(
       name = nickname
     )
     createUserUseCase(user.asDomain())
+
     sendSideEffect(NicknameSideEffect.ShowSnackBar(UiText.StringResource(R.string.nickname_success_snackbar)))
     sendSideEffect(NicknameSideEffect.NavigateToHome)
   }

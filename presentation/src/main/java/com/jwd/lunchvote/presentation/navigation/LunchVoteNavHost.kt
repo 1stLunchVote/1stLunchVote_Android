@@ -14,6 +14,7 @@ import com.jwd.lunchvote.presentation.ui.home.HomeRoute
 import com.jwd.lunchvote.presentation.ui.home.dialog.HomeJoinDialog
 import com.jwd.lunchvote.presentation.ui.login.LoginRoute
 import com.jwd.lunchvote.presentation.ui.login.email_verification.EmailVerificationRoute
+import com.jwd.lunchvote.presentation.ui.login.nickname.NicknameRoute
 import com.jwd.lunchvote.presentation.ui.login.password.PasswordRoute
 import com.jwd.lunchvote.presentation.ui.login.register.RegisterEmailRoute
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeRoute
@@ -91,6 +92,12 @@ fun LunchVoteNavHost(
         navigateToNickname = { email, password ->
           navController.navigateWithPop(LunchVoteNavRoute.Nickname, email, password)
         },
+        showSnackBar = showSnackBar
+      )
+    }
+    composable(LunchVoteNavRoute.Nickname) {
+      NicknameRoute(
+        navigateToHome = { navController.navigateWithPop(LunchVoteNavRoute.Home) },
         showSnackBar = showSnackBar
       )
     }
