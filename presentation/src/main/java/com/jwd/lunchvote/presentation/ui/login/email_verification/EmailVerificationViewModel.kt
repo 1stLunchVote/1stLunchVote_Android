@@ -3,6 +3,8 @@ package com.jwd.lunchvote.presentation.ui.login.email_verification
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.actionCodeSettings
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.presentation.R
@@ -11,13 +13,17 @@ import com.jwd.lunchvote.presentation.ui.login.email_verification.EmailVerificat
 import com.jwd.lunchvote.presentation.ui.login.email_verification.EmailVerificationContract.EmailVerificationSideEffect
 import com.jwd.lunchvote.presentation.ui.login.email_verification.EmailVerificationContract.EmailVerificationState
 import com.jwd.lunchvote.presentation.util.UiText
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
+@HiltViewModel
 class EmailVerificationViewModel @Inject constructor(
+  private val auth: FirebaseAuth,
   savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<EmailVerificationState, EmailVerificationEvent, EmailVerificationReduce, EmailVerificationSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): EmailVerificationState {
@@ -59,9 +65,25 @@ class EmailVerificationViewModel @Inject constructor(
   }
 
   private fun sendEmail() {
-    // Todo : 이메일 전송
-    sendSideEffect(EmailVerificationSideEffect.ShowSnackBar(UiText.StringResource(R.string.email_verification_email_send_snackbar)))
-    updateState(EmailVerificationReduce.UpdateEmailSent(true))
+    val actionCodeSettings = actionCodeSettings {
+      url = "https://github.com/1stLunchVote/1stLunchVote_Android"
+      handleCodeInApp = true
+      setAndroidPackageName(
+        "com.jwd.lunchvote",
+        true, // installIfNotAvailable
+        "1", // minimumVersion
+      )
+    }
+
+    auth.sendSignInLinkToEmail(currentState.email, actionCodeSettings)
+      .addOnCompleteListener { task ->
+        if (task.isSuccessful) {
+          sendSideEffect(EmailVerificationSideEffect.ShowSnackBar(UiText.StringResource(R.string.email_verification_email_send_snackbar)))
+          updateState(EmailVerificationReduce.UpdateEmailSent(true))
+        } else {
+          sendSideEffect(EmailVerificationSideEffect.ShowSnackBar(UiText.StringResource(R.string.email_verification_email_send_error_snackbar)))
+        }
+      }
   }
 
   private fun resendEmail() {
