@@ -41,7 +41,6 @@ fun PasswordRoute(
   context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
-  val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
@@ -52,8 +51,7 @@ fun PasswordRoute(
     }
   }
 
-  if (isLoading) LoadingScreen()
-  else PasswordScreen(
+  PasswordScreen(
     state = state,
     modifier = modifier,
     onPasswordChanged = { viewModel.sendEvent(PasswordEvent.OnPasswordChanged(it)) },

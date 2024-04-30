@@ -42,7 +42,6 @@ fun EmailVerificationRoute(
   context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
-  val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
@@ -53,8 +52,7 @@ fun EmailVerificationRoute(
     }
   }
 
-  if (isLoading) LoadingScreen()
-  else EmailVerificationScreen(
+  EmailVerificationScreen(
     state = state,
     modifier = modifier,
     onEmailChanged = { viewModel.sendEvent(EmailVerificationEvent.OnEmailChanged(it)) },
