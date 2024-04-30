@@ -3,11 +3,9 @@ package com.jwd.lunchvote.presentation.ui.login.email_verification
 import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -15,7 +13,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
@@ -38,7 +35,6 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun EmailVerificationRoute(
-  popBackStack: () -> Unit,
   navigateToPassword: () -> Unit,
   showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
@@ -47,22 +43,13 @@ fun EmailVerificationRoute(
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
   val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
-  val dialogState by viewModel.dialogState.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
       when (it) {
-        is EmailVerificationSideEffect.PopBackStack -> popBackStack()
-        is EmailVerificationSideEffect.OpenQuitDialog -> viewModel.setDialogState(EmailVerificationContract.QUIT_DIALOG)
         is EmailVerificationSideEffect.NavigateToPassword -> navigateToPassword()
         is EmailVerificationSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
       }
-    }
-  }
-
-  when(dialogState) {
-    EmailVerificationContract.QUIT_DIALOG -> {
-      // TODO: Implement dialog
     }
   }
 
@@ -72,9 +59,7 @@ fun EmailVerificationRoute(
     modifier = modifier,
     onEmailChanged = { viewModel.sendEvent(EmailVerificationEvent.OnEmailChanged(it)) },
     onClickSendButton = { viewModel.sendEvent(EmailVerificationEvent.OnClickSendButton) },
-    onClickResendButton = { viewModel.sendEvent(EmailVerificationEvent.OnClickResendButton) },
-    onCodeChanged = { viewModel.sendEvent(EmailVerificationEvent.OnCodeChanged(it)) },
-    onClickNextButton = { viewModel.sendEvent(EmailVerificationEvent.OnClickNextButton) }
+    onClickResendButton = { viewModel.sendEvent(EmailVerificationEvent.OnClickResendButton) }
   )
 }
 
@@ -84,9 +69,7 @@ private fun EmailVerificationScreen(
   modifier: Modifier = Modifier,
   onEmailChanged: (String) -> Unit = {},
   onClickSendButton: () -> Unit = {},
-  onClickResendButton: () -> Unit = {},
-  onCodeChanged: (String) -> Unit = {},
-  onClickNextButton: () -> Unit = {}
+  onClickResendButton: () -> Unit = {}
 ) {
   Screen(
     modifier = modifier,
@@ -150,52 +133,21 @@ private fun EmailVerificationScreen(
             style = MaterialTheme.typography.labelMedium
           )
         }
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.spacedBy(12.dp),
-          verticalAlignment = Alignment.CenterVertically
-        ) {
-          if (state.emailSent.not()) {
-            Button(
-              onClick = onClickSendButton,
-              modifier = Modifier.weight(1f),
-              enabled = state.email.isNotEmpty() && isValid
-            ) {
-              Text(text = stringResource(R.string.email_verification_send_button))
-            }
-          } else {
-            OutlinedButton(
-              onClick = onClickResendButton,
-              modifier = Modifier.weight(1f)
-            ) {
-              Text(text = stringResource(R.string.email_verification_resend_button))
-            }
+        if (state.emailSent.not()) {
+          Button(
+            onClick = onClickSendButton,
+            modifier = Modifier.fillMaxWidth(),
+            enabled = state.email.isNotEmpty() && isValid
+          ) {
+            Text(text = stringResource(R.string.email_verification_send_button))
           }
-          LunchVoteTextField(
-            text = state.code,
-            onTextChange = onCodeChanged,
-            hintText = stringResource(R.string.email_verification_code_hint),
-            modifier = Modifier
-              .weight(2f)
-              .alpha(if (state.emailSent) 1f else 0f),
-            enabled = state.emailSent,
-            isError = state.isWrongCode
-          )
-        }
-      }
-      if (state.emailSent) {
-        Button(
-          onClick = onClickNextButton,
-          modifier = Modifier
-            .width(120.dp)
-            .constrainAs(nextButton) {
-              bottom.linkTo(parent.bottom, 64.dp)
-              start.linkTo(parent.start)
-              end.linkTo(parent.end)
-            },
-          enabled = state.code.length == 6 && state.isWrongCode.not()
-        ) {
-          Text(text = stringResource(R.string.email_verification_next_button))
+        } else {
+          OutlinedButton(
+            onClick = onClickResendButton,
+            modifier = Modifier.fillMaxWidth()
+          ) {
+            Text(text = stringResource(R.string.email_verification_resend_button))
+          }
         }
       }
     }
@@ -221,8 +173,7 @@ private fun Preview2() {
     EmailVerificationScreen(
       EmailVerificationState(
         email = "email@email.com",
-        emailSent = true,
-        code = "123456"
+        emailSent = true
       )
     )
   }

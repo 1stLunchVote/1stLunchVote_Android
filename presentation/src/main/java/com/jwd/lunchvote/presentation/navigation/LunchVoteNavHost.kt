@@ -80,8 +80,7 @@ fun LunchVoteNavHost(
     }
     composable(LunchVoteNavRoute.EmailVerification) {
       EmailVerificationRoute(
-        popBackStack = { navController.popBackStack() },
-        navigateToPassword = { /*TODO*/ },
+        navigateToPassword = { navController.navigate(LunchVoteNavRoute.Password) },
         showSnackBar = showSnackBar
       )
     }

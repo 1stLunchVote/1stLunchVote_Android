@@ -12,6 +12,7 @@ enum class LunchVoteNavRoute(
 ) {
   Login,
   EmailVerification,
+  Password,
 
   Home,
   LoungeMember,
