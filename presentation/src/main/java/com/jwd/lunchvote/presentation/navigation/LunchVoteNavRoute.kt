@@ -11,6 +11,8 @@ enum class LunchVoteNavRoute(
   val links: List<String> = emptyList(),
 ) {
   Login,
+  EmailVerification,
+
   Home,
   LoungeMember,
   RegisterEmail,

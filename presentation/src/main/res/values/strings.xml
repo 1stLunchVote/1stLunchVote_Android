@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">제1회점심메뉴총선거</string>
 
-    <!-- LoginFragment-->
+    <!-- LoginScreen -->
     <string name="login_email_hint">이메일</string>
     <string name="login_password_hint">비밀번호</string>
     <string name="login_button">로그인</string>
@@ -10,6 +10,16 @@
     <string name="login_kakao_button">카카오 로그인</string>
     <string name="login_google_button">Google 계정으로 로그인</string>
     <string name="login_success_snackbar">로그인에 성공했습니다.</string>
+
+    <!-- EmailVerificationScreen -->
+    <string name="email_verification_title">먼저 본인인증을 진행해주세요.</string>
+    <string name="email_verification_description">입력한 이메일로 인증 메일을 보내드릴게요.</string>
+    <string name="email_verification_email_hint">이메일 입력</string>
+    <string name="email_verification_email_format_error">올바른 이메일 형식을 입력해주세요.</string>
+    <string name="email_verification_send_button">메일 전송</string>
+    <string name="email_verification_resend_button">다시 전송</string>
+    <string name="email_verification_code_hint">인증 코드 입력</string>
+    <string name="email_verification_next_button">입력 완료</string>
 
     <!-- HomeScreen -->
     <string name="home_banner_title">지금 사람들은 뭘 먹고 싶을까?</string>

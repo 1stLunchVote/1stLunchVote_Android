@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.presentation.ui.template.edit_template
+package com.jwd.lunchvote.presentation.ui.template.edit_template.dialog
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size

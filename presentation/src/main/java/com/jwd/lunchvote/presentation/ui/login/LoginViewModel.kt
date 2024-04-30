@@ -38,7 +38,7 @@ class LoginViewModel @Inject constructor(
       is LoginEvent.OnEmailChange -> updateState(LoginReduce.UpdateEmail(event.email))
       is LoginEvent.OnPasswordChange -> updateState(LoginReduce.UpdatePassword(event.password))
       is LoginEvent.OnClickEmailLoginButton -> throwError(NotImplementedError())
-      is LoginEvent.OnClickRegisterButton -> sendSideEffect(LoginSideEffect.NavigateToRegisterEmail)
+      is LoginEvent.OnClickRegisterButton -> sendSideEffect(LoginSideEffect.NavigateToEmailVerification)
       is LoginEvent.OnClickKakaoLoginButton -> sendSideEffect(LoginSideEffect.LaunchKakaoLogin)
       is LoginEvent.OnClickGoogleLoginButton -> sendSideEffect(LoginSideEffect.LaunchGoogleLogin)
       is LoginEvent.ProcessKakaoLogin -> kakaoLogin(event.oAuthToken)

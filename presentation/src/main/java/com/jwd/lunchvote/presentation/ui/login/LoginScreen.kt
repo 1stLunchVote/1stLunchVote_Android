@@ -56,7 +56,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun LoginRoute(
   navigateToHome: () -> Unit,
-  navigateToRegisterEmail: () -> Unit,
+  navigateToEmailVerification: () -> Unit,
   showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: LoginViewModel = hiltViewModel(),
@@ -91,7 +91,7 @@ fun LoginRoute(
     viewModel.sideEffect.collectLatest {
       when (it) {
         is LoginSideEffect.NavigateToHome -> navigateToHome()
-        is LoginSideEffect.NavigateToRegisterEmail -> navigateToRegisterEmail()
+        is LoginSideEffect.NavigateToEmailVerification -> navigateToEmailVerification()
         is LoginSideEffect.LaunchKakaoLogin -> {
           try {
             val oAuthToken = UserApiClient.login(context)

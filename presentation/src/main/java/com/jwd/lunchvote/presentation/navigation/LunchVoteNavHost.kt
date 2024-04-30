@@ -13,6 +13,7 @@ import androidx.navigation.compose.dialog
 import com.jwd.lunchvote.presentation.ui.home.HomeRoute
 import com.jwd.lunchvote.presentation.ui.home.dialog.HomeJoinDialog
 import com.jwd.lunchvote.presentation.ui.login.LoginRoute
+import com.jwd.lunchvote.presentation.ui.login.email_verification.EmailVerificationRoute
 import com.jwd.lunchvote.presentation.ui.login.register.RegisterEmailRoute
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeRoute
 import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberRoute
@@ -70,6 +71,25 @@ fun LunchVoteNavHost(
     startDestination = startDestination,
     modifier = modifier
   ) {
+    composable(LunchVoteNavRoute.Login) {
+      LoginRoute(
+        navigateToHome = { navController.navigateWithPop(LunchVoteNavRoute.Home) },
+        navigateToEmailVerification = { navController.navigate(LunchVoteNavRoute.EmailVerification) },
+        showSnackBar = showSnackBar
+      )
+    }
+    composable(LunchVoteNavRoute.EmailVerification) {
+      EmailVerificationRoute(
+        popBackStack = { navController.popBackStack() },
+        navigateToPassword = { /*TODO*/ },
+        showSnackBar = showSnackBar
+      )
+    }
+    composable(LunchVoteNavRoute.RegisterEmail){
+      RegisterEmailRoute(
+        showSnackBar = showSnackBar
+      )
+    }
     composable(LunchVoteNavRoute.Home) {
       HomeRoute(
         navigateToLounge = {
@@ -151,18 +171,6 @@ fun LunchVoteNavHost(
     composable(LunchVoteNavRoute.AddTemplate) {
       AddTemplateRoute(
         popBackStack = { navController.popBackStack() },
-        showSnackBar = showSnackBar
-      )
-    }
-    composable(LunchVoteNavRoute.Login) {
-      LoginRoute(
-        navigateToHome = { navController.navigateWithPop(LunchVoteNavRoute.Home) },
-        navigateToRegisterEmail = { navController.navigate(LunchVoteNavRoute.RegisterEmail) },
-        showSnackBar = showSnackBar
-      )
-    }
-    composable(LunchVoteNavRoute.RegisterEmail){
-      RegisterEmailRoute(
         showSnackBar = showSnackBar
       )
     }
