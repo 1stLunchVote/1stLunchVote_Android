@@ -26,7 +26,6 @@ import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.ui.login.password.PasswordContract.PasswordEvent
 import com.jwd.lunchvote.presentation.ui.login.password.PasswordContract.PasswordSideEffect
 import com.jwd.lunchvote.presentation.ui.login.password.PasswordContract.PasswordState
-import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
