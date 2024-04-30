@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.jwd.lunchvote.core.common.config.EmailConfig
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.ui.login.email_verification.EmailVerificationContract.EmailVerificationEvent
 import com.jwd.lunchvote.presentation.ui.login.email_verification.EmailVerificationContract.EmailVerificationSideEffect
@@ -124,9 +125,9 @@ private fun EmailVerificationScreen(
             top.linkTo(parent.top)
             bottom.linkTo(parent.bottom)
           },
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp)
       ) {
-        val regex = Regex("^([0-9a-zA-Z_\\.-]+)@([0-9a-zA-Z_-]+)(\\.[0-9a-zA-Z_-]+){1,2}$")
+        val isValid = EmailConfig.REGEX.matches(state.email)
 
         Column(
           modifier = Modifier.fillMaxWidth(),
@@ -137,27 +138,28 @@ private fun EmailVerificationScreen(
             onTextChange = onEmailChanged,
             hintText = stringResource(R.string.email_verification_email_hint),
             modifier = Modifier.fillMaxWidth(),
-            enabled = state.emailSent.not()
+            enabled = state.emailSent.not(),
+            isError = state.email.isNotEmpty() && isValid.not()
           )
           Text(
             text = stringResource(R.string.email_verification_email_format_error),
             modifier = Modifier
               .padding(horizontal = 8.dp)
-              .alpha(if (regex.matches(state.email) || state.email.isEmpty()) 0f else 1f),
+              .alpha(if (state.email.isNotEmpty() && isValid.not()) 1f else 0f),
             color = MaterialTheme.colorScheme.error,
             style = MaterialTheme.typography.labelMedium
           )
         }
         Row(
           modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.spacedBy(8.dp),
+          horizontalArrangement = Arrangement.spacedBy(12.dp),
           verticalAlignment = Alignment.CenterVertically
         ) {
           if (state.emailSent.not()) {
             Button(
               onClick = onClickSendButton,
               modifier = Modifier.weight(1f),
-              enabled = state.email.isNotEmpty() && regex.matches(state.email)
+              enabled = state.email.isNotEmpty() && isValid
             ) {
               Text(text = stringResource(R.string.email_verification_send_button))
             }
@@ -176,7 +178,8 @@ private fun EmailVerificationScreen(
             modifier = Modifier
               .weight(2f)
               .alpha(if (state.emailSent) 1f else 0f),
-            enabled = state.emailSent
+            enabled = state.emailSent,
+            isError = state.isWrongCode
           )
         }
       }
@@ -190,7 +193,7 @@ private fun EmailVerificationScreen(
               start.linkTo(parent.start)
               end.linkTo(parent.end)
             },
-          enabled = state.code.length == 6
+          enabled = state.code.length == 6 && state.isWrongCode.not()
         ) {
           Text(text = stringResource(R.string.email_verification_next_button))
         }

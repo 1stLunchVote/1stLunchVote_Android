@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.ui.login.email_verification.EmailVerificationContract.EmailVerificationEvent
 import com.jwd.lunchvote.presentation.ui.login.email_verification.EmailVerificationContract.EmailVerificationReduce
 import com.jwd.lunchvote.presentation.ui.login.email_verification.EmailVerificationContract.EmailVerificationSideEffect
@@ -36,8 +37,11 @@ class EmailVerificationViewModel @Inject constructor(
       is EmailVerificationEvent.OnEmailChanged -> updateState(EmailVerificationReduce.UpdateEmail(event.email))
       is EmailVerificationEvent.OnClickSendButton -> sendEmail()
       is EmailVerificationEvent.OnClickResendButton -> resendEmail()
-      is EmailVerificationEvent.OnCodeChanged -> updateState(EmailVerificationReduce.UpdateCode(event.code))
-      is EmailVerificationEvent.OnClickNextButton -> sendSideEffect(EmailVerificationSideEffect.NavigateToPassword)
+      is EmailVerificationEvent.OnCodeChanged -> {
+        updateState(EmailVerificationReduce.UpdateIsWrongCode(false))
+        updateState(EmailVerificationReduce.UpdateCode(event.code))
+      }
+      is EmailVerificationEvent.OnClickNextButton -> checkCode()
     }
   }
 
@@ -46,6 +50,7 @@ class EmailVerificationViewModel @Inject constructor(
       is EmailVerificationReduce.UpdateEmail -> state.copy(email = reduce.email)
       is EmailVerificationReduce.UpdateEmailSent -> state.copy(emailSent = reduce.emailSent)
       is EmailVerificationReduce.UpdateCode -> state.copy(code = reduce.code)
+      is EmailVerificationReduce.UpdateIsWrongCode -> state.copy(isWrongCode = reduce.isWrongCode)
     }
   }
 
@@ -55,10 +60,20 @@ class EmailVerificationViewModel @Inject constructor(
 
   private fun sendEmail() {
     // Todo : 이메일 전송
+    sendSideEffect(EmailVerificationSideEffect.ShowSnackBar(UiText.StringResource(R.string.email_verification_email_send_snackbar)))
     updateState(EmailVerificationReduce.UpdateEmailSent(true))
   }
 
   private fun resendEmail() {
     // Todo : 이메일 재전송
+  }
+
+  private fun checkCode() {
+    if (currentState.code == "123456") {
+      sendSideEffect(EmailVerificationSideEffect.NavigateToPassword)
+    } else {
+      sendSideEffect(EmailVerificationSideEffect.ShowSnackBar(UiText.StringResource(R.string.email_verification_wrong_code_error_snackbar)))
+      updateState(EmailVerificationReduce.UpdateIsWrongCode(true))
+    }
   }
 }

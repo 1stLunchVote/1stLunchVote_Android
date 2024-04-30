@@ -10,7 +10,8 @@ class EmailVerificationContract {
   data class EmailVerificationState(
     val email: String = "",
     val emailSent: Boolean = false,
-    val code: String = ""
+    val code: String = "",
+    val isWrongCode: Boolean = false
   ) : ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this
   }
@@ -27,6 +28,7 @@ class EmailVerificationContract {
     data class UpdateEmail(val email: String) : EmailVerificationReduce
     data class UpdateEmailSent(val emailSent: Boolean) : EmailVerificationReduce
     data class UpdateCode(val code: String) : EmailVerificationReduce
+    data class UpdateIsWrongCode(val isWrongCode: Boolean) : EmailVerificationReduce
   }
 
   sealed interface EmailVerificationSideEffect : ViewModelContract.SideEffect {

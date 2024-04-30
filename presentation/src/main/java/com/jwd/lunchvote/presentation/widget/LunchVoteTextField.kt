@@ -28,6 +28,7 @@ fun LunchVoteTextField(
   modifier: Modifier = Modifier,
   enabled: Boolean = true,
   textFieldType: TextFieldType = TextFieldType.Default,
+  isError: Boolean = false,
   visualTransformation: VisualTransformation = VisualTransformation.None,
   keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
   maxLines: Int = 1,
@@ -47,6 +48,7 @@ fun LunchVoteTextField(
       colors = OutlinedTextFieldDefaults.colors(
         unfocusedLabelColor = MaterialTheme.colorScheme.outlineVariant,
       ),
+      isError = isError,
       visualTransformation = visualTransformation,
       keyboardOptions = keyboardOptions,
       keyboardActions = KeyboardActions(
@@ -73,6 +75,7 @@ fun LunchVoteTextField(
       colors = OutlinedTextFieldDefaults.colors(
         unfocusedLabelColor = MaterialTheme.colorScheme.outlineVariant,
       ),
+      isError = isError,
       visualTransformation = visualTransformation,
       keyboardOptions = keyboardOptions,
       keyboardActions = KeyboardActions(
