@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.presentation.ui.login.email_verification
+package com.jwd.lunchvote.presentation.ui.login.password
 
 import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,16 +16,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jwd.lunchvote.core.common.config.EmailConfig
 import com.jwd.lunchvote.presentation.R
-import com.jwd.lunchvote.presentation.ui.login.email_verification.EmailVerificationContract.EmailVerificationEvent
-import com.jwd.lunchvote.presentation.ui.login.email_verification.EmailVerificationContract.EmailVerificationSideEffect
-import com.jwd.lunchvote.presentation.ui.login.email_verification.EmailVerificationContract.EmailVerificationState
+import com.jwd.lunchvote.presentation.ui.login.password.PasswordContract.PasswordEvent
+import com.jwd.lunchvote.presentation.ui.login.password.PasswordContract.PasswordSideEffect
+import com.jwd.lunchvote.presentation.ui.login.password.PasswordContract.PasswordState
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.Screen
@@ -34,11 +33,11 @@ import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun EmailVerificationRoute(
-  navigateToPassword: () -> Unit,
+fun PasswordRoute(
+  navigateToNickname: () -> Unit,
   showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
-  viewModel: EmailVerificationViewModel = hiltViewModel(),
+  viewModel: PasswordViewModel = hiltViewModel(),
   context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
@@ -47,29 +46,29 @@ fun EmailVerificationRoute(
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
       when (it) {
-        is EmailVerificationSideEffect.NavigateToPassword -> navigateToPassword()
-        is EmailVerificationSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
+        is PasswordSideEffect.NavigateToNickname -> navigateToNickname()
+        is PasswordSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
       }
     }
   }
 
   if (isLoading) LoadingScreen()
-  else EmailVerificationScreen(
+  else PasswordScreen(
     state = state,
     modifier = modifier,
-    onEmailChanged = { viewModel.sendEvent(EmailVerificationEvent.OnEmailChanged(it)) },
-    onClickSendButton = { viewModel.sendEvent(EmailVerificationEvent.OnClickSendButton) },
-    onClickResendButton = { viewModel.sendEvent(EmailVerificationEvent.OnClickResendButton) }
+    onPasswordChanged = { viewModel.sendEvent(PasswordEvent.OnPasswordChanged(it)) },
+    onPasswordConfirmChanged = { viewModel.sendEvent(PasswordEvent.OnPasswordConfirmChanged(it)) },
+    onClickNextButton = { viewModel.sendEvent(PasswordEvent.OnClickNextButton) }
   )
 }
 
 @Composable
-private fun EmailVerificationScreen(
-  state: EmailVerificationState,
+private fun PasswordScreen(
+  state: PasswordState,
   modifier: Modifier = Modifier,
-  onEmailChanged: (String) -> Unit = {},
-  onClickSendButton: () -> Unit = {},
-  onClickResendButton: () -> Unit = {}
+  onPasswordChanged: (String) -> Unit = {},
+  onPasswordConfirmChanged: (String) -> Unit = {},
+  onClickNextButton: () -> Unit = {}
 ) {
   Screen(
     modifier = modifier,
@@ -78,10 +77,13 @@ private fun EmailVerificationScreen(
     ConstraintLayout(
       modifier = Modifier.fillMaxSize()
     ) {
-      val (title, description, inputColumn) = createRefs()
+      val (title, description, inputColumn, nextButton) = createRefs()
+
+      val formatError = state.password.isNotEmpty() && (state.password.length < 10 || state.password.length > 20)
+      val confirmError = state.password.isNotEmpty() && state.passwordConfirm.isNotEmpty() && state.password != state.passwordConfirm
 
       Text(
-        text = stringResource(R.string.email_verification_title),
+        text = stringResource(R.string.password_title),
         modifier = Modifier
           .fillMaxWidth()
           .padding(horizontal = 24.dp)
@@ -91,7 +93,7 @@ private fun EmailVerificationScreen(
         style = MaterialTheme.typography.titleLarge
       )
       Text(
-        text = stringResource(R.string.email_verification_description),
+        text = stringResource(R.string.password_description),
         modifier = Modifier
           .fillMaxWidth()
           .padding(horizontal = 24.dp)
@@ -110,45 +112,47 @@ private fun EmailVerificationScreen(
           },
         verticalArrangement = Arrangement.spacedBy(8.dp)
       ) {
-        val isValid = EmailConfig.REGEX.matches(state.email)
-
         Column(
           modifier = Modifier.fillMaxWidth(),
           verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
           LunchVoteTextField(
-            text = state.email,
-            onTextChange = onEmailChanged,
-            hintText = stringResource(R.string.email_verification_email_hint),
+            text = state.password,
+            onTextChange = onPasswordChanged,
+            hintText = stringResource(R.string.password_password_hint),
             modifier = Modifier.fillMaxWidth(),
-            enabled = state.emailSent.not(),
-            isError = state.email.isNotEmpty() && isValid.not()
+            isError = formatError,
+            visualTransformation = PasswordVisualTransformation()
+          )
+          LunchVoteTextField(
+            text = state.passwordConfirm,
+            onTextChange = onPasswordConfirmChanged,
+            hintText = stringResource(R.string.password_password_confirm_hint),
+            modifier = Modifier.fillMaxWidth(),
+            isError = confirmError,
+            visualTransformation = PasswordVisualTransformation()
           )
           Text(
-            text = stringResource(R.string.email_verification_email_format_error),
+            text = if (confirmError) stringResource(R.string.password_password_confirm_error) else stringResource(R.string.password_password_format_error),
             modifier = Modifier
               .padding(horizontal = 8.dp)
-              .alpha(if (state.email.isNotEmpty() && isValid.not()) 1f else 0f),
+              .alpha(if (confirmError || formatError) 1f else 0f),
             color = MaterialTheme.colorScheme.error,
             style = MaterialTheme.typography.labelMedium
           )
         }
-        if (state.emailSent.not()) {
-          Button(
-            onClick = onClickSendButton,
-            modifier = Modifier.fillMaxWidth(),
-            enabled = state.email.isNotEmpty() && isValid
-          ) {
-            Text(text = stringResource(R.string.email_verification_send_button))
-          }
-        } else {
-          OutlinedButton(
-            onClick = onClickResendButton,
-            modifier = Modifier.fillMaxWidth()
-          ) {
-            Text(text = stringResource(R.string.email_verification_resend_button))
-          }
-        }
+      }
+      Button(
+        onClick = onClickNextButton,
+        modifier = Modifier
+          .constrainAs(nextButton) {
+            bottom.linkTo(parent.bottom, 64.dp)
+            start.linkTo(parent.start)
+            end.linkTo(parent.end)
+          },
+        enabled = state.password.isNotEmpty() && state.passwordConfirm.isNotEmpty() && !formatError && !confirmError
+      ) {
+        Text(text = stringResource(R.string.password_next_button))
       }
     }
   }
@@ -158,10 +162,8 @@ private fun EmailVerificationScreen(
 @Composable
 private fun Preview1() {
   ScreenPreview {
-    EmailVerificationScreen(
-      EmailVerificationState(
-        email = "email@email.com"
-      )
+    PasswordScreen(
+      PasswordState()
     )
   }
 }
@@ -170,10 +172,35 @@ private fun Preview1() {
 @Composable
 private fun Preview2() {
   ScreenPreview {
-    EmailVerificationScreen(
-      EmailVerificationState(
-        email = "email@email.com",
-        emailSent = true
+    PasswordScreen(
+      PasswordState(
+        password = "password"
+      )
+    )
+  }
+}
+
+@Preview
+@Composable
+private fun Preview3() {
+  ScreenPreview {
+    PasswordScreen(
+      PasswordState(
+        password = "password123",
+        passwordConfirm = "password124"
+      )
+    )
+  }
+}
+
+@Preview
+@Composable
+private fun Preview4() {
+  ScreenPreview {
+    PasswordScreen(
+      PasswordState(
+        password = "password123",
+        passwordConfirm = "password123"
       )
     )
   }
