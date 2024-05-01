@@ -33,6 +33,7 @@ import com.jwd.lunchvote.presentation.R
 fun KakaoLoginButton(
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
+  enabled: Boolean = true,
   size: LoginButtonSize = LoginButtonSize.Small,
   density: Density = LocalDensity.current
 ) {
@@ -51,7 +52,7 @@ fun KakaoLoginButton(
       .height(containerHeightDp)
       .clip(RoundedCornerShape(containerRadiusDp))
       .background(containerColor)
-      .clickable { onClick() }
+      .clickable(enabled = enabled, onClick = onClick)
       .padding(horizontal = paddingDp),
     verticalAlignment = Alignment.CenterVertically
   ) {
@@ -75,6 +76,7 @@ fun KakaoLoginButton(
 fun GoogleLoginButton(
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
+  enabled: Boolean = true,
   size: LoginButtonSize = LoginButtonSize.Small,
   density: Density = LocalDensity.current
 ) {
@@ -94,7 +96,7 @@ fun GoogleLoginButton(
       .height(containerHeightDp)
       .clip(RoundedCornerShape(containerRadiusDp))
       .background(containerColor)
-      .clickable { onClick() }
+      .clickable(enabled = enabled, onClick = onClick)
       .padding(horizontal = paddingDp),
     verticalAlignment = Alignment.CenterVertically
   ) {

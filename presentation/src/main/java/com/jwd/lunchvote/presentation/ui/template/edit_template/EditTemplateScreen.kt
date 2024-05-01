@@ -38,6 +38,8 @@ import com.jwd.lunchvote.presentation.model.enums.FoodStatus
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateEvent
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateSideEffect
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateState
+import com.jwd.lunchvote.presentation.ui.template.edit_template.dialog.EditTemplateConfirmDialog
+import com.jwd.lunchvote.presentation.ui.template.edit_template.dialog.EditTemplateDeleteDialog
 import com.jwd.lunchvote.presentation.widget.FoodItem
 import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen

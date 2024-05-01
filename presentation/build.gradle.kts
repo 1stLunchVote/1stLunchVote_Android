@@ -69,6 +69,8 @@ dependencies {
   implementation(libs.timber)
   implementation(libs.kakao)
 
+  implementation(platform(libs.firebase))
+  implementation(libs.firebase.dynamicLinks)
   implementation(libs.firebase.auth)
   implementation(libs.firebase.gmsAuth)
   implementation(libs.firebase.functions)

@@ -104,6 +104,7 @@ kakao = { group = "com.kakao.sdk", name = "v2-all-rx", version.ref = "kakao" }
 firebase = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-database = { group = "com.google.firebase", name = "firebase-database-ktx" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore-ktx" }
+firebase-dynamicLinks = { group = "com.google.firebase", name = "firebase-dynamic-links-ktx" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuth" }
 firebase-functions = { group = "com.google.firebase", name = "firebase-functions-ktx", version.ref = "firebaseFunctions" }
 firebase-gmsAuth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "firebaseGmsAuth" }

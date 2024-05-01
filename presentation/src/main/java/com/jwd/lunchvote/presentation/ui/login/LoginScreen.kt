@@ -7,22 +7,20 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -35,15 +33,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.jwd.lunchvote.core.common.config.EmailConfig
 import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.ui.login.LoginContract.LoginEvent
 import com.jwd.lunchvote.presentation.ui.login.LoginContract.LoginSideEffect
 import com.jwd.lunchvote.presentation.ui.login.LoginContract.LoginState
+import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.util.login
+import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.GoogleLoginButton
 import com.jwd.lunchvote.presentation.widget.KakaoLoginButton
-import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LoginButtonSize
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.Screen
@@ -56,13 +56,13 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun LoginRoute(
   navigateToHome: () -> Unit,
-  navigateToRegisterEmail: () -> Unit,
+  navigateToEmailVerification: () -> Unit,
   showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: LoginViewModel = hiltViewModel(),
   context: Context = LocalContext.current,
 ) {
-  val loginState by viewModel.viewState.collectAsStateWithLifecycle()
+  val state by viewModel.viewState.collectAsStateWithLifecycle()
   val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
   val googleSignInClient by lazy {
@@ -91,7 +91,7 @@ fun LoginRoute(
     viewModel.sideEffect.collectLatest {
       when (it) {
         is LoginSideEffect.NavigateToHome -> navigateToHome()
-        is LoginSideEffect.NavigateToRegisterEmail -> navigateToRegisterEmail()
+        is LoginSideEffect.NavigateToEmailVerification -> navigateToEmailVerification()
         is LoginSideEffect.LaunchKakaoLogin -> {
           try {
             val oAuthToken = UserApiClient.login(context)
@@ -110,10 +110,10 @@ fun LoginRoute(
     }
   }
 
-  if (isLoading) LoadingScreen()
-  else LoginScreen(
-    loginState = loginState,
+  LoginScreen(
+    state = state,
     modifier = modifier,
+    isLoading = isLoading,
     onEmailChange = { viewModel.sendEvent(LoginEvent.OnEmailChange(it)) },
     onPasswordChange = { viewModel.sendEvent(LoginEvent.OnPasswordChange(it)) },
     onClickEmailLoginButton = { viewModel.sendEvent(LoginEvent.OnClickEmailLoginButton) },
@@ -125,8 +125,9 @@ fun LoginRoute(
 
 @Composable
 private fun LoginScreen(
-  loginState: LoginState,
+  state: LoginState,
   modifier: Modifier = Modifier,
+  isLoading: Boolean = false,
   onEmailChange: (String) -> Unit = {},
   onPasswordChange: (String) -> Unit = {},
   onClickEmailLoginButton: () -> Unit = {},
@@ -135,36 +136,42 @@ private fun LoginScreen(
   onClickGoogleLoginButton: () -> Unit = {}
 ) {
   Screen(
-    modifier = modifier
-  ) {
-    Image(
-      painterResource(R.drawable.bg_login_title),
-      contentDescription = "Login Title",
-      modifier = Modifier.fillMaxWidth()
-    )
-    Column(
-      modifier = Modifier
-        .weight(1f)
-        .fillMaxWidth()
-        .padding(horizontal = 24.dp)
-    ) {
-      LoginFields(
-        email = loginState.email,
-        password = loginState.password,
-        onEmailChange = onEmailChange,
-        onPasswordChange = onPasswordChange,
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(top = 24.dp)
-      )
-      RegisterRow(
-        onClickRegisterButton = onClickRegisterButton,
+    modifier = modifier,
+    topAppBar = {
+      Image(
+        painterResource(R.drawable.bg_login_title),
+        contentDescription = "Login Title",
         modifier = Modifier.fillMaxWidth()
       )
-      LoginButtonList(
+    },
+    scrollable = false
+  ) {
+    Column(
+      modifier = Modifier
+        .fillMaxSize()
+        .padding(horizontal = 24.dp)
+        .padding(top = 24.dp, bottom = 32.dp)
+    ) {
+      LoginFields(
+        email = state.email,
+        password = state.password,
+        onEmailChange = onEmailChange,
+        onPasswordChange = onPasswordChange,
         onClickEmailLoginButton = onClickEmailLoginButton,
+        isLoading = isLoading,
+        modifier = Modifier.fillMaxWidth()
+      )
+      Gap(height = 8.dp)
+      RegisterRow(
+        onClickRegisterButton = onClickRegisterButton,
+        isLoading = isLoading,
+        modifier = Modifier.fillMaxWidth()
+      )
+      Gap(minHeight = 32.dp)
+      SocialLoginButtons(
         onClickKakaoLoginButton = onClickKakaoLoginButton,
         onClickGoogleLoginButton = onClickGoogleLoginButton,
+        isLoading = isLoading,
         modifier = Modifier.fillMaxWidth()
       )
     }
@@ -177,17 +184,22 @@ private fun LoginFields(
   password: String,
   onEmailChange: (String) -> Unit,
   onPasswordChange: (String) -> Unit,
+  onClickEmailLoginButton: () -> Unit,
+  isLoading: Boolean,
   modifier: Modifier = Modifier,
 ) {
   Column(
     modifier = modifier,
-    verticalArrangement = Arrangement.spacedBy(10.dp)
+    verticalArrangement = Arrangement.spacedBy(8.dp)
   ) {
+    val isValid = EmailConfig.REGEX.matches(email)
+
     LunchVoteTextField(
       text = email,
       onTextChange = onEmailChange,
       hintText = stringResource(R.string.login_email_hint),
       modifier = Modifier.fillMaxWidth(),
+      enabled = isLoading.not(),
       keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
     )
     LunchVoteTextField(
@@ -195,15 +207,32 @@ private fun LoginFields(
       onTextChange = onPasswordChange,
       hintText = stringResource(R.string.login_password_hint),
       modifier = Modifier.fillMaxWidth(),
+      enabled = isLoading.not(),
       keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
       visualTransformation = PasswordVisualTransformation()
     )
+    Text(
+      text = stringResource(R.string.login_email_format_error),
+      modifier = Modifier
+        .padding(horizontal = 8.dp)
+        .alpha(if (email.isNotEmpty() && isValid.not()) 1f else 0f),
+      color = MaterialTheme.colorScheme.error,
+      style = MaterialTheme.typography.labelMedium
+    )
+    Button(
+      onClick = onClickEmailLoginButton,
+      modifier = Modifier.fillMaxWidth(),
+      enabled = isLoading.not() && email.isNotEmpty() && password.isNotEmpty() && isValid
+    ) {
+      Text(stringResource(R.string.login_button))
+    }
   }
 }
 
 @Composable
 private fun RegisterRow(
   onClickRegisterButton: () -> Unit,
+  isLoading: Boolean,
   modifier: Modifier = Modifier
 ) {
   Row(
@@ -212,49 +241,46 @@ private fun RegisterRow(
     verticalAlignment = Alignment.CenterVertically
   ) {
     Text(
-      stringResource(R.string.login_register_guide),
+      text = stringResource(R.string.login_register_guide),
       style = MaterialTheme.typography.bodyLarge
     )
-    TextButton(
-      onClick = onClickRegisterButton,
-      contentPadding = PaddingValues(start = 8.dp, top = 12.dp, bottom = 12.dp, end = 0.dp)
-    ) {
-      Text(
-        stringResource(R.string.login_register_button),
-        style = MaterialTheme.typography.bodyLarge.copy(
-          textDecoration = TextDecoration.Underline
+    Text(
+      text = stringResource(R.string.login_register_button),
+      modifier = Modifier
+        .clickableWithoutEffect(
+          enabled = isLoading.not(),
+          onClick = onClickRegisterButton
         )
+        .padding(start = 8.dp, top = 12.dp, bottom = 12.dp, end = 0.dp),
+      color = MaterialTheme.colorScheme.primary,
+      style = MaterialTheme.typography.bodyLarge.copy(
+        textDecoration = TextDecoration.Underline
       )
-    }
+    )
   }
 }
 
 @Composable
-private fun LoginButtonList(
-  onClickEmailLoginButton: () -> Unit,
+private fun SocialLoginButtons(
   onClickKakaoLoginButton: () -> Unit,
   onClickGoogleLoginButton: () -> Unit,
+  isLoading: Boolean,
   modifier: Modifier = Modifier
 ) {
   Column(
-    modifier = modifier
+    modifier = modifier,
+    verticalArrangement = Arrangement.spacedBy(12.dp)
   ) {
-    Button(
-      onClick = onClickEmailLoginButton,
-      modifier = Modifier.fillMaxWidth()
-    ) {
-      Text(stringResource(R.string.login_button))
-    }
-    Spacer(Modifier.height(84.dp))
     KakaoLoginButton(
       onClick = onClickKakaoLoginButton,
       modifier = Modifier.fillMaxWidth(),
+      enabled = isLoading.not(),
       size = LoginButtonSize.Medium
     )
-    Spacer(Modifier.height(12.dp))
     GoogleLoginButton(
       onClick = onClickGoogleLoginButton,
       modifier = Modifier.fillMaxWidth(),
+      enabled = isLoading.not(),
       size = LoginButtonSize.Medium
     )
   }
@@ -262,10 +288,49 @@ private fun LoginButtonList(
 
 @Preview
 @Composable
-private fun LoginScreenPreview() {
+private fun Preview1() {
   ScreenPreview {
     LoginScreen(
       LoginState()
+    )
+  }
+}
+
+@Preview
+@Composable
+private fun Preview2() {
+  ScreenPreview {
+    LoginScreen(
+      LoginState(
+        email = "email"
+      )
+    )
+  }
+}
+
+@Preview
+@Composable
+private fun Preview3() {
+  ScreenPreview {
+    LoginScreen(
+      LoginState(
+        email = "email@email.com",
+        password = "password"
+      )
+    )
+  }
+}
+
+@Preview
+@Composable
+private fun Preview4() {
+  ScreenPreview {
+    LoginScreen(
+      LoginState(
+        email = "email@email.com",
+        password = "password"
+      ),
+      isLoading = true
     )
   }
 }

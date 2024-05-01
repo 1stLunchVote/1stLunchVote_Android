@@ -4,11 +4,13 @@ import com.jwd.lunchvote.data.repository.FirstVoteRepositoryImpl
 import com.jwd.lunchvote.data.repository.HomeRepositoryImpl
 import com.jwd.lunchvote.data.repository.LoginRepositoryImpl
 import com.jwd.lunchvote.data.repository.LoungeRepositoryImpl
+import com.jwd.lunchvote.data.repository.PreferenceRepositoryImpl
 import com.jwd.lunchvote.data.repository.TemplateRepositoryImpl
 import com.jwd.lunchvote.domain.repository.FirstVoteRepository
 import com.jwd.lunchvote.domain.repository.HomeRepository
 import com.jwd.lunchvote.domain.repository.LoginRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
+import com.jwd.lunchvote.domain.repository.PreferenceRepository
 import com.jwd.lunchvote.domain.repository.TemplateRepository
 import dagger.Binds
 import dagger.Module
@@ -19,6 +21,12 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 internal abstract class RepositoryModule {
+
+  @Binds
+  @Singleton
+  abstract fun bindsPreferenceRepository(
+    repository: PreferenceRepositoryImpl
+  ): PreferenceRepository
 
   @Binds
   @Singleton

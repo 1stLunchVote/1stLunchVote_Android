@@ -34,7 +34,7 @@ class LoginContract {
 
   sealed interface LoginSideEffect : ViewModelContract.SideEffect {
     data object NavigateToHome : LoginSideEffect
-    data object NavigateToRegisterEmail : LoginSideEffect
+    data object NavigateToEmailVerification : LoginSideEffect
     data object LaunchGoogleLogin : LoginSideEffect
     data object LaunchKakaoLogin : LoginSideEffect
     data class ShowSnackBar(val message: UiText) : LoginSideEffect

@@ -1,8 +1,9 @@
 <resources>
     <string name="app_name">제1회점심메뉴총선거</string>
 
-    <!-- LoginFragment-->
+    <!-- LoginScreen -->
     <string name="login_email_hint">이메일</string>
+    <string name="login_email_format_error">올바른 이메일 형식을 입력해주세요.</string>
     <string name="login_password_hint">비밀번호</string>
     <string name="login_button">로그인</string>
     <string name="login_register_guide">계정이 없으신가요?</string>
@@ -10,6 +11,39 @@
     <string name="login_kakao_button">카카오 로그인</string>
     <string name="login_google_button">Google 계정으로 로그인</string>
     <string name="login_success_snackbar">로그인에 성공했습니다.</string>
+    <string name="login_user_collision_error_snackbar">해당 이메일로 생성된 계정이 있습니다. 계정을 확인해주세요.</string>
+    <string name="login_user_not_found_error_snackbar">해당 이메일로 생성된 계정이 없습니다.\n회원가입을 먼저 진행해주세요.</string>
+    <string name="login_wrong_password_error_snackbar">비밀번호가 잘못되었습니다. 비밀번호를 확인해주세요.</string>
+    <string name="login_user_disabled_error_snackbar">관리자에 의해 차단된 계정입니다.</string>
+
+    <!-- EmailVerificationScreen -->
+    <string name="email_verification_title">먼저 본인인증을 진행해주세요.</string>
+    <string name="email_verification_description">입력한 이메일로 인증 메일을 보내드릴게요.</string>
+    <string name="email_verification_email_hint">이메일 입력</string>
+    <string name="email_verification_email_format_error">올바른 이메일 형식을 입력해주세요.</string>
+    <string name="email_verification_send_button">메일 전송</string>
+    <string name="email_verification_user_collision_error_snackbar">해당 이메일로 생성된 계정이 있습니다. 계정을 확인해주세요.</string>
+    <string name="email_verification_email_send_error_snackbar">이메일 전송에 실패했습니다.</string>
+    <string name="email_verification_email_send_snackbar">이메일이 전송되었습니다.</string>
+    <string name="email_verification_resend_button">다시 전송</string>
+
+    <!-- PasswordScreen -->
+    <string name="password_title">본인인증이 완료되었습니다!</string>
+    <string name="password_email">인증된 이메일: %s</string>
+    <string name="password_description">로그인에 사용할 비밀번호를 입력해주세요.\n10~20자 이내로 설정해주세요.</string>
+    <string name="password_password_hint">비밀번호 입력</string>
+    <string name="password_password_confirm_hint">비밀번호 확인</string>
+    <string name="password_password_format_error">10~20자 이내로 설정해주세요.</string>
+    <string name="password_password_confirm_error">비밀번호가 일치하지 않습니다.</string>
+    <string name="password_next_button">입력 완료</string>
+
+    <!-- NicknameScreen -->
+    <string name="nickname_title">거의 끝났습니다!</string>
+    <string name="nickname_description">제1회 점심메뉴 총선거에서 사용할\n멋진 닉네임을 정해주세요!</string>
+    <string name="nickname_nickname_hint">닉네임 입력</string>
+    <string name="nickname_next_button">계정 생성</string>
+    <string name="nickname_user_collision_error_snackbar">해당 이메일로 생성된 계정이 있습니다. 계정을 확인해주세요.</string>
+    <string name="nickname_success_snackbar">계정이 성공적으로 생성되었습니다.</string>
 
     <!-- HomeScreen -->
     <string name="home_banner_title">지금 사람들은 뭘 먹고 싶을까?</string>

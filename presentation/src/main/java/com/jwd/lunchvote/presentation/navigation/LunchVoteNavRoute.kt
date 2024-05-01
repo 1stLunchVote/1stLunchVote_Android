@@ -11,9 +11,21 @@ enum class LunchVoteNavRoute(
   val links: List<String> = emptyList(),
 ) {
   Login,
+  EmailVerification,
+  Password,
+  Nickname(
+    arguments = listOf(
+      navArgument("email") {
+        type = NavType.StringType
+      },
+      navArgument("password") {
+        type = NavType.StringType
+      }
+    )
+  ),
+
   Home,
   LoungeMember,
-  RegisterEmail,
   Profile,
 
   FirstVote,

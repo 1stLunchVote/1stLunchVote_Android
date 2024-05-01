@@ -19,6 +19,17 @@ class UserDataSourceImpl @Inject constructor(
     const val COLUMN_CREATED_AT = "createdAt"
   }
 
+  override suspend fun checkUserExists(
+    email: String
+  ): Boolean =
+    fireStore
+      .collection(USER_PATH)
+      .whereEqualTo(COLUMN_EMAIL, email)
+      .get()
+      .await()
+      .isEmpty
+      .not()
+
   override suspend fun createUser(
     user: UserData
   ): String {
