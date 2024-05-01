@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.presentation.ui.login.nickname
+package com.jwd.lunchvote.presentation.ui.login.register.nickname
 
 import android.os.Parcelable
 import com.jwd.lunchvote.core.ui.base.ViewModelContract

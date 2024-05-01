@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.presentation.ui.login.email_verification
+package com.jwd.lunchvote.presentation.ui.login.register.email_verification
 
 import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
@@ -24,9 +24,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.core.common.config.EmailConfig
 import com.jwd.lunchvote.presentation.R
-import com.jwd.lunchvote.presentation.ui.login.email_verification.EmailVerificationContract.EmailVerificationEvent
-import com.jwd.lunchvote.presentation.ui.login.email_verification.EmailVerificationContract.EmailVerificationSideEffect
-import com.jwd.lunchvote.presentation.ui.login.email_verification.EmailVerificationContract.EmailVerificationState
+import com.jwd.lunchvote.presentation.ui.login.register.email_verification.EmailVerificationContract.EmailVerificationEvent
+import com.jwd.lunchvote.presentation.ui.login.register.email_verification.EmailVerificationContract.EmailVerificationSideEffect
+import com.jwd.lunchvote.presentation.ui.login.register.email_verification.EmailVerificationContract.EmailVerificationState
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview

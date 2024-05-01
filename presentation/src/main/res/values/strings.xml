@@ -3,6 +3,7 @@
 
     <!-- LoginScreen -->
     <string name="login_email_hint">이메일</string>
+    <string name="login_email_format_error">올바른 이메일 형식을 입력해주세요.</string>
     <string name="login_password_hint">비밀번호</string>
     <string name="login_button">로그인</string>
     <string name="login_register_guide">계정이 없으신가요?</string>
@@ -10,6 +11,10 @@
     <string name="login_kakao_button">카카오 로그인</string>
     <string name="login_google_button">Google 계정으로 로그인</string>
     <string name="login_success_snackbar">로그인에 성공했습니다.</string>
+    <string name="login_user_collision_error_snackbar">해당 이메일로 생성된 계정이 있습니다. 계정을 확인해주세요.</string>
+    <string name="login_user_not_found_error_snackbar">해당 이메일로 생성된 계정이 없습니다.\n회원가입을 먼저 진행해주세요.</string>
+    <string name="login_wrong_password_error_snackbar">비밀번호가 잘못되었습니다. 비밀번호를 확인해주세요.</string>
+    <string name="login_user_disabled_error_snackbar">관리자에 의해 차단된 계정입니다.</string>
 
     <!-- EmailVerificationScreen -->
     <string name="email_verification_title">먼저 본인인증을 진행해주세요.</string>
@@ -17,6 +22,7 @@
     <string name="email_verification_email_hint">이메일 입력</string>
     <string name="email_verification_email_format_error">올바른 이메일 형식을 입력해주세요.</string>
     <string name="email_verification_send_button">메일 전송</string>
+    <string name="email_verification_user_collision_error_snackbar">해당 이메일로 생성된 계정이 있습니다. 계정을 확인해주세요.</string>
     <string name="email_verification_email_send_error_snackbar">이메일 전송에 실패했습니다.</string>
     <string name="email_verification_email_send_snackbar">이메일이 전송되었습니다.</string>
     <string name="email_verification_resend_button">다시 전송</string>

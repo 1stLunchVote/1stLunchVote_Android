@@ -3,10 +3,13 @@ package com.jwd.lunchvote.presentation.ui.login
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.firebase.auth.FirebaseAuthException
 import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.domain.usecase.CheckUserExists
 import com.jwd.lunchvote.domain.usecase.CreateUserUseCase
+import com.jwd.lunchvote.domain.usecase.SignInWithEmailAndPassword
 import com.jwd.lunchvote.domain.usecase.SignInWithGoogleIdToken
 import com.jwd.lunchvote.domain.usecase.SignInWithKakaoIdToken
 import com.jwd.lunchvote.presentation.R
@@ -25,6 +28,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
   savedStateHandle: SavedStateHandle,
+  private val signInWithEmailAndPassword: SignInWithEmailAndPassword,
+  private val checkUserExists: CheckUserExists,
   private val signInWithKakaoIdToken: SignInWithKakaoIdToken,
   private val signInWithGoogleIdToken: SignInWithGoogleIdToken,
   private val createUserUseCase: CreateUserUseCase
@@ -37,7 +42,7 @@ class LoginViewModel @Inject constructor(
     when (event) {
       is LoginEvent.OnEmailChange -> updateState(LoginReduce.UpdateEmail(event.email))
       is LoginEvent.OnPasswordChange -> updateState(LoginReduce.UpdatePassword(event.password))
-      is LoginEvent.OnClickEmailLoginButton -> throwError(NotImplementedError())
+      is LoginEvent.OnClickEmailLoginButton -> launch { emailLogin() }
       is LoginEvent.OnClickRegisterButton -> sendSideEffect(LoginSideEffect.NavigateToEmailVerification)
       is LoginEvent.OnClickKakaoLoginButton -> sendSideEffect(LoginSideEffect.LaunchKakaoLogin)
       is LoginEvent.OnClickGoogleLoginButton -> sendSideEffect(LoginSideEffect.LaunchGoogleLogin)
@@ -54,18 +59,36 @@ class LoginViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+    when (error) {
+      is FirebaseAuthException -> {
+        when (error.errorCode) {
+          "ERROR_USER_NOT_FOUND" -> sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.StringResource(R.string.login_user_not_found_error_snackbar)))
+          "ERROR_WRONG_PASSWORD" -> sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.StringResource(R.string.login_wrong_password_error_snackbar)))
+          "ERROR_USER_DISABLED" -> sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.StringResource(R.string.login_user_disabled_error_snackbar)))
+          else -> sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+        }
+      }
+      else -> sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+    }
+  }
+
+  private suspend fun emailLogin() {
+    signInWithEmailAndPassword(currentState.email, currentState.password)
+    loginSuccess()
   }
 
   private suspend fun googleLogin(account: GoogleSignInAccount) {
     val userId = signInWithGoogleIdToken(account.idToken!!)
-    val user = UserUIModel(
-      id = userId,
-      email = account.email ?: "",
-      name = account.givenName ?: "",
-      profileImageUrl = account.photoUrl?.toString() ?: ""
-    )
-    createUserUseCase(user.asDomain())
+    val exists = checkUserExists(account.email ?: throw LoginError.NoEmail)
+    if (exists.not()) {
+      val user = UserUIModel(
+        id = userId,
+        email = account.email ?: "",
+        name = account.givenName ?: "",
+        profileImageUrl = account.photoUrl?.toString() ?: ""
+      )
+      createUserUseCase(user.asDomain())
+    }
     loginSuccess()
   }
 
@@ -80,13 +103,16 @@ class LoginViewModel @Inject constructor(
           oAuthToken.idToken == null -> throw LoginError.TokenFailed
           else -> {
             val userId = signInWithKakaoIdToken(oAuthToken.idToken!!)
-            val newUser = UserUIModel(
-              id = userId,
-              email = user.kakaoAccount?.email ?: "",
-              name = user.kakaoAccount?.profile?.nickname ?: "",
-              profileImageUrl = user.kakaoAccount?.profile?.thumbnailImageUrl ?: ""
-            )
-            createUserUseCase(newUser.asDomain())
+            val exists = checkUserExists(user.kakaoAccount?.email ?: throw LoginError.NoEmail)
+            if (exists.not()) {
+              val newUser = UserUIModel(
+                id = userId,
+                email = user.kakaoAccount?.email ?: "",
+                name = user.kakaoAccount?.profile?.nickname ?: "",
+                profileImageUrl = user.kakaoAccount?.profile?.thumbnailImageUrl ?: ""
+              )
+              createUserUseCase(newUser.asDomain())
+            }
             loginSuccess()
           }
         }

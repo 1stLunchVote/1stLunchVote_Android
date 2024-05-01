@@ -13,10 +13,9 @@ import androidx.navigation.compose.dialog
 import com.jwd.lunchvote.presentation.ui.home.HomeRoute
 import com.jwd.lunchvote.presentation.ui.home.dialog.HomeJoinDialog
 import com.jwd.lunchvote.presentation.ui.login.LoginRoute
-import com.jwd.lunchvote.presentation.ui.login.email_verification.EmailVerificationRoute
-import com.jwd.lunchvote.presentation.ui.login.nickname.NicknameRoute
-import com.jwd.lunchvote.presentation.ui.login.password.PasswordRoute
-import com.jwd.lunchvote.presentation.ui.login.register.RegisterEmailRoute
+import com.jwd.lunchvote.presentation.ui.login.register.email_verification.EmailVerificationRoute
+import com.jwd.lunchvote.presentation.ui.login.register.nickname.NicknameRoute
+import com.jwd.lunchvote.presentation.ui.login.register.password.PasswordRoute
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeRoute
 import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberRoute
 import com.jwd.lunchvote.presentation.ui.setting.SettingRoute
@@ -98,11 +97,6 @@ fun LunchVoteNavHost(
     composable(LunchVoteNavRoute.Nickname) {
       NicknameRoute(
         navigateToHome = { navController.navigateWithPop(LunchVoteNavRoute.Home) },
-        showSnackBar = showSnackBar
-      )
-    }
-    composable(LunchVoteNavRoute.RegisterEmail){
-      RegisterEmailRoute(
         showSnackBar = showSnackBar
       )
     }

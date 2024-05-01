@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.presentation.ui.login.nickname
+package com.jwd.lunchvote.presentation.ui.login.register.nickname
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
@@ -12,10 +12,10 @@ import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.model.UserUIModel
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
-import com.jwd.lunchvote.presentation.ui.login.nickname.NicknameContract.NicknameEvent
-import com.jwd.lunchvote.presentation.ui.login.nickname.NicknameContract.NicknameReduce
-import com.jwd.lunchvote.presentation.ui.login.nickname.NicknameContract.NicknameSideEffect
-import com.jwd.lunchvote.presentation.ui.login.nickname.NicknameContract.NicknameState
+import com.jwd.lunchvote.presentation.ui.login.register.nickname.NicknameContract.NicknameEvent
+import com.jwd.lunchvote.presentation.ui.login.register.nickname.NicknameContract.NicknameReduce
+import com.jwd.lunchvote.presentation.ui.login.register.nickname.NicknameContract.NicknameSideEffect
+import com.jwd.lunchvote.presentation.ui.login.register.nickname.NicknameContract.NicknameState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

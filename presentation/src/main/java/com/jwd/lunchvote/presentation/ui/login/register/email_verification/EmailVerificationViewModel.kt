@@ -1,25 +1,26 @@
-package com.jwd.lunchvote.presentation.ui.login.email_verification
+package com.jwd.lunchvote.presentation.ui.login.register.email_verification
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.actionCodeSettings
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.domain.usecase.CheckUserExists
 import com.jwd.lunchvote.domain.usecase.SetEmailUseCase
 import com.jwd.lunchvote.presentation.R
-import com.jwd.lunchvote.presentation.ui.login.email_verification.EmailVerificationContract.EmailVerificationEvent
-import com.jwd.lunchvote.presentation.ui.login.email_verification.EmailVerificationContract.EmailVerificationReduce
-import com.jwd.lunchvote.presentation.ui.login.email_verification.EmailVerificationContract.EmailVerificationSideEffect
-import com.jwd.lunchvote.presentation.ui.login.email_verification.EmailVerificationContract.EmailVerificationState
+import com.jwd.lunchvote.presentation.ui.login.register.email_verification.EmailVerificationContract.EmailVerificationEvent
+import com.jwd.lunchvote.presentation.ui.login.register.email_verification.EmailVerificationContract.EmailVerificationReduce
+import com.jwd.lunchvote.presentation.ui.login.register.email_verification.EmailVerificationContract.EmailVerificationSideEffect
+import com.jwd.lunchvote.presentation.ui.login.register.email_verification.EmailVerificationContract.EmailVerificationState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class EmailVerificationViewModel @Inject constructor(
-  private val auth: FirebaseAuth,
+  private val checkUserExists: CheckUserExists,
   private val setEmailUseCase: SetEmailUseCase,
   savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<EmailVerificationState, EmailVerificationEvent, EmailVerificationReduce, EmailVerificationSideEffect>(savedStateHandle) {
@@ -30,7 +31,7 @@ class EmailVerificationViewModel @Inject constructor(
   override fun handleEvents(event: EmailVerificationEvent) {
     when (event) {
       is EmailVerificationEvent.OnEmailChanged -> updateState(EmailVerificationReduce.UpdateEmail(event.email))
-      is EmailVerificationEvent.OnClickSendButton -> sendEmail()
+      is EmailVerificationEvent.OnClickSendButton -> launch { checkEmail() }
       is EmailVerificationEvent.OnClickResendButton -> sendEmail()
     }
   }
@@ -56,8 +57,14 @@ class EmailVerificationViewModel @Inject constructor(
     )
   }
 
+  private suspend fun checkEmail() {
+    val exists = checkUserExists(currentState.email)
+    if (exists) sendSideEffect(EmailVerificationSideEffect.ShowSnackBar(UiText.StringResource(R.string.email_verification_user_collision_error_snackbar)))
+    else sendEmail()
+  }
+
   private fun sendEmail() {
-    auth.sendSignInLinkToEmail(currentState.email, actionCodeSettings)
+    Firebase.auth.sendSignInLinkToEmail(currentState.email, actionCodeSettings)
       .addOnCompleteListener { task ->
         if (task.isSuccessful) {
           setEmailUseCase(currentState.email)

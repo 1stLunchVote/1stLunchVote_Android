@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.presentation.ui.login.nickname
+package com.jwd.lunchvote.presentation.ui.login.register.nickname
 
 import android.content.Context
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,9 +19,9 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
-import com.jwd.lunchvote.presentation.ui.login.nickname.NicknameContract.NicknameEvent
-import com.jwd.lunchvote.presentation.ui.login.nickname.NicknameContract.NicknameSideEffect
-import com.jwd.lunchvote.presentation.ui.login.nickname.NicknameContract.NicknameState
+import com.jwd.lunchvote.presentation.ui.login.register.nickname.NicknameContract.NicknameEvent
+import com.jwd.lunchvote.presentation.ui.login.register.nickname.NicknameContract.NicknameSideEffect
+import com.jwd.lunchvote.presentation.ui.login.register.nickname.NicknameContract.NicknameState
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.Screen

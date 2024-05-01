@@ -18,7 +18,7 @@ interface LoginError {
 
   data object NoEmail : Throwable() {
     private fun readResolve(): Any = NoUser
-    override val message: String = "이메일을 확인할 수 없습니다. 다시 회원가입 해주세요."
+    override val message: String = "이메일을 확인할 수 없습니다."
   }
 
   data object TokenFailed : Throwable() {

@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.presentation.ui.login.password
+package com.jwd.lunchvote.presentation.ui.login.register.password
 
 import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
@@ -23,9 +23,9 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
-import com.jwd.lunchvote.presentation.ui.login.password.PasswordContract.PasswordEvent
-import com.jwd.lunchvote.presentation.ui.login.password.PasswordContract.PasswordSideEffect
-import com.jwd.lunchvote.presentation.ui.login.password.PasswordContract.PasswordState
+import com.jwd.lunchvote.presentation.ui.login.register.password.PasswordContract.PasswordEvent
+import com.jwd.lunchvote.presentation.ui.login.register.password.PasswordContract.PasswordSideEffect
+import com.jwd.lunchvote.presentation.ui.login.register.password.PasswordContract.PasswordState
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview

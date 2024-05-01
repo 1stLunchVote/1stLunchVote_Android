@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.presentation.ui.login.email_verification
+package com.jwd.lunchvote.presentation.ui.login.register.email_verification
 
 import android.os.Parcelable
 import com.jwd.lunchvote.core.ui.base.ViewModelContract
