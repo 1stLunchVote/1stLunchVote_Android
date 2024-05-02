@@ -48,11 +48,13 @@ fun SettingRoute(
   context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
+  val loading by viewModel.isLoading.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
       when(it) {
         is SettingSideEffect.PopBackStack -> popBackStack()
+        is SettingSideEffect.NavigateToLogin -> navigateToLogin()
         is SettingSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
       }
     }
@@ -75,6 +77,7 @@ fun SettingRoute(
 
   SettingScreen(
     state = state,
+    loading = loading,
     onClickBackButton = { viewModel.handleEvents(SettingEvent.OnClickBackButton) },
     onClickEditProfileButton = { viewModel.handleEvents(SettingEvent.OnClickEditProfileButton) },
     onClickAlertSettingButton = { viewModel.handleEvents(SettingEvent.OnClickAlertSettingButton) },
@@ -95,7 +98,8 @@ private fun SettingScreen(
   onClickContactButton: () -> Unit = {},
   onClickNoticeButton: () -> Unit = {},
   onClickSuggestButton: () -> Unit = {},
-  onClickLogoutButton: () -> Unit = {}
+  onClickLogoutButton: () -> Unit = {},
+  loading: Boolean = false
 ) {
   Screen(
     modifier = modifier,
@@ -108,15 +112,30 @@ private fun SettingScreen(
     }
   ) {
     SettingBlock(name = "내 정보") {
-      SettingItem(name = "프로필 수정") { onClickEditProfileButton() }
+      SettingItem(
+        name = "프로필 수정",
+        onClickItem = onClickEditProfileButton
+      )
     }
     SettingBlock(name = "서비스 이용") {
-      SettingItem(name = "알림 설정") { onClickAlertSettingButton() }
-      SettingItem(name = "1:1 문의") { onClickContactButton() }
+      SettingItem(
+        name = "알림 설정",
+        onClickItem = onClickAlertSettingButton
+      )
+      SettingItem(
+        name = "1:1 문의",
+        onClickItem = onClickContactButton
+      )
     }
     SettingBlock(name = "서비스 이용") {
-      SettingItem(name = "공지사항 및 이용약관") { onClickNoticeButton() }
-      SettingItem(name = "개선 제안하기") { onClickSuggestButton() }
+      SettingItem(
+        name = "공지사항 및 이용약관",
+        onClickItem = onClickNoticeButton
+      )
+      SettingItem(
+        name = "개선 제안하기",
+        onClickItem = onClickSuggestButton
+      )
       Row(
         modifier = Modifier
           .fillMaxWidth()
@@ -144,7 +163,10 @@ private fun SettingScreen(
       Text(
         text = "로그아웃",
         modifier = Modifier
-          .clickableWithoutEffect(onClickLogoutButton)
+          .clickableWithoutEffect(
+            enabled = !loading,
+            onClick = onClickLogoutButton
+          )
           .padding(horizontal = 12.dp, vertical = 8.dp),
         style = MaterialTheme.typography.titleMedium,
         color = MaterialTheme.colorScheme.error,
@@ -180,12 +202,16 @@ private fun SettingBlock(
 private fun SettingItem(
   name: String,
   modifier: Modifier = Modifier,
+  loading: Boolean = false,
   onClickItem: () -> Unit
 ) {
   Row(
     modifier = modifier
       .fillMaxWidth()
-      .clickableWithoutEffect(onClickItem)
+      .clickableWithoutEffect(
+        enabled = !loading,
+        onClick = onClickItem
+      )
       .padding(vertical = 12.dp),
     horizontalArrangement = Arrangement.SpaceBetween,
     verticalAlignment = Alignment.CenterVertically

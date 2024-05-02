@@ -30,6 +30,7 @@ class SettingContract {
 
   sealed interface SettingSideEffect: ViewModelContract.SideEffect {
     data object PopBackStack : SettingSideEffect
+    data object NavigateToLogin : SettingSideEffect
     data class ShowSnackBar(val message: UiText) : SettingSideEffect
   }
 }
