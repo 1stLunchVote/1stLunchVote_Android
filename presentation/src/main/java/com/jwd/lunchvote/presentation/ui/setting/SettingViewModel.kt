@@ -2,8 +2,11 @@ package com.jwd.lunchvote.presentation.ui.setting
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingEvent
 import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingReduce
 import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingSideEffect
@@ -29,7 +32,7 @@ class SettingViewModel @Inject constructor(
       is SettingEvent.OnClickContactButton -> sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.DynamicString("1:1 문의")))
       is SettingEvent.OnClickNoticeButton -> sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.DynamicString("공지사항 및 이용약관")))
       is SettingEvent.OnClickSuggestButton -> sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.DynamicString("개선 제안하기")))
-      is SettingEvent.OnClickLogoutButton -> sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.DynamicString("로그아웃")))
+      is SettingEvent.OnClickLogoutButton -> launch { logout() }
     }
   }
 
@@ -41,5 +44,12 @@ class SettingViewModel @Inject constructor(
 
   override fun handleErrors(error: Throwable) {
     sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+  }
+
+  private fun logout() {
+    Firebase.auth.signOut()
+
+    sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.StringResource(R.string.setting_logout_success_snackbar)))
+    sendSideEffect(SettingSideEffect.NavigateToLogin)
   }
 }

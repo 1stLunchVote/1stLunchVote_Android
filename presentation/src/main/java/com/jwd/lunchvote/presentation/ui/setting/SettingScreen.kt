@@ -3,15 +3,12 @@ package com.jwd.lunchvote.presentation.ui.setting
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
@@ -25,14 +22,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingEvent
 import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingSideEffect
 import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingState
+import com.jwd.lunchvote.presentation.util.UiText
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
@@ -48,7 +48,6 @@ fun SettingRoute(
   context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
-  val loading by viewModel.isLoading.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
@@ -69,7 +68,7 @@ fun SettingRoute(
       }
       packageInfo.versionName
     } catch (e: PackageManager.NameNotFoundException) {
-      "버전 정보를 가져올 수 없습니다."
+      UiText.StringResource(R.string.setting_app_version_failed).asString(context)
     }
 
     viewModel.handleEvents(SettingEvent.ScreenInitialize(appVersion))
@@ -77,7 +76,6 @@ fun SettingRoute(
 
   SettingScreen(
     state = state,
-    loading = loading,
     onClickBackButton = { viewModel.handleEvents(SettingEvent.OnClickBackButton) },
     onClickEditProfileButton = { viewModel.handleEvents(SettingEvent.OnClickEditProfileButton) },
     onClickAlertSettingButton = { viewModel.handleEvents(SettingEvent.OnClickAlertSettingButton) },
@@ -98,42 +96,41 @@ private fun SettingScreen(
   onClickContactButton: () -> Unit = {},
   onClickNoticeButton: () -> Unit = {},
   onClickSuggestButton: () -> Unit = {},
-  onClickLogoutButton: () -> Unit = {},
-  loading: Boolean = false
+  onClickLogoutButton: () -> Unit = {}
 ) {
   Screen(
     modifier = modifier,
     topAppBar = {
       LunchVoteTopBar(
-        title = "설정",
+        title = stringResource(R.string.setting_title),
         navIconVisible = true,
         popBackStack = onClickBackButton
       )
     }
   ) {
-    SettingBlock(name = "내 정보") {
+    SettingBlock(name = stringResource(R.string.setting_my_info)) {
       SettingItem(
-        name = "프로필 수정",
+        name = stringResource(R.string.setting_edit_profile),
         onClickItem = onClickEditProfileButton
       )
     }
-    SettingBlock(name = "서비스 이용") {
+    SettingBlock(name = stringResource(R.string.setting_service)) {
       SettingItem(
-        name = "알림 설정",
+        name = stringResource(R.string.setting_alert),
         onClickItem = onClickAlertSettingButton
       )
       SettingItem(
-        name = "1:1 문의",
+        name = stringResource(R.string.setting_contact),
         onClickItem = onClickContactButton
       )
     }
-    SettingBlock(name = "서비스 이용") {
+    SettingBlock(name = stringResource(R.string.setting_app_config)) {
       SettingItem(
-        name = "공지사항 및 이용약관",
+        name = stringResource(R.string.setting_notice_and_terms),
         onClickItem = onClickNoticeButton
       )
       SettingItem(
-        name = "개선 제안하기",
+        name = stringResource(R.string.setting_suggest),
         onClickItem = onClickSuggestButton
       )
       Row(
@@ -144,7 +141,7 @@ private fun SettingScreen(
         verticalAlignment = Alignment.CenterVertically
       ) {
         Text(
-          text = "앱 버전",
+          text = stringResource(R.string.setting_app_version),
           style = MaterialTheme.typography.titleMedium
         )
         Text(
@@ -161,12 +158,9 @@ private fun SettingScreen(
       contentAlignment = Alignment.Center
     ) {
       Text(
-        text = "로그아웃",
+        text = stringResource(R.string.setting_logout),
         modifier = Modifier
-          .clickableWithoutEffect(
-            enabled = !loading,
-            onClick = onClickLogoutButton
-          )
+          .clickableWithoutEffect(onClickLogoutButton)
           .padding(horizontal = 12.dp, vertical = 8.dp),
         style = MaterialTheme.typography.titleMedium,
         color = MaterialTheme.colorScheme.error,
@@ -202,16 +196,12 @@ private fun SettingBlock(
 private fun SettingItem(
   name: String,
   modifier: Modifier = Modifier,
-  loading: Boolean = false,
   onClickItem: () -> Unit
 ) {
   Row(
     modifier = modifier
       .fillMaxWidth()
-      .clickableWithoutEffect(
-        enabled = !loading,
-        onClick = onClickItem
-      )
+      .clickableWithoutEffect(onClickItem)
       .padding(vertical = 12.dp),
     horizontalArrangement = Arrangement.SpaceBetween,
     verticalAlignment = Alignment.CenterVertically
