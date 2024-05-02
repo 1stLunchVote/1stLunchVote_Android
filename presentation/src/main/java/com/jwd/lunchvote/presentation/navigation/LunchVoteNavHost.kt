@@ -186,7 +186,9 @@ fun LunchVoteNavHost(
     }
     composable(LunchVoteNavRoute.Setting) {
       SettingRoute(
-        popBackStack = { navController.popBackStack() }
+        popBackStack = { navController.popBackStack() },
+        navigateToLogin = { navController.navigateWithPop(LunchVoteNavRoute.Login) },
+        showSnackBar = showSnackBar
       )
     }
 
