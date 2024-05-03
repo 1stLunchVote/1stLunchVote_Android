@@ -1,9 +1,12 @@
 package com.jwd.lunchvote.remote.source
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.data.model.UserData
 import com.jwd.lunchvote.data.source.remote.UserDataSource
+import com.jwd.lunchvote.remote.mapper.asData
 import com.jwd.lunchvote.remote.mapper.asRemote
+import com.jwd.lunchvote.remote.model.UserRemote
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -41,4 +44,15 @@ class UserDataSourceImpl @Inject constructor(
 
     return user.id
   }
+
+  override suspend fun getUserById(
+    id: String
+  ): UserData =
+    fireStore
+      .collection(USER_PATH)
+      .document(id)
+      .get()
+      .await()
+      .toObject(UserRemote::class.java)
+      ?.asData() ?: throw LoginError.NoUser
 }

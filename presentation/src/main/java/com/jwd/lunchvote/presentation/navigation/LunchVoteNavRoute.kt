@@ -5,6 +5,7 @@ import androidx.navigation.NavDeepLink
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.kakao.sdk.common.KakaoSdk.type
 
 enum class LunchVoteNavRoute(
   val arguments: List<NamedNavArgument> = emptyList(),
@@ -26,7 +27,6 @@ enum class LunchVoteNavRoute(
 
   Home,
   LoungeMember,
-  Profile,
 
   FirstVote,
   SecondVote,
@@ -48,6 +48,7 @@ enum class LunchVoteNavRoute(
   ),
 
   Setting,
+  Profile,
 
   Lounge(
     arguments = listOf(

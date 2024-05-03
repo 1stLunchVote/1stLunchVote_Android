@@ -42,6 +42,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun SettingRoute(
   popBackStack: () -> Unit,
+  navigateToProfile: () -> Unit,
   navigateToLogin: () -> Unit,
   showSnackBar: suspend (String) -> Unit,
   viewModel: SettingViewModel = hiltViewModel(),
@@ -53,6 +54,7 @@ fun SettingRoute(
     viewModel.sideEffect.collectLatest {
       when(it) {
         is SettingSideEffect.PopBackStack -> popBackStack()
+        is SettingSideEffect.NavigateToProfile -> navigateToProfile()
         is SettingSideEffect.NavigateToLogin -> navigateToLogin()
         is SettingSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
       }
@@ -77,7 +79,7 @@ fun SettingRoute(
   SettingScreen(
     state = state,
     onClickBackButton = { viewModel.handleEvents(SettingEvent.OnClickBackButton) },
-    onClickEditProfileButton = { viewModel.handleEvents(SettingEvent.OnClickEditProfileButton) },
+    onClickProfileButton = { viewModel.handleEvents(SettingEvent.OnClickProfileButton) },
     onClickAlertSettingButton = { viewModel.handleEvents(SettingEvent.OnClickAlertSettingButton) },
     onClickContactButton = { viewModel.handleEvents(SettingEvent.OnClickContactButton) },
     onClickNoticeButton = { viewModel.handleEvents(SettingEvent.OnClickNoticeButton) },
@@ -91,7 +93,7 @@ private fun SettingScreen(
   state: SettingState,
   modifier: Modifier = Modifier,
   onClickBackButton: () -> Unit = {},
-  onClickEditProfileButton: () -> Unit = {},
+  onClickProfileButton: () -> Unit = {},
   onClickAlertSettingButton: () -> Unit = {},
   onClickContactButton: () -> Unit = {},
   onClickNoticeButton: () -> Unit = {},
@@ -110,8 +112,8 @@ private fun SettingScreen(
   ) {
     SettingBlock(name = stringResource(R.string.setting_my_info)) {
       SettingItem(
-        name = stringResource(R.string.setting_edit_profile),
-        onClickItem = onClickEditProfileButton
+        name = stringResource(R.string.setting_my_profile),
+        onClickItem = onClickProfileButton
       )
     }
     SettingBlock(name = stringResource(R.string.setting_service)) {

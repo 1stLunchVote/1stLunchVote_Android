@@ -27,7 +27,7 @@ class SettingViewModel @Inject constructor(
     when(event) {
       is SettingEvent.ScreenInitialize -> updateState(SettingReduce.UpdateAppVersion(event.appVersion))
       is SettingEvent.OnClickBackButton -> sendSideEffect(SettingSideEffect.PopBackStack)
-      is SettingEvent.OnClickEditProfileButton -> sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.DynamicString("프로필 수정")))
+      is SettingEvent.OnClickProfileButton -> sendSideEffect(SettingSideEffect.NavigateToProfile)
       is SettingEvent.OnClickAlertSettingButton -> sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.DynamicString("알림 설정")))
       is SettingEvent.OnClickContactButton -> sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.DynamicString("1:1 문의")))
       is SettingEvent.OnClickNoticeButton -> sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.DynamicString("공지사항 및 이용약관")))

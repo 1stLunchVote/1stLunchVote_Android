@@ -16,7 +16,7 @@ class SettingContract {
   sealed interface SettingEvent: ViewModelContract.Event {
     data class ScreenInitialize(val appVersion: String): SettingEvent
     data object OnClickBackButton: SettingEvent
-    data object OnClickEditProfileButton: SettingEvent
+    data object OnClickProfileButton: SettingEvent
     data object OnClickAlertSettingButton: SettingEvent
     data object OnClickContactButton: SettingEvent
     data object OnClickNoticeButton: SettingEvent
@@ -30,6 +30,7 @@ class SettingContract {
 
   sealed interface SettingSideEffect: ViewModelContract.SideEffect {
     data object PopBackStack : SettingSideEffect
+    data object NavigateToProfile : SettingSideEffect
     data object NavigateToLogin : SettingSideEffect
     data class ShowSnackBar(val message: UiText) : SettingSideEffect
   }

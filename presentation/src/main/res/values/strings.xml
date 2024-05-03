@@ -133,7 +133,7 @@
     <!-- SettingScreen -->
     <string name="setting_title">설정</string>
     <string name="setting_my_info">내 정보</string>
-    <string name="setting_edit_profile">프로필 수정</string>
+    <string name="setting_my_profile">내 프로필</string>
     <string name="setting_service">서비스 이용</string>
     <string name="setting_alert">알림 설정</string>
     <string name="setting_contact">1:1 문의</string>
@@ -144,6 +144,15 @@
     <string name="setting_app_version_failed">버전 정보를 가져올 수 없습니다.</string>
     <string name="setting_logout">로그아웃</string>
     <string name="setting_logout_success_snackbar">로그아웃 되었습니다.</string>
+
+    <!-- ProfileScreen -->
+    <string name="profile_title">내 프로필</string>
+    <string name="profile_nickname">닉네임</string>
+    <string name="profile_email">연동된 이메일</string>
+    <string name="profile_vertical_divider">|</string>
+    <string name="profile_edit_profile_image">프로필 이미지 수정</string>
+    <string name="profile_edit_name">닉네임 수정</string>
+    <string name="profile_delete_user">회원탈퇴</string>
 
 
     <string name="default_web_client_id">865155786423-o5doff8vas3949mfb7cvf8llhflutd5i.apps.googleusercontent.com</string>
