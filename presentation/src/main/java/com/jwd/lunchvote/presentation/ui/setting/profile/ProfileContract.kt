@@ -1,5 +1,6 @@
 package com.jwd.lunchvote.presentation.ui.setting.profile
 
+import android.content.Context
 import android.net.Uri
 import android.os.Parcelable
 import androidx.core.net.toUri
@@ -29,7 +30,7 @@ class ProfileContract {
     data class OnProfileImageChangedEditProfileImageDialog(val profileImageUri: Uri) : ProfileEvent
     data object OnImageLoadErrorEditProfileImageDialog : ProfileEvent
     data object OnClickCancelButtonEditProfileImageDialog : ProfileEvent
-    data object OnClickSaveButtonEditProfileImageDialog : ProfileEvent
+    data class OnClickSaveButtonEditProfileImageDialog(val context: Context) : ProfileEvent
     data class OnNameChangedEditNameDialog(val name: String) : ProfileEvent
     data object OnClickCancelButtonEditNameDialog : ProfileEvent
     data object OnClickSaveButtonEditNameDialog : ProfileEvent

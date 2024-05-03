@@ -6,4 +6,5 @@ interface UserDataSource {
   suspend fun checkUserExists(email: String): Boolean
   suspend fun createUser(user: UserData): String
   suspend fun getUserById(id: String): UserData
+  suspend fun updateUser(user: UserData)
 }

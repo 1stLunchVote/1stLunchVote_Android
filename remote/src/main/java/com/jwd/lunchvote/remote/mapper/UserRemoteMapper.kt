@@ -29,6 +29,6 @@ internal fun UserData.asRemote(): UserRemote {
   return UserRemoteMapper.mapToLeft(this)
 }
 
-internal fun UserRemote.asData(): UserData {
-  return UserRemoteMapper.mapToRight(this)
+internal fun UserRemote.asData(id: String): UserData {
+  return UserRemoteMapper.mapToRight(this).copy(id = id)
 }

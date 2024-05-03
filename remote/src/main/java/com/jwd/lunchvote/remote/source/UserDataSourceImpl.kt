@@ -54,5 +54,15 @@ class UserDataSourceImpl @Inject constructor(
       .get()
       .await()
       .toObject(UserRemote::class.java)
-      ?.asData() ?: throw LoginError.NoUser
+      ?.asData(id) ?: throw LoginError.NoUser
+
+  override suspend fun updateUser(
+    user: UserData
+  ) {
+    fireStore
+      .collection(USER_PATH)
+      .document(user.id)
+      .set(user.asRemote())
+      .await()
+  }
 }

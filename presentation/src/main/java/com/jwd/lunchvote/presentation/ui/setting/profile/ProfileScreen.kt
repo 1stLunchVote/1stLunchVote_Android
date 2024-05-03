@@ -61,6 +61,7 @@ import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 import kotlinx.coroutines.flow.collectLatest
 import java.io.File
@@ -102,7 +103,7 @@ fun ProfileRoute(
         onDismissRequest = { viewModel.sendEvent(ProfileEvent.OnClickCancelButtonEditProfileImageDialog) },
         onProfileImageChanged = { viewModel.sendEvent(ProfileEvent.OnProfileImageChangedEditProfileImageDialog(it)) },
         onImageError = { viewModel.sendEvent(ProfileEvent.OnImageLoadErrorEditProfileImageDialog) },
-        onConfirmation = { viewModel.sendEvent(ProfileEvent.OnClickSaveButtonEditProfileImageDialog) }
+        onConfirmation = { viewModel.sendEvent(ProfileEvent.OnClickSaveButtonEditProfileImageDialog(context)) }
       )
     }
     ProfileContract.EDIT_NAME_DIALOG -> {
@@ -215,6 +216,9 @@ private fun ProfileTicket(
           .size(100.dp)
           .clip(CircleShape)
           .border(2.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape),
+        imageOptions = ImageOptions(
+          contentScale = ContentScale.Crop
+        ),
         previewPlaceholder = R.drawable.ic_food_image_temp
       )
       Gap(height = 16.dp)
@@ -308,19 +312,24 @@ private fun EditProfileImageDialog(
       CoilImage(
         imageModel = { profileImageUri.toString() },
         modifier = modifier,
+        imageOptions = ImageOptions(
+          contentScale = ContentScale.Crop
+        ),
         previewPlaceholder = R.drawable.ic_food_image_temp
       )
     else if (uri.toString().startsWith("content"))
       Image(
         bitmap = ImageBitmapFactory().createBitmapFromUri(context, uri).asImageBitmap(),
         contentDescription = "Profile Image",
-        modifier = modifier
+        modifier = modifier,
+        contentScale = ContentScale.Crop
       )
     else if (File(uri.toString()).exists())
       Image(
         bitmap = BitmapFactory.decodeFile(uri.toString()).asImageBitmap(),
         contentDescription = null,
-        modifier = modifier
+        modifier = modifier,
+        contentScale = ContentScale.Crop
       )
     else
       Box(
