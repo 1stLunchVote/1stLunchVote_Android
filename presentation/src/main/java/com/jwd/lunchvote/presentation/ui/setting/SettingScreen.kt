@@ -3,73 +3,83 @@ package com.jwd.lunchvote.presentation.ui.setting
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.KeyboardArrowRight
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
+import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingEvent
 import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingSideEffect
 import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingState
+import com.jwd.lunchvote.presentation.util.UiText
+import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
+import com.jwd.lunchvote.presentation.widget.Screen
+import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun SettingRoute(
-  popBackStack: (String) -> Unit,
-  viewModel: SettingViewModel = hiltViewModel()
+  popBackStack: () -> Unit,
+  navigateToProfile: () -> Unit,
+  navigateToLogin: () -> Unit,
+  showSnackBar: suspend (String) -> Unit,
+  viewModel: SettingViewModel = hiltViewModel(),
+  context: Context = LocalContext.current
 ) {
-  val settingState by viewModel.viewState.collectAsStateWithLifecycle()
-  val loading by viewModel.isLoading.collectAsStateWithLifecycle()
-//  val settingDialogState by viewModel.dialogState.collectAsStateWithLifecycle()
-
-  val snackBarHostState = remember { SnackbarHostState() }
+  val state by viewModel.viewState.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
       when(it) {
-        is SettingSideEffect.PopBackStack -> popBackStack(it.message)
-        is SettingSideEffect.ShowSnackBar -> snackBarHostState.showSnackbar(it.message)
+        is SettingSideEffect.PopBackStack -> popBackStack()
+        is SettingSideEffect.NavigateToProfile -> navigateToProfile()
+        is SettingSideEffect.NavigateToLogin -> navigateToLogin()
+        is SettingSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
       }
     }
   }
 
-  if (loading) Dialog({}) { CircularProgressIndicator() }
+  LaunchedEffect(Unit) {
+    val appVersion = try {
+      val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        context.packageManager.getPackageInfo(context.packageName, PackageManager.PackageInfoFlags.of(0))
+      } else {
+        context.packageManager.getPackageInfo(context.packageName, 0)
+      }
+      packageInfo.versionName
+    } catch (e: PackageManager.NameNotFoundException) {
+      UiText.StringResource(R.string.setting_app_version_failed).asString(context)
+    }
+
+    viewModel.handleEvents(SettingEvent.ScreenInitialize(appVersion))
+  }
+
   SettingScreen(
-    snackBarHostState = snackBarHostState,
-    settingState = settingState,
+    state = state,
     onClickBackButton = { viewModel.handleEvents(SettingEvent.OnClickBackButton) },
-    onClickEditProfileButton = { viewModel.handleEvents(SettingEvent.OnClickEditProfileButton) },
+    onClickProfileButton = { viewModel.handleEvents(SettingEvent.OnClickProfileButton) },
     onClickAlertSettingButton = { viewModel.handleEvents(SettingEvent.OnClickAlertSettingButton) },
     onClickContactButton = { viewModel.handleEvents(SettingEvent.OnClickContactButton) },
     onClickNoticeButton = { viewModel.handleEvents(SettingEvent.OnClickNoticeButton) },
@@ -79,172 +89,144 @@ fun SettingRoute(
 }
 
 @Composable
-fun SettingScreen(
-  snackBarHostState: SnackbarHostState,
-  settingState: SettingState,
+private fun SettingScreen(
+  state: SettingState,
+  modifier: Modifier = Modifier,
   onClickBackButton: () -> Unit = {},
-  onClickEditProfileButton: () -> Unit = {},
+  onClickProfileButton: () -> Unit = {},
   onClickAlertSettingButton: () -> Unit = {},
   onClickContactButton: () -> Unit = {},
   onClickNoticeButton: () -> Unit = {},
   onClickSuggestButton: () -> Unit = {},
-  onClickLogoutButton: () -> Unit = {},
-  context: Context = LocalContext.current
+  onClickLogoutButton: () -> Unit = {}
 ) {
-  Scaffold(
-    snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
-  ) { padding ->
-    Column(
-      modifier = Modifier
-        .fillMaxSize()
-        .padding(padding),
-      horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+  Screen(
+    modifier = modifier,
+    topAppBar = {
       LunchVoteTopBar(
-        title = "설정",
+        title = stringResource(R.string.setting_title),
         navIconVisible = true,
         popBackStack = onClickBackButton
       )
-      SettingBlock(
-        name = "내 정보"
-      ) {
-        SettingItem(
-          name = "프로필 수정",
-          onClickItem = onClickEditProfileButton
-        )
-      }
-      SettingBlock(
-        name = "서비스 이용"
-      ) {
-        SettingItem(
-          name = "알림 설정",
-          onClickItem = onClickAlertSettingButton
-        )
-        SettingItem(
-          name = "1:1 문의",
-          onClickItem = onClickContactButton
-        )
-      }
-      SettingBlock(
-        name = "서비스 이용"
-      ) {
-        SettingItem(
-          name = "공지사항 및 이용약관",
-          onClickItem = onClickNoticeButton
-        )
-        SettingItem(
-          name = "개선 제안하기",
-          onClickItem = onClickSuggestButton
-        )
-        Row(
-          modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 12.dp),
-          horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.CenterVertically
-        ) {
-          Text(
-            "앱 버전",
-            style = MaterialTheme.typography.titleMedium
-          )
-          val appVersion = try {
-            val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-              context.packageManager.getPackageInfo(context.packageName, PackageManager.PackageInfoFlags.of(0))
-            } else {
-              context.packageManager.getPackageInfo(context.packageName, 0)
-            }
-            packageInfo.versionName
-          } catch (e: PackageManager.NameNotFoundException) {
-            "버전 정보를 가져올 수 없습니다."
-          }
-          Text(
-            appVersion,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.outline
-          )
-        }
-      }
-      Box(
+    }
+  ) {
+    SettingBlock(name = stringResource(R.string.setting_my_info)) {
+      SettingItem(
+        name = stringResource(R.string.setting_my_profile),
+        onClickItem = onClickProfileButton
+      )
+    }
+    SettingBlock(name = stringResource(R.string.setting_service)) {
+      SettingItem(
+        name = stringResource(R.string.setting_alert),
+        onClickItem = onClickAlertSettingButton
+      )
+      SettingItem(
+        name = stringResource(R.string.setting_contact),
+        onClickItem = onClickContactButton
+      )
+    }
+    SettingBlock(name = stringResource(R.string.setting_app_config)) {
+      SettingItem(
+        name = stringResource(R.string.setting_notice_and_terms),
+        onClickItem = onClickNoticeButton
+      )
+      SettingItem(
+        name = stringResource(R.string.setting_suggest),
+        onClickItem = onClickSuggestButton
+      )
+      Row(
         modifier = Modifier
           .fillMaxWidth()
-          .padding(vertical = 24.dp),
-        contentAlignment = Alignment.Center
+          .padding(vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
       ) {
         Text(
-          "로그아웃",
-          modifier = Modifier.clickable(
-            interactionSource = remember { MutableInteractionSource() },
-            indication = null
-          ) { onClickLogoutButton() },
-          style = MaterialTheme.typography.titleMedium,
-          color = MaterialTheme.colorScheme.error,
-          textDecoration = TextDecoration.Underline
+          text = stringResource(R.string.setting_app_version),
+          style = MaterialTheme.typography.titleMedium
+        )
+        Text(
+          text = state.appVersion,
+          style = MaterialTheme.typography.bodyLarge,
+          color = MaterialTheme.colorScheme.outline
         )
       }
+    }
+    Box(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(vertical = 16.dp),
+      contentAlignment = Alignment.Center
+    ) {
+      Text(
+        text = stringResource(R.string.setting_logout),
+        modifier = Modifier
+          .clickableWithoutEffect(onClickLogoutButton)
+          .padding(horizontal = 12.dp, vertical = 8.dp),
+        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.error,
+        textDecoration = TextDecoration.Underline
+      )
     }
   }
 }
 
 @Composable
-fun SettingBlock(
+private fun SettingBlock(
   name: String,
+  modifier: Modifier = Modifier,
   items: @Composable ColumnScope.() -> Unit
 ) {
   Column(
-    modifier = Modifier
+    modifier = modifier
       .fillMaxWidth()
       .padding(horizontal = 24.dp, vertical = 16.dp),
     verticalArrangement = Arrangement.spacedBy(8.dp)
   ) {
     Text(
-      name,
+      text = name,
       style = MaterialTheme.typography.titleSmall,
       color = MaterialTheme.colorScheme.outline
     )
     items()
   }
-  Box(
-    modifier = Modifier
-      .fillMaxWidth()
-      .height(2.dp)
-      .background(MaterialTheme.colorScheme.outlineVariant)
-  )
+  HorizontalDivider(thickness = 2.dp)
 }
 
 @Composable
-fun SettingItem(
+private fun SettingItem(
   name: String,
-  onClickItem: () -> Unit = {}
+  modifier: Modifier = Modifier,
+  onClickItem: () -> Unit
 ) {
   Row(
-    modifier = Modifier
+    modifier = modifier
       .fillMaxWidth()
-      .padding(vertical = 12.dp)
-      .clickable(
-        interactionSource = remember { MutableInteractionSource() },
-        indication = null
-      ) { onClickItem() },
+      .clickableWithoutEffect(onClickItem)
+      .padding(vertical = 12.dp),
     horizontalArrangement = Arrangement.SpaceBetween,
     verticalAlignment = Alignment.CenterVertically
   ) {
     Text(
-      name,
+      text = name,
       style = MaterialTheme.typography.titleMedium
     )
     Icon(
-      imageVector = Icons.Rounded.KeyboardArrowRight,
-      contentDescription = null
+      Icons.AutoMirrored.Rounded.KeyboardArrowRight,
+      null
     )
   }
 }
 
 @Preview
 @Composable
-fun SettingScreenPreview() {
-  LunchVoteTheme {
+private fun Preview() {
+  ScreenPreview {
     SettingScreen(
-      snackBarHostState = remember { SnackbarHostState() },
-      settingState = SettingState()
+      SettingState(
+        appVersion = "1.0.0"
+      )
     )
   }
 }

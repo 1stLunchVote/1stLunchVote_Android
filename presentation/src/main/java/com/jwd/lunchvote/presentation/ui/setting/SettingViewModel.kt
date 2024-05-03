@@ -2,12 +2,16 @@ package com.jwd.lunchvote.presentation.ui.setting
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingEvent
 import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingReduce
 import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingSideEffect
 import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingState
+import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -21,19 +25,31 @@ class SettingViewModel @Inject constructor(
 
   override fun handleEvents(event: SettingEvent) {
     when(event) {
-      is SettingEvent.OnClickBackButton -> sendSideEffect(SettingSideEffect.PopBackStack(""))
-      is SettingEvent.OnClickEditProfileButton -> sendSideEffect(SettingSideEffect.ShowSnackBar("프로필 수정"))
-      is SettingEvent.OnClickAlertSettingButton -> sendSideEffect(SettingSideEffect.ShowSnackBar("알림 설정"))
-      is SettingEvent.OnClickContactButton -> sendSideEffect(SettingSideEffect.ShowSnackBar("1:1 문의"))
-      is SettingEvent.OnClickNoticeButton -> sendSideEffect(SettingSideEffect.ShowSnackBar("공지사항 및 이용약관"))
-      is SettingEvent.OnClickSuggestButton -> sendSideEffect(SettingSideEffect.ShowSnackBar("개선 제안하기"))
-      is SettingEvent.OnClickLogoutButton -> sendSideEffect(SettingSideEffect.ShowSnackBar("로그아웃"))
+      is SettingEvent.ScreenInitialize -> updateState(SettingReduce.UpdateAppVersion(event.appVersion))
+      is SettingEvent.OnClickBackButton -> sendSideEffect(SettingSideEffect.PopBackStack)
+      is SettingEvent.OnClickProfileButton -> sendSideEffect(SettingSideEffect.NavigateToProfile)
+      is SettingEvent.OnClickAlertSettingButton -> sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.DynamicString("알림 설정")))
+      is SettingEvent.OnClickContactButton -> sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.DynamicString("1:1 문의")))
+      is SettingEvent.OnClickNoticeButton -> sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.DynamicString("공지사항 및 이용약관")))
+      is SettingEvent.OnClickSuggestButton -> sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.DynamicString("개선 제안하기")))
+      is SettingEvent.OnClickLogoutButton -> launch { logout() }
     }
   }
 
-  override fun reduceState(state: SettingState, reduce: SettingReduce): SettingState = state
+  override fun reduceState(state: SettingState, reduce: SettingReduce): SettingState {
+    return when (reduce) {
+      is SettingReduce.UpdateAppVersion -> state.copy(appVersion = reduce.appVersion)
+    }
+  }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(SettingSideEffect.ShowSnackBar(error.message ?: UnknownError.UNKNOWN))
+    sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+  }
+
+  private fun logout() {
+    Firebase.auth.signOut()
+
+    sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.StringResource(R.string.setting_logout_success_snackbar)))
+    sendSideEffect(SettingSideEffect.NavigateToLogin)
   }
 }

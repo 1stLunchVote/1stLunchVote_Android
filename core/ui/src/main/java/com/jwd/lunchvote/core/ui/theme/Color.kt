@@ -46,6 +46,8 @@ fun lunchVoteColorScheme() = MaterialTheme.colorScheme.copy(
     onError = colorOnError,
     background = colorBackground,
     onBackground = colorOnBackground,
+    surface = colorBackground,
+    onSurface = colorOnBackground,
     outline = colorOutline,
     outlineVariant = colorOutlineVariant
 )
