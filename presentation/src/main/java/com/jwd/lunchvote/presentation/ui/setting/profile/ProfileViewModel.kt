@@ -2,7 +2,6 @@ package com.jwd.lunchvote.presentation.ui.setting.profile
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.media.Image
 import android.os.Environment
 import android.os.Parcelable
 import androidx.core.net.toUri
@@ -15,6 +14,7 @@ import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.usecase.GetUserByIdUseCase
 import com.jwd.lunchvote.domain.usecase.UpdateUserUseCase
+import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.ui.setting.profile.ProfileContract.ProfileEvent
@@ -24,13 +24,11 @@ import com.jwd.lunchvote.presentation.ui.setting.profile.ProfileContract.Profile
 import com.jwd.lunchvote.presentation.util.ImageBitmapFactory
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import timber.log.Timber
 import java.io.File
 import java.util.UUID
 import javax.inject.Inject
@@ -63,7 +61,7 @@ class ProfileViewModel @Inject constructor(
 
       // DialogEvent
       is ProfileEvent.OnProfileImageChangedEditProfileImageDialog -> updateState(ProfileReduce.UpdateProfileImage(event.profileImageUri))
-      is ProfileEvent.OnImageLoadErrorEditProfileImageDialog -> sendSideEffect(ProfileSideEffect.ShowSnackBar(UiText.DynamicString("이미지를 불러오는데 실패했습니다.")))
+      is ProfileEvent.OnImageLoadErrorEditProfileImageDialog -> sendSideEffect(ProfileSideEffect.ShowSnackBar(UiText.StringResource(R.string.profile_edit_profile_image_dialog_image_load_error)))
       is ProfileEvent.OnClickCancelButtonEditProfileImageDialog -> sendSideEffect(ProfileSideEffect.CloseDialog)
       is ProfileEvent.OnClickSaveButtonEditProfileImageDialog -> launch { saveProfileImage(event.context) }
       is ProfileEvent.OnNameChangedEditNameDialog -> updateState(ProfileReduce.UpdateName(event.name))
@@ -114,7 +112,7 @@ class ProfileViewModel @Inject constructor(
     val user = currentState.user.copy(profileImageUrl = file.absolutePath)
     updateUserUseCase(user.asDomain())
     
-    sendSideEffect(ProfileSideEffect.ShowSnackBar(UiText.DynamicString("프로필 이미지가 수정되었습니다.")))
+    sendSideEffect(ProfileSideEffect.ShowSnackBar(UiText.StringResource(R.string.profile_edit_profile_image_success_snackbar)))
     sendSideEffect(ProfileSideEffect.CloseDialog)
     initialize()
   }
@@ -123,7 +121,7 @@ class ProfileViewModel @Inject constructor(
     val user = currentState.user.copy(name = currentState.name)
 
     updateUserUseCase(user.asDomain())
-    sendSideEffect(ProfileSideEffect.ShowSnackBar(UiText.DynamicString("닉네임이 수정되었습니다.")))
+    sendSideEffect(ProfileSideEffect.ShowSnackBar(UiText.StringResource(R.string.profile_edit_name_success_snackbar)))
     sendSideEffect(ProfileSideEffect.CloseDialog)
     initialize()
   }
@@ -132,7 +130,7 @@ class ProfileViewModel @Inject constructor(
     val currentUser = Firebase.auth.currentUser ?: throw LoginError.NoUser
     currentUser.delete().await()
 
-    sendSideEffect(ProfileSideEffect.ShowSnackBar(UiText.DynamicString("정상적으로 탈퇴되었습니다.")))
+    sendSideEffect(ProfileSideEffect.ShowSnackBar(UiText.StringResource(R.string.profile_delete_user_success_snackbar)))
     sendSideEffect(ProfileSideEffect.NavigateToLogin)
   }
 }

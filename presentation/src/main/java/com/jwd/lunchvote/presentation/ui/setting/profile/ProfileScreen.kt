@@ -3,7 +3,6 @@ package com.jwd.lunchvote.presentation.ui.setting.profile
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -22,7 +21,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonColors
@@ -337,7 +335,7 @@ private fun EditProfileImageDialog(
         contentAlignment = Alignment.Center
       ) {
         Text(
-          text = "이미지 없음",
+          text = stringResource(R.string.profile_edit_profile_image_dialog_no_image),
           color = MaterialTheme.colorScheme.outline
         )
       }
