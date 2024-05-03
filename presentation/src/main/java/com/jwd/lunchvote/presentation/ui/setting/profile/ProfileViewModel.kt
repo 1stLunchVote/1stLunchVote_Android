@@ -1,6 +1,7 @@
 package com.jwd.lunchvote.presentation.ui.setting.profile
 
 import android.os.Parcelable
+import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -49,7 +51,8 @@ class ProfileViewModel @Inject constructor(
       is ProfileEvent.OnClickDeleteUserButton -> sendSideEffect(ProfileSideEffect.OpenDeleteUserConfirmDialog)
 
       // DialogEvent
-      is ProfileEvent.OnProfileImageChangedEditProfileImageDialog -> updateState(ProfileReduce.UpdateProfileImage(event.profileImageUrl))
+      is ProfileEvent.OnProfileImageChangedEditProfileImageDialog -> updateState(ProfileReduce.UpdateProfileImage(event.profileImageUri))
+      is ProfileEvent.OnImageLoadErrorEditProfileImageDialog -> sendSideEffect(ProfileSideEffect.ShowSnackBar(UiText.DynamicString("이미지를 불러오는데 실패했습니다.")))
       is ProfileEvent.OnClickCancelButtonEditProfileImageDialog -> sendSideEffect(ProfileSideEffect.CloseDialog)
       is ProfileEvent.OnClickSaveButtonEditProfileImageDialog -> {}
       is ProfileEvent.OnNameChangedEditNameDialog -> updateState(ProfileReduce.UpdateName(event.name))
@@ -63,7 +66,7 @@ class ProfileViewModel @Inject constructor(
   override fun reduceState(state: ProfileState, reduce: ProfileReduce): ProfileState {
     return when (reduce) {
       is ProfileReduce.UpdateUser -> state.copy(user = reduce.user)
-      is ProfileReduce.UpdateProfileImage -> state.copy(profileImageUrl = reduce.profileImageUrl)
+      is ProfileReduce.UpdateProfileImage -> state.copy(profileImageUri = reduce.profileImageUri)
       is ProfileReduce.UpdateName -> state.copy(name = reduce.name)
     }
   }
@@ -81,8 +84,12 @@ class ProfileViewModel @Inject constructor(
   private suspend fun initialize() {
     val currentUser = Firebase.auth.currentUser ?: throw LoginError.NoUser
     val user = getUserByIdUseCase(currentUser.uid).asUI()
+    
+    Timber.w("💛 ===ktw=== ${user}")
 
     updateState(ProfileReduce.UpdateUser(user))
+    updateState(ProfileReduce.UpdateProfileImage(user.profileImageUrl.toUri()))
+    updateState(ProfileReduce.UpdateName(user.name))
   }
 
   private suspend fun deleteUser() {

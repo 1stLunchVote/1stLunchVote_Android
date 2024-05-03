@@ -1,6 +1,8 @@
 package com.jwd.lunchvote.presentation.ui.setting.profile
 
+import android.net.Uri
 import android.os.Parcelable
+import androidx.core.net.toUri
 import com.jwd.lunchvote.core.ui.base.ViewModelContract
 import com.jwd.lunchvote.presentation.model.UserUIModel
 import com.jwd.lunchvote.presentation.util.UiText
@@ -10,7 +12,7 @@ class ProfileContract {
   @Parcelize
   data class ProfileState(
     val user: UserUIModel = UserUIModel(),
-    val profileImageUrl: String = "",
+    val profileImageUri: Uri = "".toUri(),
     val name: String = ""
   ) : ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this
@@ -24,7 +26,8 @@ class ProfileContract {
     data object OnClickDeleteUserButton : ProfileEvent
 
     // DialogEvent
-    data class OnProfileImageChangedEditProfileImageDialog(val profileImageUrl: String) : ProfileEvent
+    data class OnProfileImageChangedEditProfileImageDialog(val profileImageUri: Uri) : ProfileEvent
+    data object OnImageLoadErrorEditProfileImageDialog : ProfileEvent
     data object OnClickCancelButtonEditProfileImageDialog : ProfileEvent
     data object OnClickSaveButtonEditProfileImageDialog : ProfileEvent
     data class OnNameChangedEditNameDialog(val name: String) : ProfileEvent
@@ -36,7 +39,7 @@ class ProfileContract {
 
   sealed interface ProfileReduce : ViewModelContract.Reduce {
     data class UpdateUser(val user: UserUIModel) : ProfileReduce
-    data class UpdateProfileImage(val profileImageUrl: String) : ProfileReduce
+    data class UpdateProfileImage(val profileImageUri: Uri) : ProfileReduce
     data class UpdateName(val name: String) : ProfileReduce
   }
 
