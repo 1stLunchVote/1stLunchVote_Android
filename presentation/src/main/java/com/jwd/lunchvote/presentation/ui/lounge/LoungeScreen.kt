@@ -88,7 +88,7 @@ fun LoungeRoute(
   clipboardManager: ClipboardManager = LocalClipboardManager.current,
   context: Context = LocalContext.current
 ) {
-  val loungeState by viewModel.viewState.collectAsStateWithLifecycle()
+  val state by viewModel.viewState.collectAsStateWithLifecycle()
   val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect) {
@@ -107,21 +107,21 @@ fun LoungeRoute(
   }
 
   // 다이얼로그가 보이지 않는 상황 or 키보드 안보일 때 뒤로가기 버튼 누르면 다이얼로그 띄움
-  BackHandler(loungeState.exitDialogShown.not() && WindowInsets.isImeVisible.not()) {
+  BackHandler(state.exitDialogShown.not() && WindowInsets.isImeVisible.not()) {
     viewModel.sendEvent(LoungeEvent.OnTryExit)
   }
 
-  if (loungeState.exitDialogShown) {
+  if (state.exitDialogShown) {
     VoteExitDialog(
       onDismiss = { viewModel.sendEvent(LoungeEvent.OnClickExit(false)) },
       onExit = { viewModel.sendEvent(LoungeEvent.OnClickExit(true)) },
-      isOwner = loungeState.isOwner
+      isOwner = state.isOwner
     )
   }
 
   if (isLoading) LoadingScreen()
   else LoungeScreen(
-    loungeState = loungeState,
+    state = state,
     modifier = modifier,
     navigateToMember = navigateToMember,
     onEventAction = viewModel::sendEvent
@@ -130,7 +130,7 @@ fun LoungeRoute(
 
 @Composable
 private fun LoungeScreen(
-  loungeState: LoungeState,
+  state: LoungeState,
   modifier: Modifier = Modifier,
   navigateToMember: (MemberUIModel, String, Boolean) -> Unit = { _, _, _ -> },
   onEventAction: (LoungeEvent) -> Unit = {}
@@ -142,8 +142,8 @@ private fun LoungeScreen(
       title = stringResource(id = R.string.lounge_topbar_title),
       popBackStack = { onEventAction(LoungeEvent.OnTryExit) }
     )
-    if (loungeState.loungeId == null) LoungeLoadingScreen(
-      isOwner = loungeState.isOwner,
+    if (state.loungeId == null) LoungeLoadingScreen(
+      isOwner = state.isOwner,
       modifier = Modifier
         .weight(1f)
         .fillMaxWidth()
@@ -152,14 +152,14 @@ private fun LoungeScreen(
       modifier = Modifier
         .weight(1f)
         .fillMaxWidth(),
-      loungeState = loungeState,
+      state = state,
       navigateToMember = navigateToMember,
       onClickInvite = { onEventAction(LoungeEvent.OnClickInvite) },
       onScrolled = { onEventAction(LoungeEvent.OnScrolled(it)) }
     )
-    if (loungeState.memberList.isNotEmpty()) {
+    if (state.memberList.isNotEmpty()) {
       LoungeBottomBar(
-        loungeState = loungeState,
+        state = state,
         onEditChat = { onEventAction(LoungeEvent.OnEditChat(it)) },
         onSendChat = { onEventAction(LoungeEvent.OnSendChat) },
         onClickReadyStart = { onEventAction(LoungeEvent.OnReady) }
@@ -171,7 +171,7 @@ private fun LoungeScreen(
 @Composable
 private fun LoungeContent(
   modifier: Modifier,
-  loungeState: LoungeState,
+  state: LoungeState,
   navigateToMember: (MemberUIModel, String, Boolean) -> Unit = { _, _, _ -> },
   onClickInvite: () -> Unit = {},
   onScrolled: (Int) -> Unit = {}
@@ -180,12 +180,12 @@ private fun LoungeContent(
     Spacer(modifier = Modifier.height(16.dp))
 
     LoungeMemberList(
-      memberList = loungeState.memberList,
+      memberList = state.memberList,
       navigateToMember = {
         navigateToMember(
           it,
-          loungeState.loungeId ?: return@LoungeMemberList,
-          loungeState.isOwner
+          state.loungeId ?: return@LoungeMemberList,
+          state.isOwner
         )
       },
       onClickInvite = onClickInvite
@@ -194,9 +194,9 @@ private fun LoungeContent(
     Spacer(modifier = Modifier.height(24.dp))
 
     LoungeChatList(
-      loungeState = loungeState,
+      state = state,
       navigateToMember = {
-        navigateToMember(it, loungeState.loungeId ?: return@LoungeChatList, loungeState.isOwner)
+        navigateToMember(it, state.loungeId ?: return@LoungeChatList, state.isOwner)
       },
       onScrolled = onScrolled
     )
@@ -205,24 +205,24 @@ private fun LoungeContent(
 
 @Composable
 private fun LoungeChatList(
-  loungeState: LoungeState,
+  state: LoungeState,
   listState: LazyListState = rememberLazyListState(),
   navigateToMember: (MemberUIModel) -> Unit = {},
   onScrolled: (Int) -> Unit = {}
 ) {
-  LaunchedEffect(loungeState.chatList.size) {
-    if (loungeState.chatList.isEmpty()) return@LaunchedEffect
+  LaunchedEffect(state.chatList.size) {
+    if (state.chatList.isEmpty()) return@LaunchedEffect
 
     // 마지막으로 메시지 온 것이 내 것일 때(내가 직전에 보냈을 때 포함) 스크롤
-    if (loungeState.chatList.first().isMine) {
+    if (state.chatList.first().isMine) {
       listState.scrollToItem(0)
     }
   }
 
   LaunchedEffect(listState) {
     // 스크롤 포지션 복구
-    if (loungeState.scrollIndex > 0) {
-      listState.scrollToItem(loungeState.scrollIndex)
+    if (state.scrollIndex > 0) {
+      listState.scrollToItem(state.scrollIndex)
     }
 
     // 현재 스크롤 포지션 저장
@@ -242,7 +242,7 @@ private fun LoungeChatList(
   ) {
     item { Spacer(modifier = Modifier.height(0.dp)) }
 
-    items(loungeState.chatList) { chat ->
+    items(state.chatList) { chat ->
       // 채팅방 생성, 참가 메시지
       if (chat.messageType != MessageType.NORMAL) {
         Surface(
@@ -264,11 +264,11 @@ private fun LoungeChatList(
           message = chat.content,
           profileImage = chat.profileImage,
           isMine = chat.isMine,
-          isReady = loungeState.memberList.find { it.uid == chat.sender }?.isReady ?: false,
+          isReady = state.memberList.find { it.uid == chat.sender }?.isReady ?: false,
           sendStatus = chat.sendStatus,
           navigateToMember = {
             navigateToMember(
-              loungeState.memberList.find { it.uid == chat.sender } ?: return@ChatBubble,
+              state.memberList.find { it.uid == chat.sender } ?: return@ChatBubble,
             )
           }
         )
@@ -393,12 +393,12 @@ private fun LoungeLoadingScreen(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun LoungeBottomBar(
-  loungeState: LoungeState,
+  state: LoungeState,
   onEditChat: (String) -> Unit = {},
   onSendChat: () -> Unit = {},
   onClickReadyStart: () -> Unit = {},
 ) {
-  val isTyping by rememberUpdatedState(newValue = WindowInsets.isImeVisible && loungeState.currentChat.isNotBlank())
+  val isTyping by rememberUpdatedState(newValue = WindowInsets.isImeVisible && state.currentChat.isNotBlank())
 
   Column(modifier = Modifier.fillMaxWidth()) {
     Divider(
@@ -415,14 +415,14 @@ private fun LoungeBottomBar(
     ) {
       Surface(
         shape = RoundedCornerShape(100.dp),
-        contentColor = if (loungeState.isReady || loungeState.allReady) MaterialTheme.colorScheme.onPrimaryContainer
+        contentColor = if (state.isReady || state.allReady) MaterialTheme.colorScheme.onPrimaryContainer
         else MaterialTheme.colorScheme.onBackground,
-        color = if (loungeState.isReady || loungeState.allReady) MaterialTheme.colorScheme.primaryContainer
+        color = if (state.isReady || state.allReady) MaterialTheme.colorScheme.primaryContainer
         else MaterialTheme.colorScheme.background,
         border = BorderStroke(width = 2.dp, color = Color.Black),
       ) {
         Text(
-          text = stringResource(id = if (loungeState.isOwner) R.string.lounge_start_button else R.string.lounge_ready_button),
+          text = stringResource(id = if (state.isOwner) R.string.lounge_start_button else R.string.lounge_ready_button),
           style = buttonTextStyle,
           modifier = Modifier
             .clickable {
@@ -444,7 +444,7 @@ private fun LoungeBottomBar(
         modifier = Modifier.weight(1f),
       ) {
         BasicTextField(
-          value = loungeState.currentChat,
+          value = state.currentChat,
           onValueChange = onEditChat,
           textStyle = MaterialTheme.typography.bodyLarge,
           modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
@@ -457,9 +457,9 @@ private fun LoungeBottomBar(
         onClick = onSendChat,
         border = BorderStroke(
           width = 2.dp,
-          color = if (loungeState.currentChat.isNotBlank()) Color.Black else colorNeutral90
+          color = if (state.currentChat.isNotBlank()) Color.Black else colorNeutral90
         ),
-        enabled = loungeState.currentChat.isNotBlank(),
+        enabled = state.currentChat.isNotBlank(),
         modifier = Modifier
           .size(40.dp)
           .padding(5.dp),
