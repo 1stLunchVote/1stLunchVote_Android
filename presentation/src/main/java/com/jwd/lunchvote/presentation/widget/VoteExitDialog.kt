@@ -17,38 +17,38 @@ import com.jwd.lunchvote.presentation.R
 
 @Composable
 fun VoteExitDialog(
-    onDismiss: () -> Unit,
-    onExit: () -> Unit,
-    isOwner: Boolean = false
-){
-    LunchVoteDialog(
-        title = "정말 나가시겠습니까?",
-        dismissText = "취소",
-        onDismissRequest = onDismiss,
-        confirmText = "나가기",
-        onConfirmation = onExit,
-        icon = {
-            Icon(
-                imageVector = Icons.Rounded.Warning,
-                contentDescription = null,
-                modifier = Modifier.size(28.dp)
-            )
-        },
-        content = {
-            Text(
-                if (isOwner) stringResource(id = R.string.lounge_exit_dialog_owner_content)
-                    else stringResource(id = R.string.lounge_exit_dialog_member_content),
-                modifier = Modifier.fillMaxWidth(),
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-    )
+  onDismiss: () -> Unit,
+  onExit: () -> Unit,
+  isOwner: Boolean = false
+) {
+  LunchVoteDialog(
+    title = "정말 나가시겠습니까?",
+    dismissText = "취소",
+    onDismissRequest = onDismiss,
+    confirmText = "나가기",
+    onConfirmation = onExit,
+    icon = {
+      Icon(
+        imageVector = Icons.Rounded.Warning,
+        contentDescription = null,
+        modifier = Modifier.size(28.dp)
+      )
+    },
+    content = {
+      Text(
+        if (isOwner) stringResource(R.string.lounge_exit_dialog_owner_content)
+        else stringResource(R.string.lounge_exit_dialog_member_content),
+        modifier = Modifier.fillMaxWidth(),
+        style = MaterialTheme.typography.bodyMedium
+      )
+    }
+  )
 }
 
 @Preview(showBackground = true)
 @Composable
-fun VoteExitDialogPreview(){
-    LunchVoteTheme {
-        VoteExitDialog(onDismiss = {}, onExit = {})
-    }
+fun VoteExitDialogPreview() {
+  LunchVoteTheme {
+    VoteExitDialog(onDismiss = {}, onExit = {})
+  }
 }

@@ -31,87 +31,91 @@ import com.jwd.lunchvote.domain.entity.type.SendStatusType
 
 @Composable
 fun ChatBubble(
-    message: String,
-    isMine: Boolean = false,
-    profileImage: String?,
-    isReady: Boolean = false,
-    sendStatus: SendStatusType = SendStatusType.SUCCESS,
-    navigateToMember : () -> Unit = {},
-    configuration : Configuration = LocalConfiguration.current
+  message: String,
+  isMine: Boolean = false,
+  profileImage: String?,
+  isReady: Boolean = false,
+  sendStatus: SendStatusType = SendStatusType.SUCCESS,
+  navigateToMember: () -> Unit = {},
+  configuration: Configuration = LocalConfiguration.current
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        if (isMine) {
-            Spacer(modifier = Modifier.weight(1f))
+  Row(
+    modifier = Modifier.fillMaxWidth(),
+    verticalAlignment = Alignment.CenterVertically
+  ) {
+    if (isMine) {
+      Spacer(modifier = Modifier.weight(1f))
 
-            if (sendStatus == SendStatusType.SENDING) {
-                Text(text = "전송중", style = MaterialTheme.typography.titleSmall)
-                Spacer(modifier = Modifier.width(8.dp))
-            }
+      if (sendStatus == SendStatusType.SENDING) {
+        Text(text = "전송중", style = MaterialTheme.typography.titleSmall)
+        Spacer(modifier = Modifier.width(8.dp))
+      }
 
-            Surface(
-                shape = RoundedCornerShape(20.dp, 0.dp, 20.dp, 20.dp),
-                color = MaterialTheme.colorScheme.background,
-                border = BorderStroke(2.dp, Color.Black)
-            ) {
-                Text(
-                    text = message,
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier
-                        .padding(horizontal = 20.dp)
-                        .padding(vertical = 14.dp)
-                )
-            }
-        } else {
-            Surface(
-                shape = RoundedCornerShape(0.dp, 20.dp, 20.dp, 20.dp),
-                color = MaterialTheme.colorScheme.background,
-                border = BorderStroke(2.dp, Color.Black),
-                modifier = Modifier.widthIn(max = configuration.screenWidthDp.dp - 100.dp)
-            ) {
-                Text(
-                    text = message,
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier
-                        .padding(horizontal = 20.dp)
-                        .padding(vertical = 14.dp)
-                )
-            }
+      Surface(
+        shape = RoundedCornerShape(20.dp, 0.dp, 20.dp, 20.dp),
+        color = MaterialTheme.colorScheme.background,
+        border = BorderStroke(2.dp, Color.Black)
+      ) {
+        Text(
+          text = message,
+          style = MaterialTheme.typography.titleMedium,
+          modifier = Modifier
+            .padding(horizontal = 20.dp)
+            .padding(vertical = 14.dp)
+        )
+      }
+    } else {
+      Surface(
+        shape = RoundedCornerShape(0.dp, 20.dp, 20.dp, 20.dp),
+        color = MaterialTheme.colorScheme.background,
+        border = BorderStroke(2.dp, Color.Black),
+        modifier = Modifier.widthIn(max = configuration.screenWidthDp.dp - 100.dp)
+      ) {
+        Text(
+          text = message,
+          style = MaterialTheme.typography.titleMedium,
+          modifier = Modifier
+            .padding(horizontal = 20.dp)
+            .padding(vertical = 14.dp)
+        )
+      }
 
-            Spacer(modifier = Modifier.width(8.dp))
+      Spacer(modifier = Modifier.width(8.dp))
 
-            Surface(
-                shape = CircleShape,
-                modifier = Modifier.size(48.dp).modifyIf(isReady) {
-                    circleShadow(blurRadius = 16.dp)
-                },
-                color = MaterialTheme.colorScheme.background,
-                border = BorderStroke(width = 2.dp, color = if (isReady) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.outline)
-            ) {
-                AsyncImage(
-                    model = profileImage,
-                    contentDescription = "chat_profile",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.clickable(onClick = navigateToMember)
-                )
-            }
-            Spacer(modifier = Modifier.weight(1f))
-        }
-
+      Surface(
+        shape = CircleShape,
+        modifier = Modifier
+          .size(48.dp)
+          .modifyIf(isReady) {
+            circleShadow(blurRadius = 16.dp)
+          },
+        color = MaterialTheme.colorScheme.background,
+        border = BorderStroke(
+          width = 2.dp, color = if (isReady) MaterialTheme.colorScheme.primary
+          else MaterialTheme.colorScheme.outline
+        )
+      ) {
+        AsyncImage(
+          model = profileImage,
+          contentDescription = "chat_profile",
+          contentScale = ContentScale.Crop,
+          modifier = Modifier.clickable(onClick = navigateToMember)
+        )
+      }
+      Spacer(modifier = Modifier.weight(1f))
     }
+
+  }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun ChatBubblePreview(){
-    LunchVoteTheme {
-        ChatBubble(
-            message = "안녕하세요",
-            isMine = true,
-            profileImage = null
-        )
-    }
+fun ChatBubblePreview() {
+  LunchVoteTheme {
+    ChatBubble(
+      message = "안녕하세요",
+      isMine = true,
+      profileImage = null
+    )
+  }
 }

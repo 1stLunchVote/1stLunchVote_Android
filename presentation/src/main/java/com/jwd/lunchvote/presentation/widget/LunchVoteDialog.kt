@@ -50,7 +50,7 @@ fun LunchVoteDialog(
         .fillMaxWidth()
         .background(MaterialTheme.colorScheme.background, RoundedCornerShape(28.dp))
         .border(2.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(28.dp)),
-    ){
+    ) {
       Column(
         modifier = Modifier.padding(24.dp)
       ) {
@@ -99,7 +99,7 @@ fun LunchVoteDialog(
 
 @Preview
 @Composable
-private fun LunchVoteDialogPreview(){
+private fun LunchVoteDialogPreview() {
   LunchVoteTheme {
     LunchVoteDialog(
       title = "투표 방 참여하기",
@@ -121,7 +121,7 @@ private fun LunchVoteDialogPreview(){
 
 @Preview
 @Composable
-private fun LunchVoteIconDialogPreview(){
+private fun LunchVoteIconDialogPreview() {
   LunchVoteTheme {
     LunchVoteDialog(
       title = "정말 나가시겠습니까?",
