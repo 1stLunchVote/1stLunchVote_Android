@@ -2,6 +2,7 @@ package com.jwd.lunchvote.presentation.ui.lounge
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.core.common.error.LoungeError
@@ -20,6 +21,7 @@ import com.jwd.lunchvote.domain.usecase.SendChatUseCase
 import com.jwd.lunchvote.domain.usecase.UpdateReadyUseCase
 import com.jwd.lunchvote.presentation.mapper.ChatUIMapper
 import com.jwd.lunchvote.presentation.mapper.MemberUIMapper
+import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeEvent
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeReduce
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeSideEffect
@@ -29,6 +31,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
@@ -51,15 +56,25 @@ class LoungeViewModel @Inject constructor(
   override fun createInitialState(savedState: Parcelable?): LoungeState {
     return savedState as? LoungeState ?: LoungeState()
   }
+
+  private val _dialogState = MutableStateFlow("")
+  val dialogState: StateFlow<String> = _dialogState.asStateFlow()
+  fun openDialog(dialogState: String) {
+    viewModelScope.launch {
+      _dialogState.emit(dialogState)
+    }
+  }
+
   // todo : 이미 시작된 방인 경우 뒤로가기 처리 필요
 
-  private var checkJob: Job? = null
+  private var currentJob: Job? = null
 
   init {
-    savedStateHandle.get<String?>(LOUNGE_KEY_ID)?.let {
-      joinLounge(it)
-      getLoungeData(it)
-    } ?: {
+    val loungeId = savedStateHandle.get<String?>(LunchVoteNavRoute.Lounge.arguments.first().name)
+    if (loungeId != null) {
+      joinLounge(loungeId)
+      getLoungeData(loungeId)
+    } else {
       createLounge()
       updateState(LoungeReduce.UpdateIsOwner(true))
     }
@@ -67,7 +82,8 @@ class LoungeViewModel @Inject constructor(
 
   override fun handleEvents(event: LoungeEvent) {
     when (event) {
-      is LoungeEvent.OnEditChat -> updateState(LoungeReduce.UpdateCurrentChat(event.chat))
+      is LoungeEvent.OnClickBackButton -> sendSideEffect(LoungeSideEffect.PopBackStack)
+      is LoungeEvent.OnChatChanged -> updateState(LoungeReduce.UpdateCurrentChat(event.chat))
       is LoungeEvent.OnSendChat -> {
         updateState(LoungeReduce.UpdateCurrentChat(""))
         sendChat()
@@ -79,20 +95,12 @@ class LoungeViewModel @Inject constructor(
         } else updateReady()
       }
 
-      is LoungeEvent.OnTryExit -> {
-        updateState(LoungeReduce.UpdateExitDialogShown(true))
-      }
-
-      is LoungeEvent.OnClickExit -> {
-        if (event.exit) {
-          exitLounge()
-        }
-
-        updateState(LoungeReduce.UpdateExitDialogShown(false))
-      }
-
       is LoungeEvent.OnClickInvite -> sendSideEffect(LoungeSideEffect.CopyToClipboard(currentState.loungeId ?: throw LoungeError.NoLounge))
       is LoungeEvent.OnScrolled -> updateState(LoungeReduce.UpdateScrollIndex(event.index))
+
+      // DialogEvents
+      is LoungeEvent.OnClickCancelButtonVoteExitDialog -> sendSideEffect(LoungeSideEffect.CloseDialog)
+      is LoungeEvent.OnClickConfirmButtonVoteExitDialog -> launch { exitLounge() }
     }
   }
 
@@ -112,7 +120,7 @@ class LoungeViewModel @Inject constructor(
       }
 
       is LoungeReduce.UpdateChatList -> state.copy(chatList = reduce.chatList.reversed())
-      is LoungeReduce.UpdateCurrentChat -> state.copy(currentChat = reduce.chat)
+      is LoungeReduce.UpdateCurrentChat -> state.copy(chat = reduce.chat)
       is LoungeReduce.UpdateExitDialogShown -> state.copy(exitDialogShown = reduce.shown)
       is LoungeReduce.UpdateScrollIndex -> state.copy(scrollIndex = reduce.index)
     }
@@ -155,7 +163,7 @@ class LoungeViewModel @Inject constructor(
 
   private fun sendChat() {
     launch {
-      sendChatUseCase(currentState.loungeId ?: throw LoungeError.NoLounge, currentState.currentChat)
+      sendChatUseCase(currentState.loungeId ?: throw LoungeError.NoLounge, currentState.chat)
     }
   }
 
@@ -194,7 +202,7 @@ class LoungeViewModel @Inject constructor(
   }
 
   private fun checkMemberStatus() {
-    checkJob = launch {
+    currentJob = launch {
       checkMemberStatusUseCase(
         auth.currentUser?.uid ?: throw LoginError.NoUser,
         currentState.loungeId ?: throw LoungeError.NoLounge
@@ -211,7 +219,7 @@ class LoungeViewModel @Inject constructor(
               sendSideEffect(LoungeSideEffect.PopBackStack)
 
               CoroutineScope(Dispatchers.IO).launch {
-                checkJob?.cancel()
+                currentJob?.cancel()
 
                 currentState.loungeId?.let { loungeId ->
                   exitLoungeUseCase(auth.currentUser?.uid ?: throw LoginError.NoUser, loungeId)
@@ -239,18 +247,17 @@ class LoungeViewModel @Inject constructor(
     }
   }
 
-  private fun exitLounge() {
-    // 대기방에서 먼저 나오고 백그라운드로 라운 나오기
-    CoroutineScope(Dispatchers.IO).launch {
-      checkJob?.cancel()
+  private suspend fun exitLounge() {
+    currentJob?.cancel()
 
-      sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("투표 대기방에서 나왔습니다.")))
-      sendSideEffect(LoungeSideEffect.PopBackStack)
+    val loungeId = currentState.loungeId ?: throw LoungeError.NoLounge
+    val userId = auth.currentUser?.uid ?: throw LoginError.NoUser
 
-      currentState.loungeId?.let { loungeId ->
-        exitLoungeUseCase(auth.currentUser?.uid ?: throw LoginError.NoUser, loungeId)
-      } ?: throw LoungeError.NoLounge
-    }
+    exitLoungeUseCase(userId, loungeId)
+
+    sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("투표 대기방에서 나왔습니다.")))
+    sendSideEffect(LoungeSideEffect.CloseDialog)
+    sendSideEffect(LoungeSideEffect.PopBackStack)
   }
 
   companion object {

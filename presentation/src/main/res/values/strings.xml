@@ -74,6 +74,8 @@
     <string name="lounge_exit_dialog_title">정말 나가시겠습니까?</string>
     <string name="lounge_exit_dialog_owner_content">방장이 방을 나갈 경우, 투표 대기방이 사라지게 됩니다.</string>
     <string name="lounge_exit_dialog_member_content">방을 나갈 경우, 초대 코드를 입력하면 다시 들어올 수 있습니다.</string>
+    <string name="lounge_exit_dialog_cancel_button">취소</string>
+    <string name="lounge_exit_dialog_confirm_button">나가기</string>
 
     <!-- LoungeMemberScreen -->
     <string name="lounge_member_topbar_title">참여자 정보방</string>

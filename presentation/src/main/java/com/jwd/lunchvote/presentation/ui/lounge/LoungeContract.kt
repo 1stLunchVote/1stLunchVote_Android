@@ -14,9 +14,8 @@ class LoungeContract {
     val isOwner: Boolean = false,
     val memberList: List<MemberUIModel> = emptyList(),
     val chatList: List<ChatUIModel> = emptyList(),
-    val currentChat: String = "",
+    val chat: String = "",
     val isReady: Boolean = false,
-    val exitDialogShown: Boolean = false,
     val scrollIndex: Int = 0,
     val allReady: Boolean = false   // 대기방 주인을 제외하고 전부 다 레디 or 주인 아닌 경우 레디 한 경우
   ) : ViewModelContract.State, Parcelable {
@@ -24,13 +23,16 @@ class LoungeContract {
   }
 
   sealed interface LoungeEvent : ViewModelContract.Event {
-    data class OnEditChat(val chat: String) : LoungeEvent
+    data object OnClickBackButton : LoungeEvent
+    data class OnChatChanged(val chat: String) : LoungeEvent
     data object OnSendChat : LoungeEvent
     data object OnReady : LoungeEvent
-    data object OnTryExit : LoungeEvent
-    data class OnClickExit(val exit: Boolean) : LoungeEvent
     data object OnClickInvite : LoungeEvent
     data class OnScrolled(val index: Int) : LoungeEvent
+
+    // DialogEvents
+    data object OnClickCancelButtonVoteExitDialog : LoungeEvent
+    data object OnClickConfirmButtonVoteExitDialog : LoungeEvent
   }
 
   sealed interface LoungeReduce : ViewModelContract.Reduce {
@@ -44,9 +46,16 @@ class LoungeContract {
   }
 
   sealed interface LoungeSideEffect : ViewModelContract.SideEffect {
-    data class NavigateToVote(val loungeId: String) : LoungeSideEffect
     data object PopBackStack : LoungeSideEffect
+    data class NavigateToMember(val member: MemberUIModel, val loungeId: String, val isOwner: Boolean) : LoungeSideEffect
+    data class NavigateToVote(val loungeId: String) : LoungeSideEffect
+    data object OpenVoteExitDialog : LoungeSideEffect
+    data object CloseDialog : LoungeSideEffect
     data class ShowSnackBar(val message: UiText) : LoungeSideEffect
     data class CopyToClipboard(val loungeId: String) : LoungeSideEffect
+  }
+
+  companion object {
+    const val VOTE_EXIT_DIALOG = "vote_exit_dialog"
   }
 }

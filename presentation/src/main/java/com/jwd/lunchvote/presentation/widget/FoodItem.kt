@@ -27,7 +27,7 @@ import com.jwd.lunchvote.core.ui.theme.colorSuccess
 import com.jwd.lunchvote.core.ui.util.circleShadow
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodUIModel
-import com.jwd.lunchvote.presentation.model.enums.FoodStatus
+import com.jwd.lunchvote.presentation.model.type.FoodStatus
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 

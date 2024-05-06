@@ -6,7 +6,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.jwd.lunchvote.data.model.type.MessageDataType
 import com.jwd.lunchvote.data.source.local.LoungeLocalDataSource
-import com.jwd.lunchvote.data.source.remote.LoungeRemoteDataSource
+import com.jwd.lunchvote.data.source.remote.LoungeDataSource
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -18,7 +18,7 @@ class SendChatWorker @AssistedInject constructor(
   @Assisted private val context: Context,
   @Assisted private val workerParams: WorkerParameters,
   private val dispatcher: CoroutineDispatcher,
-  private val remoteDataSource: LoungeRemoteDataSource,
+  private val remoteDataSource: LoungeDataSource,
   private val localDataSource: LoungeLocalDataSource
 ): CoroutineWorker(context, workerParams){
     override suspend fun doWork(): Result = withContext(dispatcher){

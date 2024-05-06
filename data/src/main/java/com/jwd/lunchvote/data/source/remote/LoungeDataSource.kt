@@ -2,14 +2,16 @@ package com.jwd.lunchvote.data.source.remote
 
 import com.jwd.lunchvote.data.model.LoungeChatData
 import com.jwd.lunchvote.data.model.MemberData
+import com.jwd.lunchvote.data.model.UserData
 import com.jwd.lunchvote.data.model.type.LoungeStatusDataType
 import com.jwd.lunchvote.data.model.type.MessageDataType
+import com.jwd.lunchvote.domain.entity.User
 import kotlinx.coroutines.flow.Flow
 
-interface LoungeRemoteDataSource {
+interface LoungeDataSource {
     suspend fun checkLoungeExist(loungeId: String) : Boolean
-    suspend fun createLounge() : String
-    suspend fun joinLounge(loungeId: String)
+    suspend fun createLounge(owner: UserData) : String
+    suspend fun joinLounge(user: UserData, loungeId: String)
     fun getMemberList(loungeId: String) : Flow<List<MemberData>>
     fun getChatList(loungeId: String) : Flow<List<LoungeChatData>>
     fun getLoungeStatus(loungeId: String) : Flow<LoungeStatusDataType>

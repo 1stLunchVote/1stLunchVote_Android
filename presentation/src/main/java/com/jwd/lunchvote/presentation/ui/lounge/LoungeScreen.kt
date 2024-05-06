@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.isImeVisible
@@ -45,7 +44,6 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
@@ -56,7 +54,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
 import com.jwd.lunchvote.core.ui.theme.buttonTextStyle
 import com.jwd.lunchvote.core.ui.theme.colorNeutral90
 import com.jwd.lunchvote.core.ui.theme.colorOutlineVariant
@@ -65,6 +62,7 @@ import com.jwd.lunchvote.core.ui.util.modifyIf
 import com.jwd.lunchvote.domain.entity.type.MessageType
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.MemberUIModel
+import com.jwd.lunchvote.presentation.model.type.MemberStatusUIType
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeEvent
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeSideEffect
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeState
@@ -72,16 +70,16 @@ import com.jwd.lunchvote.presentation.util.UiText
 import com.jwd.lunchvote.presentation.widget.ChatBubble
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
+import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.VoteExitDialog
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun LoungeRoute(
+  popBackStack: () -> Unit,
   navigateToMember: (MemberUIModel, String, Boolean) -> Unit,
   navigateToFirstVote: (String) -> Unit,
-  popBackStack: () -> Unit,
   showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: LoungeViewModel = hiltViewModel(),
@@ -89,42 +87,46 @@ fun LoungeRoute(
   context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
-  val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+  val loading by viewModel.isLoading.collectAsStateWithLifecycle()
+  val dialog by viewModel.dialogState.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
       when (it) {
-        is LoungeSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
         is LoungeSideEffect.PopBackStack -> popBackStack()
+        is LoungeSideEffect.NavigateToMember -> navigateToMember(it.member, it.loungeId, it.isOwner)
+        is LoungeSideEffect.NavigateToVote -> navigateToFirstVote(it.loungeId)
+        is LoungeSideEffect.OpenVoteExitDialog -> viewModel.openDialog(LoungeContract.VOTE_EXIT_DIALOG)
+        is LoungeSideEffect.CloseDialog -> viewModel.openDialog("")
+        is LoungeSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
         is LoungeSideEffect.CopyToClipboard -> {
           clipboardManager.setText(AnnotatedString(it.loungeId))
           showSnackBar(UiText.DynamicString("초대 코드가 복사되었습니다.").asString(context))
         }
-
-        is LoungeSideEffect.NavigateToVote -> navigateToFirstVote(it.loungeId)
       }
     }
   }
 
-  // 다이얼로그가 보이지 않는 상황 or 키보드 안보일 때 뒤로가기 버튼 누르면 다이얼로그 띄움
-  BackHandler(state.exitDialogShown.not() && WindowInsets.isImeVisible.not()) {
-    viewModel.sendEvent(LoungeEvent.OnTryExit)
-  }
+  BackHandler { viewModel.sendEvent(LoungeEvent.OnClickBackButton) }
 
-  if (state.exitDialogShown) {
-    VoteExitDialog(
-      onDismiss = { viewModel.sendEvent(LoungeEvent.OnClickExit(false)) },
-      onExit = { viewModel.sendEvent(LoungeEvent.OnClickExit(true)) },
-      isOwner = state.isOwner
+  when (dialog) {
+    LoungeContract.VOTE_EXIT_DIALOG -> VoteExitDialog(
+      isOwner = state.isOwner,
+      onDismissRequest = { viewModel.sendEvent(LoungeEvent.OnClickCancelButtonVoteExitDialog) },
+      onConfirmation = { viewModel.sendEvent(LoungeEvent.OnClickConfirmButtonVoteExitDialog) }
     )
+
   }
 
-  if (isLoading) LoadingScreen()
+  if (loading) LoadingScreen(
+    message = if (state.isOwner) stringResource(R.string.lounge_create_loading)
+    else stringResource(R.string.lounge_join_loading)
+  )
   else LoungeScreen(
     state = state,
     modifier = modifier,
     navigateToMember = navigateToMember,
-    onEventAction = viewModel::sendEvent
+    onEvent = viewModel::sendEvent
   )
 }
 
@@ -133,15 +135,18 @@ private fun LoungeScreen(
   state: LoungeState,
   modifier: Modifier = Modifier,
   navigateToMember: (MemberUIModel, String, Boolean) -> Unit = { _, _, _ -> },
-  onEventAction: (LoungeEvent) -> Unit = {}
+  onEvent: (LoungeEvent) -> Unit = {}
 ) {
-  Column(
-    modifier = modifier.fillMaxSize()
+  Screen(
+    modifier = modifier,
+    topAppBar = {
+      LunchVoteTopBar(
+        title = stringResource(R.string.lounge_topbar_title),
+        popBackStack = { onEvent(LoungeEvent.OnClickBackButton) }
+      )
+    },
+    scrollable = false
   ) {
-    LunchVoteTopBar(
-      title = stringResource(id = R.string.lounge_topbar_title),
-      popBackStack = { onEventAction(LoungeEvent.OnTryExit) }
-    )
     if (state.loungeId == null) LoungeLoadingScreen(
       isOwner = state.isOwner,
       modifier = Modifier
@@ -154,15 +159,15 @@ private fun LoungeScreen(
         .fillMaxWidth(),
       state = state,
       navigateToMember = navigateToMember,
-      onClickInvite = { onEventAction(LoungeEvent.OnClickInvite) },
-      onScrolled = { onEventAction(LoungeEvent.OnScrolled(it)) }
+      onClickInvite = { onEvent(LoungeEvent.OnClickInvite) },
+      onScrolled = { onEvent(LoungeEvent.OnScrolled(it)) }
     )
     if (state.memberList.isNotEmpty()) {
       LoungeBottomBar(
         state = state,
-        onEditChat = { onEventAction(LoungeEvent.OnEditChat(it)) },
-        onSendChat = { onEventAction(LoungeEvent.OnSendChat) },
-        onClickReadyStart = { onEventAction(LoungeEvent.OnReady) }
+        onEditChat = { onEvent(LoungeEvent.OnChatChanged(it)) },
+        onSendChat = { onEvent(LoungeEvent.OnSendChat) },
+        onClickReadyStart = { onEvent(LoungeEvent.OnReady) }
       )
     }
   }
@@ -251,7 +256,7 @@ private fun LoungeChatList(
           contentColor = Color.White,
         ) {
           Text(
-            text = chat.content,
+            text = chat.message,
             style = MaterialTheme.typography.titleSmall,
             modifier = Modifier
               .padding(horizontal = 48.dp)
@@ -261,14 +266,14 @@ private fun LoungeChatList(
       } else {
         // 일반 메시지
         ChatBubble(
-          message = chat.content,
-          profileImage = chat.profileImage,
+          message = chat.message,
+          profileImage = chat.userProfile,
           isMine = chat.isMine,
-          isReady = state.memberList.find { it.uid == chat.sender }?.isReady ?: false,
+          isReady = state.memberList.find { it.id == chat.sender }?.status == MemberStatusUIType.READY,
           sendStatus = chat.sendStatus,
           navigateToMember = {
             navigateToMember(
-              state.memberList.find { it.uid == chat.sender } ?: return@ChatBubble,
+              state.memberList.find { it.id == chat.sender } ?: return@ChatBubble,
             )
           }
         )
@@ -295,28 +300,29 @@ private fun LoungeMemberList(
   ) {
     item { Spacer(modifier = Modifier.width(20.dp)) }
 
-    items(memberList) { item ->
+    items(memberList) { member ->
       Surface(
         shape = CircleShape,
         border = BorderStroke(
-          width = 2.dp, color = if (item.isReady) MaterialTheme.colorScheme.primary
+          width = 2.dp, color = if (member.status == MemberStatusUIType.READY) MaterialTheme.colorScheme.primary
           else MaterialTheme.colorScheme.outline
         ),
         modifier = Modifier
           .size(48.dp)
-          .modifyIf(item.isReady) {
+          .modifyIf(member.status == MemberStatusUIType.READY) {
             circleShadow(blurRadius = 16.dp)
           },
         color = MaterialTheme.colorScheme.background,
       ) {
-        AsyncImage(
-          model = item.profileImage,
-          contentDescription = null,
-          contentScale = ContentScale.Crop,
-          modifier = Modifier.clickable(enabled = !item.isMine) {
-            navigateToMember(item)
-          },
-        )
+        // TODO: 나중에 추가햇
+//        AsyncImage(
+//          model = member.profileImage,
+//          contentDescription = null,
+//          contentScale = ContentScale.Crop,
+//          modifier = Modifier.clickable(enabled = !member.isMine) {
+//            navigateToMember(member)
+//          },
+//        )
       }
     }
 
@@ -369,8 +375,8 @@ private fun LoungeMemberList(
 
 @Composable
 private fun LoungeLoadingScreen(
-  isOwner: Boolean = false,
-  modifier: Modifier = Modifier
+  modifier: Modifier = Modifier,
+  isOwner: Boolean = false
 ) {
   Column(
     verticalArrangement = Arrangement.Center,
@@ -398,7 +404,7 @@ private fun LoungeBottomBar(
   onSendChat: () -> Unit = {},
   onClickReadyStart: () -> Unit = {},
 ) {
-  val isTyping by rememberUpdatedState(newValue = WindowInsets.isImeVisible && state.currentChat.isNotBlank())
+  val isTyping by rememberUpdatedState(newValue = WindowInsets.isImeVisible && state.chat.isNotBlank())
 
   Column(modifier = Modifier.fillMaxWidth()) {
     Divider(
@@ -444,7 +450,7 @@ private fun LoungeBottomBar(
         modifier = Modifier.weight(1f),
       ) {
         BasicTextField(
-          value = state.currentChat,
+          value = state.chat,
           onValueChange = onEditChat,
           textStyle = MaterialTheme.typography.bodyLarge,
           modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
@@ -457,9 +463,9 @@ private fun LoungeBottomBar(
         onClick = onSendChat,
         border = BorderStroke(
           width = 2.dp,
-          color = if (state.currentChat.isNotBlank()) Color.Black else colorNeutral90
+          color = if (state.chat.isNotBlank()) Color.Black else colorNeutral90
         ),
-        enabled = state.currentChat.isNotBlank(),
+        enabled = state.chat.isNotBlank(),
         modifier = Modifier
           .size(40.dp)
           .padding(5.dp),

@@ -34,7 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
-import com.jwd.lunchvote.presentation.model.enums.FoodStatus
+import com.jwd.lunchvote.presentation.model.type.FoodStatus
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateEvent
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateSideEffect
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateState

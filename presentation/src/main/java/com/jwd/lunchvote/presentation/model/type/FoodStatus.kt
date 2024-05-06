@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.presentation.model.enums
+package com.jwd.lunchvote.presentation.model.type
 
 enum class FoodStatus {
     DEFAULT,

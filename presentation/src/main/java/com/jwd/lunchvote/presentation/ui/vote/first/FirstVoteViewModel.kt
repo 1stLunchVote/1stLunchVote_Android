@@ -8,7 +8,7 @@ import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.usecase.GetFoodListUseCase
 import com.jwd.lunchvote.domain.usecase.GetTemplateListUseCase
 import com.jwd.lunchvote.presentation.mapper.asUI
-import com.jwd.lunchvote.presentation.model.enums.FoodStatus
+import com.jwd.lunchvote.presentation.model.type.FoodStatus
 import com.jwd.lunchvote.presentation.model.updateFoodMap
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteEvent
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteReduce
