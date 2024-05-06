@@ -269,11 +269,11 @@ private fun LoungeChatList(
           message = chat.message,
           profileImage = chat.userProfile,
           isMine = chat.isMine,
-          isReady = state.memberList.find { it.id == chat.sender }?.status == MemberStatusUIType.READY,
+          isReady = state.memberList.find { it.id == chat.userId }?.status == MemberStatusUIType.READY,
           sendStatus = chat.sendStatus,
           navigateToMember = {
             navigateToMember(
-              state.memberList.find { it.id == chat.sender } ?: return@ChatBubble,
+              state.memberList.find { it.id == chat.userId } ?: return@ChatBubble,
             )
           }
         )
