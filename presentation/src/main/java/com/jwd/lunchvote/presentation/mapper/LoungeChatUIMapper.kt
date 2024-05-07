@@ -10,8 +10,9 @@ private object ChatUIMapper: BiMapper<LoungeChatUIModel, LoungeChat> {
   override fun mapToRight(from: LoungeChatUIModel): LoungeChat {
     return LoungeChat(
       id = from.id,
-      loungeId = "",
+      loungeId = from.loungeId,
       userId = from.userId,
+      userName = from.userName,
       userProfile = from.userProfile,
       message = from.message,
       messageType = from.messageType.asDomain(),
@@ -23,7 +24,9 @@ private object ChatUIMapper: BiMapper<LoungeChatUIModel, LoungeChat> {
   override fun mapToLeft(from: LoungeChat): LoungeChatUIModel {
     return LoungeChatUIModel(
       id = from.id,
+      loungeId = from.loungeId,
       userId = from.userId,
+      userName = from.userName,
       userProfile = from.userProfile,
       message = from.message,
       messageType = from.messageType.asUI(),

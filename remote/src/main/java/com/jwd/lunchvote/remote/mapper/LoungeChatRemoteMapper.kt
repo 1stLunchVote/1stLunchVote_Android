@@ -11,12 +11,13 @@ private object LoungeChatRemoteMapper : BiMapper<LoungeChatRemote, LoungeChatDat
   override fun mapToRight(from: LoungeChatRemote): LoungeChatData {
     return LoungeChatData(
       id = "",
-      loungeId = from.loungeId.orEmpty(),
-      userId = from.userId.orEmpty(),
+      loungeId = from.loungeId,
+      userId = from.userId,
+      userName = from.userName,
       userProfile = from.userProfile,
-      message = from.message.orEmpty(),
+      message = from.message,
       messageType = from.messageType.asMessageDataType(),
-      createdAt = from.createdAt.orEmpty(),
+      createdAt = from.createdAt,
       sendStatus = SendStatusDataType.SUCCESS
     )
   }
@@ -25,6 +26,7 @@ private object LoungeChatRemoteMapper : BiMapper<LoungeChatRemote, LoungeChatDat
     return LoungeChatRemote(
       loungeId = from.loungeId,
       userId = from.userId,
+      userName = from.userName,
       userProfile = from.userProfile,
       message = from.message,
       messageType = from.messageType.asRemote(),

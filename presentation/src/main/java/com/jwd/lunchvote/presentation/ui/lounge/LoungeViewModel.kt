@@ -24,7 +24,10 @@ import com.jwd.lunchvote.presentation.mapper.ChatUIMapper
 import com.jwd.lunchvote.presentation.mapper.MemberUIMapper
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
+import com.jwd.lunchvote.presentation.model.LoungeChatUIModel
 import com.jwd.lunchvote.presentation.model.type.MemberStatusUIType
+import com.jwd.lunchvote.presentation.model.type.MessageUIType
+import com.jwd.lunchvote.presentation.model.type.SendStatusUIType
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeEvent
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeReduce
@@ -41,6 +44,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
+import java.time.ZonedDateTime
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -157,7 +162,18 @@ class LoungeViewModel @Inject constructor(
 
   private suspend fun sendChat() {
     updateState(LoungeReduce.UpdateChat(""))
-    sendChatUseCase(currentState.lounge.id, currentState.chat)
+
+    val chat = LoungeChatUIModel(
+      id = UUID.randomUUID().toString(),
+      userId = currentState.user.id,
+      userName = currentState.user.name,
+      userProfile = currentState.user.profileImageUrl,
+      message = currentState.chat,
+      messageType = MessageUIType.NORMAL,
+      sendStatus = SendStatusUIType.SENDING,
+      createdAt = ZonedDateTime.now().toString()
+    )
+    sendChatUseCase.invoke(chat.asDomain())
   }
 
   private fun getLoungeData(loungeId: String) {

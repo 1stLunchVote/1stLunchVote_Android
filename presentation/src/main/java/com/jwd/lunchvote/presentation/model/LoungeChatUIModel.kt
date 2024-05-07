@@ -8,7 +8,9 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class LoungeChatUIModel(
   val id: String = "",
+  val loungeId: String = "",
   val userId: String = "",
+  val userName: String = "",
   val userProfile: String = "",
   val message: String = "",
   val messageType: MessageUIType = MessageUIType.NORMAL,
