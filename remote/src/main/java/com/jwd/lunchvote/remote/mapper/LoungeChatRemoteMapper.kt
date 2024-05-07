@@ -1,7 +1,6 @@
 package com.jwd.lunchvote.remote.mapper
 
 import com.jwd.lunchvote.core.common.mapper.BiMapper
-import com.jwd.lunchvote.core.common.mapper.Mapper
 import com.jwd.lunchvote.data.model.LoungeChatData
 import com.jwd.lunchvote.data.model.type.SendStatusDataType
 import com.jwd.lunchvote.remote.mapper.type.asMessageDataType
