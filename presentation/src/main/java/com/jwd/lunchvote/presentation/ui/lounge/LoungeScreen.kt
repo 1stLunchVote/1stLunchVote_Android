@@ -159,15 +159,15 @@ private fun LoungeScreen(
         .fillMaxWidth(),
       state = state,
       navigateToMember = navigateToMember,
-      onClickInvite = { onEvent(LoungeEvent.OnClickInvite) },
+      onClickInvite = { onEvent(LoungeEvent.OnClickInviteButton) },
       onScrolled = { onEvent(LoungeEvent.OnScrolled(it)) }
     )
     if (state.memberList.isNotEmpty()) {
       LoungeBottomBar(
         state = state,
         onEditChat = { onEvent(LoungeEvent.OnChatChanged(it)) },
-        onSendChat = { onEvent(LoungeEvent.OnSendChat) },
-        onClickReadyStart = { onEvent(LoungeEvent.OnReady) }
+        onSendChat = { onEvent(LoungeEvent.OnClickSendChatButton) },
+        onClickReadyStart = { onEvent(LoungeEvent.OnClickReadyButton) }
       )
     }
   }
