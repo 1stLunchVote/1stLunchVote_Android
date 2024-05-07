@@ -125,20 +125,26 @@ class LoungeDataSourceImpl @Inject constructor(
   override suspend fun joinLounge(
     user: UserData,
     loungeId: String
-  ) {
-    withContext(dispatcher) {
-      val member = MemberRemote(
-        loungeId = loungeId,
-        status = MEMBER_STATUS_JOINED
-      )
-      database
-        .getReference(LOUNGE_PATH)
-        .child(loungeId)
-        .child(LOUNGE_MEMBERS)
-        .child(user.id)
-        .setValue(member)
-        .await()
-    }
+  ): LoungeData = withContext(dispatcher) {
+    val member = MemberRemote(
+      loungeId = loungeId,
+      status = MEMBER_STATUS_JOINED
+    )
+    database
+      .getReference(LOUNGE_PATH)
+      .child(loungeId)
+      .child(LOUNGE_MEMBERS)
+      .child(user.id)
+      .setValue(member)
+      .await()
+
+    (database
+      .getReference(LOUNGE_PATH)
+      .child(loungeId)
+      .get()
+      .await()
+      .value as LoungeRemote?)
+      ?.asData(loungeId) ?: throw LoungeError.NoLounge
   }
 
   override fun getMemberList(

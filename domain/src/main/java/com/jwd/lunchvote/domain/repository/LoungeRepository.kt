@@ -12,7 +12,7 @@ interface LoungeRepository {
   suspend fun checkLoungeExist(loungeId: String): Boolean
   suspend fun createLounge(owner: User): String
   suspend fun getLoungeById(id: String): Lounge
-  suspend fun joinLounge(user: User, loungeId: String)
+  suspend fun joinLounge(user: User, loungeId: String): Lounge
   fun getMemberList(loungeId: String): Flow<List<Member>>
   fun getChatList(loungeId: String): Flow<List<LoungeChat>>
   fun getLoungeStatus(loungeId: String): Flow<LoungeStatusType>

@@ -7,6 +7,7 @@ import com.jwd.lunchvote.data.mapper.type.asDomain
 import com.jwd.lunchvote.data.source.local.LoungeLocalDataSource
 import com.jwd.lunchvote.data.source.remote.LoungeDataSource
 import com.jwd.lunchvote.data.worker.SendWorkerManager
+import com.jwd.lunchvote.domain.entity.Lounge
 import com.jwd.lunchvote.domain.entity.LoungeChat
 import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.entity.User
@@ -43,6 +44,7 @@ class LoungeRepositoryImpl @Inject constructor(
       id = UUID.randomUUID().toString(),
       loungeId = loungeId,
       userId = owner.id,
+      userName = owner.name,
       userProfile = owner.profileImageUrl,
       message = "",
       messageType = MessageType.CREATE,
@@ -57,13 +59,14 @@ class LoungeRepositoryImpl @Inject constructor(
   override suspend fun getLoungeById(id: String) =
     remote.getLoungeById(id).asDomain()
 
-  override suspend fun joinLounge(user: User, loungeId: String) {
-    remote.joinLounge(user.asData(), loungeId)
+  override suspend fun joinLounge(user: User, loungeId: String): Lounge {
+    val lounge = remote.joinLounge(user.asData(), loungeId)
 
     val chat = LoungeChat(
       id = UUID.randomUUID().toString(),
       loungeId = loungeId,
       userId = user.id,
+      userName = user.name,
       userProfile = user.profileImageUrl,
       message = "",
       messageType = MessageType.JOIN,
@@ -71,6 +74,8 @@ class LoungeRepositoryImpl @Inject constructor(
       createdAt = LocalDateTime.now().toString()
     )
     remote.sendChat(chat.asData())
+
+    return lounge.asDomain()
   }
 
   override fun getMemberList(loungeId: String): Flow<List<Member>> {
@@ -120,6 +125,7 @@ class LoungeRepositoryImpl @Inject constructor(
       id = UUID.randomUUID().toString(),
       loungeId = member.loungeId,
       userId = member.id,
+      userName = "",
       userProfile = "",
       message = "",
       messageType = MessageType.EXIT,
