@@ -13,7 +13,7 @@ interface FoodDao {
     fun insertFood(food: FoodEntity): Long
 
     // 음식의 id로 불러오기
-    @Query("SELECT * FROM FoodTable WHERE foodId = :foodId")
+    @Query("SELECT * FROM FoodTable WHERE id = :foodId")
     fun getFood(foodId: Long): FoodEntity
 
     // 음식의 이름으로 불러오기
@@ -29,7 +29,7 @@ interface FoodDao {
     fun updateFood(food: FoodEntity)
 
     // 음식의 id로 삭제하기
-    @Query("DELETE FROM FoodTable WHERE foodId = :foodId")
+    @Query("DELETE FROM FoodTable WHERE id = :foodId")
     fun deleteFood(foodId: Long)
 
     // 음식의 이름으로 삭제하기

@@ -9,6 +9,7 @@ import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.entity.type.MemberStatusType
 import com.jwd.lunchvote.domain.usecase.CheckMemberStatusUseCase
 import com.jwd.lunchvote.domain.usecase.ExileMemberUseCase
+import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberContract.LoungeMemberEvent
 import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberContract.LoungeMemberReduce
 import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberContract.LoungeMemberSideEffect
@@ -40,19 +41,25 @@ class LoungeMemberViewModel @Inject constructor(
   }
 
   init {
-    updateState(LoungeMemberReduce.SetMemberInfo(memberId, nickname, profileUrl, isOwner))
-
-    checkMemberStatusUseCase(auth.currentUser?.uid!!, loungeId)
-      .onEach {
-        when (it) {
-          MemberStatusType.EXILED, MemberStatusType.EXITED -> {
-            sendSideEffect(LoungeMemberSideEffect.PopBackStack)
-          }
-
-          else -> {}
-        }
-      }
-      .launchIn(viewModelScope)
+//    updateState(LoungeMemberReduce.SetMemberInfo(memberId, nickname, profileUrl, isOwner))
+//
+//    val member = MemberUIModel(
+//      id = memberId,
+//      loungeId = loungeId,
+//      status = MemberStatusType.JOINED,
+//      joinedAt = "",
+//    )
+//    checkMemberStatusUseCase(auth.currentUser?.uid!!, loungeId)
+//      .onEach {
+//        when (it) {
+//          MemberStatusType.EXILED, MemberStatusType.EXITED -> {
+//            sendSideEffect(LoungeMemberSideEffect.PopBackStack)
+//          }
+//
+//          else -> {}
+//        }
+//      }
+//      .launchIn(viewModelScope)
   }
 
   override fun reduceState(
@@ -77,7 +84,7 @@ class LoungeMemberViewModel @Inject constructor(
 
   private fun exileMember() {
     launch {
-      exileMemberUseCase(memberId, loungeId)
+//      exileMemberUseCase(memberId, loungeId)
 
       sendSideEffect(LoungeMemberSideEffect.PopBackStack)
     }

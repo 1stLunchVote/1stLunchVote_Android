@@ -11,7 +11,6 @@ private object MemberDataMapper : BiMapper<MemberData, Member> {
     return Member(
       id = from.id,
       loungeId = from.loungeId,
-      isOwner = from.isOwner,
       status = from.status.asDomain(),
       joinedAt = from.joinedAt
     )
@@ -21,7 +20,6 @@ private object MemberDataMapper : BiMapper<MemberData, Member> {
     return MemberData(
       id = from.id,
       loungeId = from.loungeId,
-      isOwner = from.isOwner,
       status = from.status.asData(),
       joinedAt = from.joinedAt
     )

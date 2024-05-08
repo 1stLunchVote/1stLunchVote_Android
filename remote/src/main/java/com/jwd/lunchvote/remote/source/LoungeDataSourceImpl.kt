@@ -1,10 +1,12 @@
 package com.jwd.lunchvote.remote.source
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.values
 import com.google.firebase.functions.FirebaseFunctions
 import com.jwd.lunchvote.core.common.error.LoungeError
+import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.data.model.LoungeChatData
 import com.jwd.lunchvote.data.model.LoungeData
 import com.jwd.lunchvote.data.model.MemberData
@@ -19,13 +21,17 @@ import com.jwd.lunchvote.remote.mapper.type.asMemberStatusDataType
 import com.jwd.lunchvote.remote.model.LoungeChatRemote
 import com.jwd.lunchvote.remote.model.LoungeRemote
 import com.jwd.lunchvote.remote.model.MemberRemote
+import com.jwd.lunchvote.remote.util.getValueEventFlow
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import timber.log.Timber
 import java.util.UUID
 import javax.inject.Inject
 
@@ -112,15 +118,27 @@ class LoungeDataSourceImpl @Inject constructor(
   override suspend fun getLoungeById(
     id: String
   ): LoungeData = withContext(dispatcher) {
-    (database
+    val members = database
+      .getReference(LOUNGE_PATH)
+      .child(id)
+      .child(LOUNGE_MEMBERS)
+      .get()
+      .await()
+      .children
+      .map {
+        val memberId = it.key ?: throw Exception("TODO: getLoungeById, key is null")
+        it.getValue(MemberRemote::class.java)?.asData(memberId)
+          ?: throw Exception("TODO: getLoungeById, key is null")
+      }
+
+    database
       .getReference(LOUNGE_PATH)
       .child(id)
       .get()
       .await()
-      .value as LoungeRemote?)
-      ?.asData(id) ?: throw LoungeError.NoLounge
+      .getValue(LoungeRemote::class.java)
+      ?.asData(id, members) ?: throw LoungeError.NoLounge
   }
-
 
   override suspend fun joinLounge(
     user: UserData,
@@ -138,13 +156,13 @@ class LoungeDataSourceImpl @Inject constructor(
       .setValue(member)
       .await()
 
-    (database
+    database
       .getReference(LOUNGE_PATH)
       .child(loungeId)
       .get()
       .await()
-      .value as LoungeRemote?)
-      ?.asData(loungeId) ?: throw LoungeError.NoLounge
+      .getValue(LoungeRemote::class.java)
+      ?.asData(loungeId, listOf(member.asData(user.id))) ?: throw LoungeError.NoLounge
   }
 
   override fun getMemberList(

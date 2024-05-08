@@ -9,7 +9,7 @@ import com.jwd.lunchvote.presentation.model.LoungeUIModel
 private object LoungeUIMapper : BiMapper<LoungeUIModel, Lounge> {
   override fun mapToRight(from: LoungeUIModel): Lounge {
     return Lounge(
-      id = "",
+      id = from.id,
       status = from.status.asDomain(),
       members = from.members.map { it.asDomain() }
     )
@@ -17,6 +17,7 @@ private object LoungeUIMapper : BiMapper<LoungeUIModel, Lounge> {
 
   override fun mapToLeft(from: Lounge): LoungeUIModel {
     return LoungeUIModel(
+      id = from.id,
       status = from.status.asUI(),
       members = from.members.map { it.asUI() }
     )

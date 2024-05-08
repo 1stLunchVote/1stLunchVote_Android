@@ -6,23 +6,20 @@ import androidx.room.PrimaryKey
 import com.jwd.lunchvote.data.model.type.MemberStatusDataType
 
 @Entity(
-    tableName = "MemberTable",
-    foreignKeys = [
-        ForeignKey(
-            entity = LoungeEntity::class,
-            parentColumns = ["loungeId"],
-            childColumns = ["loungeId"],
-            onDelete = ForeignKey.CASCADE
-        )
-    ]
+  tableName = "MemberTable",
+  foreignKeys = [
+    ForeignKey(
+      entity = LoungeEntity::class,
+      parentColumns = ["loungeId"],
+      childColumns = ["loungeId"],
+      onDelete = ForeignKey.CASCADE
+    )
+  ]
 )
 
 data class MemberEntity(
-    @PrimaryKey val id: String,
-    val loungeId: String,
-    val name: String,
-    val profileImage: String? = null,
-    val status: MemberStatusDataType,
-    val isOwner: Boolean = false,
-    val joinedAt: String
+  @PrimaryKey val id: String,
+  val loungeId: String,
+  val status: MemberStatusDataType,
+  val joinedAt: String
 )
