@@ -101,6 +101,7 @@ class LoungeDataSourceImpl @Inject constructor(
       .await()
 
     val member = MemberRemote(
+      userProfile = owner.profileImageUrl,
       loungeId = loungeId,
       status = MEMBER_STATUS_OWNER
     )
@@ -145,6 +146,7 @@ class LoungeDataSourceImpl @Inject constructor(
     loungeId: String
   ): LoungeData = withContext(dispatcher) {
     val member = MemberRemote(
+      userProfile = user.profileImageUrl,
       loungeId = loungeId,
       status = MEMBER_STATUS_JOINED
     )
@@ -248,7 +250,7 @@ class LoungeDataSourceImpl @Inject constructor(
           .getReference(LOUNGE_PATH)
           .child(member.loungeId)
           .child(LOUNGE_MEMBERS)
-          .child(member.id)
+          .child(member.userId)
           .child(MEMBER_STATUS)
           .setValue(
             when (member.status) {
@@ -269,7 +271,7 @@ class LoungeDataSourceImpl @Inject constructor(
         .getReference(LOUNGE_PATH)
         .child(member.loungeId)
         .child(LOUNGE_MEMBERS)
-        .child(member.id)
+        .child(member.userId)
         .removeValue()
     }
   }
@@ -282,7 +284,7 @@ class LoungeDataSourceImpl @Inject constructor(
         .getReference(LOUNGE_PATH)
         .child(member.loungeId)
         .child(LOUNGE_MEMBERS)
-        .child(member.id)
+        .child(member.userId)
         .child(MEMBER_STATUS)
         .setValue(MEMBER_STATUS_EXILED)
         .await()
@@ -296,7 +298,7 @@ class LoungeDataSourceImpl @Inject constructor(
       .getReference(LOUNGE_PATH)
       .child(member.loungeId)
       .child(LOUNGE_MEMBERS)
-      .child(member.id)
+      .child(member.userId)
       .child(MEMBER_STATUS)
       .values<String>()
       .map { status ->

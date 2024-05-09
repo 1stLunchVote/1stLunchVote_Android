@@ -24,10 +24,11 @@ class LoungeContract {
 
   sealed interface LoungeEvent : ViewModelContract.Event {
     data object OnClickBackButton : LoungeEvent
+    data class OnClickMember(val member: MemberUIModel) : LoungeEvent
+    data object OnClickInviteButton : LoungeEvent
     data class OnChatChanged(val chat: String) : LoungeEvent
     data object OnClickSendChatButton : LoungeEvent
     data object OnClickReadyButton : LoungeEvent
-    data object OnClickInviteButton : LoungeEvent
     data class OnScrolled(val index: Int) : LoungeEvent
 
     // DialogEvents

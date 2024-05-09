@@ -9,7 +9,8 @@ import com.jwd.lunchvote.domain.entity.Member
 private object MemberDataMapper : BiMapper<MemberData, Member> {
   override fun mapToRight(from: MemberData): Member {
     return Member(
-      id = from.id,
+      userId = from.userId,
+      userProfile = from.userProfile,
       loungeId = from.loungeId,
       status = from.status.asDomain(),
       joinedAt = from.joinedAt
@@ -18,7 +19,8 @@ private object MemberDataMapper : BiMapper<MemberData, Member> {
 
   override fun mapToLeft(from: Member): MemberData {
     return MemberData(
-      id = from.id,
+      userId = from.userId,
+      userProfile = from.userProfile,
       loungeId = from.loungeId,
       status = from.status.asData(),
       joinedAt = from.joinedAt

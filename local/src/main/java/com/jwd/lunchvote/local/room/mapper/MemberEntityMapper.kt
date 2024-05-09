@@ -7,7 +7,8 @@ import com.jwd.lunchvote.local.room.entity.MemberEntity
 private object MemberEntityMapper : BiMapper<MemberEntity, MemberData> {
   override fun mapToRight(from: MemberEntity): MemberData {
     return MemberData(
-      id = from.id,
+      userId = from.userId,
+      userProfile = from.userProfile,
       loungeId = from.loungeId,
       status = from.status,
       joinedAt = from.joinedAt
@@ -16,7 +17,8 @@ private object MemberEntityMapper : BiMapper<MemberEntity, MemberData> {
 
   override fun mapToLeft(from: MemberData): MemberEntity {
     return MemberEntity(
-      id = from.id,
+      userId = from.userId,
+      userProfile = from.userProfile,
       loungeId = from.loungeId,
       status = from.status,
       joinedAt = from.joinedAt

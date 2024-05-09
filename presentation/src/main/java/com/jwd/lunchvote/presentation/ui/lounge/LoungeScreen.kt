@@ -109,7 +109,7 @@ fun LoungeRoute(
 
   BackHandler { viewModel.sendEvent(LoungeEvent.OnClickBackButton) }
 
-  val isOwner = state.user.id == state.memberList.find { it.status == MemberStatusUIType.OWNER }?.id
+  val isOwner = state.user.id == state.memberList.find { it.status == MemberStatusUIType.OWNER }?.userId
   when (dialog) {
     LoungeContract.VOTE_EXIT_DIALOG -> VoteExitDialog(
       isOwner = isOwner,
@@ -121,43 +121,35 @@ fun LoungeRoute(
   if (loading) LoadingScreen(
     message = if (isOwner) stringResource(R.string.lounge_create_loading)
     else stringResource(R.string.lounge_join_loading)
+  ) else LoungeScreen(
+    state = state,
+    modifier = modifier,
+    onEvent = viewModel::sendEvent
   )
-//  else LoungeScreen(
-//    state = state,
-//    modifier = modifier,
-//    navigateToMember = navigateToMember,
-//    onEvent = viewModel::sendEvent
-//  )
 }
 
-//@Composable
-//private fun LoungeScreen(
-//  state: LoungeState,
-//  modifier: Modifier = Modifier,
-//  navigateToMember: (MemberUIModel, String, Boolean) -> Unit = { _, _, _ -> },
-//  onEvent: (LoungeEvent) -> Unit = {}
-//) {
-//  Screen(
-//    modifier = modifier,
-//    topAppBar = {
-//      LunchVoteTopBar(
-//        title = stringResource(R.string.lounge_topbar_title),
-//        popBackStack = { onEvent(LoungeEvent.OnClickBackButton) }
-//      )
-//    },
-//    scrollable = false
-//  ) {
-//    val isOwner = state.user.id == state.memberList.find { it.status == MemberStatusUIType.OWNER }?.id
-//
-//    LoungeContent(
-//      modifier = Modifier
-//        .weight(1f)
-//        .fillMaxWidth(),
-//      state = state,
-//      navigateToMember = navigateToMember,
-//      onClickInvite = { onEvent(LoungeEvent.OnClickInviteButton) },
-//      onScrolled = { onEvent(LoungeEvent.OnScrolled(it)) }
-//    )
+@Composable
+private fun LoungeScreen(
+  state: LoungeState,
+  modifier: Modifier = Modifier,
+  onEvent: (LoungeEvent) -> Unit = {}
+) {
+  Screen(
+    modifier = modifier,
+    topAppBar = {
+      LunchVoteTopBar(
+        title = stringResource(R.string.lounge_topbar_title),
+        popBackStack = { onEvent(LoungeEvent.OnClickBackButton) }
+      )
+    },
+    scrollable = false
+  ) {
+    MemberRow(
+      memberList = state.memberList,
+      onClickMember = { onEvent(LoungeEvent.OnClickMember(it)) },
+      onClickInvite = { onEvent(LoungeEvent.OnClickInviteButton) }
+    )
+
 //    if (state.memberList.isNotEmpty()) {
 //      LoungeBottomBar(
 //        state = state,
@@ -166,8 +158,31 @@ fun LoungeRoute(
 //        onClickReadyStart = { onEvent(LoungeEvent.OnClickReadyButton) }
 //      )
 //    }
-//  }
-//}
+  }
+}
+
+@Composable
+private fun MemberRow(
+  memberList: List<MemberUIModel>,
+  onClickMember: (MemberUIModel) -> Unit,
+  onClickInvite: () -> Unit,
+  modifier: Modifier = Modifier
+) {
+  Row(
+    modifier = modifier.padding(horizontal = 32.dp, vertical = 16.dp),
+  ) {
+    memberList.forEach {
+
+    }
+  }
+}
+
+@Composable
+private fun LoungeChatList(
+
+) {
+
+}
 //
 //@Composable
 //private fun LoungeContent(
@@ -301,7 +316,8 @@ fun LoungeRoute(
 //      Surface(
 //        shape = CircleShape,
 //        border = BorderStroke(
-//          width = 2.dp, color = if (member.status == MemberStatusUIType.READY) MaterialTheme.colorScheme.primary
+//          width = 2.dp,
+//          color = if (member.status == MemberStatusUIType.READY) MaterialTheme.colorScheme.primary
 //          else MaterialTheme.colorScheme.outline
 //        ),
 //        modifier = Modifier

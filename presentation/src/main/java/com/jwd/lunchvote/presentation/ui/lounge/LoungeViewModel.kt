@@ -78,6 +78,8 @@ class LoungeViewModel @Inject constructor(
   }
 
   private var currentJob: Job? = null
+  private val owner: MemberUIModel
+    get() = currentState.memberList.find { it.status == MemberStatusUIType.OWNER } ?: throw LoungeError.InvalidLounge("방장 정보가 없습니다.")
 
   init {
     launch {
@@ -98,24 +100,26 @@ class LoungeViewModel @Inject constructor(
   override fun handleEvents(event: LoungeEvent) {
     when (event) {
       is LoungeEvent.OnClickBackButton -> sendSideEffect(LoungeSideEffect.PopBackStack)
+      is LoungeEvent.OnClickMember -> sendSideEffect(
+        LoungeSideEffect.NavigateToMember(
+          member = event.member,
+          loungeId = currentState.lounge.id,
+          isOwner = currentState.user.id == owner.userId
+        )
+      )
+      is LoungeEvent.OnClickInviteButton -> sendSideEffect(LoungeSideEffect.CopyToClipboard(currentState.lounge.id))
       is LoungeEvent.OnChatChanged -> updateState(LoungeReduce.UpdateChat(event.chat))
       is LoungeEvent.OnClickSendChatButton -> launch { sendChat() }
 
       is LoungeEvent.OnClickReadyButton -> launch {
         val owner = currentState.memberList.find { it.status == MemberStatusUIType.OWNER }
           ?: throw LoungeError.InvalidLounge("방장 정보가 없습니다.")
-        if (currentState.user.id == owner.id && currentState.memberList.any { it.status != MemberStatusUIType.READY }) {
+        if (currentState.user.id == owner.userId && currentState.memberList.any { it.status != MemberStatusUIType.READY }) {
           sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("모든 멤버가 준비해야합니다.")))
         } else {
           updateReady()
         }
       }
-
-      is LoungeEvent.OnClickInviteButton -> sendSideEffect(
-        LoungeSideEffect.CopyToClipboard(
-          currentState.lounge.id
-        )
-      )
 
       is LoungeEvent.OnScrolled -> updateState(LoungeReduce.UpdateScrollIndex(event.index))
 
@@ -187,7 +191,7 @@ class LoungeViewModel @Inject constructor(
     collectChatList(lounge.id)
 
     currentJob = launch {
-      val member = lounge.members.find { it.id == currentState.user.id }
+      val member = lounge.members.find { it.userId == currentState.user.id }
         ?: throw LoungeError.InvalidMember
       checkMemberStatus(member)
     }
@@ -245,7 +249,7 @@ class LoungeViewModel @Inject constructor(
   }
 
   private suspend fun updateReady() {
-    val member = currentState.memberList.find { it.id == currentState.user.id }
+    val member = currentState.memberList.find { it.userId == currentState.user.id }
       ?: throw LoungeError.InvalidMember
     updateReadyUseCase(member.asDomain())
   }
@@ -253,7 +257,7 @@ class LoungeViewModel @Inject constructor(
   private suspend fun exitLounge() {
     currentJob?.cancel()
 
-    val member = currentState.memberList.find { it.id == currentState.user.id }
+    val member = currentState.memberList.find { it.userId == currentState.user.id }
       ?: throw LoungeError.InvalidMember
     exitLoungeUseCase(member.asDomain())
 

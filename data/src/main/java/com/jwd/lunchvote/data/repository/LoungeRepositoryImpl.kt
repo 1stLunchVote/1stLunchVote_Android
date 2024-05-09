@@ -116,7 +116,7 @@ class LoungeRepositoryImpl @Inject constructor(
   }
 
   override suspend fun updateReady(member: Member) {
-    local.updateMemberReady(member.id, member.loungeId) // TOOD: 변경
+    local.updateMemberReady(member.userId, member.loungeId) // TOOD: 변경
     remote.updateReady(member.asData())
   }
 
@@ -124,7 +124,7 @@ class LoungeRepositoryImpl @Inject constructor(
     val chat = LoungeChat(
       id = UUID.randomUUID().toString(),
       loungeId = member.loungeId,
-      userId = member.id,
+      userId = member.userId,
       userName = "",
       userProfile = "",
       message = "",

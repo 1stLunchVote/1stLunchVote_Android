@@ -15,6 +15,7 @@ lifecycle = "2.7.0"
 navigation = "2.7.7"
 workManager = "2.9.0"
 splashScreen = "1.0.1"
+graphics = "1.0.0-alpha05"
 
 junit = "4.13.2"
 ext = "1.1.5"
@@ -67,6 +68,7 @@ navigation = { group = "androidx.navigation", name = "navigation-compose", versi
 navigation-ui = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigation" }
 workManager = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workManager" }
 splashScreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashScreen" }
+graphics = { group = "androidx.graphics", name = "graphics-shapes", version.ref = "graphics" }
 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext = { group = "androidx.test.ext", name = "junit", version.ref = "ext" }
@@ -125,7 +127,7 @@ gms = { group = "com.google.gms", name = "google-services", version.ref = "fireb
 androidGradle = { group = "com.android.tools.build", name = "gradle", version.ref = "android" }
 
 [bundles]
-android = ["appcompat", "core", "material", "constraintLayout", "lifecycle", "lifecycle-viewModel", "navigation", "navigation-ui", "workManager", "splashScreen"]
+android = ["appcompat", "core", "material", "constraintLayout", "lifecycle", "lifecycle-viewModel", "navigation", "navigation-ui", "workManager", "splashScreen", "graphics"]
 test = ["junit", "ext", "espresso", "mockk", "androidMockk", "test", "test_coroutines", "slf4j"]
 hilt = ["hilt", "hilt-android", "hilt-work"]
 hilt-compiler = ["hilt-compiler", "hilt-android-compiler"]

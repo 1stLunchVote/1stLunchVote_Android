@@ -9,7 +9,8 @@ import com.jwd.lunchvote.presentation.model.MemberUIModel
 private object MemberUIMapper : BiMapper<MemberUIModel, Member> {
   override fun mapToRight(from: MemberUIModel): Member {
     return Member(
-      id = from.id,
+      userId = from.userId,
+      userProfile = from.userProfile,
       loungeId = from.loungeId,
       status = from.status.asDomain(),
       joinedAt = from.joinedAt
@@ -18,7 +19,8 @@ private object MemberUIMapper : BiMapper<MemberUIModel, Member> {
 
   override fun mapToLeft(from: Member): MemberUIModel {
     return MemberUIModel(
-      id = from.id,
+      userId = from.userId,
+      userProfile = from.userProfile,
       loungeId = from.loungeId,
       status = from.status.asUI(),
       joinedAt = from.joinedAt
