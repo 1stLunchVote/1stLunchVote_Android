@@ -51,6 +51,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -68,9 +69,13 @@ import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeSideEffect
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeState
 import com.jwd.lunchvote.presentation.util.UiText
 import com.jwd.lunchvote.presentation.widget.ChatBubble
+import com.jwd.lunchvote.presentation.widget.EmptyProfile
+import com.jwd.lunchvote.presentation.widget.InviteProfile
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
+import com.jwd.lunchvote.presentation.widget.MemberProfile
 import com.jwd.lunchvote.presentation.widget.Screen
+import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.VoteExitDialog
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
@@ -147,7 +152,8 @@ private fun LoungeScreen(
     MemberRow(
       memberList = state.memberList,
       onClickMember = { onEvent(LoungeEvent.OnClickMember(it)) },
-      onClickInvite = { onEvent(LoungeEvent.OnClickInviteButton) }
+      onClickInvite = { onEvent(LoungeEvent.OnClickInviteButton) },
+      modifier = Modifier.fillMaxWidth()
     )
 
 //    if (state.memberList.isNotEmpty()) {
@@ -170,9 +176,21 @@ private fun MemberRow(
 ) {
   Row(
     modifier = modifier.padding(horizontal = 32.dp, vertical = 16.dp),
+    horizontalArrangement = Arrangement.SpaceBetween
   ) {
-    memberList.forEach {
-
+    memberList.forEach { member ->
+      MemberProfile(
+        member = member,
+        onClick = onClickMember
+      )
+    }
+    if (memberList.size < 6) {
+      InviteProfile(
+        onClick = onClickInvite
+      )
+    }
+    repeat(6 - memberList.size - 1) {
+      EmptyProfile()
     }
   }
 }
@@ -182,6 +200,18 @@ private fun LoungeChatList(
 
 ) {
 
+}
+
+@Preview
+@Composable
+private fun Preview() {
+  ScreenPreview {
+    LoungeScreen(
+      LoungeState(
+        memberList = List(4) { MemberUIModel() }
+      )
+    )
+  }
 }
 //
 //@Composable

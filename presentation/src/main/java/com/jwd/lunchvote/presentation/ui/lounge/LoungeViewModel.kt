@@ -157,18 +157,13 @@ class LoungeViewModel @Inject constructor(
   }
 
   private suspend fun createLounge() {
-    withTimeoutOrNull(TIMEOUT) {
-      val user = currentState.user
-      val loungeId = createLoungeUseCase(user.asDomain())
-      val lounge = getLoungeByIdUseCase(loungeId).asUI()
+    val user = currentState.user
+    val loungeId = createLoungeUseCase(user.asDomain())
+    val lounge = getLoungeByIdUseCase(loungeId).asUI()
 
-      updateState(LoungeReduce.UpdateLounge(lounge))
+    updateState(LoungeReduce.UpdateLounge(lounge))
 
-      collectLoungeData(lounge)
-    } ?: {
-      sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("방 생성에 실패하였습니다.")))
-      sendSideEffect(LoungeSideEffect.PopBackStack)
-    }
+    collectLoungeData(lounge)
   }
 
   private suspend fun joinLounge(loungeId: String) {
@@ -185,10 +180,10 @@ class LoungeViewModel @Inject constructor(
     }
   }
 
-  private suspend fun collectLoungeData(lounge: LoungeUIModel) {
-    collectLoungeStatus(lounge.id)
-    collectMemberList(lounge.id)
-    collectChatList(lounge.id)
+  private fun collectLoungeData(lounge: LoungeUIModel) {
+    launch { collectLoungeStatus(lounge.id) }
+    launch { collectMemberList(lounge.id) }
+    launch { collectChatList(lounge.id) }
 
     currentJob = launch {
       val member = lounge.members.find { it.userId == currentState.user.id }
@@ -197,10 +192,12 @@ class LoungeViewModel @Inject constructor(
     }
   }
 
-  private suspend fun collectChatList(loungeId: String) {
-    getChatListUseCase(loungeId)
-      .collectLatest { chatList ->
-        updateState(LoungeReduce.UpdateChatList(chatList.map { it.asUI() }))
+  private suspend fun collectLoungeStatus(loungeId: String) {
+    getLoungeStatusUseCase(loungeId)
+      .collectLatest { status ->
+        if (status == LoungeStatusType.STARTED) {
+          sendSideEffect(LoungeSideEffect.NavigateToVote(loungeId))
+        }
       }
   }
 
@@ -211,12 +208,10 @@ class LoungeViewModel @Inject constructor(
       }
   }
 
-  private suspend fun collectLoungeStatus(loungeId: String) {
-    getLoungeStatusUseCase(loungeId)
-      .collectLatest { status ->
-        if (status == LoungeStatusType.STARTED) {
-          sendSideEffect(LoungeSideEffect.NavigateToVote(loungeId))
-        }
+  private suspend fun collectChatList(loungeId: String) {
+    getChatListUseCase(loungeId)
+      .collectLatest { chatList ->
+        updateState(LoungeReduce.UpdateChatList(chatList.map { it.asUI() }))
       }
   }
 

@@ -13,9 +13,9 @@ interface LoungeRepository {
   suspend fun createLounge(owner: User): String
   suspend fun getLoungeById(id: String): Lounge
   suspend fun joinLounge(user: User, loungeId: String): Lounge
+  fun getLoungeStatus(loungeId: String): Flow<LoungeStatusType>
   fun getMemberList(loungeId: String): Flow<List<Member>>
   fun getChatList(loungeId: String): Flow<List<LoungeChat>>
-  fun getLoungeStatus(loungeId: String): Flow<LoungeStatusType>
   suspend fun sendChat(chat: LoungeChat)
   suspend fun updateReady(member: Member)
   suspend fun exitLounge(member: Member)

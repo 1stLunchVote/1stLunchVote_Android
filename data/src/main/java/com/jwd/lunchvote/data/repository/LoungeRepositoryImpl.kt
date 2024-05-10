@@ -78,11 +78,11 @@ class LoungeRepositoryImpl @Inject constructor(
     return lounge.asDomain()
   }
 
-  override fun getMemberList(loungeId: String): Flow<List<Member>> {
-    return local.getMemberList(loungeId)
-      .map { list -> list.map { it.asDomain() } }
-      .onStart { syncMemberList(loungeId) }
-  }
+  override fun getLoungeStatus(loungeId: String): Flow<LoungeStatusType> =
+    remote.getLoungeStatus(loungeId).map { it.asDomain() }
+
+  override fun getMemberList(loungeId: String): Flow<List<Member>> =
+    remote.getMemberList(loungeId).map { list -> list.map { it.asDomain() } }
 
   private suspend fun syncMemberList(loungeId: String) {
     val coroutineScope = CoroutineScope(currentCoroutineContext())
@@ -105,9 +105,6 @@ class LoungeRepositoryImpl @Inject constructor(
       .onEach { list -> local.putChatList(list.map { it.asData() }, loungeId) }
       .launchIn(coroutineScope)
   }
-
-  override fun getLoungeStatus(loungeId: String): Flow<LoungeStatusType> =
-    remote.getLoungeStatus(loungeId).map { it.asDomain() }
 
   // 일반 채팅 메시지 보내는 경우
   override suspend fun sendChat(chat: LoungeChat) {

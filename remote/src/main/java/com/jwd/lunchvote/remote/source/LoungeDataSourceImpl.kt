@@ -1,12 +1,10 @@
 package com.jwd.lunchvote.remote.source
 
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.values
 import com.google.firebase.functions.FirebaseFunctions
 import com.jwd.lunchvote.core.common.error.LoungeError
-import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.data.model.LoungeChatData
 import com.jwd.lunchvote.data.model.LoungeData
 import com.jwd.lunchvote.data.model.MemberData
@@ -23,15 +21,12 @@ import com.jwd.lunchvote.remote.model.LoungeRemote
 import com.jwd.lunchvote.remote.model.MemberRemote
 import com.jwd.lunchvote.remote.util.getValueEventFlow
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
-import timber.log.Timber
 import java.util.UUID
 import javax.inject.Inject
 
@@ -167,35 +162,6 @@ class LoungeDataSourceImpl @Inject constructor(
       ?.asData(loungeId, listOf(member.asData(user.id))) ?: throw LoungeError.NoLounge
   }
 
-  override fun getMemberList(
-    loungeId: String
-  ): Flow<List<MemberData>> =
-    database
-      .getReference(LOUNGE_PATH)
-      .child(loungeId)
-      .child(LOUNGE_MEMBERS)
-      .orderByChild(MEMBER_JOINED_AT)
-      .equalTo(MEMBER_STATUS_EXILED, MEMBER_STATUS)
-      .values<HashMap<String, MemberRemote>>()
-      .map { hashMap ->
-        hashMap?.map { (key, value) -> value.asData(key) }
-          ?: throw Exception("TODO: getMemberList, hashMap is null")
-      }
-      .flowOn(dispatcher)
-
-  override fun getChatList(
-    loungeId: String
-  ): Flow<List<LoungeChatData>> =
-    database
-      .getReference(CHAT_PATH)
-      .child(loungeId)
-      .values<HashMap<String, LoungeChatRemote>>()
-      .map { hashMap ->
-        hashMap?.values?.map { it.asData() }
-          ?: throw Exception("TODO: getChatList, hashMap is null")
-      }
-      .flowOn(dispatcher)
-
   override fun getLoungeStatus(
     loungeId: String
   ): Flow<LoungeStatusDataType> =
@@ -207,6 +173,36 @@ class LoungeDataSourceImpl @Inject constructor(
       .map { status ->
         status?.asLoungeStatusDataType() ?: throw Exception("TODO: getLoungeStatus, it is null")
       }
+
+  override fun getMemberList(
+    loungeId: String
+  ): Flow<List<MemberData>> {
+    return database
+      .getReference(LOUNGE_PATH)
+      .child(loungeId)
+      .child(LOUNGE_MEMBERS)
+      .getValueEventFlow<MemberRemote>()
+      .map {
+        it.map { (key, value) ->
+          value?.asData(key) ?: throw Exception("TODO: getMemberList, value is null")
+        }
+      }
+      .flowOn(dispatcher)
+  }
+
+  override fun getChatList(
+    loungeId: String
+  ): Flow<List<LoungeChatData>> =
+    database
+      .getReference(CHAT_PATH)
+      .child(loungeId)
+      .getValueEventFlow<LoungeChatRemote>()
+      .map {
+        it.map { (key, value) ->
+          value?.asData() ?: throw Exception("TODO: getChatList, hashMap is null")
+        }
+      }
+      .flowOn(dispatcher)
 
   override suspend fun sendChat(
     chat: LoungeChatData

@@ -13,9 +13,9 @@ interface LoungeDataSource {
   suspend fun createLounge(owner: UserData): String
   suspend fun getLoungeById(id: String): LoungeData
   suspend fun joinLounge(user: UserData, loungeId: String): LoungeData
+  fun getLoungeStatus(loungeId: String): Flow<LoungeStatusDataType>
   fun getMemberList(loungeId: String): Flow<List<MemberData>>
   fun getChatList(loungeId: String): Flow<List<LoungeChatData>>
-  fun getLoungeStatus(loungeId: String): Flow<LoungeStatusDataType>
   suspend fun sendChat(chat: LoungeChatData)
   suspend fun updateReady(member: MemberData)
   suspend fun exitLounge(member: MemberData)

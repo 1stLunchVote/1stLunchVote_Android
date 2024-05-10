@@ -6,15 +6,12 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
-import timber.log.Timber
 
-inline fun <reified T> DatabaseReference.getValueEventFlow() = callbackFlow<T> {
+inline fun <reified T> DatabaseReference.getValueEventFlow() = callbackFlow {
   val listener = object : ValueEventListener {
     override fun onDataChange(snapshot: DataSnapshot) {
-      val value = snapshot.getValue(T::class.java)
-      if (value != null) {
-        trySend(value)
-      }
+      val value = snapshot.children.associateBy({ it.key!! }, { it.getValue(T::class.java) })
+      trySend(value)
     }
 
     override fun onCancelled(error: DatabaseError) {
