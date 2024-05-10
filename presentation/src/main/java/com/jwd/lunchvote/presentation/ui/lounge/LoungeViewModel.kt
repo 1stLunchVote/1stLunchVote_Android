@@ -157,13 +157,18 @@ class LoungeViewModel @Inject constructor(
   }
 
   private suspend fun createLounge() {
-    val user = currentState.user
-    val loungeId = createLoungeUseCase(user.asDomain())
-    val lounge = getLoungeByIdUseCase(loungeId).asUI()
+    withTimeoutOrNull(TIMEOUT) {
+      val user = currentState.user
+      val loungeId = createLoungeUseCase(user.asDomain())
+      val lounge = getLoungeByIdUseCase(loungeId).asUI()
 
-    updateState(LoungeReduce.UpdateLounge(lounge))
+      updateState(LoungeReduce.UpdateLounge(lounge))
 
-    collectLoungeData(lounge)
+      collectLoungeData(lounge)
+    } ?: {
+      sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("방 생성에 실패하였습니다.")))
+      sendSideEffect(LoungeSideEffect.PopBackStack)
+    }
   }
 
   private suspend fun joinLounge(loungeId: String) {
