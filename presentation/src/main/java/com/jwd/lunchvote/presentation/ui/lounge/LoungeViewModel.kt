@@ -88,12 +88,7 @@ class LoungeViewModel @Inject constructor(
       updateState(LoungeReduce.UpdateUser(user))
 
       val loungeId = savedStateHandle.get<String?>(LunchVoteNavRoute.Lounge.arguments.first().name)
-      loungeId?.let {
-        val lounge = getLoungeByIdUseCase(it).asUI()
-        if (lounge.status != LoungeStatusUIType.CREATED) throw LoungeError.NoLounge
-
-        joinLounge(it)
-      } ?: createLounge()
+      if (loungeId != null) joinLounge(loungeId) else createLounge()
     }
   }
 
@@ -174,7 +169,10 @@ class LoungeViewModel @Inject constructor(
   private suspend fun joinLounge(loungeId: String) {
     withTimeoutOrNull(TIMEOUT) {
       val user = currentState.user
-      val lounge = joinLoungeUseCase(user.asDomain(), loungeId).asUI()
+      val lounge = getLoungeByIdUseCase(loungeId).asUI()
+
+      if (lounge.status != LoungeStatusUIType.CREATED) throw LoungeError.NoLounge
+      joinLoungeUseCase(user.asDomain(), loungeId).asUI()
 
       updateState(LoungeReduce.UpdateLounge(lounge))
 
