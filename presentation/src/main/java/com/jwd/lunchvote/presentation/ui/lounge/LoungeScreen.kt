@@ -62,6 +62,7 @@ import com.jwd.lunchvote.core.ui.util.circleShadow
 import com.jwd.lunchvote.core.ui.util.modifyIf
 import com.jwd.lunchvote.domain.entity.type.MessageType
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.model.LoungeChatUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.type.MemberStatusUIType
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeEvent
@@ -155,7 +156,13 @@ private fun LoungeScreen(
       onClickInvite = { onEvent(LoungeEvent.OnClickInviteButton) },
       modifier = Modifier.fillMaxWidth()
     )
-
+    LoungeChatList(
+      userId = state.user.id,
+      chatList = state.chatList,
+      memberList = state.memberList,
+      onClickProfile = { onEvent(LoungeEvent.OnClickMember(it)) },
+      modifier = Modifier.fillMaxWidth()
+    )
 //    if (state.memberList.isNotEmpty()) {
 //      LoungeBottomBar(
 //        state = state,
@@ -197,9 +204,29 @@ private fun MemberRow(
 
 @Composable
 private fun LoungeChatList(
-
+  userId: String,
+  chatList: List<LoungeChatUIModel>,
+  memberList: List<MemberUIModel>,
+  onClickProfile: (MemberUIModel) -> Unit,
+  modifier: Modifier = Modifier
 ) {
+  val lazyListState = rememberLazyListState()
 
+  LazyColumn(
+    modifier = modifier.padding(24.dp),
+    state = lazyListState,
+    verticalArrangement = Arrangement.spacedBy(16.dp),
+    reverseLayout = true
+  ) {
+    items(chatList) {chat ->
+      ChatBubble(
+        chat = chat,
+        member = memberList.find { it.userId == chat.userId } ?: MemberUIModel(),
+        isMine = chat.userId == userId,
+        onClickProfile = onClickProfile
+      )
+    }
+  }
 }
 
 @Preview
@@ -208,7 +235,8 @@ private fun Preview() {
   ScreenPreview {
     LoungeScreen(
       LoungeState(
-        memberList = List(4) { MemberUIModel() }
+        memberList = List(4) { MemberUIModel() },
+        chatList = List(10) { LoungeChatUIModel() }
       )
     )
   }
