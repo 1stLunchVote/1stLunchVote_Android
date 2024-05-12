@@ -94,7 +94,7 @@ class LoungeViewModel @Inject constructor(
 
   override fun handleEvents(event: LoungeEvent) {
     when (event) {
-      is LoungeEvent.OnClickBackButton -> sendSideEffect(LoungeSideEffect.PopBackStack)
+      is LoungeEvent.OnClickBackButton -> sendSideEffect(LoungeSideEffect.OpenVoteExitDialog)
       is LoungeEvent.OnClickMember -> sendSideEffect(
         LoungeSideEffect.NavigateToMember(
           member = event.member,
@@ -103,10 +103,10 @@ class LoungeViewModel @Inject constructor(
         )
       )
       is LoungeEvent.OnClickInviteButton -> sendSideEffect(LoungeSideEffect.CopyToClipboard(currentState.lounge.id))
-      is LoungeEvent.OnChatChanged -> updateState(LoungeReduce.UpdateChat(event.chat))
-      is LoungeEvent.OnClickSendChatButton -> launch { sendChat() }
+      is LoungeEvent.OnTextChanged -> updateState(LoungeReduce.UpdateText(event.text))
+      is LoungeEvent.OnClickSendChatButton -> launch(false) { sendChat() }
 
-      is LoungeEvent.OnClickReadyButton -> launch {
+      is LoungeEvent.OnClickReadyButton -> launch(false) {
         val owner = currentState.memberList.find { it.status == MemberStatusUIType.OWNER }
           ?: throw LoungeError.InvalidLounge("방장 정보가 없습니다.")
         if (currentState.user.id == owner.userId && currentState.memberList.any { it.status != MemberStatusUIType.READY }) {
@@ -120,7 +120,7 @@ class LoungeViewModel @Inject constructor(
 
       // DialogEvents
       is LoungeEvent.OnClickCancelButtonVoteExitDialog -> sendSideEffect(LoungeSideEffect.CloseDialog)
-      is LoungeEvent.OnClickConfirmButtonVoteExitDialog -> launch { exitLounge() }
+      is LoungeEvent.OnClickConfirmButtonVoteExitDialog -> launch(false) { exitLounge() }
     }
   }
 
@@ -130,7 +130,7 @@ class LoungeViewModel @Inject constructor(
       is LoungeReduce.UpdateLounge -> state.copy(lounge = reduce.lounge)
       is LoungeReduce.UpdateMemberList -> state.copy(memberList = reduce.memberList)
       is LoungeReduce.UpdateChatList -> state.copy(chatList = reduce.chatList)
-      is LoungeReduce.UpdateChat -> state.copy(chat = reduce.chat)
+      is LoungeReduce.UpdateText -> state.copy(text = reduce.text)
       is LoungeReduce.UpdateScrollIndex -> state.copy(scrollIndex = reduce.index)
     }
   }
@@ -231,14 +231,14 @@ class LoungeViewModel @Inject constructor(
   }
 
   private suspend fun sendChat() {
-    updateState(LoungeReduce.UpdateChat(""))
+    updateState(LoungeReduce.UpdateText(""))
 
     val chat = LoungeChatUIModel(
       id = UUID.randomUUID().toString(),
       userId = currentState.user.id,
       userName = currentState.user.name,
       userProfile = currentState.user.profileImageUrl,
-      message = currentState.chat,
+      message = currentState.text,
       messageType = MessageUIType.NORMAL,
       sendStatus = SendStatusUIType.SENDING,
       createdAt = ZonedDateTime.now().toString()

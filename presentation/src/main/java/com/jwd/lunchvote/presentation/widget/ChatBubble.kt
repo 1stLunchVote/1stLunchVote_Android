@@ -32,7 +32,7 @@ fun ChatBubble(
   member: MemberUIModel,
   isMine: Boolean,
   modifier: Modifier = Modifier,
-  onClickProfile: (MemberUIModel) -> Unit = {}
+  onClickMember: (MemberUIModel) -> Unit = {}
 ) {
   when (chat.messageType) {
     MessageUIType.NORMAL -> Row(
@@ -43,7 +43,11 @@ fun ChatBubble(
         Box(
           modifier = Modifier
             .clip(RoundedCornerShape(20.dp, 0.dp, 20.dp, 20.dp))
-            .border(2.dp, MaterialTheme.colorScheme.onBackground, RoundedCornerShape(20.dp, 0.dp, 20.dp, 20.dp)),
+            .border(
+              2.dp,
+              MaterialTheme.colorScheme.onBackground,
+              RoundedCornerShape(20.dp, 0.dp, 20.dp, 20.dp)
+            ),
           contentAlignment = Alignment.Center
         ) {
           Text(
@@ -55,20 +59,31 @@ fun ChatBubble(
       } else {
         MemberProfile(
           member = member,
-          onClick = onClickProfile
+          onClick = onClickMember
         )
-        Box(
-          modifier = Modifier
-            .padding(top = 16.dp)
-            .clip(RoundedCornerShape(0.dp, 20.dp, 20.dp, 20.dp))
-            .border(2.dp, MaterialTheme.colorScheme.onBackground, RoundedCornerShape(0.dp, 20.dp, 20.dp, 20.dp)),
-          contentAlignment = Alignment.Center
+        Column(
+          verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
           Text(
-            text = chat.message,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp)
+            text = chat.userName,
+            style = MaterialTheme.typography.titleSmall
           )
+          Box(
+            modifier = Modifier
+              .clip(RoundedCornerShape(0.dp, 20.dp, 20.dp, 20.dp))
+              .border(
+                2.dp,
+                MaterialTheme.colorScheme.onBackground,
+                RoundedCornerShape(0.dp, 20.dp, 20.dp, 20.dp)
+              ),
+            contentAlignment = Alignment.Center
+          ) {
+            Text(
+              text = chat.message,
+              style = MaterialTheme.typography.titleMedium,
+              modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp)
+            )
+          }
         }
       }
     }

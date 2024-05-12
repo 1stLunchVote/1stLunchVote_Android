@@ -1,7 +1,6 @@
 package com.jwd.lunchvote.presentation.widget
 
 import android.graphics.Paint
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
@@ -43,6 +41,7 @@ fun MemberProfile(
 ) {
   val borderColor = when (member.status) {
     MemberStatusUIType.READY -> MaterialTheme.colorScheme.primary
+    MemberStatusUIType.OWNER -> MaterialTheme.colorScheme.primary
     else -> MaterialTheme.colorScheme.outline
   }
 

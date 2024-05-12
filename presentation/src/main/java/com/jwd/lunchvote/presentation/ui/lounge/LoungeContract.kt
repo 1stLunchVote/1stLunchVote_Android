@@ -16,7 +16,7 @@ class LoungeContract {
     val lounge: LoungeUIModel = LoungeUIModel(),
     val memberList: List<MemberUIModel> = emptyList(),
     val chatList: List<LoungeChatUIModel> = emptyList(),
-    val chat: String = "",
+    val text: String = "",
     val scrollIndex: Int = 0
   ) : ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this
@@ -26,7 +26,7 @@ class LoungeContract {
     data object OnClickBackButton : LoungeEvent
     data class OnClickMember(val member: MemberUIModel) : LoungeEvent
     data object OnClickInviteButton : LoungeEvent
-    data class OnChatChanged(val chat: String) : LoungeEvent
+    data class OnTextChanged(val text: String) : LoungeEvent
     data object OnClickSendChatButton : LoungeEvent
     data object OnClickReadyButton : LoungeEvent
     data class OnScrolled(val index: Int) : LoungeEvent
@@ -41,7 +41,7 @@ class LoungeContract {
     data class UpdateLounge(val lounge: LoungeUIModel) : LoungeReduce
     data class UpdateMemberList(val memberList: List<MemberUIModel>) : LoungeReduce
     data class UpdateChatList(val chatList: List<LoungeChatUIModel>) : LoungeReduce
-    data class UpdateChat(val chat: String) : LoungeReduce
+    data class UpdateText(val text: String) : LoungeReduce
     data class UpdateScrollIndex(val index: Int) : LoungeReduce
   }
 
