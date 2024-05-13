@@ -22,6 +22,7 @@ import com.jwd.lunchvote.domain.usecase.GetUserByIdUseCase
 import com.jwd.lunchvote.domain.usecase.JoinLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.SendChatUseCase
 import com.jwd.lunchvote.domain.usecase.UpdateReadyUseCase
+import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.LoungeChatUIModel
@@ -78,8 +79,7 @@ class LoungeViewModel @Inject constructor(
 
   private var currentJob: Job? = null
   private val owner: MemberUIModel
-    get() = currentState.memberList.find { it.status == MemberStatusUIType.OWNER }
-      ?: throw LoungeError.InvalidLounge("방장 정보가 없습니다.")
+    get() = currentState.memberList.find { it.status == MemberStatusUIType.OWNER } ?: throw LoungeError.NoOwner
 
   init {
     launch {
@@ -139,7 +139,7 @@ class LoungeViewModel @Inject constructor(
 
       collectLoungeData(lounge)
     } ?: {
-      sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("방 생성에 실패하였습니다.")))
+      sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_create_lounge_snackbar)))
       sendSideEffect(LoungeSideEffect.PopBackStack)
     }
   }
@@ -156,7 +156,7 @@ class LoungeViewModel @Inject constructor(
 
       collectLoungeData(lounge)
     } ?: {
-      sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("입장에 실패하였습니다.")))
+      sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_join_lounge_snackbar)))
       sendSideEffect(LoungeSideEffect.PopBackStack)
     }
   }
@@ -185,12 +185,12 @@ class LoungeViewModel @Inject constructor(
     getMemberListUseCase(loungeId).collectLatest { memberList ->
       when {
         memberList.find { it.status == MemberStatusType.OWNER } == null -> {
-          sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("투표 방이 종료되었습니다.")))
+          sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_owner_exited_snackbar)))
           sendSideEffect(LoungeSideEffect.PopBackStack)
         }
 
         memberList.find { it.userId == currentState.user.id } == null -> {
-          sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("투표 방에서 강퇴되었습니다.")))
+          sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_exiled_snackbar)))
           sendSideEffect(LoungeSideEffect.PopBackStack)
         }
 
@@ -210,7 +210,7 @@ class LoungeViewModel @Inject constructor(
       if (status == MemberStatusType.EXILED) {
         exitLoungeUseCase(member.asDomain())
 
-        sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("방장에 의해 추방되었습니다.")))
+        sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_exiled_snackbar)))
         sendSideEffect(LoungeSideEffect.PopBackStack)
       }
     }
@@ -235,9 +235,9 @@ class LoungeViewModel @Inject constructor(
 
   private suspend fun updateReady() {
     val owner = currentState.memberList.find { it.status == MemberStatusUIType.OWNER }
-      ?: throw LoungeError.InvalidLounge("방장 정보가 없습니다.")
+      ?: throw LoungeError.NoOwner
     if (currentState.user.id == owner.userId && currentState.memberList.any { it.status != MemberStatusUIType.READY }) {
-      sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("모든 멤버가 준비해야합니다.")))
+      sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_not_ready_to_start_snackbar)))
     } else {
       val member = currentState.memberList.find { it.userId == currentState.user.id }
         ?: throw LoungeError.InvalidMember
@@ -252,7 +252,7 @@ class LoungeViewModel @Inject constructor(
       ?: throw LoungeError.InvalidMember
     exitLoungeUseCase(member.asDomain())
 
-    sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("투표 대기방에서 나왔습니다.")))
+    sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_exited_snackbar)))
     sendSideEffect(LoungeSideEffect.CloseDialog)
     sendSideEffect(LoungeSideEffect.PopBackStack)
   }

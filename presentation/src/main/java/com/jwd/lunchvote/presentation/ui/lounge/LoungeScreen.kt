@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -96,7 +95,7 @@ fun LoungeRoute(
         is LoungeSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
         is LoungeSideEffect.CopyToClipboard -> {
           clipboardManager.setText(AnnotatedString(it.loungeId))
-          showSnackBar(UiText.DynamicString("초대 코드가 복사되었습니다.").asString(context))
+          showSnackBar(UiText.StringResource(R.string.lounge_copy_invite_code_snackbar).asString(context))
         }
       }
     }

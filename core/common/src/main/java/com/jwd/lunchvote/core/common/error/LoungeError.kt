@@ -7,9 +7,9 @@ interface LoungeError {
     override val message: String = "라운지 정보를 확인할 수 없습니다."
   }
 
-  data class InvalidLounge(val detail: String) : Throwable() {
-    private fun readResolve(): Any = InvalidLounge(detail)
-    override val message: String = "유효하지 않은 투표 방입니다. $detail"
+  data object InvalidLounge : Throwable() {
+    private fun readResolve(): Any = InvalidLounge
+    override val message: String = "유효하지 않은 투표 방입니다."
   }
 
   data object InvalidLoungeStatus : Throwable() {
@@ -25,5 +25,10 @@ interface LoungeError {
   data object InvalidMember : Throwable() {
     private fun readResolve(): Any = InvalidMember
     override val message: String = "유효하지 않은 참가자입니다. 다시 시도해주세요."
+  }
+
+  data object NoOwner : Throwable() {
+    private fun readResolve(): Any = NoOwner
+    override val message: String = "투표 방이 종료되었습니다."
   }
 }
