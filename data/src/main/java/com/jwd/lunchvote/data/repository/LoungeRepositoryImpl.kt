@@ -1,17 +1,19 @@
 package com.jwd.lunchvote.data.repository
 
-import com.jwd.lunchvote.data.mapper.LoungeChatDataMapper
-import com.jwd.lunchvote.data.mapper.MemberDataMapper
-import com.jwd.lunchvote.data.mapper.type.LoungeStatusDataTypeMapper
-import com.jwd.lunchvote.data.mapper.type.MemberStatusDataTypeMapper
-import com.jwd.lunchvote.data.model.type.MessageDataType
+import com.jwd.lunchvote.data.mapper.asData
+import com.jwd.lunchvote.data.mapper.asDomain
+import com.jwd.lunchvote.data.mapper.type.asDomain
 import com.jwd.lunchvote.data.source.local.LoungeLocalDataSource
-import com.jwd.lunchvote.data.source.remote.LoungeRemoteDataSource
+import com.jwd.lunchvote.data.source.remote.LoungeDataSource
 import com.jwd.lunchvote.data.worker.SendWorkerManager
+import com.jwd.lunchvote.domain.entity.Lounge
 import com.jwd.lunchvote.domain.entity.LoungeChat
 import com.jwd.lunchvote.domain.entity.Member
+import com.jwd.lunchvote.domain.entity.User
 import com.jwd.lunchvote.domain.entity.type.LoungeStatusType
 import com.jwd.lunchvote.domain.entity.type.MemberStatusType
+import com.jwd.lunchvote.domain.entity.type.MessageType
+import com.jwd.lunchvote.domain.entity.type.SendStatusType
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.currentCoroutineContext
@@ -21,97 +23,115 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
 
 class LoungeRepositoryImpl @Inject constructor(
-    private val sendWorkerManager: SendWorkerManager,
-    private val local: LoungeLocalDataSource,
-    private val remote: LoungeRemoteDataSource
-): LoungeRepository {
-    override suspend fun checkLoungeExist(loungeId: String): Boolean {
-        return remote.checkLoungeExist(loungeId)
-    }
+  private val sendWorkerManager: SendWorkerManager,
+  private val local: LoungeLocalDataSource,
+  private val remote: LoungeDataSource
+) : LoungeRepository {
+  override suspend fun checkLoungeExist(loungeId: String): Boolean {
+    return remote.checkLoungeExist(loungeId)
+  }
 
-    override suspend fun createLounge(): String {
-        val id = UUID.randomUUID().toString()
-        val loungeId = remote.createLounge()
-        remote.sendChat(id, loungeId, null, MessageDataType.CREATE)
-        return loungeId
-    }
+  override suspend fun createLounge(owner: User): String {
+    val loungeId = remote.createLounge(owner.asData())
 
-    override suspend fun joinLounge(loungeId: String) {
-        val id = UUID.randomUUID().toString()
-        remote.joinLounge(loungeId)
-        remote.sendChat(id, loungeId, null, MessageDataType.JOIN)
-    }
+    val chat = LoungeChat(
+      id = UUID.randomUUID().toString(),
+      loungeId = loungeId,
+      userId = owner.id,
+      userName = owner.name,
+      userProfile = owner.profileImageUrl,
+      message = "",
+      messageType = MessageType.CREATE,
+      sendStatus = SendStatusType.SENDING,
+      createdAt = LocalDateTime.now().toString()
+    )
+    remote.sendChat(chat.asData())
 
-    override fun getMemberList(loungeId: String): Flow<List<Member>> {
-        return local.getMemberList(loungeId)
-            .map { it.map(MemberDataMapper::mapToRight) }
-            .onStart { syncMemberList(loungeId) }
-    }
+    return loungeId
+  }
 
-    override fun getChatList(loungeId: String): Flow<List<LoungeChat>> {
-        return local.getChatList(loungeId)
-            .map{it.map(LoungeChatDataMapper::mapToRight)}
-            .filter { it.isNotEmpty() }
-            .onStart { syncChatList(loungeId) }
-    }
+  override suspend fun getLoungeById(id: String): Lounge =
+    remote.getLoungeById(id).asDomain()
 
-    override fun getLoungeStatus(loungeId: String): Flow<LoungeStatusType> {
-        return remote.getLoungeStatus(loungeId)
-            .map { LoungeStatusDataTypeMapper.mapToRight(it) }
-    }
+  override suspend fun joinLounge(user: User, loungeId: String): Lounge {
+    val lounge = remote.joinLounge(user.asData(), loungeId)
 
-    // 일반 채팅 메시지 보내는 경우
-    override suspend fun sendChat(loungeId: String, content: String) {
-        val id = UUID.randomUUID().toString()
-        sendWorkerManager.startSendWork(id, loungeId, content)
-        return local.insertChat(id, loungeId, content, MessageDataType.NORMAL)
-    }
+    val chat = LoungeChat(
+      id = UUID.randomUUID().toString(),
+      loungeId = loungeId,
+      userId = user.id,
+      userName = user.name,
+      userProfile = user.profileImageUrl,
+      message = "",
+      messageType = MessageType.JOIN,
+      sendStatus = SendStatusType.SENDING,
+      createdAt = LocalDateTime.now().toString()
+    )
+    remote.sendChat(chat.asData())
 
-    override suspend fun updateReady(uid: String, loungeId: String, isOwner: Boolean) {
-        local.updateMemberReady(uid, loungeId)
-        remote.updateReady(uid, loungeId, isOwner)
-    }
+    return lounge.asDomain()
+  }
 
-    override suspend fun exitLounge(uid: String, loungeId: String) {
-        val id = UUID.randomUUID().toString()
-        remote.sendChat(id, loungeId, null, MessageDataType.EXIT)
-        remote.exitLounge(uid, loungeId)
-        local.deleteAllChat(loungeId)
-    }
+  override fun getLoungeStatus(loungeId: String): Flow<LoungeStatusType> =
+    remote.getLoungeStatus(loungeId).map { it.asDomain() }
 
-    override suspend fun exileMember(memberId: String, loungeId: String) {
-        remote.exileMember(memberId, loungeId)
-    }
+  override fun getMemberList(loungeId: String): Flow<List<Member>> =
+    remote.getMemberList(loungeId).map { list -> list.map { it.asDomain() } }
 
-    override fun getMemberStatus(uid: String, loungeId: String): Flow<MemberStatusType>{
-        return remote.getMemberList(loungeId)
-            .map {
-                if (it.isEmpty()){
-                    MemberStatusType.EXITED
-                }
-                else it.find { member -> member.id == uid }?.status?.let(MemberStatusDataTypeMapper::mapToRight)
-                    ?: MemberStatusType.EXILED
-            }
-    }
+  private suspend fun syncMemberList(loungeId: String) {
+    val coroutineScope = CoroutineScope(currentCoroutineContext())
+    remote.getMemberList(loungeId).onEach { list -> local.putMemberList(list, loungeId) }
+      .launchIn(coroutineScope)
+  }
 
-    private suspend fun syncMemberList(loungeId: String){
-        remote.getMemberList(loungeId)
-            .onEach{
-                local.putMemberList(it, loungeId)
-            }
-            .launchIn(CoroutineScope(currentCoroutineContext()))
-    }
+  override fun getChatList(loungeId: String): Flow<List<LoungeChat>> {
+    return local.getChatList(loungeId).map { list -> list.map { it.asDomain() } }
+      .filter { list -> list.isNotEmpty() }.onStart { syncChatList(loungeId) }
+  }
 
-    private suspend fun syncChatList(loungeId: String){
-        remote.getChatList(loungeId)
-            .map { it.map(LoungeChatDataMapper::mapToRight) }
-            .onEach{
-                local.putChatList(it.map(LoungeChatDataMapper::mapToLeft), loungeId)
-            }
-            .launchIn(CoroutineScope(currentCoroutineContext()))
-    }
+  private suspend fun syncChatList(loungeId: String) {
+    val coroutineScope = CoroutineScope(currentCoroutineContext())
+    remote.getChatList(loungeId).map { list -> list.map { it.asDomain() } }
+      .onEach { list -> local.putChatList(list.map { it.asData() }, loungeId) }
+      .launchIn(coroutineScope)
+  }
+
+  // 일반 채팅 메시지 보내는 경우
+  override suspend fun sendChat(chat: LoungeChat) {
+    remote.sendChat(chat.asData())
+  }
+
+  override suspend fun updateReady(member: Member) {
+    local.updateMemberReady(member.userId, member.loungeId) // TOOD: 변경
+    remote.updateReady(member.asData())
+  }
+
+  override suspend fun exitLounge(member: Member) {
+    val chat = LoungeChat(
+      id = UUID.randomUUID().toString(),
+      loungeId = member.loungeId,
+      userId = member.userId,
+      userName = member.userName,
+      userProfile = "",
+      message = "",
+      messageType = MessageType.EXIT,
+      sendStatus = SendStatusType.SENDING,
+      createdAt = LocalDateTime.now().toString()
+    )
+    remote.sendChat(chat.asData())
+    remote.exitLounge(member.asData())
+    local.deleteAllChat(member.loungeId)
+  }
+
+  override suspend fun exileMember(member: Member) {
+    remote.exileMember(member.asData())
+  }
+
+  override fun getMemberStatus(member: Member): Flow<MemberStatusType> =
+    remote.getMemberStatus(member.asData()).map { it.asDomain() }
 }

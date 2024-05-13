@@ -2,7 +2,9 @@ package com.jwd.lunchvote.presentation.ui.lounge
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import com.google.firebase.auth.FirebaseAuth
+import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.core.common.error.LoungeError
 import com.jwd.lunchvote.core.common.error.UnknownError
@@ -13,31 +15,47 @@ import com.jwd.lunchvote.domain.usecase.CheckMemberStatusUseCase
 import com.jwd.lunchvote.domain.usecase.CreateLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.ExitLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.GetChatListUseCase
+import com.jwd.lunchvote.domain.usecase.GetLoungeByIdUseCase
 import com.jwd.lunchvote.domain.usecase.GetLoungeStatusUseCase
 import com.jwd.lunchvote.domain.usecase.GetMemberListUseCase
+import com.jwd.lunchvote.domain.usecase.GetUserByIdUseCase
 import com.jwd.lunchvote.domain.usecase.JoinLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.SendChatUseCase
 import com.jwd.lunchvote.domain.usecase.UpdateReadyUseCase
-import com.jwd.lunchvote.presentation.mapper.ChatUIMapper
-import com.jwd.lunchvote.presentation.mapper.MemberUIMapper
+import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.mapper.asDomain
+import com.jwd.lunchvote.presentation.mapper.asUI
+import com.jwd.lunchvote.presentation.model.LoungeChatUIModel
+import com.jwd.lunchvote.presentation.model.LoungeUIModel
+import com.jwd.lunchvote.presentation.model.MemberUIModel
+import com.jwd.lunchvote.presentation.model.type.LoungeStatusUIType
+import com.jwd.lunchvote.presentation.model.type.MemberStatusUIType
+import com.jwd.lunchvote.presentation.model.type.MessageUIType
+import com.jwd.lunchvote.presentation.model.type.SendStatusUIType
+import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeEvent
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeReduce
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeSideEffect
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
+import java.time.ZonedDateTime
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class LoungeViewModel @Inject constructor(
+  private val getUserByIdUseCase: GetUserByIdUseCase,
   private val joinLoungeUseCase: JoinLoungeUseCase,
   private val createLoungeUseCase: CreateLoungeUseCase,
+  private val getLoungeByIdUseCase: GetLoungeByIdUseCase,
   private val getMemberListUseCase: GetMemberListUseCase,
   private val getChatListUseCase: GetChatListUseCase,
   private val getLoungeStatusUseCase: GetLoungeStatusUseCase,
@@ -45,216 +63,201 @@ class LoungeViewModel @Inject constructor(
   private val sendChatUseCase: SendChatUseCase,
   private val exitLoungeUseCase: ExitLoungeUseCase,
   private val checkMemberStatusUseCase: CheckMemberStatusUseCase,
-  private val auth: FirebaseAuth,
   savedStateHandle: SavedStateHandle
 ) : BaseStateViewModel<LoungeState, LoungeEvent, LoungeReduce, LoungeSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): LoungeState {
     return savedState as? LoungeState ?: LoungeState()
   }
-  // todo : 이미 시작된 방인 경우 뒤로가기 처리 필요
 
-  private var checkJob: Job? = null
+  private val _dialogState = MutableStateFlow("")
+  val dialogState: StateFlow<String> = _dialogState.asStateFlow()
+  fun openDialog(dialogState: String) {
+    viewModelScope.launch {
+      _dialogState.emit(dialogState)
+    }
+  }
+
+  private var currentJob: Job? = null
+  private val owner: MemberUIModel
+    get() = currentState.memberList.find { it.status == MemberStatusUIType.OWNER } ?: throw LoungeError.NoOwner
 
   init {
-    savedStateHandle.get<String?>(LOUNGE_KEY_ID)?.let {
-      joinLounge(it)
-      getLoungeData(it)
-    } ?: {
-      createLounge()
-      updateState(LoungeReduce.UpdateIsOwner(true))
+    launch {
+      val userId = Firebase.auth.currentUser?.uid ?: throw LoginError.NoUser
+      val user = getUserByIdUseCase(userId).asUI()
+      updateState(LoungeReduce.UpdateUser(user))
+
+      val loungeId = savedStateHandle.get<String?>(LunchVoteNavRoute.Lounge.arguments.first().name)
+      if (loungeId != null) joinLounge(loungeId) else createLounge()
     }
   }
 
   override fun handleEvents(event: LoungeEvent) {
     when (event) {
-      is LoungeEvent.OnEditChat -> updateState(LoungeReduce.UpdateCurrentChat(event.chat))
-      is LoungeEvent.OnSendChat -> {
-        updateState(LoungeReduce.UpdateCurrentChat(""))
-        sendChat()
-      }
-
-      is LoungeEvent.OnReady -> {
-        if (currentState.isOwner && currentState.allReady.not()) {
-          sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("멤버 전원이 준비해야합니다.")))
-        } else updateReady()
-      }
-
-      is LoungeEvent.OnTryExit -> {
-        updateState(LoungeReduce.UpdateExitDialogShown(true))
-      }
-
-      is LoungeEvent.OnClickExit -> {
-        if (event.exit) {
-          exitLounge()
-        }
-
-        updateState(LoungeReduce.UpdateExitDialogShown(false))
-      }
-
-      is LoungeEvent.OnClickInvite -> sendSideEffect(LoungeSideEffect.CopyToClipboard(currentState.loungeId ?: throw LoungeError.NoLounge))
+      is LoungeEvent.OnClickBackButton -> sendSideEffect(LoungeSideEffect.OpenVoteExitDialog)
+      is LoungeEvent.OnClickMember -> sendSideEffect(LoungeSideEffect.NavigateToMember(event.member, currentState.lounge.id, currentState.user.id == owner.userId))
+      is LoungeEvent.OnClickInviteButton -> sendSideEffect(LoungeSideEffect.CopyToClipboard(currentState.lounge.id))
+      is LoungeEvent.OnTextChanged -> updateState(LoungeReduce.UpdateText(event.text))
+      is LoungeEvent.OnClickSendChatButton -> launch(false) { sendChat() }
+      is LoungeEvent.OnClickReadyButton -> launch(false) { updateReady() }
       is LoungeEvent.OnScrolled -> updateState(LoungeReduce.UpdateScrollIndex(event.index))
+
+      // DialogEvents
+      is LoungeEvent.OnClickCancelButtonVoteExitDialog -> sendSideEffect(LoungeSideEffect.CloseDialog)
+      is LoungeEvent.OnClickConfirmButtonVoteExitDialog -> launch(false) { exitLounge() }
     }
   }
 
   override fun reduceState(state: LoungeState, reduce: LoungeReduce): LoungeState {
     return when (reduce) {
-      is LoungeReduce.UpdateIsOwner -> state.copy(isOwner = reduce.isOwner)
-      is LoungeReduce.UpdateLoungeId -> state.copy(loungeId = reduce.loungeId)
-      is LoungeReduce.UpdateMemberList -> {
-        state.copy(
-          memberList = reduce.memberList,
-          isReady = reduce.memberList.find { it.isMine }?.isReady ?: false,
-          allReady = with(state) {
-            memberList.filter { !it.isOwner }.all { it.isReady }
-              || (!isOwner && isReady) || (memberList.size == 1 && isOwner)
-          }
-        )
-      }
-
-      is LoungeReduce.UpdateChatList -> state.copy(chatList = reduce.chatList.reversed())
-      is LoungeReduce.UpdateCurrentChat -> state.copy(currentChat = reduce.chat)
-      is LoungeReduce.UpdateExitDialogShown -> state.copy(exitDialogShown = reduce.shown)
+      is LoungeReduce.UpdateUser -> state.copy(user = reduce.user)
+      is LoungeReduce.UpdateLounge -> state.copy(lounge = reduce.lounge)
+      is LoungeReduce.UpdateMemberList -> state.copy(memberList = reduce.memberList)
+      is LoungeReduce.UpdateChatList -> state.copy(chatList = reduce.chatList)
+      is LoungeReduce.UpdateText -> state.copy(text = reduce.text)
       is LoungeReduce.UpdateScrollIndex -> state.copy(scrollIndex = reduce.index)
     }
   }
 
   override fun handleErrors(error: Throwable) {
     sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
-  }
-
-  private fun createLounge() {
-    launch {
-      withTimeoutOrNull(TIMEOUT) {
-        val res = createLoungeUseCase()
-
-        updateState(LoungeReduce.UpdateLoungeId(res))
-
-        getLoungeData(res)
-        checkMemberStatus()
-      } ?: run {
-        sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("방 생성에 실패하였습니다.")))
-        sendSideEffect(LoungeSideEffect.PopBackStack)
-      }
+    when (error) {
+      is LoungeError.NoLounge -> sendSideEffect(LoungeSideEffect.PopBackStack)
+      is LoungeError.InvalidMember -> sendSideEffect(LoungeSideEffect.PopBackStack)
+      is LoungeError.InvalidLounge -> sendSideEffect(LoungeSideEffect.PopBackStack)
+      else -> {}
     }
   }
 
-  private fun joinLounge(loungeId: String) {
-    launch {
-      withTimeoutOrNull(TIMEOUT) {
-        joinLoungeUseCase(loungeId)
+  private suspend fun createLounge() {
+    withTimeoutOrNull(TIMEOUT) {
+      val user = currentState.user
+      val loungeId = createLoungeUseCase(user.asDomain())
+      val lounge = getLoungeByIdUseCase(loungeId).asUI()
 
-        updateState(LoungeReduce.UpdateLoungeId(loungeId))
+      updateState(LoungeReduce.UpdateLounge(lounge))
 
-        checkMemberStatus()
-      } ?: run {
-        sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("입장에 실패하였습니다.")))
-        sendSideEffect(LoungeSideEffect.PopBackStack)
-      }
-    }
-  }
-
-  private fun sendChat() {
-    launch {
-      sendChatUseCase(currentState.loungeId ?: throw LoungeError.NoLounge, currentState.currentChat)
-    }
-  }
-
-  private fun getLoungeData(loungeId: String) {
-    launch {
-      getChatListUseCase(loungeId)
-        .collectLatest {
-          updateState(
-            LoungeReduce.UpdateChatList(it.map { chat ->
-              ChatUIMapper.mapToRight(chat, chat.userId == auth.currentUser?.uid)
-            })
-          )
-        }
-    }
-
-
-    launch {
-      getMemberListUseCase(loungeId)
-        .collectLatest {
-          updateState(LoungeReduce.UpdateMemberList(it.map { m ->
-            MemberUIMapper.mapToRight(m, m.id == auth.currentUser?.uid)
-          }))
-        }
-    }
-
-
-    launch {
-      getLoungeStatusUseCase(loungeId)
-        .collectLatest {
-          when (it) {
-            LoungeStatusType.STARTED -> sendSideEffect(LoungeSideEffect.NavigateToVote(loungeId))
-            else -> Unit
-          }
-        }
-    }
-  }
-
-  private fun checkMemberStatus() {
-    checkJob = launch {
-      checkMemberStatusUseCase(
-        auth.currentUser?.uid ?: throw LoginError.NoUser,
-        currentState.loungeId ?: throw LoungeError.NoLounge
-      )
-        .collectLatest {
-          when (it) {
-            MemberStatusType.EXITED -> {
-              sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("방장이 방을 종료하였습니다.")))
-              sendSideEffect(LoungeSideEffect.PopBackStack)
-            }
-
-            MemberStatusType.EXILED -> {
-              sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("방장에 의해 추방되었습니다.")))
-              sendSideEffect(LoungeSideEffect.PopBackStack)
-
-              CoroutineScope(Dispatchers.IO).launch {
-                checkJob?.cancel()
-
-                currentState.loungeId?.let { loungeId ->
-                  exitLoungeUseCase(auth.currentUser?.uid ?: throw LoginError.NoUser, loungeId)
-                }
-              }
-            }
-
-            else -> {}
-          }
-        }
-    }
-  }
-
-  private fun updateReady() {
-    launch {
-      runCatching {
-        updateReadyUseCase(
-          auth.currentUser?.uid ?: throw LoginError.NoUser,
-          currentState.loungeId ?: throw LoungeError.NoLounge,
-          currentState.isOwner
-        )
-      }.onFailure {
-        sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString(if (currentState.isOwner) "게임 시작 실패" else "준비 상태 변경 실패")))
-      }
-    }
-  }
-
-  private fun exitLounge() {
-    // 대기방에서 먼저 나오고 백그라운드로 라운 나오기
-    CoroutineScope(Dispatchers.IO).launch {
-      checkJob?.cancel()
-
-      sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("투표 대기방에서 나왔습니다.")))
+      collectLoungeData(lounge)
+    } ?: {
+      sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_create_lounge_snackbar)))
       sendSideEffect(LoungeSideEffect.PopBackStack)
-
-      currentState.loungeId?.let { loungeId ->
-        exitLoungeUseCase(auth.currentUser?.uid ?: throw LoginError.NoUser, loungeId)
-      } ?: throw LoungeError.NoLounge
     }
+  }
+
+  private suspend fun joinLounge(loungeId: String) {
+    withTimeoutOrNull(TIMEOUT) {
+      val user = currentState.user
+      val loungeStatus = getLoungeByIdUseCase(loungeId).asUI().status
+      if (loungeStatus != LoungeStatusUIType.CREATED) throw LoungeError.NoLounge
+
+      val lounge = joinLoungeUseCase(user.asDomain(), loungeId).asUI()
+
+      updateState(LoungeReduce.UpdateLounge(lounge))
+
+      collectLoungeData(lounge)
+    } ?: {
+      sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_join_lounge_snackbar)))
+      sendSideEffect(LoungeSideEffect.PopBackStack)
+    }
+  }
+
+  private fun collectLoungeData(lounge: LoungeUIModel) {
+    launch { collectLoungeStatus(lounge.id) }
+    launch { collectMemberList(lounge.id) }
+    launch { collectChatList(lounge.id) }
+
+    currentJob = launch {
+      val member =
+        lounge.members.find { it.userId == currentState.user.id } ?: throw LoungeError.InvalidMember
+      checkMemberStatus(member)
+    }
+  }
+
+  private suspend fun collectLoungeStatus(loungeId: String) {
+    getLoungeStatusUseCase(loungeId).collectLatest { status ->
+      if (status == LoungeStatusType.STARTED) {
+        sendSideEffect(LoungeSideEffect.NavigateToVote(loungeId))
+      }
+    }
+  }
+
+  private suspend fun collectMemberList(loungeId: String) {
+    getMemberListUseCase(loungeId).collectLatest { memberList ->
+      when {
+        memberList.find { it.status == MemberStatusType.OWNER } == null -> {
+          sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_owner_exited_snackbar)))
+          sendSideEffect(LoungeSideEffect.PopBackStack)
+        }
+
+        memberList.find { it.userId == currentState.user.id } == null -> {
+          sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_exiled_snackbar)))
+          sendSideEffect(LoungeSideEffect.PopBackStack)
+        }
+
+        else -> updateState(LoungeReduce.UpdateMemberList(memberList.map { it.asUI() }))
+      }
+    }
+  }
+
+  private suspend fun collectChatList(loungeId: String) {
+    getChatListUseCase(loungeId).collectLatest { chatList ->
+      updateState(LoungeReduce.UpdateChatList(chatList.map { it.asUI() }))
+    }
+  }
+
+  private suspend fun checkMemberStatus(member: MemberUIModel) {
+    checkMemberStatusUseCase(member.asDomain()).collectLatest { status ->
+      if (status == MemberStatusType.EXILED) {
+        exitLoungeUseCase(member.asDomain())
+
+        sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_exiled_snackbar)))
+        sendSideEffect(LoungeSideEffect.PopBackStack)
+      }
+    }
+  }
+
+  private suspend fun sendChat() {
+    updateState(LoungeReduce.UpdateText(""))
+
+    val chat = LoungeChatUIModel(
+      id = UUID.randomUUID().toString(),
+      loungeId = currentState.lounge.id,
+      userId = currentState.user.id,
+      userName = currentState.user.name,
+      userProfile = currentState.user.profileImageUrl,
+      message = currentState.text,
+      messageType = MessageUIType.NORMAL,
+      sendStatus = SendStatusUIType.SENDING,
+      createdAt = ZonedDateTime.now().toString()
+    )
+    sendChatUseCase.invoke(chat.asDomain())
+  }
+
+  private suspend fun updateReady() {
+    val owner = currentState.memberList.find { it.status == MemberStatusUIType.OWNER }
+      ?: throw LoungeError.NoOwner
+    if (currentState.user.id == owner.userId && currentState.memberList.any { it.status != MemberStatusUIType.READY }) {
+      sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_not_ready_to_start_snackbar)))
+    } else {
+      val member = currentState.memberList.find { it.userId == currentState.user.id }
+        ?: throw LoungeError.InvalidMember
+      updateReadyUseCase(member.asDomain())
+    }
+  }
+
+  private suspend fun exitLounge() {
+    currentJob?.cancel()
+
+    val member = currentState.memberList.find { it.userId == currentState.user.id }
+      ?: throw LoungeError.InvalidMember
+    exitLoungeUseCase(member.asDomain())
+
+    sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_exited_snackbar)))
+    sendSideEffect(LoungeSideEffect.CloseDialog)
+    sendSideEffect(LoungeSideEffect.PopBackStack)
   }
 
   companion object {
     private const val TIMEOUT = 10000L
-    private const val LOUNGE_KEY_ID = "id"
   }
 }

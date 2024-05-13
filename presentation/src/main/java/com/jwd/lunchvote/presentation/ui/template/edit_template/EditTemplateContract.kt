@@ -7,7 +7,7 @@ import com.jwd.lunchvote.core.ui.base.ViewModelContract.SideEffect
 import com.jwd.lunchvote.core.ui.base.ViewModelContract.State
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
-import com.jwd.lunchvote.presentation.model.enums.FoodStatus
+import com.jwd.lunchvote.presentation.model.type.FoodStatus
 import com.jwd.lunchvote.presentation.util.UiText
 import kotlinx.parcelize.Parcelize
 

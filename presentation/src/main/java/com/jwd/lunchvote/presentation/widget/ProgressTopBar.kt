@@ -20,46 +20,46 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun ProgressTopBar(
-    title: String,
-    animationDuration : Int = 60000,
-    onProgressComplete : () -> Unit = {}
-){
-    var progress by remember { mutableStateOf(0f) }
+  title: String,
+  animationDuration: Int = 60000,
+  onProgressComplete: () -> Unit = {}
+) {
+  var progress by remember { mutableStateOf(0f) }
 
-    val seconds = animationDuration / 1000f
-    LaunchedEffect(Unit){
-        while (progress < 1f){
-            progress += 1f / seconds
-            delay(1000)
+  val seconds = animationDuration / 1000f
+  LaunchedEffect(Unit) {
+    while (progress < 1f) {
+      progress += 1f / seconds
+      delay(1000)
 
-            if (progress >= 1f) onProgressComplete()
-        }
+      if (progress >= 1f) onProgressComplete()
     }
+  }
 
-    val progressAnimation by animateFloatAsState(
-        targetValue = progress,
-        animationSpec = tween(durationMillis = 1000, easing = LinearEasing),
+  val progressAnimation by animateFloatAsState(
+    targetValue = progress,
+    animationSpec = tween(durationMillis = 1000, easing = LinearEasing),
+  )
+
+  Column {
+    LunchVoteTopBar(
+      title = title,
+      popBackStack = {},
+      navIconVisible = false
     )
 
-    Column {
-        LunchVoteTopBar(
-            title = title,
-            popBackStack = {},
-            navIconVisible = false
-        )
-
-        LinearProgressIndicator(
-            progress = progressAnimation,
-            modifier = Modifier.fillMaxWidth(),
-            trackColor = MaterialTheme.colorScheme.outlineVariant
-        )
-    }
+    LinearProgressIndicator(
+      progress = { progressAnimation },
+      modifier = Modifier.fillMaxWidth(),
+      trackColor = MaterialTheme.colorScheme.outlineVariant,
+    )
+  }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun ProgressTopBarPreview(){
-    LunchVoteTheme {
-        ProgressTopBar(title = "2차 투표")
-    }
+fun ProgressTopBarPreview() {
+  LunchVoteTheme {
+    ProgressTopBar(title = "2차 투표")
+  }
 }

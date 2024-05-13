@@ -4,28 +4,34 @@ import com.jwd.lunchvote.core.common.mapper.BiMapper
 import com.jwd.lunchvote.data.model.MemberData
 import com.jwd.lunchvote.local.room.entity.MemberEntity
 
-internal object MemberEntityMapper : BiMapper<MemberEntity, MemberData> {
-    override fun mapToRight(from: MemberEntity): MemberData {
-        return MemberData(
-            id = from.id,
-            loungeId = from.loungeId,
-            name = from.name,
-            profileImage = from.profileImage,
-            status = from.status,
-            isOwner = from.isOwner,
-            joinedAt = from.joinedAt
-        )
-    }
+private object MemberEntityMapper : BiMapper<MemberEntity, MemberData> {
+  override fun mapToRight(from: MemberEntity): MemberData {
+    return MemberData(
+      userId = from.userId,
+      userName = from.userName,
+      userProfile = from.userProfile,
+      loungeId = from.loungeId,
+      status = from.status,
+      joinedAt = from.joinedAt
+    )
+  }
 
-    override fun mapToLeft(from: MemberData): MemberEntity {
-        return MemberEntity(
-            id = from.id,
-            loungeId = from.loungeId,
-            name = from.name,
-            profileImage = from.profileImage,
-            status = from.status,
-            isOwner = from.isOwner,
-            joinedAt = from.joinedAt
-        )
-    }
+  override fun mapToLeft(from: MemberData): MemberEntity {
+    return MemberEntity(
+      userId = from.userId,
+      userName = from.userName,
+      userProfile = from.userProfile,
+      loungeId = from.loungeId,
+      status = from.status,
+      joinedAt = from.joinedAt
+    )
+  }
+}
+
+internal fun MemberEntity.asData(): MemberData {
+  return MemberEntityMapper.mapToRight(this)
+}
+
+internal fun MemberData.asEntity(): MemberEntity {
+  return MemberEntityMapper.mapToLeft(this)
 }

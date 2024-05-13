@@ -4,7 +4,7 @@ import com.jwd.lunchvote.core.common.mapper.BiMapper
 import com.jwd.lunchvote.data.model.UserData
 import com.jwd.lunchvote.remote.model.UserRemote
 
-object UserRemoteMapper: BiMapper<UserRemote, UserData> {
+private object UserRemoteMapper: BiMapper<UserRemote, UserData> {
   override fun mapToRight(from: UserRemote): UserData {
     return UserData(
       id = "",

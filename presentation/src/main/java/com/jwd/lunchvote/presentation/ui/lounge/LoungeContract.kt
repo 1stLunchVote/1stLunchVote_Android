@@ -2,51 +2,60 @@ package com.jwd.lunchvote.presentation.ui.lounge
 
 import android.os.Parcelable
 import com.jwd.lunchvote.core.ui.base.ViewModelContract
-import com.jwd.lunchvote.presentation.model.ChatUIModel
+import com.jwd.lunchvote.presentation.model.LoungeChatUIModel
+import com.jwd.lunchvote.presentation.model.LoungeUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
+import com.jwd.lunchvote.presentation.model.UserUIModel
 import com.jwd.lunchvote.presentation.util.UiText
 import kotlinx.parcelize.Parcelize
 
 class LoungeContract {
   @Parcelize
   data class LoungeState(
-    val loungeId: String? = null,
-    val isOwner: Boolean = false,
+    val user: UserUIModel = UserUIModel(),
+    val lounge: LoungeUIModel = LoungeUIModel(),
     val memberList: List<MemberUIModel> = emptyList(),
-    val chatList: List<ChatUIModel> = emptyList(),
-    val currentChat: String = "",
-    val isReady: Boolean = false,
-    val exitDialogShown: Boolean = false,
-    val scrollIndex: Int = 0,
-    val allReady: Boolean = false   // 대기방 주인을 제외하고 전부 다 레디 or 주인 아닌 경우 레디 한 경우
+    val chatList: List<LoungeChatUIModel> = emptyList(),
+    val text: String = "",
+    val scrollIndex: Int = 0
   ) : ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this
   }
 
   sealed interface LoungeEvent : ViewModelContract.Event {
-    data class OnEditChat(val chat: String) : LoungeEvent
-    data object OnSendChat : LoungeEvent
-    data object OnReady : LoungeEvent
-    data object OnTryExit : LoungeEvent
-    data class OnClickExit(val exit: Boolean) : LoungeEvent
-    data object OnClickInvite : LoungeEvent
+    data object OnClickBackButton : LoungeEvent
+    data class OnClickMember(val member: MemberUIModel) : LoungeEvent
+    data object OnClickInviteButton : LoungeEvent
+    data class OnTextChanged(val text: String) : LoungeEvent
+    data object OnClickSendChatButton : LoungeEvent
+    data object OnClickReadyButton : LoungeEvent
     data class OnScrolled(val index: Int) : LoungeEvent
+
+    // DialogEvents
+    data object OnClickCancelButtonVoteExitDialog : LoungeEvent
+    data object OnClickConfirmButtonVoteExitDialog : LoungeEvent
   }
 
   sealed interface LoungeReduce : ViewModelContract.Reduce {
-    data class UpdateIsOwner(val isOwner: Boolean) : LoungeReduce
-    data class UpdateLoungeId(val loungeId: String?) : LoungeReduce
+    data class UpdateUser(val user: UserUIModel) : LoungeReduce
+    data class UpdateLounge(val lounge: LoungeUIModel) : LoungeReduce
     data class UpdateMemberList(val memberList: List<MemberUIModel>) : LoungeReduce
-    data class UpdateChatList(val chatList: List<ChatUIModel>) : LoungeReduce
-    data class UpdateCurrentChat(val chat: String) : LoungeReduce
-    data class UpdateExitDialogShown(val shown: Boolean) : LoungeReduce
+    data class UpdateChatList(val chatList: List<LoungeChatUIModel>) : LoungeReduce
+    data class UpdateText(val text: String) : LoungeReduce
     data class UpdateScrollIndex(val index: Int) : LoungeReduce
   }
 
   sealed interface LoungeSideEffect : ViewModelContract.SideEffect {
-    data class NavigateToVote(val loungeId: String) : LoungeSideEffect
     data object PopBackStack : LoungeSideEffect
+    data class NavigateToMember(val member: MemberUIModel, val loungeId: String, val isOwner: Boolean) : LoungeSideEffect
+    data class NavigateToVote(val loungeId: String) : LoungeSideEffect
+    data object OpenVoteExitDialog : LoungeSideEffect
+    data object CloseDialog : LoungeSideEffect
     data class ShowSnackBar(val message: UiText) : LoungeSideEffect
     data class CopyToClipboard(val loungeId: String) : LoungeSideEffect
+  }
+
+  companion object {
+    const val VOTE_EXIT_DIALOG = "vote_exit_dialog"
   }
 }

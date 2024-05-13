@@ -2,11 +2,9 @@ package com.jwd.lunchvote.presentation.ui.lounge.member
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
-import com.jwd.lunchvote.domain.entity.type.MemberStatusType
 import com.jwd.lunchvote.domain.usecase.CheckMemberStatusUseCase
 import com.jwd.lunchvote.domain.usecase.ExileMemberUseCase
 import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberContract.LoungeMemberEvent
@@ -15,8 +13,6 @@ import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberContract.Loun
 import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberContract.LoungeMemberState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
@@ -40,19 +36,25 @@ class LoungeMemberViewModel @Inject constructor(
   }
 
   init {
-    updateState(LoungeMemberReduce.SetMemberInfo(memberId, nickname, profileUrl, isOwner))
-
-    checkMemberStatusUseCase(auth.currentUser?.uid!!, loungeId)
-      .onEach {
-        when (it) {
-          MemberStatusType.EXILED, MemberStatusType.EXITED -> {
-            sendSideEffect(LoungeMemberSideEffect.PopBackStack)
-          }
-
-          else -> {}
-        }
-      }
-      .launchIn(viewModelScope)
+//    updateState(LoungeMemberReduce.SetMemberInfo(memberId, nickname, profileUrl, isOwner))
+//
+//    val member = MemberUIModel(
+//      id = memberId,
+//      loungeId = loungeId,
+//      status = MemberStatusType.JOINED,
+//      joinedAt = "",
+//    )
+//    checkMemberStatusUseCase(auth.currentUser?.uid!!, loungeId)
+//      .onEach {
+//        when (it) {
+//          MemberStatusType.EXILED, MemberStatusType.EXITED -> {
+//            sendSideEffect(LoungeMemberSideEffect.PopBackStack)
+//          }
+//
+//          else -> {}
+//        }
+//      }
+//      .launchIn(viewModelScope)
   }
 
   override fun reduceState(
@@ -77,7 +79,7 @@ class LoungeMemberViewModel @Inject constructor(
 
   private fun exileMember() {
     launch {
-      exileMemberUseCase(memberId, loungeId)
+//      exileMemberUseCase(memberId, loungeId)
 
       sendSideEffect(LoungeMemberSideEffect.PopBackStack)
     }

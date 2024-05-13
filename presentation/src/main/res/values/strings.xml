@@ -71,9 +71,18 @@
     <string name="lounge_join_loading">방에 접속중입니다\n잠시만 기다려주세요</string>
     <string name="lounge_ready_button">준비</string>
     <string name="lounge_start_button">시작</string>
+    <string name="lounge_copy_invite_code_snackbar">초대 코드가 복사되었습니다.</string>
     <string name="lounge_exit_dialog_title">정말 나가시겠습니까?</string>
     <string name="lounge_exit_dialog_owner_content">방장이 방을 나갈 경우, 투표 대기방이 사라지게 됩니다.</string>
     <string name="lounge_exit_dialog_member_content">방을 나갈 경우, 초대 코드를 입력하면 다시 들어올 수 있습니다.</string>
+    <string name="lounge_exit_dialog_cancel_button">취소</string>
+    <string name="lounge_exit_dialog_confirm_button">나가기</string>
+    <string name="lounge_create_lounge_snackbar">방 생성에 실패하였습니다.</string>
+    <string name="lounge_join_lounge_snackbar">방 입장에 실패하였습니다.</string>
+    <string name="lounge_owner_exited_snackbar">방장이 투표 방을 나갔습니다.</string>
+    <string name="lounge_exiled_snackbar">투표 방에서 강퇴되었습니다.</string>
+    <string name="lounge_not_ready_to_start_snackbar">모든 멤버가 준비해야합니다.</string>
+    <string name="lounge_exited_snackbar">투표 대기방에서 나왔습니다..</string>
 
     <!-- LoungeMemberScreen -->
     <string name="lounge_member_topbar_title">참여자 정보방</string>

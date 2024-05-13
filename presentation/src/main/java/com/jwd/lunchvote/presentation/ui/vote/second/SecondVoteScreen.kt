@@ -66,8 +66,9 @@ fun SecondVoteRoute(
 
     if (secondVoteState.exitDialogShown){
         VoteExitDialog(
-            onDismiss = { viewModel.sendEvent(SecondVoteEvent.OnClickExitDialog(false)) },
-            onExit = { viewModel.sendEvent(SecondVoteEvent.OnClickExitDialog(true)) }
+            isOwner = false,
+            onDismissRequest = { viewModel.sendEvent(SecondVoteEvent.OnClickExitDialog(false)) },
+            onConfirmation = { viewModel.sendEvent(SecondVoteEvent.OnClickExitDialog(true)) }
         )
     }
 

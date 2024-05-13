@@ -1,11 +1,11 @@
 package com.jwd.lunchvote.remote.model
 
+import java.time.ZonedDateTime
+
 data class MemberRemote(
-    val id: String? = null,
-    val loungeId: String? = null,
-    val name: String? = null,
-    val profileImage: String? = null,
-    val status: String? = null,
-    val isOwner: Boolean = false,
-    val joinedAt: String? = null
+  val userName: String = "",
+  val userProfile: String = "",
+  val loungeId: String = "",
+  val status: String = "",
+  val joinedAt: String = ZonedDateTime.now().toString()
 )

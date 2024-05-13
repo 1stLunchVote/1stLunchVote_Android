@@ -19,10 +19,10 @@ interface MemberDao {
     @Query("DELETE FROM MemberTable WHERE loungeId = :loungeId")
     fun deleteAllMember(loungeId: String)
 
-    @Query("SELECT status FROM MemberTable WHERE id = :id AND loungeId = :loungeId")
-    fun getMemberStatus(id: String, loungeId: String): MemberStatusDataType
+    @Query("SELECT status FROM MemberTable WHERE userId = :userId AND loungeId = :loungeId")
+    fun getMemberStatus(userId: String, loungeId: String): MemberStatusDataType
 
     // 현재 레디값의 반대로 업데이트
-    @Query("UPDATE MemberTable SET status = :status WHERE id = :id AND loungeId = :loungeId")
-    fun updateMemberReady(id: String, loungeId: String, status: MemberStatusDataType)
+    @Query("UPDATE MemberTable SET status = :status WHERE userId = :userId AND loungeId = :loungeId")
+    fun updateMemberReady(userId: String, loungeId: String, status: MemberStatusDataType)
 }

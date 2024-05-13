@@ -1,10 +1,14 @@
 package com.jwd.lunchvote.domain.usecase
 
+import com.jwd.lunchvote.domain.entity.User
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class CreateLoungeUseCase @Inject constructor(
-    private val repository: LoungeRepository
-){
-    suspend operator fun invoke() = repository.createLounge()
+  private val loungeRepository: LoungeRepository
+) {
+  suspend operator fun invoke(user: User): String =
+    loungeRepository.createLounge(user)
 }

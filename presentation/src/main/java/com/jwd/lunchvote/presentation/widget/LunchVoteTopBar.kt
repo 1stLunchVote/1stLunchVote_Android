@@ -25,12 +25,12 @@ fun LunchVoteTopBar(
   navIconVisible: Boolean = true,
   popBackStack: () -> Unit = {},
   actions: @Composable RowScope.() -> Unit = { }
-){
+) {
   CenterAlignedTopAppBar(
     title = { Text(text = title) },
     modifier = modifier.fillMaxWidth(),
     navigationIcon = {
-      if (navIconVisible){
+      if (navIconVisible) {
         IconButton(popBackStack) {
           Icon(
             Icons.AutoMirrored.Filled.ArrowBack,
@@ -48,7 +48,7 @@ fun LunchVoteTopBar(
 
 @Preview
 @Composable
-fun LunchVoteTopBarPreview(){
+fun LunchVoteTopBarPreview() {
   LunchVoteTheme {
     LunchVoteTopBar(
       title = "투표 대기방",

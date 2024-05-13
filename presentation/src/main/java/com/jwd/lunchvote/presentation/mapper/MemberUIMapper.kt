@@ -1,18 +1,40 @@
 package com.jwd.lunchvote.presentation.mapper
 
+import com.jwd.lunchvote.core.common.mapper.BiMapper
 import com.jwd.lunchvote.domain.entity.Member
-import com.jwd.lunchvote.domain.entity.type.MemberStatusType
+import com.jwd.lunchvote.presentation.mapper.type.asDomain
+import com.jwd.lunchvote.presentation.mapper.type.asUI
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 
-internal object MemberUIMapper {
-    fun mapToRight(member: Member, isMine: Boolean = false) : MemberUIModel {
-        return MemberUIModel(
-            member.id,
-            member.name.ifEmpty { "익명" },
-            member.profileImage,
-            member.status == MemberStatusType.READY,
-            member.isOwner,
-            isMine
-        )
-    }
+private object MemberUIMapper : BiMapper<MemberUIModel, Member> {
+  override fun mapToRight(from: MemberUIModel): Member {
+    return Member(
+      userId = from.userId,
+      userName = from.userName,
+      userProfile = from.userProfile,
+      loungeId = from.loungeId,
+      status = from.status.asDomain(),
+      joinedAt = from.joinedAt
+    )
+  }
+
+  override fun mapToLeft(from: Member): MemberUIModel {
+    return MemberUIModel(
+      userId = from.userId,
+      userName = from.userName,
+      userProfile = from.userProfile,
+      loungeId = from.loungeId,
+      status = from.status.asUI(),
+      joinedAt = from.joinedAt
+    )
+  }
+
+}
+
+internal fun Member.asUI(): MemberUIModel {
+  return MemberUIMapper.mapToLeft(this)
+}
+
+internal fun MemberUIModel.asDomain(): Member {
+  return MemberUIMapper.mapToRight(this)
 }

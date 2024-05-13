@@ -3,22 +3,19 @@ package com.jwd.lunchvote.presentation.widget
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -32,51 +29,44 @@ import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 @Composable
 fun LunchVoteDialog(
   title: String,
+  modifier: Modifier = Modifier,
   dismissText: String,
   onDismissRequest: () -> Unit,
+  dismissEnabled: Boolean = true,
   confirmText: String,
   onConfirmation: () -> Unit,
-  modifier: Modifier = Modifier,
-  dismissEnabled: Boolean = true,
   confirmEnabled: Boolean = true,
   icon: @Composable (() -> Unit)? = null,
   content: @Composable ColumnScope.() -> Unit,
 ) {
-  Dialog(
-    onDismissRequest = onDismissRequest
+  ProvideTextStyle(
+    value = MaterialTheme.typography.bodyMedium
   ) {
-    Column(
-      modifier = modifier
-        .fillMaxWidth()
-        .background(MaterialTheme.colorScheme.background, RoundedCornerShape(28.dp))
-        .border(2.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(28.dp)),
-    ){
+    Dialog(
+      onDismissRequest = onDismissRequest
+    ) {
       Column(
-        modifier = Modifier.padding(24.dp)
+        modifier = modifier
+          .fillMaxWidth()
+          .background(MaterialTheme.colorScheme.background, RoundedCornerShape(28.dp))
+          .border(2.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(28.dp))
+          .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
       ) {
-        icon?.let {
-          Box(
-            modifier = Modifier
-              .fillMaxWidth()
-              .height(30.dp),
-            contentAlignment = Alignment.Center
-          ) {
-            it.invoke()
-          }
-        }
-        Spacer(Modifier.height(16.dp))
+        icon?.invoke()
+        Gap(height = 16.dp)
         Text(
           title,
           modifier = Modifier.fillMaxWidth(),
           style = MaterialTheme.typography.titleLarge,
           textAlign = if (icon == null) TextAlign.Start else TextAlign.Center
         )
-        Spacer(Modifier.height(16.dp))
+        Gap(height = 16.dp)
         content()
-        Spacer(Modifier.height(24.dp))
+        Gap(height = 24.dp)
         Row(
           modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.End
+          horizontalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.End)
         ) {
           Button(
             onClick = onDismissRequest,
@@ -84,7 +74,6 @@ fun LunchVoteDialog(
           ) {
             Text(dismissText)
           }
-          Spacer(Modifier.width(8.dp))
           Button(
             onClick = onConfirmation,
             enabled = confirmEnabled
@@ -99,7 +88,7 @@ fun LunchVoteDialog(
 
 @Preview
 @Composable
-private fun LunchVoteDialogPreview(){
+private fun LunchVoteDialogPreview() {
   LunchVoteTheme {
     LunchVoteDialog(
       title = "투표 방 참여하기",
@@ -121,7 +110,7 @@ private fun LunchVoteDialogPreview(){
 
 @Preview
 @Composable
-private fun LunchVoteIconDialogPreview(){
+private fun LunchVoteIconDialogPreview() {
   LunchVoteTheme {
     LunchVoteDialog(
       title = "정말 나가시겠습니까?",

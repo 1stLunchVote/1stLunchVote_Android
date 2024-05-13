@@ -27,7 +27,7 @@ import com.jwd.lunchvote.core.ui.theme.colorSuccess
 import com.jwd.lunchvote.core.ui.util.circleShadow
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodUIModel
-import com.jwd.lunchvote.presentation.model.enums.FoodStatus
+import com.jwd.lunchvote.presentation.model.type.FoodStatus
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 
@@ -40,7 +40,7 @@ fun FoodItem(
 ) {
   Column(
     modifier = modifier.clickable(
-      interactionSource = remember{ MutableInteractionSource() },
+      interactionSource = remember { MutableInteractionSource() },
       indication = null,
       onClick = onClick
     ),
@@ -60,10 +60,12 @@ fun FoodItem(
                 .clip(RoundedCornerShape(16.dp))
                 .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
                 .alpha(0.8f)
+
               FoodStatus.LIKE -> it
                 .clip(RoundedCornerShape(16.dp))
                 .border(2.dp, colorSuccess, RoundedCornerShape(16.dp))
                 .circleShadow(colorSuccess, blurRadius = 8.dp)
+
               else -> it
             }
           },
@@ -94,7 +96,7 @@ fun FoodItem(
 
 @Preview(showBackground = true)
 @Composable
-fun FoodItemDefaultPreview(){
+fun FoodItemDefaultPreview() {
   LunchVoteTheme {
     Row(
       horizontalArrangement = Arrangement.spacedBy(16.dp)
