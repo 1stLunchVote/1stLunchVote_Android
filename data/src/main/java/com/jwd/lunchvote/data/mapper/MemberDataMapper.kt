@@ -10,6 +10,7 @@ private object MemberDataMapper : BiMapper<MemberData, Member> {
   override fun mapToRight(from: MemberData): Member {
     return Member(
       userId = from.userId,
+      userName = from.userName,
       userProfile = from.userProfile,
       loungeId = from.loungeId,
       status = from.status.asDomain(),
@@ -20,6 +21,7 @@ private object MemberDataMapper : BiMapper<MemberData, Member> {
   override fun mapToLeft(from: Member): MemberData {
     return MemberData(
       userId = from.userId,
+      userName = from.userName,
       userProfile = from.userProfile,
       loungeId = from.loungeId,
       status = from.status.asData(),

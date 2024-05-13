@@ -2,7 +2,6 @@ package com.jwd.lunchvote.data.repository
 
 import com.jwd.lunchvote.data.mapper.asData
 import com.jwd.lunchvote.data.mapper.asDomain
-import com.jwd.lunchvote.data.mapper.type.asData
 import com.jwd.lunchvote.data.mapper.type.asDomain
 import com.jwd.lunchvote.data.source.local.LoungeLocalDataSource
 import com.jwd.lunchvote.data.source.remote.LoungeDataSource
@@ -56,7 +55,7 @@ class LoungeRepositoryImpl @Inject constructor(
     return loungeId
   }
 
-  override suspend fun getLoungeById(id: String) =
+  override suspend fun getLoungeById(id: String): Lounge =
     remote.getLoungeById(id).asDomain()
 
   override suspend fun joinLounge(user: User, loungeId: String): Lounge {
@@ -86,22 +85,18 @@ class LoungeRepositoryImpl @Inject constructor(
 
   private suspend fun syncMemberList(loungeId: String) {
     val coroutineScope = CoroutineScope(currentCoroutineContext())
-    remote.getMemberList(loungeId)
-      .onEach { list -> local.putMemberList(list, loungeId) }
+    remote.getMemberList(loungeId).onEach { list -> local.putMemberList(list, loungeId) }
       .launchIn(coroutineScope)
   }
 
   override fun getChatList(loungeId: String): Flow<List<LoungeChat>> {
-    return local.getChatList(loungeId)
-      .map { list -> list.map { it.asDomain() } }
-      .filter { list -> list.isNotEmpty() }
-      .onStart { syncChatList(loungeId) }
+    return local.getChatList(loungeId).map { list -> list.map { it.asDomain() } }
+      .filter { list -> list.isNotEmpty() }.onStart { syncChatList(loungeId) }
   }
 
   private suspend fun syncChatList(loungeId: String) {
     val coroutineScope = CoroutineScope(currentCoroutineContext())
-    remote.getChatList(loungeId)
-      .map { list -> list.map { it.asDomain() } }
+    remote.getChatList(loungeId).map { list -> list.map { it.asDomain() } }
       .onEach { list -> local.putChatList(list.map { it.asData() }, loungeId) }
       .launchIn(coroutineScope)
   }
@@ -109,8 +104,6 @@ class LoungeRepositoryImpl @Inject constructor(
   // 일반 채팅 메시지 보내는 경우
   override suspend fun sendChat(chat: LoungeChat) {
     remote.sendChat(chat.asData())
-//    sendWorkerManager.startSendWork(chat.asData())
-//    return local.insertChat(chat.id, chat.loungeId, chat.message, chat.messageType.asData()) // TOOD: 변경
   }
 
   override suspend fun updateReady(member: Member) {
@@ -123,7 +116,7 @@ class LoungeRepositoryImpl @Inject constructor(
       id = UUID.randomUUID().toString(),
       loungeId = member.loungeId,
       userId = member.userId,
-      userName = "",
+      userName = member.userName,
       userProfile = "",
       message = "",
       messageType = MessageType.EXIT,

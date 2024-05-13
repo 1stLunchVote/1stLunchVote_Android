@@ -7,6 +7,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class MemberUIModel(
   val userId: String = "",
+  val userName: String = "",
   val userProfile: String = "",
   val loungeId: String = "",
   val status: MemberStatusUIType = MemberStatusUIType.JOINED,

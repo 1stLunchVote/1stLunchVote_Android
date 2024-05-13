@@ -10,6 +10,7 @@ private object MemberRemoteMapper : BiMapper<MemberRemote, MemberData> {
   override fun mapToRight(from: MemberRemote): MemberData {
     return MemberData(
       userId = "",
+      userName = from.userName,
       userProfile = from.userProfile,
       loungeId = from.loungeId,
       status = from.status.asMemberStatusDataType(),
@@ -19,6 +20,7 @@ private object MemberRemoteMapper : BiMapper<MemberRemote, MemberData> {
 
   override fun mapToLeft(from: MemberData): MemberRemote {
     return MemberRemote(
+      userName = from.userName,
       userProfile = from.userProfile,
       loungeId = from.loungeId,
       status = from.status.asRemote(),

@@ -147,10 +147,10 @@ class LoungeViewModel @Inject constructor(
   private suspend fun joinLounge(loungeId: String) {
     withTimeoutOrNull(TIMEOUT) {
       val user = currentState.user
-      val lounge = getLoungeByIdUseCase(loungeId).asUI()
+      val loungeStatus = getLoungeByIdUseCase(loungeId).asUI().status
+      if (loungeStatus != LoungeStatusUIType.CREATED) throw LoungeError.NoLounge
 
-      if (lounge.status != LoungeStatusUIType.CREATED) throw LoungeError.NoLounge
-      joinLoungeUseCase(user.asDomain(), loungeId).asUI()
+      val lounge = joinLoungeUseCase(user.asDomain(), loungeId).asUI()
 
       updateState(LoungeReduce.UpdateLounge(lounge))
 

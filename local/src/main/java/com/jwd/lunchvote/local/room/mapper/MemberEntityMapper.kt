@@ -8,6 +8,7 @@ private object MemberEntityMapper : BiMapper<MemberEntity, MemberData> {
   override fun mapToRight(from: MemberEntity): MemberData {
     return MemberData(
       userId = from.userId,
+      userName = from.userName,
       userProfile = from.userProfile,
       loungeId = from.loungeId,
       status = from.status,
@@ -18,6 +19,7 @@ private object MemberEntityMapper : BiMapper<MemberEntity, MemberData> {
   override fun mapToLeft(from: MemberData): MemberEntity {
     return MemberEntity(
       userId = from.userId,
+      userName = from.userName,
       userProfile = from.userProfile,
       loungeId = from.loungeId,
       status = from.status,
