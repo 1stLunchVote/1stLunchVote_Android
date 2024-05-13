@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,6 +21,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material3.HorizontalDivider
@@ -153,6 +155,7 @@ private fun LoungeScreen(
     LoungeBottomBar(
       text = state.text,
       isOwner = state.user.id == state.memberList.find { it.status == MemberStatusUIType.OWNER }?.userId,
+      modifier = Modifier.fillMaxWidth(),
       onTextChanged = { onEvent(LoungeEvent.OnTextChanged(it)) },
       onClickSendChatButton = { onEvent(LoungeEvent.OnClickSendChatButton) },
       onClickReadyButton = { onEvent(LoungeEvent.OnClickReadyButton) }
@@ -224,14 +227,16 @@ private fun LoungeBottomBar(
   onClickSendChatButton: () -> Unit,
   onClickReadyButton: () -> Unit,
 ) {
-  Column {
+  Column(
+    modifier = modifier
+  ) {
     HorizontalDivider(thickness = 2.dp, color = MaterialTheme.colorScheme.onBackground)
     Row(
       modifier = Modifier
         .fillMaxWidth()
         .padding(16.dp),
       horizontalArrangement = Arrangement.spacedBy(8.dp),
-      verticalAlignment = Alignment.CenterVertically
+      verticalAlignment = Alignment.Top
     ) {
       OutlinedButton(
         onClick = onClickReadyButton,
@@ -247,8 +252,9 @@ private fun LoungeBottomBar(
       ChatTextField(
         text = text,
         onTextChanged = onTextChanged,
+        onClickSendChatButton = onClickSendChatButton,
         modifier = Modifier
-          .height(48.dp)
+          .heightIn(min = 48.dp)
           .weight(1f)
       )
       OutlinedIconButton(
@@ -269,6 +275,7 @@ private fun LoungeBottomBar(
 private fun ChatTextField(
   text: String,
   onTextChanged: (String) -> Unit,
+  onClickSendChatButton: () -> Unit,
   modifier: Modifier = Modifier
 ) {
   val interactionSource = remember { MutableInteractionSource() }
@@ -278,19 +285,23 @@ private fun ChatTextField(
     onValueChange = onTextChanged,
     modifier = modifier,
     textStyle = MaterialTheme.typography.bodyLarge,
+    keyboardActions = KeyboardActions(
+      onSend = { onClickSendChatButton() }
+    ),
+    maxLines = 5,
     interactionSource = interactionSource
   ) {
     val isFocus = interactionSource.collectIsFocusedAsState().value
 
     Box(
       modifier = Modifier
-        .clip(RoundedCornerShape(100))
+        .clip(RoundedCornerShape(24.dp))
         .border(
           width = 2.dp,
           color = if (isFocus) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
-          shape = RoundedCornerShape(100)
+          shape = RoundedCornerShape(24.dp)
         )
-        .padding(horizontal = 24.dp),
+        .padding(horizontal = 24.dp, vertical = 8.dp),
       contentAlignment = Alignment.CenterStart
     ) {
       it()

@@ -21,15 +21,11 @@ import com.jwd.lunchvote.remote.model.LoungeRemote
 import com.jwd.lunchvote.remote.model.MemberRemote
 import com.jwd.lunchvote.remote.util.getValueEventFlow
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
-import timber.log.Timber
 import java.util.UUID
 import javax.inject.Inject
 
@@ -99,6 +95,7 @@ class LoungeDataSourceImpl @Inject constructor(
       .await()
 
     val member = MemberRemote(
+      userName = owner.name,
       userProfile = owner.profileImageUrl,
       loungeId = loungeId,
       status = MEMBER_STATUS_OWNER
@@ -144,6 +141,7 @@ class LoungeDataSourceImpl @Inject constructor(
     loungeId: String
   ): LoungeData = withContext(dispatcher) {
     val member = MemberRemote(
+      userName = user.name,
       userProfile = user.profileImageUrl,
       loungeId = loungeId,
       status = MEMBER_STATUS_JOINED

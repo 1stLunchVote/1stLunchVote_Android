@@ -49,7 +49,7 @@ fun MemberProfile(
     modifier = modifier
       .size(48.dp)
       .let {
-        if (member.status == MemberStatusUIType.READY) {
+        if (member.status == MemberStatusUIType.READY || member.status == MemberStatusUIType.OWNER) {
           val glowingColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
 
           it.drawBehind {
@@ -115,6 +115,7 @@ fun InviteProfile(
   Box(
     modifier = modifier
       .size(48.dp)
+      .clip(CircleShape)
       .border(2.dp, MaterialTheme.colorScheme.outline, CircleShape)
       .clickable { onClick() },
     contentAlignment = Alignment.Center

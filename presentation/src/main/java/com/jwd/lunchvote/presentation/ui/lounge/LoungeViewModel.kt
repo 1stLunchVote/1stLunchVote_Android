@@ -45,7 +45,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
-import timber.log.Timber
 import java.time.ZonedDateTime
 import java.util.UUID
 import javax.inject.Inject
@@ -79,7 +78,8 @@ class LoungeViewModel @Inject constructor(
 
   private var currentJob: Job? = null
   private val owner: MemberUIModel
-    get() = currentState.memberList.find { it.status == MemberStatusUIType.OWNER } ?: throw LoungeError.InvalidLounge("방장 정보가 없습니다.")
+    get() = currentState.memberList.find { it.status == MemberStatusUIType.OWNER }
+      ?: throw LoungeError.InvalidLounge("방장 정보가 없습니다.")
 
   init {
     launch {
@@ -167,7 +167,8 @@ class LoungeViewModel @Inject constructor(
     launch { collectChatList(lounge.id) }
 
     currentJob = launch {
-      val member = lounge.members.find { it.userId == currentState.user.id } ?: throw LoungeError.InvalidMember
+      val member =
+        lounge.members.find { it.userId == currentState.user.id } ?: throw LoungeError.InvalidMember
       checkMemberStatus(member)
     }
   }
@@ -182,7 +183,19 @@ class LoungeViewModel @Inject constructor(
 
   private suspend fun collectMemberList(loungeId: String) {
     getMemberListUseCase(loungeId).collectLatest { memberList ->
-      updateState(LoungeReduce.UpdateMemberList(memberList.map { it.asUI() }))
+      when {
+        memberList.find { it.status == MemberStatusType.OWNER } == null -> {
+          sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("투표 방이 종료되었습니다.")))
+          sendSideEffect(LoungeSideEffect.PopBackStack)
+        }
+
+        memberList.find { it.userId == currentState.user.id } == null -> {
+          sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("투표 방에서 강퇴되었습니다.")))
+          sendSideEffect(LoungeSideEffect.PopBackStack)
+        }
+
+        else -> updateState(LoungeReduce.UpdateMemberList(memberList.map { it.asUI() }))
+      }
     }
   }
 
@@ -221,11 +234,13 @@ class LoungeViewModel @Inject constructor(
   }
 
   private suspend fun updateReady() {
-    val owner = currentState.memberList.find { it.status == MemberStatusUIType.OWNER } ?: throw LoungeError.InvalidLounge("방장 정보가 없습니다.")
+    val owner = currentState.memberList.find { it.status == MemberStatusUIType.OWNER }
+      ?: throw LoungeError.InvalidLounge("방장 정보가 없습니다.")
     if (currentState.user.id == owner.userId && currentState.memberList.any { it.status != MemberStatusUIType.READY }) {
       sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("모든 멤버가 준비해야합니다.")))
     } else {
-      val member = currentState.memberList.find { it.userId == currentState.user.id } ?: throw LoungeError.InvalidMember
+      val member = currentState.memberList.find { it.userId == currentState.user.id }
+        ?: throw LoungeError.InvalidMember
       updateReadyUseCase(member.asDomain())
     }
   }
@@ -233,7 +248,8 @@ class LoungeViewModel @Inject constructor(
   private suspend fun exitLounge() {
     currentJob?.cancel()
 
-    val member = currentState.memberList.find { it.userId == currentState.user.id } ?: throw LoungeError.InvalidMember
+    val member = currentState.memberList.find { it.userId == currentState.user.id }
+      ?: throw LoungeError.InvalidMember
     exitLoungeUseCase(member.asDomain())
 
     sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("투표 대기방에서 나왔습니다.")))
