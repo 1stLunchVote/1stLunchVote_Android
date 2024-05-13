@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -22,6 +23,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material3.HorizontalDivider
@@ -42,6 +44,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -257,16 +260,6 @@ private fun LoungeBottomBar(
           .heightIn(min = 48.dp)
           .weight(1f)
       )
-      OutlinedIconButton(
-        onClick = onClickSendChatButton,
-        modifier = Modifier.size(48.dp),
-        border = BorderStroke(2.dp, MaterialTheme.colorScheme.onBackground)
-      ) {
-        Icon(
-          Icons.Rounded.KeyboardArrowUp,
-          contentDescription = "Send"
-        )
-      }
     }
   }
 }
@@ -285,6 +278,9 @@ private fun ChatTextField(
     onValueChange = onTextChanged,
     modifier = modifier,
     textStyle = MaterialTheme.typography.bodyLarge,
+    keyboardOptions = KeyboardOptions(
+      imeAction = ImeAction.Send
+    ),
     keyboardActions = KeyboardActions(
       onSend = { onClickSendChatButton() }
     ),
@@ -293,7 +289,7 @@ private fun ChatTextField(
   ) {
     val isFocus = interactionSource.collectIsFocusedAsState().value
 
-    Box(
+    Row(
       modifier = Modifier
         .clip(RoundedCornerShape(24.dp))
         .border(
@@ -301,10 +297,33 @@ private fun ChatTextField(
           color = if (isFocus) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
           shape = RoundedCornerShape(24.dp)
         )
-        .padding(horizontal = 24.dp, vertical = 8.dp),
-      contentAlignment = Alignment.CenterStart
+        .padding(start = 24.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+      horizontalArrangement = Arrangement.spacedBy(8.dp),
+      verticalAlignment = Alignment.Top
     ) {
-      it()
+      Box(
+        modifier = Modifier
+          .weight(1f)
+          .align(Alignment.CenterVertically),
+        contentAlignment = Alignment.CenterStart
+      ) {
+        it()
+      }
+      OutlinedIconButton(
+        onClick = onClickSendChatButton,
+        modifier = Modifier.size(32.dp),
+        enabled = text.isNotBlank(),
+        border = BorderStroke(
+          width = 2.dp,
+          color = if (text.isBlank()) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onBackground
+        )
+      ) {
+        Icon(
+          Icons.Rounded.KeyboardArrowUp,
+          contentDescription = "Send",
+          tint = if (text.isBlank()) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onBackground
+        )
+      }
     }
   }
 }
