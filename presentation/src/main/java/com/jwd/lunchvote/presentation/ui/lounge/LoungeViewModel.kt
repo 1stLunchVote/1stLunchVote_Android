@@ -95,27 +95,11 @@ class LoungeViewModel @Inject constructor(
   override fun handleEvents(event: LoungeEvent) {
     when (event) {
       is LoungeEvent.OnClickBackButton -> sendSideEffect(LoungeSideEffect.OpenVoteExitDialog)
-      is LoungeEvent.OnClickMember -> sendSideEffect(
-        LoungeSideEffect.NavigateToMember(
-          member = event.member,
-          loungeId = currentState.lounge.id,
-          isOwner = currentState.user.id == owner.userId
-        )
-      )
+      is LoungeEvent.OnClickMember -> sendSideEffect(LoungeSideEffect.NavigateToMember(event.member, currentState.lounge.id, currentState.user.id == owner.userId))
       is LoungeEvent.OnClickInviteButton -> sendSideEffect(LoungeSideEffect.CopyToClipboard(currentState.lounge.id))
       is LoungeEvent.OnTextChanged -> updateState(LoungeReduce.UpdateText(event.text))
       is LoungeEvent.OnClickSendChatButton -> launch(false) { sendChat() }
-
-      is LoungeEvent.OnClickReadyButton -> launch(false) {
-        val owner = currentState.memberList.find { it.status == MemberStatusUIType.OWNER }
-          ?: throw LoungeError.InvalidLounge("방장 정보가 없습니다.")
-        if (currentState.user.id == owner.userId && currentState.memberList.any { it.status != MemberStatusUIType.READY }) {
-          sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("모든 멤버가 준비해야합니다.")))
-        } else {
-          updateReady()
-        }
-      }
-
+      is LoungeEvent.OnClickReadyButton -> launch(false) { updateReady() }
       is LoungeEvent.OnScrolled -> updateState(LoungeReduce.UpdateScrollIndex(event.index))
 
       // DialogEvents
@@ -136,13 +120,7 @@ class LoungeViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(
-      LoungeSideEffect.ShowSnackBar(
-        UiText.DynamicString(
-          error.message ?: UnknownError.UNKNOWN
-        )
-      )
-    )
+    sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
     when (error) {
       is LoungeError.NoLounge -> sendSideEffect(LoungeSideEffect.PopBackStack)
       is LoungeError.InvalidMember -> sendSideEffect(LoungeSideEffect.PopBackStack)
@@ -189,45 +167,40 @@ class LoungeViewModel @Inject constructor(
     launch { collectChatList(lounge.id) }
 
     currentJob = launch {
-      val member = lounge.members.find { it.userId == currentState.user.id }
-        ?: throw LoungeError.InvalidMember
+      val member = lounge.members.find { it.userId == currentState.user.id } ?: throw LoungeError.InvalidMember
       checkMemberStatus(member)
     }
   }
 
   private suspend fun collectLoungeStatus(loungeId: String) {
-    getLoungeStatusUseCase(loungeId)
-      .collectLatest { status ->
-        if (status == LoungeStatusType.STARTED) {
-          sendSideEffect(LoungeSideEffect.NavigateToVote(loungeId))
-        }
+    getLoungeStatusUseCase(loungeId).collectLatest { status ->
+      if (status == LoungeStatusType.STARTED) {
+        sendSideEffect(LoungeSideEffect.NavigateToVote(loungeId))
       }
+    }
   }
 
   private suspend fun collectMemberList(loungeId: String) {
-    getMemberListUseCase(loungeId)
-      .collectLatest { memberList ->
-        updateState(LoungeReduce.UpdateMemberList(memberList.map { it.asUI() }))
-      }
+    getMemberListUseCase(loungeId).collectLatest { memberList ->
+      updateState(LoungeReduce.UpdateMemberList(memberList.map { it.asUI() }))
+    }
   }
 
   private suspend fun collectChatList(loungeId: String) {
-    getChatListUseCase(loungeId)
-      .collectLatest { chatList ->
-        updateState(LoungeReduce.UpdateChatList(chatList.map { it.asUI() }))
-      }
+    getChatListUseCase(loungeId).collectLatest { chatList ->
+      updateState(LoungeReduce.UpdateChatList(chatList.map { it.asUI() }))
+    }
   }
 
   private suspend fun checkMemberStatus(member: MemberUIModel) {
-    checkMemberStatusUseCase(member.asDomain())
-      .collectLatest { status ->
-        if (status == MemberStatusType.EXILED) {
-          exitLoungeUseCase(member.asDomain())
+    checkMemberStatusUseCase(member.asDomain()).collectLatest { status ->
+      if (status == MemberStatusType.EXILED) {
+        exitLoungeUseCase(member.asDomain())
 
-          sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("방장에 의해 추방되었습니다.")))
-          sendSideEffect(LoungeSideEffect.PopBackStack)
-        }
+        sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("방장에 의해 추방되었습니다.")))
+        sendSideEffect(LoungeSideEffect.PopBackStack)
       }
+    }
   }
 
   private suspend fun sendChat() {
@@ -235,6 +208,7 @@ class LoungeViewModel @Inject constructor(
 
     val chat = LoungeChatUIModel(
       id = UUID.randomUUID().toString(),
+      loungeId = currentState.lounge.id,
       userId = currentState.user.id,
       userName = currentState.user.name,
       userProfile = currentState.user.profileImageUrl,
@@ -247,16 +221,19 @@ class LoungeViewModel @Inject constructor(
   }
 
   private suspend fun updateReady() {
-    val member = currentState.memberList.find { it.userId == currentState.user.id }
-      ?: throw LoungeError.InvalidMember
-    updateReadyUseCase(member.asDomain())
+    val owner = currentState.memberList.find { it.status == MemberStatusUIType.OWNER } ?: throw LoungeError.InvalidLounge("방장 정보가 없습니다.")
+    if (currentState.user.id == owner.userId && currentState.memberList.any { it.status != MemberStatusUIType.READY }) {
+      sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("모든 멤버가 준비해야합니다.")))
+    } else {
+      val member = currentState.memberList.find { it.userId == currentState.user.id } ?: throw LoungeError.InvalidMember
+      updateReadyUseCase(member.asDomain())
+    }
   }
 
   private suspend fun exitLounge() {
     currentJob?.cancel()
 
-    val member = currentState.memberList.find { it.userId == currentState.user.id }
-      ?: throw LoungeError.InvalidMember
+    val member = currentState.memberList.find { it.userId == currentState.user.id } ?: throw LoungeError.InvalidMember
     exitLoungeUseCase(member.asDomain())
 
     sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString("투표 대기방에서 나왔습니다.")))

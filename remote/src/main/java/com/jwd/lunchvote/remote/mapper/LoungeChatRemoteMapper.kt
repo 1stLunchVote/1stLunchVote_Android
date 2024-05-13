@@ -35,8 +35,8 @@ private object LoungeChatRemoteMapper : BiMapper<LoungeChatRemote, LoungeChatDat
   }
 }
 
-internal fun LoungeChatRemote.asData(): LoungeChatData {
-  return LoungeChatRemoteMapper.mapToRight(this)
+internal fun LoungeChatRemote.asData(id: String): LoungeChatData {
+  return LoungeChatRemoteMapper.mapToRight(this).copy(id = id)
 }
 
 internal fun LoungeChatData.asRemote(): LoungeChatRemote {

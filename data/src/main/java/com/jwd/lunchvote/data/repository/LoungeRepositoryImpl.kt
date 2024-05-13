@@ -108,8 +108,9 @@ class LoungeRepositoryImpl @Inject constructor(
 
   // 일반 채팅 메시지 보내는 경우
   override suspend fun sendChat(chat: LoungeChat) {
-    sendWorkerManager.startSendWork(chat.asData())
-    return local.insertChat(chat.id, chat.loungeId, chat.message, chat.messageType.asData()) // TOOD: 변경
+    remote.sendChat(chat.asData())
+//    sendWorkerManager.startSendWork(chat.asData())
+//    return local.insertChat(chat.id, chat.loungeId, chat.message, chat.messageType.asData()) // TOOD: 변경
   }
 
   override suspend fun updateReady(member: Member) {

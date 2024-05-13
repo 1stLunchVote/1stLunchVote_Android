@@ -21,12 +21,15 @@ import com.jwd.lunchvote.remote.model.LoungeRemote
 import com.jwd.lunchvote.remote.model.MemberRemote
 import com.jwd.lunchvote.remote.util.getValueEventFlow
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import timber.log.Timber
 import java.util.UUID
 import javax.inject.Inject
 
@@ -199,8 +202,8 @@ class LoungeDataSourceImpl @Inject constructor(
       .getValueEventFlow<LoungeChatRemote>()
       .map {
         it.map { (key, value) ->
-          value?.asData() ?: throw Exception("TODO: getChatList, hashMap is null")
-        }
+          value?.asData(key) ?: throw Exception("TODO: getChatList, hashMap is null")
+        }.sortedByDescending { chat -> chat.createdAt }
       }
       .flowOn(dispatcher)
 
@@ -209,25 +212,30 @@ class LoungeDataSourceImpl @Inject constructor(
   ) {
     withContext(dispatcher) {
       val chatRemote = chat.asRemote()
-      val name = auth.currentUser?.displayName?.ifBlank { "익명" }
       val chatMessage = when (chatRemote.messageType) {
         CHAT_MESSAGE_TYPE_NORMAL -> chatRemote.message
         CHAT_MESSAGE_TYPE_CREATE -> CHAT_MESSAGE_CREATE
-        CHAT_MESSAGE_TYPE_JOIN -> "$name $CHAT_MESSAGE_JOIN"
-        CHAT_MESSAGE_TYPE_EXIT -> "$name $CHAT_MESSAGE_EXIT"
+        CHAT_MESSAGE_TYPE_JOIN -> "${chatRemote.userName} $CHAT_MESSAGE_JOIN"
+        CHAT_MESSAGE_TYPE_EXIT -> "${chatRemote.userName} $CHAT_MESSAGE_EXIT"
         else -> throw Exception("TODO: sendChat, invalid messageType")
       }
 
-      val data = JSONObject().apply {
-        put(CHAT_LOUNGE_ID, chatRemote.loungeId)
-        put(CHAT_USER_ID, chatRemote.userId)
-        put(CHAT_USER_PROFILE, chatRemote.userProfile)
-        put(CHAT_MESSAGE, chatMessage)
-        put(CHAT_MESSAGE_TYPE, chatRemote.messageType)
-        put(CHAT_CREATED_AT, chatRemote.createdAt)
-      }
+      database
+        .getReference(CHAT_PATH)
+        .child(chatRemote.loungeId)
+        .child(chat.id)
+        .setValue(chatRemote.copy(message = chatMessage))
 
-      functions.getHttpsCallable("sendChat").call(data).await()
+//      val data = JSONObject().apply {
+//        put(CHAT_LOUNGE_ID, chatRemote.loungeId)
+//        put(CHAT_USER_ID, chatRemote.userId)
+//        put(CHAT_USER_PROFILE, chatRemote.userProfile)
+//        put(CHAT_MESSAGE, chatMessage)
+//        put(CHAT_MESSAGE_TYPE, chatRemote.messageType)
+//        put(CHAT_CREATED_AT, chatRemote.createdAt)
+//      }
+//
+//      functions.getHttpsCallable("sendChat").call(data).await()
     }
   }
 
