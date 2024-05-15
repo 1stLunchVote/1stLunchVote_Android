@@ -24,6 +24,7 @@ import com.jwd.lunchvote.presentation.ui.template.TemplateListRoute
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateRoute
 import com.jwd.lunchvote.presentation.ui.template.dialog.TemplateListAddDialog
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateRoute
+import com.jwd.lunchvote.presentation.ui.tips.TipsRoute
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteRoute
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteRoute
 
@@ -197,6 +198,12 @@ fun LunchVoteNavHost(
       ProfileRoute(
         popBackStack = { navController.popBackStack() },
         navigateToLogin = { navController.navigateWithPop(LunchVoteNavRoute.Login) },
+        showSnackBar = showSnackBar
+      )
+    }
+    composable(LunchVoteNavRoute.Tips) {
+      TipsRoute(
+        popBackStack = { navController.popBackStack() },
         showSnackBar = showSnackBar
       )
     }

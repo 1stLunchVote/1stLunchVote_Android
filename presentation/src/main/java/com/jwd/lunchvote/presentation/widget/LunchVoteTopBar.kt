@@ -48,7 +48,7 @@ fun LunchVoteTopBar(
 
 @Preview
 @Composable
-fun LunchVoteTopBarPreview() {
+private fun LunchVoteTopBarPreview() {
   LunchVoteTheme {
     LunchVoteTopBar(
       title = "투표 대기방",
