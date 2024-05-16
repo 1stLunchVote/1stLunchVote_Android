@@ -20,18 +20,18 @@ class ProfileContract {
   }
 
   sealed interface ProfileEvent : ViewModelContract.Event {
-    data object OnScreenLoaded : ProfileEvent
+    data object ScreenInitialize : ProfileEvent
     data object OnClickBackButton : ProfileEvent
     data object OnClickEditProfileImageButton : ProfileEvent
     data object OnClickEditNameButton : ProfileEvent
     data object OnClickDeleteUserButton : ProfileEvent
 
     // DialogEvent
-    data class OnProfileImageChangedEditProfileImageDialog(val profileImageUri: Uri) : ProfileEvent
+    data class OnProfileImageChangeEditProfileImageDialog(val profileImageUri: Uri) : ProfileEvent
     data object OnImageLoadErrorEditProfileImageDialog : ProfileEvent
     data object OnClickCancelButtonEditProfileImageDialog : ProfileEvent
     data class OnClickSaveButtonEditProfileImageDialog(val context: Context) : ProfileEvent
-    data class OnNameChangedEditNameDialog(val name: String) : ProfileEvent
+    data class OnNameChangeEditNameDialog(val name: String) : ProfileEvent
     data object OnClickCancelButtonEditNameDialog : ProfileEvent
     data object OnClickSaveButtonEditNameDialog : ProfileEvent
     data object OnClickCancelButtonDeleteUserConfirmDialog : ProfileEvent

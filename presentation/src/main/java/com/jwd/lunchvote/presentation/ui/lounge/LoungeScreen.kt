@@ -158,7 +158,7 @@ private fun LoungeScreen(
       text = state.text,
       isOwner = state.user.id == state.memberList.find { it.status == MemberStatusUIType.OWNER }?.userId,
       modifier = Modifier.fillMaxWidth(),
-      onTextChanged = { onEvent(LoungeEvent.OnTextChanged(it)) },
+      onTextChange = { onEvent(LoungeEvent.OnTextChange(it)) },
       onClickSendChatButton = { onEvent(LoungeEvent.OnClickSendChatButton) },
       onClickReadyButton = { onEvent(LoungeEvent.OnClickReadyButton) }
     )
@@ -225,7 +225,7 @@ private fun LoungeBottomBar(
   text: String,
   isOwner: Boolean,
   modifier: Modifier = Modifier,
-  onTextChanged: (String) -> Unit,
+  onTextChange: (String) -> Unit,
   onClickSendChatButton: () -> Unit,
   onClickReadyButton: () -> Unit,
 ) {
@@ -253,7 +253,7 @@ private fun LoungeBottomBar(
       }
       ChatTextField(
         text = text,
-        onTextChanged = onTextChanged,
+        onTextChange = onTextChange,
         onClickSendChatButton = onClickSendChatButton,
         modifier = Modifier
           .heightIn(min = 48.dp)
@@ -266,7 +266,7 @@ private fun LoungeBottomBar(
 @Composable
 private fun ChatTextField(
   text: String,
-  onTextChanged: (String) -> Unit,
+  onTextChange: (String) -> Unit,
   onClickSendChatButton: () -> Unit,
   modifier: Modifier = Modifier
 ) {
@@ -274,7 +274,7 @@ private fun ChatTextField(
 
   BasicTextField(
     value = text,
-    onValueChange = onTextChanged,
+    onValueChange = onTextChange,
     modifier = modifier,
     textStyle = MaterialTheme.typography.bodyLarge,
     keyboardOptions = KeyboardOptions(

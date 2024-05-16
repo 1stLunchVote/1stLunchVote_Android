@@ -52,8 +52,7 @@ fun NicknameRoute(
   else NicknameScreen(
     state = state,
     modifier = modifier,
-    onNicknameChanged = { viewModel.sendEvent(NicknameEvent.OnNicknameChanged(it)) },
-    onClickNextButton = { viewModel.sendEvent(NicknameEvent.OnClickNextButton) }
+    onEvent = viewModel::sendEvent
   )
 }
 
@@ -61,8 +60,7 @@ fun NicknameRoute(
 private fun NicknameScreen(
   state: NicknameState,
   modifier: Modifier = Modifier,
-  onNicknameChanged: (String) -> Unit = {},
-  onClickNextButton: () -> Unit = {}
+  onEvent: (NicknameEvent) -> Unit = {}
 ) {
   Screen(
     modifier = modifier,
@@ -95,7 +93,7 @@ private fun NicknameScreen(
       )
       LunchVoteTextField(
         text = state.nickname,
-        onTextChange = onNicknameChanged,
+        onTextChange = { onEvent(NicknameEvent.OnNicknameChange(it)) },
         hintText = stringResource(R.string.nickname_nickname_hint),
         modifier = Modifier
           .fillMaxWidth()
@@ -106,7 +104,7 @@ private fun NicknameScreen(
           }
       )
       Button(
-        onClick = onClickNextButton,
+        onClick = { onEvent(NicknameEvent.OnClickNextButton) },
         modifier = Modifier
           .constrainAs(nextButton) {
             bottom.linkTo(parent.bottom, 64.dp)

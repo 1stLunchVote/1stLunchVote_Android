@@ -91,7 +91,7 @@ fun HomeRoute(
       JoinDialog(
         loungeId = state.loungeId ?: "",
         onDismissRequest = { viewModel.sendEvent(HomeEvent.OnClickCancelButtonJoinDialog) },
-        onLoungeIdChanged = { viewModel.sendEvent(HomeEvent.OnLoungeIdChanged(it)) },
+        onLoungeIdChange = { viewModel.sendEvent(HomeEvent.OnLoungeIdChange(it)) },
         onConfirmation = { viewModel.sendEvent(HomeEvent.OnClickConfirmButtonJoinDialog) }
       )
     }
@@ -367,7 +367,7 @@ private fun JoinDialog(
   loungeId: String,
   modifier: Modifier = Modifier,
   onDismissRequest: () -> Unit = {},
-  onLoungeIdChanged: (String) -> Unit = {},
+  onLoungeIdChange: (String) -> Unit = {},
   onConfirmation: () -> Unit = {},
 ) {
   LunchVoteDialog(
@@ -381,7 +381,7 @@ private fun JoinDialog(
   ) {
     LunchVoteTextField(
       text = loungeId,
-      onTextChange = onLoungeIdChanged,
+      onTextChange = onLoungeIdChange,
       hintText = stringResource(R.string.join_dialog_hint_text)
     )
   }

@@ -170,10 +170,10 @@ fun LunchVoteNavHost(
     }
     composable(LunchVoteNavRoute.TemplateList) {
       TemplateListRoute(
+        navigateToAddTemplate = { navController.navigate(LunchVoteNavRoute.AddTemplate) },
         navigateToEditTemplate = { templateId ->
           navController.navigate(LunchVoteNavRoute.EditTemplate, templateId)
         },
-        openAddDialog = { navController.navigate(LunchVoteNavRoute.TemplateListAddDialog) },
         popBackStack = { navController.popBackStack() },
         showSnackBar = showSnackBar
       )
@@ -208,16 +208,6 @@ fun LunchVoteNavHost(
     composable(LunchVoteNavRoute.Tips) {
       TipsRoute(
         popBackStack = { navController.popBackStack() },
-        showSnackBar = showSnackBar
-      )
-    }
-
-    dialog(LunchVoteNavRoute.TemplateListAddDialog) {
-      TemplateListAddDialog(
-        popBackStack = { navController.popBackStack() },
-        navigateToAddTemplate = { templateName ->
-          navController.navigate(LunchVoteNavRoute.AddTemplate, templateName)
-        },
         showSnackBar = showSnackBar
       )
     }

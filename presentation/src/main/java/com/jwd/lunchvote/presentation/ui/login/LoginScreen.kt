@@ -214,7 +214,7 @@ private fun LoginFields(
       modifier = Modifier.fillMaxWidth(),
       enabled = isLoading.not() && email.isNotEmpty() && password.isNotEmpty() && isValid
     ) {
-      Text(stringResource(R.string.login_button))
+      Text(text = stringResource(R.string.login_button))
     }
   }
 }

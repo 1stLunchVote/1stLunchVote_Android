@@ -69,7 +69,7 @@ fun AddTemplateRoute(
     modifier = modifier,
     onClickBackButton = { viewModel.sendEvent(AddTemplateEvent.OnClickBackButton) },
     onClickFood = { food -> viewModel.sendEvent(AddTemplateEvent.OnClickFood(food)) },
-    setSearchKeyword = { searchKeyword -> viewModel.sendEvent(AddTemplateEvent.OnSearchKeywordChanged(searchKeyword)) },
+    setSearchKeyword = { searchKeyword -> viewModel.sendEvent(AddTemplateEvent.OnSearchKeywordChange(searchKeyword)) },
     onClickAddButton = { viewModel.sendEvent(AddTemplateEvent.OnClickAddButton) }
   )
 }

@@ -16,8 +16,8 @@ class PasswordContract {
   }
 
   sealed interface PasswordEvent : ViewModelContract.Event {
-    data class OnPasswordChanged(val password: String) : PasswordEvent
-    data class OnPasswordConfirmChanged(val passwordConfirm: String) : PasswordEvent
+    data class OnPasswordChange(val password: String) : PasswordEvent
+    data class OnPasswordConfirmChange(val passwordConfirm: String) : PasswordEvent
     data object OnClickNextButton : PasswordEvent
   }
 

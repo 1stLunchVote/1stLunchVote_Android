@@ -22,8 +22,8 @@ class HomeContract {
     data object OnClickSettingButton : HomeEvent
     data object OnClickTipsButton : HomeEvent
 
-    // DialogEvent
-    data class OnLoungeIdChanged(val loungeId: String) : HomeEvent
+    // DialogEvents
+    data class OnLoungeIdChange(val loungeId: String) : HomeEvent
     data object OnClickCancelButtonJoinDialog : HomeEvent
     data object OnClickConfirmButtonJoinDialog : HomeEvent
   }

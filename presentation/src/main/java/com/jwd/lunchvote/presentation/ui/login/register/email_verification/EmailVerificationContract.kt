@@ -15,7 +15,7 @@ class EmailVerificationContract {
   }
 
   sealed interface EmailVerificationEvent : ViewModelContract.Event {
-    data class OnEmailChanged(val email: String) : EmailVerificationEvent
+    data class OnEmailChange(val email: String) : EmailVerificationEvent
     data object OnClickSendButton : EmailVerificationEvent
     data object OnClickResendButton : EmailVerificationEvent
   }

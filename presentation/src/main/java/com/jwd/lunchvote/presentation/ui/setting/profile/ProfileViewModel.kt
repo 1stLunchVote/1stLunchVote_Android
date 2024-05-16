@@ -55,18 +55,18 @@ class ProfileViewModel @Inject constructor(
 
   override fun handleEvents(event: ProfileEvent) {
     when(event) {
-      is ProfileEvent.OnScreenLoaded -> launch { initialize() }
+      is ProfileEvent.ScreenInitialize -> launch { initialize() }
       is ProfileEvent.OnClickBackButton -> sendSideEffect(ProfileSideEffect.PopBackStack)
       is ProfileEvent.OnClickEditProfileImageButton -> sendSideEffect(ProfileSideEffect.OpenEditProfileImageDialog)
       is ProfileEvent.OnClickEditNameButton -> sendSideEffect(ProfileSideEffect.OpenEditNameDialog)
       is ProfileEvent.OnClickDeleteUserButton -> sendSideEffect(ProfileSideEffect.OpenDeleteUserConfirmDialog)
 
       // DialogEvent
-      is ProfileEvent.OnProfileImageChangedEditProfileImageDialog -> updateState(ProfileReduce.UpdateProfileImage(event.profileImageUri))
+      is ProfileEvent.OnProfileImageChangeEditProfileImageDialog -> updateState(ProfileReduce.UpdateProfileImage(event.profileImageUri))
       is ProfileEvent.OnImageLoadErrorEditProfileImageDialog -> sendSideEffect(ProfileSideEffect.ShowSnackBar(UiText.StringResource(R.string.profile_edit_profile_image_dialog_image_load_error)))
       is ProfileEvent.OnClickCancelButtonEditProfileImageDialog -> sendSideEffect(ProfileSideEffect.CloseDialog)
       is ProfileEvent.OnClickSaveButtonEditProfileImageDialog -> launch { saveProfileImage(event.context) }
-      is ProfileEvent.OnNameChangedEditNameDialog -> updateState(ProfileReduce.UpdateName(event.name))
+      is ProfileEvent.OnNameChangeEditNameDialog -> updateState(ProfileReduce.UpdateName(event.name))
       is ProfileEvent.OnClickCancelButtonEditNameDialog -> sendSideEffect(ProfileSideEffect.CloseDialog)
       is ProfileEvent.OnClickSaveButtonEditNameDialog -> launch { saveName() }
       is ProfileEvent.OnClickCancelButtonDeleteUserConfirmDialog -> sendSideEffect(ProfileSideEffect.CloseDialog)

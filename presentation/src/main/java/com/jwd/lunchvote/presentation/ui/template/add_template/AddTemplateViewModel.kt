@@ -44,7 +44,7 @@ class AddTemplateViewModel @Inject constructor(
     when(event) {
       is AddTemplateEvent.OnClickBackButton -> sendSideEffect(AddTemplateSideEffect.PopBackStack)
       is AddTemplateEvent.OnClickFood -> updateState(AddTemplateReduce.UpdateFoodStatus(event.food))
-      is AddTemplateEvent.OnSearchKeywordChanged -> updateState(AddTemplateReduce.UpdateSearchKeyword(event.searchKeyword))
+      is AddTemplateEvent.OnSearchKeywordChange -> updateState(AddTemplateReduce.UpdateSearchKeyword(event.searchKeyword))
       is AddTemplateEvent.OnClickAddButton -> launch { addTemplate() }
     }
   }

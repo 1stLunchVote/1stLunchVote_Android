@@ -50,7 +50,7 @@ class HomeViewModel @Inject constructor(
       is HomeEvent.OnClickTipsButton -> sendSideEffect(HomeSideEffect.NavigateToTips)
 
       // DialogEvent
-      is HomeEvent.OnLoungeIdChanged -> updateState(HomeReduce.UpdateLoungeId(event.loungeId))
+      is HomeEvent.OnLoungeIdChange -> updateState(HomeReduce.UpdateLoungeId(event.loungeId))
       is HomeEvent.OnClickCancelButtonJoinDialog -> {
         updateState(HomeReduce.UpdateLoungeId(null))
         sendSideEffect(HomeSideEffect.CloseDialog)

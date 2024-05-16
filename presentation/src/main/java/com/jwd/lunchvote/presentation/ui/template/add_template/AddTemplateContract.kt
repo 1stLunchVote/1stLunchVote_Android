@@ -22,7 +22,7 @@ class AddTemplateContract {
   sealed interface AddTemplateEvent: ViewModelContract.Event {
     data object OnClickBackButton: AddTemplateEvent
     data class OnClickFood(val food: FoodUIModel): AddTemplateEvent
-    data class OnSearchKeywordChanged(val searchKeyword: String): AddTemplateEvent
+    data class OnSearchKeywordChange(val searchKeyword: String): AddTemplateEvent
     data object OnClickAddButton: AddTemplateEvent
   }
 
