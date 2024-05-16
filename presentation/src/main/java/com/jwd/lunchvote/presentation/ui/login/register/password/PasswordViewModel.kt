@@ -25,14 +25,10 @@ class PasswordViewModel @Inject constructor(
     return savedState as? PasswordState ?: PasswordState()
   }
 
-  init {
-    launch {
-      initialize()
-    }
-  }
-
   override fun handleEvents(event: PasswordEvent) {
     when (event) {
+      is PasswordEvent.ScreenInitialize -> initialize()
+
       is PasswordEvent.OnPasswordChange -> updateState(PasswordReduce.UpdatePassword(event.password))
       is PasswordEvent.OnPasswordConfirmChange -> updateState(PasswordReduce.UpdatePasswordConfirm(event.passwordConfirm))
       is PasswordEvent.OnClickNextButton -> sendSideEffect(PasswordSideEffect.NavigateToNickname(currentState.email, currentState.password))

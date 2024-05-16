@@ -52,6 +52,8 @@ fun PasswordRoute(
     }
   }
 
+  LaunchedEffect(Unit) { viewModel.sendEvent(PasswordEvent.ScreenInitialize) }
+
   PasswordScreen(
     state = state,
     modifier = modifier,

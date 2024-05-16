@@ -128,6 +128,8 @@ class ProfileViewModel @Inject constructor(
   }
 
   private suspend fun deleteUser() {
+    sendSideEffect(ProfileSideEffect.CloseDialog)
+
     val currentUser = Firebase.auth.currentUser ?: throw LoginError.NoUser
     currentUser.delete().await()
 
