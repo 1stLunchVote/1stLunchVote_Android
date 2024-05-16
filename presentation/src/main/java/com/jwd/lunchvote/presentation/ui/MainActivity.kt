@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavHost
@@ -25,12 +24,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-  @Inject
-  lateinit var firebaseAuth: FirebaseAuth
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -41,7 +37,7 @@ class MainActivity : ComponentActivity() {
       val navController = rememberNavController()
 
       val startDestination =
-        if (firebaseAuth.currentUser != null) LunchVoteNavRoute.Home.route
+        if (Firebase.auth.currentUser != null) LunchVoteNavRoute.Home.route
         else if (Firebase.auth.isSignInWithEmailLink(intent.data.toString())) LunchVoteNavRoute.Password.route
         else LunchVoteNavRoute.Login.route
 
@@ -54,9 +50,11 @@ class MainActivity : ComponentActivity() {
           ) { padding ->
             val snackbarChannel: Channel<String> = Channel()
             LaunchedEffect(snackbarChannel) {
-              snackbarChannel.receiveAsFlow().collectLatest { message ->
-                snackbarHostState.showSnackbar(message)
-              }
+              snackbarChannel
+                .receiveAsFlow()
+                .collectLatest { message ->
+                  snackbarHostState.showSnackbar(message)
+                }
             }
             LunchVoteNavHost(
               startDestination = startDestination,

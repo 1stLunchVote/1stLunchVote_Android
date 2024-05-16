@@ -3,6 +3,8 @@ package com.jwd.lunchvote.presentation.ui.template.add_template
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
@@ -15,6 +17,7 @@ import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.model.type.FoodStatus
 import com.jwd.lunchvote.presentation.model.updateFoodMap
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
+import com.jwd.lunchvote.presentation.ui.setting.profile.ProfileContract
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateEvent
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateReduce
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateSideEffect
@@ -34,14 +37,10 @@ class AddTemplateViewModel @Inject constructor(
     return savedState as? AddTemplateState ?: AddTemplateState()
   }
 
-  init {
-    launch {
-      initialize()
-    }
-  }
-
   override fun handleEvents(event: AddTemplateEvent) {
     when(event) {
+      is AddTemplateEvent.ScreenInitialize -> launch { initialize() }
+
       is AddTemplateEvent.OnClickBackButton -> sendSideEffect(AddTemplateSideEffect.PopBackStack)
       is AddTemplateEvent.OnClickFood -> updateState(AddTemplateReduce.UpdateFoodStatus(event.food))
       is AddTemplateEvent.OnSearchKeywordChange -> updateState(AddTemplateReduce.UpdateSearchKeyword(event.searchKeyword))
@@ -74,10 +73,14 @@ class AddTemplateViewModel @Inject constructor(
 
   override fun handleErrors(error: Throwable) {
     sendSideEffect(AddTemplateSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+    when (error) {
+      is LoginError.NoUser -> Firebase.auth.signOut()
+    }
   }
 
   private suspend fun initialize() {
-    val name = checkNotNull(savedStateHandle.get<String>(LunchVoteNavRoute.AddTemplate.arguments.first().name))
+    val nameKey = LunchVoteNavRoute.AddTemplate.arguments.first().name
+    val name = checkNotNull(savedStateHandle.get<String>(nameKey))
     updateState(AddTemplateReduce.UpdateName(name))
 
     val foodList = getFoodListUseCase()
