@@ -59,7 +59,6 @@
     <string name="join_dialog_hint_text">초대 코드</string>
     <string name="join_dialog_dismiss_button">취소</string>
     <string name="join_dialog_confirm_button">참여</string>
-    <string name="join_dialog_loading">로딩 중…</string>
 
     <!-- RegisterEmailScreen -->
     <string name="register_email_title">먼저 이메일을 확인할게요.</string>

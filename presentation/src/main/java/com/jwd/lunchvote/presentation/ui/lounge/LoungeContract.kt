@@ -26,7 +26,7 @@ class LoungeContract {
     data object OnClickBackButton : LoungeEvent
     data class OnClickMember(val member: MemberUIModel) : LoungeEvent
     data object OnClickInviteButton : LoungeEvent
-    data class OnTextChanged(val text: String) : LoungeEvent
+    data class OnTextChange(val text: String) : LoungeEvent
     data object OnClickSendChatButton : LoungeEvent
     data object OnClickReadyButton : LoungeEvent
     data class OnScrolled(val index: Int) : LoungeEvent

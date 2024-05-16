@@ -114,12 +114,7 @@ fun LoginRoute(
     state = state,
     modifier = modifier,
     isLoading = isLoading,
-    onEmailChange = { viewModel.sendEvent(LoginEvent.OnEmailChange(it)) },
-    onPasswordChange = { viewModel.sendEvent(LoginEvent.OnPasswordChange(it)) },
-    onClickEmailLoginButton = { viewModel.sendEvent(LoginEvent.OnClickEmailLoginButton) },
-    onClickRegisterButton = { viewModel.sendEvent(LoginEvent.OnClickRegisterButton) },
-    onClickKakaoLoginButton = { viewModel.sendEvent(LoginEvent.OnClickKakaoLoginButton) },
-    onClickGoogleLoginButton = { viewModel.sendEvent(LoginEvent.OnClickGoogleLoginButton) }
+    onEvent = viewModel::sendEvent
   )
 }
 
@@ -128,12 +123,7 @@ private fun LoginScreen(
   state: LoginState,
   modifier: Modifier = Modifier,
   isLoading: Boolean = false,
-  onEmailChange: (String) -> Unit = {},
-  onPasswordChange: (String) -> Unit = {},
-  onClickEmailLoginButton: () -> Unit = {},
-  onClickRegisterButton: () -> Unit = {},
-  onClickKakaoLoginButton: () -> Unit = {},
-  onClickGoogleLoginButton: () -> Unit = {}
+  onEvent: (LoginEvent) -> Unit = {}
 ) {
   Screen(
     modifier = modifier,
@@ -155,22 +145,22 @@ private fun LoginScreen(
       LoginFields(
         email = state.email,
         password = state.password,
-        onEmailChange = onEmailChange,
-        onPasswordChange = onPasswordChange,
-        onClickEmailLoginButton = onClickEmailLoginButton,
+        onEmailChange = { onEvent(LoginEvent.OnEmailChange(it)) },
+        onPasswordChange = { onEvent(LoginEvent.OnPasswordChange(it)) },
+        onClickEmailLoginButton = { onEvent(LoginEvent.OnClickEmailLoginButton) },
         isLoading = isLoading,
         modifier = Modifier.fillMaxWidth()
       )
       Gap(height = 8.dp)
       RegisterRow(
-        onClickRegisterButton = onClickRegisterButton,
+        onClickRegisterButton = { onEvent(LoginEvent.OnClickRegisterButton) },
         isLoading = isLoading,
         modifier = Modifier.fillMaxWidth()
       )
       Gap(minHeight = 32.dp)
       SocialLoginButtons(
-        onClickKakaoLoginButton = onClickKakaoLoginButton,
-        onClickGoogleLoginButton = onClickGoogleLoginButton,
+        onClickKakaoLoginButton = { onEvent(LoginEvent.OnClickKakaoLoginButton) },
+        onClickGoogleLoginButton = { onEvent(LoginEvent.OnClickGoogleLoginButton) },
         isLoading = isLoading,
         modifier = Modifier.fillMaxWidth()
       )
@@ -224,7 +214,7 @@ private fun LoginFields(
       modifier = Modifier.fillMaxWidth(),
       enabled = isLoading.not() && email.isNotEmpty() && password.isNotEmpty() && isValid
     ) {
-      Text(stringResource(R.string.login_button))
+      Text(text = stringResource(R.string.login_button))
     }
   }
 }

@@ -4,6 +4,7 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.presentation.R
@@ -26,6 +27,7 @@ class SettingViewModel @Inject constructor(
   override fun handleEvents(event: SettingEvent) {
     when(event) {
       is SettingEvent.ScreenInitialize -> updateState(SettingReduce.UpdateAppVersion(event.appVersion))
+
       is SettingEvent.OnClickBackButton -> sendSideEffect(SettingSideEffect.PopBackStack)
       is SettingEvent.OnClickProfileButton -> sendSideEffect(SettingSideEffect.NavigateToProfile)
       is SettingEvent.OnClickAlertSettingButton -> sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.DynamicString("알림 설정")))
@@ -44,6 +46,9 @@ class SettingViewModel @Inject constructor(
 
   override fun handleErrors(error: Throwable) {
     sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+    when (error) {
+      is LoginError.NoUser -> Firebase.auth.signOut()
+    }
   }
 
   private fun logout() {

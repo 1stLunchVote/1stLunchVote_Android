@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.ui.template.TemplateListContract.TemplateListEvent
@@ -38,6 +39,8 @@ import com.jwd.lunchvote.presentation.ui.template.TemplateListContract.TemplateL
 import com.jwd.lunchvote.presentation.ui.template.TemplateListContract.TemplateListState
 import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
+import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
+import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
@@ -46,44 +49,55 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun TemplateListRoute(
   popBackStack: () -> Unit,
+  navigateToAddTemplate: (String) -> Unit,
   navigateToEditTemplate: (String?) -> Unit,
-  openAddDialog: () -> Unit,
   showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: TemplateListViewModel = hiltViewModel(),
   context: Context = LocalContext.current
 ){
-  val templateListState by viewModel.viewState.collectAsStateWithLifecycle()
-  val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+  val state by viewModel.viewState.collectAsStateWithLifecycle()
+  val loading by viewModel.isLoading.collectAsStateWithLifecycle()
+  val dialog by viewModel.dialogState.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect){
     viewModel.sideEffect.collectLatest {
       when(it){
         is TemplateListSideEffect.PopBackStack -> popBackStack()
+        is TemplateListSideEffect.NavigateToAddTemplate -> navigateToAddTemplate(it.templateName)
         is TemplateListSideEffect.NavigateToEditTemplate -> navigateToEditTemplate(it.templateId)
-        is TemplateListSideEffect.OpenAddDialog -> openAddDialog()
+        is TemplateListSideEffect.OpenAddDialog -> viewModel.setDialogState(TemplateListContract.ADD_DIALOG)
+        is TemplateListSideEffect.CloseDialog -> viewModel.setDialogState("")
         is TemplateListSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
       }
     }
   }
 
-  if (isLoading) LoadingScreen()
+  when(dialog) {
+    TemplateListContract.ADD_DIALOG -> AddDialog(
+      templateName = state.templateName ?: "",
+      modifier = modifier,
+      onTemplateNameChange = { viewModel.sendEvent(TemplateListEvent.OnTemplateNameChange(it)) },
+      onDismissRequest = { viewModel.sendEvent(TemplateListEvent.OnClickDismissButtonAddDialog) },
+      onConfirmation = { viewModel.sendEvent(TemplateListEvent.OnClickConfirmButtonAddDialog) }
+    )
+  }
+
+  LaunchedEffect(Unit) { viewModel.sendEvent(TemplateListEvent.ScreenInitialize) }
+
+  if (loading) LoadingScreen()
   else TemplateListScreen(
-    templateListState = templateListState,
+    state = state,
     modifier = modifier,
-    onClickBackButton = { viewModel.sendEvent(TemplateListEvent.OnClickBackButton) },
-    onClickTemplate = { viewModel.sendEvent(TemplateListEvent.OnClickTemplate(it)) },
-    onClickAddButton = { viewModel.sendEvent(TemplateListEvent.OnClickAddButton) }
+    onEvent = viewModel::sendEvent
   )
 }
 
 @Composable
 private fun TemplateListScreen(
-  templateListState: TemplateListState,
+  state: TemplateListState,
   modifier: Modifier = Modifier,
-  onClickBackButton: () -> Unit = {},
-  onClickTemplate: (String) -> Unit = {},
-  onClickAddButton: () -> Unit = {},
+  onEvent: (TemplateListEvent) -> Unit = {}
 ) {
   Screen(
     modifier = modifier,
@@ -91,7 +105,7 @@ private fun TemplateListScreen(
       LunchVoteTopBar(
         title = stringResource(R.string.template_list_title),
         navIconVisible = true,
-        popBackStack = onClickBackButton
+        popBackStack = { onEvent(TemplateListEvent.OnClickBackButton) }
       )
     },
     scrollable = false
@@ -102,10 +116,10 @@ private fun TemplateListScreen(
         .padding(top = 16.dp, start = 24.dp, end = 24.dp),
       verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-      if (templateListState.templateList.isEmpty()) {
+      if (state.templateList.isEmpty()) {
         item {
           Text(
-            stringResource(R.string.template_list_no_template),
+            text = stringResource(R.string.template_list_no_template),
             modifier = Modifier
               .fillMaxWidth()
               .padding(vertical = 20.dp),
@@ -115,14 +129,18 @@ private fun TemplateListScreen(
           )
         }
       } else {
-        items(templateListState.templateList) { template ->
+        items(state.templateList) { template ->
           TemplateListItem(
             template = template,
-            onClick = { onClickTemplate(template.id) }
+            onClick = { onEvent(TemplateListEvent.OnClickTemplate(template.id)) }
           )
         }
       }
-      item { TemplateListButton(onClickAddButton) }
+      item {
+        TemplateListButton(
+          onClick = { onEvent(TemplateListEvent.OnClickAddButton) }
+        )
+      }
     }
   }
 }
@@ -149,7 +167,7 @@ private fun TemplateListItem(
       verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
       Text(
-        template.name,
+        text = template.name,
         style = MaterialTheme.typography.bodyLarge
       )
       LikeDislike(
@@ -159,7 +177,7 @@ private fun TemplateListItem(
     }
     Image(
       painterResource(R.drawable.ic_caret_right),
-      null
+      contentDescription = null
     )
   }
 }
@@ -182,14 +200,39 @@ private fun TemplateListButton(
   ) {
     Image(
       painterResource(R.drawable.ic_add),
-      null
+      contentDescription = null
+    )
+  }
+}
+
+@Composable
+private fun AddDialog(
+  templateName: String,
+  modifier: Modifier = Modifier,
+  onTemplateNameChange: (String) -> Unit = {},
+  onDismissRequest: () -> Unit = {},
+  onConfirmation: () -> Unit = {}
+) {
+  LunchVoteDialog(
+    title = stringResource(R.string.template_list_add_dialog_title),
+    dismissText = stringResource(R.string.template_list_add_dialog_dismiss_button),
+    onDismissRequest = onDismissRequest,
+    confirmText = stringResource(R.string.template_list_add_dialog_confirm_button),
+    onConfirmation = onConfirmation,
+    modifier = modifier,
+    confirmEnabled = templateName.isNotBlank()
+  ) {
+    LunchVoteTextField(
+      text = templateName,
+      hintText = stringResource(R.string.template_list_add_dialog_hint_text),
+      onTextChange = onTemplateNameChange,
     )
   }
 }
 
 @Preview
 @Composable
-private fun TemplateListScreenPreview1() {
+private fun Preview1() {
   ScreenPreview {
     TemplateListScreen(
       TemplateListState()
@@ -199,7 +242,7 @@ private fun TemplateListScreenPreview1() {
 
 @Preview
 @Composable
-private fun TemplateListScreenPreview2() {
+private fun Preview2() {
   ScreenPreview {
     TemplateListScreen(
       TemplateListState(
@@ -218,6 +261,16 @@ private fun TemplateListScreenPreview2() {
           )
         )
       )
+    )
+  }
+}
+
+@Preview
+@Composable
+private fun AddDialogPreview() {
+  LunchVoteTheme {
+    AddDialog(
+      templateName = "템플릿 이름"
     )
   }
 }

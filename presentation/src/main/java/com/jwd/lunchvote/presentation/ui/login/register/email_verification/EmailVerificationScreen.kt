@@ -54,9 +54,7 @@ fun EmailVerificationRoute(
   EmailVerificationScreen(
     state = state,
     modifier = modifier,
-    onEmailChanged = { viewModel.sendEvent(EmailVerificationEvent.OnEmailChanged(it)) },
-    onClickSendButton = { viewModel.sendEvent(EmailVerificationEvent.OnClickSendButton) },
-    onClickResendButton = { viewModel.sendEvent(EmailVerificationEvent.OnClickResendButton) }
+    onEvent = viewModel::sendEvent
   )
 }
 
@@ -64,9 +62,7 @@ fun EmailVerificationRoute(
 private fun EmailVerificationScreen(
   state: EmailVerificationState,
   modifier: Modifier = Modifier,
-  onEmailChanged: (String) -> Unit = {},
-  onClickSendButton: () -> Unit = {},
-  onClickResendButton: () -> Unit = {}
+  onEvent: (EmailVerificationEvent) -> Unit = {}
 ) {
   Screen(
     modifier = modifier,
@@ -115,7 +111,7 @@ private fun EmailVerificationScreen(
         ) {
           LunchVoteTextField(
             text = state.email,
-            onTextChange = onEmailChanged,
+            onTextChange = { onEvent(EmailVerificationEvent.OnEmailChange(it)) },
             hintText = stringResource(R.string.email_verification_email_hint),
             modifier = Modifier.fillMaxWidth(),
             enabled = state.emailSent.not(),
@@ -132,7 +128,7 @@ private fun EmailVerificationScreen(
         }
         if (state.emailSent.not()) {
           Button(
-            onClick = onClickSendButton,
+            onClick = { onEvent(EmailVerificationEvent.OnClickSendButton) },
             modifier = Modifier.fillMaxWidth(),
             enabled = state.email.isNotEmpty() && isValid
           ) {
@@ -140,7 +136,7 @@ private fun EmailVerificationScreen(
           }
         } else {
           OutlinedButton(
-            onClick = onClickResendButton,
+            onClick = { onEvent(EmailVerificationEvent.OnClickResendButton) },
             modifier = Modifier.fillMaxWidth()
           ) {
             Text(text = stringResource(R.string.email_verification_resend_button))

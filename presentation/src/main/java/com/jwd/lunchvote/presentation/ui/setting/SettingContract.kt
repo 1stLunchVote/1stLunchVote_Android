@@ -15,6 +15,7 @@ class SettingContract {
 
   sealed interface SettingEvent: ViewModelContract.Event {
     data class ScreenInitialize(val appVersion: String): SettingEvent
+
     data object OnClickBackButton: SettingEvent
     data object OnClickProfileButton: SettingEvent
     data object OnClickAlertSettingButton: SettingEvent

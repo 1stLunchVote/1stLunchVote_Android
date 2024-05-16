@@ -8,12 +8,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,10 +29,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
@@ -38,11 +42,10 @@ import com.jwd.lunchvote.presentation.model.type.FoodStatus
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateEvent
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateSideEffect
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateState
-import com.jwd.lunchvote.presentation.ui.template.edit_template.dialog.EditTemplateConfirmDialog
-import com.jwd.lunchvote.presentation.ui.template.edit_template.dialog.EditTemplateDeleteDialog
 import com.jwd.lunchvote.presentation.widget.FoodItem
 import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
+import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
@@ -58,9 +61,9 @@ fun EditTemplateRoute(
   viewModel: EditTemplateViewModel = hiltViewModel(),
   context: Context = LocalContext.current
 ){
-  val editTemplateState by viewModel.viewState.collectAsStateWithLifecycle()
-  val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
-  val dialogState by viewModel.dialogState.collectAsStateWithLifecycle()
+  val state by viewModel.viewState.collectAsStateWithLifecycle()
+  val loading by viewModel.isLoading.collectAsStateWithLifecycle()
+  val dialog by viewModel.dialogState.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
@@ -68,47 +71,38 @@ fun EditTemplateRoute(
         is EditTemplateSideEffect.PopBackStack -> popBackStack()
         is EditTemplateSideEffect.OpenDeleteDialog -> viewModel.setDialogState(EditTemplateContract.DELETE_DIALOG)
         is EditTemplateSideEffect.OpenConfirmDialog -> viewModel.setDialogState(EditTemplateContract.CONFIRM_DIALOG)
+        is EditTemplateSideEffect.CloseDialog -> viewModel.setDialogState("")
         is EditTemplateSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
       }
     }
   }
 
-  when(dialogState) {
-    EditTemplateContract.CONFIRM_DIALOG -> {
-      EditTemplateConfirmDialog(
-        onDismissRequest = { viewModel.sendEvent(EditTemplateEvent.OnClickCancelButtonConfirmDialog) },
-        onConfirmation = { viewModel.sendEvent(EditTemplateEvent.OnClickConfirmButtonConfirmDialog) }
-      )
-    }
-    EditTemplateContract.DELETE_DIALOG -> {
-      EditTemplateDeleteDialog(
-        onDismissRequest = { viewModel.sendEvent(EditTemplateEvent.OnClickCancelButtonDeleteDialog) },
-        onConfirmation = { viewModel.sendEvent(EditTemplateEvent.OnClickDeleteButtonDeleteDialog) }
-      )
-    }
+  when(dialog) {
+    EditTemplateContract.CONFIRM_DIALOG -> ConfirmDialog(
+      onDismissRequest = { viewModel.sendEvent(EditTemplateEvent.OnClickCancelButtonConfirmDialog) },
+      onConfirmation = { viewModel.sendEvent(EditTemplateEvent.OnClickConfirmButtonConfirmDialog) }
+    )
+    EditTemplateContract.DELETE_DIALOG -> DeleteDialog(
+      onDismissRequest = { viewModel.sendEvent(EditTemplateEvent.OnClickCancelButtonDeleteDialog) },
+      onConfirmation = { viewModel.sendEvent(EditTemplateEvent.OnClickDeleteButtonDeleteDialog) }
+    )
   }
 
-  if (isLoading) LoadingScreen()
+  LaunchedEffect(Unit) { viewModel.sendEvent(EditTemplateEvent.ScreenInitialize) }
+
+  if (loading) LoadingScreen()
   else EditTemplateScreen(
-    editTemplateState = editTemplateState,
+    state = state,
     modifier = modifier,
-    onClickBackButton = { viewModel.sendEvent(EditTemplateEvent.OnClickBackButton) },
-    setSearchKeyword = { viewModel.sendEvent(EditTemplateEvent.SetSearchKeyword(it)) },
-    onClickFood = { viewModel.sendEvent(EditTemplateEvent.OnClickFood(it)) },
-    onClickSaveButton = { viewModel.sendEvent(EditTemplateEvent.OnClickSaveButton) },
-    onClickDeleteButton = { viewModel.sendEvent(EditTemplateEvent.OnClickDeleteButton) }
+    onEvent = viewModel::sendEvent
   )
 }
 
 @Composable
 private fun EditTemplateScreen(
-  editTemplateState: EditTemplateState,
+  state: EditTemplateState,
   modifier: Modifier = Modifier,
-  onClickBackButton: () -> Unit = {},
-  setSearchKeyword: (String) -> Unit = {},
-  onClickFood: (FoodUIModel) -> Unit = {},
-  onClickSaveButton: () -> Unit = {},
-  onClickDeleteButton: () -> Unit = {}
+  onEvent: (EditTemplateEvent) -> Unit = {}
 ) {
   Screen(
     modifier = modifier,
@@ -116,10 +110,15 @@ private fun EditTemplateScreen(
       LunchVoteTopBar(
         title = stringResource(R.string.edit_template_title),
         navIconVisible = true,
-        popBackStack = onClickBackButton,
+        popBackStack = { onEvent(EditTemplateEvent.OnClickBackButton) },
         actions = {
-          IconButton(onClickDeleteButton) {
-            Icon(Icons.Outlined.Delete, "delete")
+          IconButton(
+            onClick = { onEvent(EditTemplateEvent.OnClickDeleteButton) }
+          ) {
+            Icon(
+              Icons.Outlined.Delete,
+              contentDescription = "delete"
+            )
           }
         }
       )
@@ -134,14 +133,14 @@ private fun EditTemplateScreen(
       verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
       TemplateTitle(
-        name = editTemplateState.template.name,
-        like = editTemplateState.likeList.size,
-        dislike = editTemplateState.dislikeList.size,
+        name = state.template.name,
+        like = state.likeList.size,
+        dislike = state.dislikeList.size,
         modifier = Modifier.fillMaxWidth()
       )
       LunchVoteTextField(
-        text = editTemplateState.searchKeyword,
-        onTextChange = setSearchKeyword,
+        text = state.searchKeyword,
+        onTextChange = { onEvent(EditTemplateEvent.OnSearchKeywordChange(it)) },
         hintText = stringResource(R.string.edit_template_hint_text),
         modifier = Modifier.fillMaxWidth(),
         textFieldType = TextFieldType.Search
@@ -154,21 +153,22 @@ private fun EditTemplateScreen(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
       ) {
-        val filteredFoodList = editTemplateState.foodMap.keys.filter { it.name.contains(editTemplateState.searchKeyword) }
+        val filteredFoodList = state.foodMap.keys.filter { it.name.contains(state.searchKeyword) }
 
         items(filteredFoodList) {food ->
           FoodItem(
             food = food,
-            status = editTemplateState.foodMap[food] ?: FoodStatus.DEFAULT
-          ) { onClickFood(food) }
+            status = state.foodMap[food] ?: FoodStatus.DEFAULT,
+            onClick = { onEvent(EditTemplateEvent.OnClickFood(food)) }
+          )
         }
       }
       Button(
-        onClick = onClickSaveButton,
+        onClick = { onEvent(EditTemplateEvent.OnClickSaveButton) },
         modifier = Modifier.align(CenterHorizontally),
-        enabled = editTemplateState.likeList.isNotEmpty() || editTemplateState.dislikeList.isNotEmpty()
+        enabled = state.likeList.isNotEmpty() || state.dislikeList.isNotEmpty()
       ) {
-        Text(stringResource(R.string.edit_template_save_button))
+        Text(text = stringResource(R.string.edit_template_save_button))
       }
     }
   }
@@ -193,33 +193,90 @@ private fun TemplateTitle(
     horizontalAlignment = CenterHorizontally
   ) {
     Text(
-      name,
+      text = name,
       style = MaterialTheme.typography.bodyLarge
     )
     LikeDislike(like, dislike)
   }
 }
 
+@Composable
+private fun ConfirmDialog(
+  modifier: Modifier = Modifier,
+  onDismissRequest: () -> Unit = {},
+  onConfirmation: () -> Unit = {}
+) {
+  LunchVoteDialog(
+    title = stringResource(R.string.edit_template_confirm_title),
+    dismissText = stringResource(R.string.edit_template_confirm_cancel_button),
+    onDismissRequest = onDismissRequest,
+    confirmText = stringResource(R.string.edit_template_confirm_confirm_button),
+    onConfirmation = onConfirmation,
+    modifier = modifier,
+    icon = {
+      Icon(
+        Icons.Outlined.Edit,
+        contentDescription = null,
+        modifier = Modifier.size(28.dp)
+      )
+    },
+    content = {
+      Text(
+        stringResource(R.string.edit_template_confirm_content),
+        modifier = Modifier.fillMaxWidth(),
+        textAlign = TextAlign.Center
+      )
+    }
+  )
+}
+
+@Composable
+private fun DeleteDialog(
+  modifier: Modifier = Modifier,
+  onDismissRequest: () -> Unit = {},
+  onConfirmation: () -> Unit = {}
+) {
+  LunchVoteDialog(
+    title = stringResource(R.string.edit_template_delete_title),
+    dismissText = stringResource(R.string.edit_template_delete_cancel_button),
+    onDismissRequest = onDismissRequest,
+    confirmText = stringResource(R.string.edit_template_delete_confirm_button),
+    onConfirmation = onConfirmation,
+    modifier = modifier,
+    icon = {
+      Icon(
+        Icons.Outlined.Delete,
+        contentDescription = null,
+        modifier = Modifier.size(28.dp)
+      )
+    },
+    content = {
+      Text(
+        stringResource(R.string.edit_template_delete_content),
+        modifier = Modifier.fillMaxWidth(),
+        textAlign = TextAlign.Center
+      )
+    }
+  )
+}
+
 @Preview
 @Composable
-private fun EditTemplateScreenPreview() {
+private fun Preview() {
   ScreenPreview {
     EditTemplateScreen(
-      editTemplateState = EditTemplateState(
+      state = EditTemplateState(
         foodMap = mapOf(
           FoodUIModel(
             id = "1",
-            imageUrl = "",
             name = "음식명"
           ) to FoodStatus.DEFAULT,
           FoodUIModel(
             id = "2",
-            imageUrl = "",
             name = "음식명"
           ) to FoodStatus.DEFAULT,
           FoodUIModel(
             id = "3",
-            imageUrl = "",
             name = "음식명"
           ) to FoodStatus.DEFAULT,
         ),
@@ -228,5 +285,21 @@ private fun EditTemplateScreenPreview() {
         )
       )
     )
+  }
+}
+
+@Preview
+@Composable
+private fun ConfirmDialogPreview() {
+  LunchVoteTheme {
+    ConfirmDialog()
+  }
+}
+
+@Preview
+@Composable
+private fun DeleteDialogPreview() {
+  LunchVoteTheme {
+    DeleteDialog()
   }
 }

@@ -97,7 +97,7 @@ class LoungeViewModel @Inject constructor(
       is LoungeEvent.OnClickBackButton -> sendSideEffect(LoungeSideEffect.OpenVoteExitDialog)
       is LoungeEvent.OnClickMember -> sendSideEffect(LoungeSideEffect.NavigateToMember(event.member, currentState.lounge.id, currentState.user.id == owner.userId))
       is LoungeEvent.OnClickInviteButton -> sendSideEffect(LoungeSideEffect.CopyToClipboard(currentState.lounge.id))
-      is LoungeEvent.OnTextChanged -> updateState(LoungeReduce.UpdateText(event.text))
+      is LoungeEvent.OnTextChange -> updateState(LoungeReduce.UpdateText(event.text))
       is LoungeEvent.OnClickSendChatButton -> launch(false) { sendChat() }
       is LoungeEvent.OnClickReadyButton -> launch(false) { updateReady() }
       is LoungeEvent.OnScrolled -> updateState(LoungeReduce.UpdateScrollIndex(event.index))

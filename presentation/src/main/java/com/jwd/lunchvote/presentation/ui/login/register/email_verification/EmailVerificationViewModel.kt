@@ -30,7 +30,7 @@ class EmailVerificationViewModel @Inject constructor(
 
   override fun handleEvents(event: EmailVerificationEvent) {
     when (event) {
-      is EmailVerificationEvent.OnEmailChanged -> updateState(EmailVerificationReduce.UpdateEmail(event.email))
+      is EmailVerificationEvent.OnEmailChange -> updateState(EmailVerificationReduce.UpdateEmail(event.email))
       is EmailVerificationEvent.OnClickSendButton -> launch { checkEmail() }
       is EmailVerificationEvent.OnClickResendButton -> sendEmail()
     }

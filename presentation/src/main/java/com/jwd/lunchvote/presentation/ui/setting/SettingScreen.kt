@@ -78,13 +78,7 @@ fun SettingRoute(
 
   SettingScreen(
     state = state,
-    onClickBackButton = { viewModel.handleEvents(SettingEvent.OnClickBackButton) },
-    onClickProfileButton = { viewModel.handleEvents(SettingEvent.OnClickProfileButton) },
-    onClickAlertSettingButton = { viewModel.handleEvents(SettingEvent.OnClickAlertSettingButton) },
-    onClickContactButton = { viewModel.handleEvents(SettingEvent.OnClickContactButton) },
-    onClickNoticeButton = { viewModel.handleEvents(SettingEvent.OnClickNoticeButton) },
-    onClickSuggestButton = { viewModel.handleEvents(SettingEvent.OnClickSuggestButton) },
-    onClickLogoutButton = { viewModel.handleEvents(SettingEvent.OnClickLogoutButton) }
+    onEvent = viewModel::sendEvent
   )
 }
 
@@ -92,13 +86,7 @@ fun SettingRoute(
 private fun SettingScreen(
   state: SettingState,
   modifier: Modifier = Modifier,
-  onClickBackButton: () -> Unit = {},
-  onClickProfileButton: () -> Unit = {},
-  onClickAlertSettingButton: () -> Unit = {},
-  onClickContactButton: () -> Unit = {},
-  onClickNoticeButton: () -> Unit = {},
-  onClickSuggestButton: () -> Unit = {},
-  onClickLogoutButton: () -> Unit = {}
+  onEvent: (SettingEvent) -> Unit = {}
 ) {
   Screen(
     modifier = modifier,
@@ -106,34 +94,34 @@ private fun SettingScreen(
       LunchVoteTopBar(
         title = stringResource(R.string.setting_title),
         navIconVisible = true,
-        popBackStack = onClickBackButton
+        popBackStack = { onEvent(SettingEvent.OnClickBackButton) }
       )
     }
   ) {
     SettingBlock(name = stringResource(R.string.setting_my_info)) {
       SettingItem(
         name = stringResource(R.string.setting_my_profile),
-        onClickItem = onClickProfileButton
+        onClickItem = { onEvent(SettingEvent.OnClickProfileButton) }
       )
     }
     SettingBlock(name = stringResource(R.string.setting_service)) {
       SettingItem(
         name = stringResource(R.string.setting_alert),
-        onClickItem = onClickAlertSettingButton
+        onClickItem = { onEvent(SettingEvent.OnClickAlertSettingButton) }
       )
       SettingItem(
         name = stringResource(R.string.setting_contact),
-        onClickItem = onClickContactButton
+        onClickItem = { onEvent(SettingEvent.OnClickContactButton) }
       )
     }
     SettingBlock(name = stringResource(R.string.setting_app_config)) {
       SettingItem(
         name = stringResource(R.string.setting_notice_and_terms),
-        onClickItem = onClickNoticeButton
+        onClickItem = { onEvent(SettingEvent.OnClickNoticeButton) }
       )
       SettingItem(
         name = stringResource(R.string.setting_suggest),
-        onClickItem = onClickSuggestButton
+        onClickItem = { onEvent(SettingEvent.OnClickSuggestButton) }
       )
       Row(
         modifier = Modifier
@@ -162,7 +150,7 @@ private fun SettingScreen(
       Text(
         text = stringResource(R.string.setting_logout),
         modifier = Modifier
-          .clickableWithoutEffect(onClickLogoutButton)
+          .clickableWithoutEffect(onClick = { onEvent(SettingEvent.OnClickLogoutButton) })
           .padding(horizontal = 12.dp, vertical = 8.dp),
         style = MaterialTheme.typography.titleMedium,
         color = MaterialTheme.colorScheme.error,
@@ -214,7 +202,7 @@ private fun SettingItem(
     )
     Icon(
       Icons.AutoMirrored.Rounded.KeyboardArrowRight,
-      null
+      contentDescription = null
     )
   }
 }

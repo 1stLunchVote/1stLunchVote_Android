@@ -1,6 +1,9 @@
 package com.jwd.lunchvote.presentation.navigation
 
 import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.DialogProperties
@@ -21,7 +24,6 @@ import com.jwd.lunchvote.presentation.ui.setting.SettingRoute
 import com.jwd.lunchvote.presentation.ui.setting.profile.ProfileRoute
 import com.jwd.lunchvote.presentation.ui.template.TemplateListRoute
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateRoute
-import com.jwd.lunchvote.presentation.ui.template.dialog.TemplateListAddDialog
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateRoute
 import com.jwd.lunchvote.presentation.ui.tips.TipsRoute
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteRoute
@@ -115,15 +117,20 @@ fun LunchVoteNavHost(
         navigateToTips = {
           navController.navigate(LunchVoteNavRoute.Tips)
         },
-        navigateToTest = {
-          // todo : 나중에 지우기
-          navController.navigate(LunchVoteNavRoute.SecondVote)
-        },
-        navigateToFirstVote = {
-          navController.navigate(LunchVoteNavRoute.FirstVote, "loungeId"/*TODO*/)
-        },
         showSnackBar = showSnackBar
       )
+
+      // TODO : 나중에 지우기
+      Row {
+        Button(onClick = {
+          navController.navigate(LunchVoteNavRoute.FirstVote, "loungeId")
+        }) {
+          Text(text = "1차 투표 테스트")
+        }
+        Button(onClick = { navController.navigate(LunchVoteNavRoute.SecondVote) }) {
+          Text(text = "2차 투표 화면 테스트")
+        }
+      }
     }
     composable(LunchVoteNavRoute.Lounge) {
       LoungeRoute(
@@ -162,10 +169,10 @@ fun LunchVoteNavHost(
     }
     composable(LunchVoteNavRoute.TemplateList) {
       TemplateListRoute(
+        navigateToAddTemplate = { navController.navigate(LunchVoteNavRoute.AddTemplate) },
         navigateToEditTemplate = { templateId ->
           navController.navigate(LunchVoteNavRoute.EditTemplate, templateId)
         },
-        openAddDialog = { navController.navigate(LunchVoteNavRoute.TemplateListAddDialog) },
         popBackStack = { navController.popBackStack() },
         showSnackBar = showSnackBar
       )
@@ -200,16 +207,6 @@ fun LunchVoteNavHost(
     composable(LunchVoteNavRoute.Tips) {
       TipsRoute(
         popBackStack = { navController.popBackStack() },
-        showSnackBar = showSnackBar
-      )
-    }
-
-    dialog(LunchVoteNavRoute.TemplateListAddDialog) {
-      TemplateListAddDialog(
-        popBackStack = { navController.popBackStack() },
-        navigateToAddTemplate = { templateName ->
-          navController.navigate(LunchVoteNavRoute.AddTemplate, templateName)
-        },
         showSnackBar = showSnackBar
       )
     }

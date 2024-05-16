@@ -33,7 +33,7 @@ class NicknameViewModel @Inject constructor(
 
   override fun handleEvents(event: NicknameEvent) {
     when (event) {
-      is NicknameEvent.OnNicknameChanged ->  updateState(NicknameReduce.UpdateNickname(event.nickname))
+      is NicknameEvent.OnNicknameChange ->  updateState(NicknameReduce.UpdateNickname(event.nickname))
       is NicknameEvent.OnClickNextButton -> launch { signUp() }
     }
   }

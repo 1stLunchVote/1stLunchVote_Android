@@ -48,24 +48,20 @@ class EditTemplateViewModel @Inject constructor(
     }
   }
 
-  init {
-    launch {
-      initialize()
-    }
-  }
-
   override fun handleEvents(event: EditTemplateEvent) {
     when(event) {
+      is EditTemplateEvent.ScreenInitialize -> launch { initialize() }
+
       is EditTemplateEvent.OnClickBackButton -> sendSideEffect(EditTemplateSideEffect.PopBackStack)
-      is EditTemplateEvent.SetSearchKeyword -> updateState(EditTemplateReduce.UpdateSearchKeyword(event.searchKeyword))
+      is EditTemplateEvent.OnSearchKeywordChange -> updateState(EditTemplateReduce.UpdateSearchKeyword(event.searchKeyword))
       is EditTemplateEvent.OnClickFood -> updateState(EditTemplateReduce.UpdateFoodStatus(event.food))
       is EditTemplateEvent.OnClickSaveButton -> sendSideEffect(EditTemplateSideEffect.OpenConfirmDialog)
       is EditTemplateEvent.OnClickDeleteButton -> sendSideEffect(EditTemplateSideEffect.OpenDeleteDialog)
 
       // DialogEvent
-      is EditTemplateEvent.OnClickCancelButtonConfirmDialog -> setDialogState("")
+      is EditTemplateEvent.OnClickCancelButtonConfirmDialog -> sendSideEffect(EditTemplateSideEffect.CloseDialog)
       is EditTemplateEvent.OnClickConfirmButtonConfirmDialog -> launch { save() }
-      is EditTemplateEvent.OnClickCancelButtonDeleteDialog -> setDialogState("")
+      is EditTemplateEvent.OnClickCancelButtonDeleteDialog -> sendSideEffect(EditTemplateSideEffect.CloseDialog)
       is EditTemplateEvent.OnClickDeleteButtonDeleteDialog -> launch { delete() }
     }
   }
@@ -100,7 +96,8 @@ class EditTemplateViewModel @Inject constructor(
   }
 
   private suspend fun initialize() {
-    val templateId = checkNotNull(savedStateHandle.get<String>(LunchVoteNavRoute.EditTemplate.arguments.first().name))
+    val templateIdKey = LunchVoteNavRoute.EditTemplate.arguments.first().name
+    val templateId = checkNotNull(savedStateHandle.get<String>(templateIdKey))
     val template = getTemplateUseCase(templateId).asUI()
 
     val foodList = getFoodListUseCase().map { it.asUI() }
@@ -121,6 +118,8 @@ class EditTemplateViewModel @Inject constructor(
   }
 
   private suspend fun save() {
+    sendSideEffect(EditTemplateSideEffect.CloseDialog)
+
     editTemplateUseCase(
       TemplateUIModel(
         id = currentState.template.id,
@@ -136,6 +135,8 @@ class EditTemplateViewModel @Inject constructor(
   }
 
   private suspend fun delete() {
+    sendSideEffect(EditTemplateSideEffect.CloseDialog)
+
     deleteTemplateUseCase(currentState.template.id)
 
     sendSideEffect(EditTemplateSideEffect.ShowSnackBar(UiText.StringResource(R.string.edit_template_delete_snackbar)))

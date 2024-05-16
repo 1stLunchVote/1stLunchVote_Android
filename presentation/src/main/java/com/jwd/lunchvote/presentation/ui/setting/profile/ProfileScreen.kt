@@ -74,7 +74,7 @@ fun ProfileRoute(
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
   val loading by viewModel.isLoading.collectAsStateWithLifecycle()
-  val dialogState by viewModel.dialogState.collectAsStateWithLifecycle()
+  val dialog by viewModel.dialogState.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
@@ -90,16 +90,12 @@ fun ProfileRoute(
     }
   }
 
-  LaunchedEffect(Unit) {
-    viewModel.sendEvent(ProfileEvent.OnScreenLoaded)
-  }
-
-  when (dialogState) {
+  when (dialog) {
     ProfileContract.EDIT_PROFILE_IMAGE_DIALOG -> {
       EditProfileImageDialog(
         profileImageUri = state.profileImageUri,
         onDismissRequest = { viewModel.sendEvent(ProfileEvent.OnClickCancelButtonEditProfileImageDialog) },
-        onProfileImageChanged = { viewModel.sendEvent(ProfileEvent.OnProfileImageChangedEditProfileImageDialog(it)) },
+        onProfileImageChange = { viewModel.sendEvent(ProfileEvent.OnProfileImageChangeEditProfileImageDialog(it)) },
         onImageError = { viewModel.sendEvent(ProfileEvent.OnImageLoadErrorEditProfileImageDialog) },
         onConfirmation = { viewModel.sendEvent(ProfileEvent.OnClickSaveButtonEditProfileImageDialog(context)) }
       )
@@ -108,7 +104,7 @@ fun ProfileRoute(
       EditNameDialog(
         name = state.name,
         onDismissRequest = { viewModel.sendEvent(ProfileEvent.OnClickCancelButtonEditNameDialog) },
-        onNameChanged = { viewModel.sendEvent(ProfileEvent.OnNameChangedEditNameDialog(it)) },
+        onNameChange = { viewModel.sendEvent(ProfileEvent.OnNameChangeEditNameDialog(it)) },
         onConfirmation = { viewModel.sendEvent(ProfileEvent.OnClickSaveButtonEditNameDialog) }
       )
     }
@@ -120,13 +116,12 @@ fun ProfileRoute(
     }
   }
 
+  LaunchedEffect(Unit) { viewModel.sendEvent(ProfileEvent.ScreenInitialize) }
+
   if (loading) LoadingScreen()
   else ProfileScreen(
     state = state,
-    onClickBackButton = { viewModel.sendEvent(ProfileEvent.OnClickBackButton) },
-    onClickEditProfileImageButton = { viewModel.sendEvent(ProfileEvent.OnClickEditProfileImageButton) },
-    onClickEditNameButton = { viewModel.sendEvent(ProfileEvent.OnClickEditNameButton) },
-    onClickDeleteUserButton = { viewModel.sendEvent(ProfileEvent.OnClickDeleteUserButton) }
+    onEvent = viewModel::sendEvent
   )
 }
 
@@ -134,18 +129,14 @@ fun ProfileRoute(
 private fun ProfileScreen(
   state: ProfileState,
   modifier: Modifier = Modifier,
-  onClickBackButton: () -> Unit = {},
-  onClickEditProfileImageButton: () -> Unit = {},
-  onClickEditNameButton: () -> Unit = {},
-  onClickDeleteUserButton: () -> Unit = {}
+  onEvent: (ProfileEvent) -> Unit = {}
 ) {
   Screen(
     modifier = modifier,
     topAppBar = {
       LunchVoteTopBar(
         title = stringResource(R.string.profile_title),
-        navIconVisible = true,
-        popBackStack = onClickBackButton
+        popBackStack = { onEvent(ProfileEvent.OnClickBackButton) }
       )
     },
     scrollable = false
@@ -162,13 +153,17 @@ private fun ProfileScreen(
       modifier = Modifier.fillMaxWidth(),
       horizontalArrangement = Arrangement.spacedBy(16.dp, alignment = Alignment.CenterHorizontally)
     ) {
-      TextButton(onClickEditProfileImageButton) {
+      TextButton(
+        onClick = { onEvent(ProfileEvent.OnClickEditProfileImageButton) }
+      ) {
         Text(
           text = stringResource(R.string.profile_edit_profile_image),
           textDecoration = TextDecoration.Underline
         )
       }
-      TextButton(onClickEditNameButton) {
+      TextButton(
+        onClick = { onEvent(ProfileEvent.OnClickEditNameButton) }
+      ) {
         Text(
           text = stringResource(R.string.profile_edit_name),
           textDecoration = TextDecoration.Underline
@@ -176,7 +171,9 @@ private fun ProfileScreen(
       }
     }
     Gap(minHeight = 32.dp)
-    TextButton(onClickDeleteUserButton) {
+    TextButton(
+      onClick = { onEvent(ProfileEvent.OnClickDeleteUserButton) }
+    ) {
       Text(
         text = stringResource(R.string.profile_delete_user),
         color = MaterialTheme.colorScheme.error,
@@ -291,13 +288,13 @@ private fun EditProfileImageDialog(
   profileImageUri: Uri,
   modifier: Modifier = Modifier,
   onDismissRequest: () -> Unit = {},
-  onProfileImageChanged: (Uri) -> Unit = {},
+  onProfileImageChange: (Uri) -> Unit = {},
   onImageError: () -> Unit = {},
   onConfirmation: () -> Unit = {},
   context: Context = LocalContext.current
 ) {
   val albumLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { imageUri: Uri? ->
-    if (imageUri != null) onProfileImageChanged(imageUri)
+    if (imageUri != null) onProfileImageChange(imageUri)
     else onImageError()
   }
 
@@ -386,7 +383,7 @@ private fun EditNameDialog(
   name: String,
   modifier: Modifier = Modifier,
   onDismissRequest: () -> Unit = {},
-  onNameChanged: (String) -> Unit = {},
+  onNameChange: (String) -> Unit = {},
   onConfirmation: () -> Unit = {}
 ) {
   LunchVoteDialog(
@@ -400,7 +397,7 @@ private fun EditNameDialog(
   ) {
     LunchVoteTextField(
       text = name,
-      onTextChange = onNameChanged,
+      onTextChange = onNameChange,
       hintText = stringResource(R.string.profile_edit_name_dialog_hint_text),
       modifier = Modifier.fillMaxWidth(),
       isError = name.isEmpty()

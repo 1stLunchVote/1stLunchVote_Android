@@ -51,8 +51,8 @@ fun AddTemplateRoute(
   viewModel: AddTemplateViewModel = hiltViewModel(),
   context: Context = LocalContext.current
 ){
-  val addTemplateState by viewModel.viewState.collectAsStateWithLifecycle()
-  val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+  val state by viewModel.viewState.collectAsStateWithLifecycle()
+  val loading by viewModel.isLoading.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect){
     viewModel.sideEffect.collectLatest {
@@ -63,33 +63,28 @@ fun AddTemplateRoute(
     }
   }
 
-  if (isLoading) LoadingScreen()
+  LaunchedEffect(Unit) { viewModel.sendEvent(AddTemplateEvent.ScreenInitialize) }
+
+  if (loading) LoadingScreen()
   else AddTemplateScreen(
-    addTemplateState = addTemplateState,
+    state = state,
     modifier = modifier,
-    onClickBackButton = { viewModel.sendEvent(AddTemplateEvent.OnClickBackButton) },
-    onClickFood = { food -> viewModel.sendEvent(AddTemplateEvent.OnClickFood(food)) },
-    setSearchKeyword = { searchKeyword -> viewModel.sendEvent(AddTemplateEvent.OnSearchKeywordChanged(searchKeyword)) },
-    onClickAddButton = { viewModel.sendEvent(AddTemplateEvent.OnClickAddButton) }
+    onEvent = viewModel::sendEvent
   )
 }
 
 @Composable
 private fun AddTemplateScreen(
-  addTemplateState: AddTemplateState,
+  state: AddTemplateState,
   modifier: Modifier = Modifier,
-  onClickBackButton: () -> Unit = {},
-  onClickFood: (FoodUIModel) -> Unit = {},
-  setSearchKeyword: (String) -> Unit = {},
-  onClickAddButton: () -> Unit = {}
+  onEvent: (AddTemplateEvent) -> Unit = {},
 ) {
   Screen(
     modifier = modifier,
     topAppBar = {
       LunchVoteTopBar(
         title = stringResource(R.string.add_template_title),
-        navIconVisible = true,
-        popBackStack = onClickBackButton
+        popBackStack = { onEvent(AddTemplateEvent.OnClickBackButton) }
       )
     },
     scrollable = false
@@ -102,14 +97,14 @@ private fun AddTemplateScreen(
       verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
       TemplateTitle(
-        name = addTemplateState.name,
-        like = addTemplateState.likeList.size,
-        dislike = addTemplateState.dislikeList.size,
+        name = state.name,
+        like = state.likeList.size,
+        dislike = state.dislikeList.size,
         modifier = Modifier.fillMaxWidth()
       )
       LunchVoteTextField(
-        text = addTemplateState.searchKeyword,
-        onTextChange = setSearchKeyword,
+        text = state.searchKeyword,
+        onTextChange = { onEvent(AddTemplateEvent.OnSearchKeywordChange(it)) },
         hintText = stringResource(R.string.add_template_hint_text),
         modifier = Modifier.fillMaxWidth(),
         textFieldType = TextFieldType.Search
@@ -122,21 +117,22 @@ private fun AddTemplateScreen(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
       ) {
-        val filteredFoodList = addTemplateState.foodMap.keys.filter { it.name.contains(addTemplateState.searchKeyword) }
+        val filteredFoodList = state.foodMap.keys.filter { it.name.contains(state.searchKeyword) }
 
         items(filteredFoodList) {food ->
           FoodItem(
             food = food,
-            status = addTemplateState.foodMap[food] ?: FoodStatus.DEFAULT
-          ) { onClickFood(food) }
+            status = state.foodMap[food] ?: FoodStatus.DEFAULT,
+            onClick = { onEvent(AddTemplateEvent.OnClickFood(food)) }
+          )
         }
       }
       Button(
-        onClick = onClickAddButton,
+        onClick = { onEvent(AddTemplateEvent.OnClickAddButton) },
         modifier = Modifier.align(CenterHorizontally),
-        enabled = addTemplateState.likeList.isNotEmpty() || addTemplateState.dislikeList.isNotEmpty()
+        enabled = state.likeList.isNotEmpty() || state.dislikeList.isNotEmpty()
       ) {
-        Text(stringResource(R.string.add_template_add_button))
+        Text(text = stringResource(R.string.add_template_add_button))
       }
     }
   }
@@ -161,7 +157,7 @@ private fun TemplateTitle(
     horizontalAlignment = CenterHorizontally
   ) {
     Text(
-      name,
+      text = name,
       style = MaterialTheme.typography.bodyLarge
     )
     LikeDislike(like, dislike)
@@ -170,27 +166,15 @@ private fun TemplateTitle(
 
 @Preview
 @Composable
-private fun AddTemplateScreenPreview() {
+private fun Preview() {
   ScreenPreview {
     AddTemplateScreen(
       AddTemplateState(
         name = "학생회 회식 대표 메뉴",
         foodMap = mapOf(
-          FoodUIModel(
-            id = "1",
-            imageUrl = "",
-            name = "음식명"
-          ) to FoodStatus.DEFAULT,
-          FoodUIModel(
-            id = "2",
-            imageUrl = "",
-            name = "음식명"
-          ) to FoodStatus.DEFAULT,
-          FoodUIModel(
-            id = "3",
-            imageUrl = "",
-            name = "음식명"
-          ) to FoodStatus.DEFAULT,
+          FoodUIModel(name = "음식명") to FoodStatus.DEFAULT,
+          FoodUIModel(name = "음식명") to FoodStatus.DEFAULT,
+          FoodUIModel(name = "음식명") to FoodStatus.DEFAULT,
         )
       )
     )

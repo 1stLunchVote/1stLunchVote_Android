@@ -2,7 +2,8 @@ package com.jwd.lunchvote.presentation.ui.template.add_template
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
@@ -27,24 +28,19 @@ import javax.inject.Inject
 class AddTemplateViewModel @Inject constructor(
   private val addTemplateUseCase: AddTemplateUseCase,
   private val getFoodListUseCase: GetFoodListUseCase,
-  private val auth: FirebaseAuth,
   private val savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<AddTemplateState, AddTemplateEvent, AddTemplateReduce, AddTemplateSideEffect>(savedStateHandle){
   override fun createInitialState(savedState: Parcelable?): AddTemplateState {
     return savedState as? AddTemplateState ?: AddTemplateState()
   }
 
-  init {
-    launch {
-      initialize()
-    }
-  }
-
   override fun handleEvents(event: AddTemplateEvent) {
     when(event) {
+      is AddTemplateEvent.ScreenInitialize -> launch { initialize() }
+
       is AddTemplateEvent.OnClickBackButton -> sendSideEffect(AddTemplateSideEffect.PopBackStack)
       is AddTemplateEvent.OnClickFood -> updateState(AddTemplateReduce.UpdateFoodStatus(event.food))
-      is AddTemplateEvent.OnSearchKeywordChanged -> updateState(AddTemplateReduce.UpdateSearchKeyword(event.searchKeyword))
+      is AddTemplateEvent.OnSearchKeywordChange -> updateState(AddTemplateReduce.UpdateSearchKeyword(event.searchKeyword))
       is AddTemplateEvent.OnClickAddButton -> launch { addTemplate() }
     }
   }
@@ -77,7 +73,8 @@ class AddTemplateViewModel @Inject constructor(
   }
 
   private suspend fun initialize() {
-    val name = checkNotNull(savedStateHandle.get<String>(LunchVoteNavRoute.AddTemplate.arguments.first().name))
+    val nameKey = LunchVoteNavRoute.AddTemplate.arguments.first().name
+    val name = checkNotNull(savedStateHandle.get<String>(nameKey))
     updateState(AddTemplateReduce.UpdateName(name))
 
     val foodList = getFoodListUseCase()
@@ -86,7 +83,7 @@ class AddTemplateViewModel @Inject constructor(
   }
 
   private suspend fun addTemplate() {
-    val userId = auth.currentUser?.uid ?: throw LoginError.NoUser
+    val userId = Firebase.auth.currentUser?.uid ?: throw LoginError.NoUser
     val template = TemplateUIModel(
       userId = userId,
       name = currentState.name,

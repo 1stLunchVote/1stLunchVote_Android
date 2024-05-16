@@ -52,12 +52,12 @@ fun PasswordRoute(
     }
   }
 
+  LaunchedEffect(Unit) { viewModel.sendEvent(PasswordEvent.ScreenInitialize) }
+
   PasswordScreen(
     state = state,
     modifier = modifier,
-    onPasswordChanged = { viewModel.sendEvent(PasswordEvent.OnPasswordChanged(it)) },
-    onPasswordConfirmChanged = { viewModel.sendEvent(PasswordEvent.OnPasswordConfirmChanged(it)) },
-    onClickNextButton = { viewModel.sendEvent(PasswordEvent.OnClickNextButton) }
+    onEvent = viewModel::sendEvent
   )
 }
 
@@ -65,9 +65,7 @@ fun PasswordRoute(
 private fun PasswordScreen(
   state: PasswordState,
   modifier: Modifier = Modifier,
-  onPasswordChanged: (String) -> Unit = {},
-  onPasswordConfirmChanged: (String) -> Unit = {},
-  onClickNextButton: () -> Unit = {}
+  onEvent: (PasswordEvent) -> Unit = {}
 ) {
   Screen(
     modifier = modifier,
@@ -128,7 +126,7 @@ private fun PasswordScreen(
         ) {
           LunchVoteTextField(
             text = state.password,
-            onTextChange = onPasswordChanged,
+            onTextChange = { onEvent(PasswordEvent.OnPasswordChange(it)) },
             hintText = stringResource(R.string.password_password_hint),
             modifier = Modifier.fillMaxWidth(),
             isError = formatError,
@@ -136,7 +134,7 @@ private fun PasswordScreen(
           )
           LunchVoteTextField(
             text = state.passwordConfirm,
-            onTextChange = onPasswordConfirmChanged,
+            onTextChange = { onEvent(PasswordEvent.OnPasswordConfirmChange(it)) },
             hintText = stringResource(R.string.password_password_confirm_hint),
             modifier = Modifier.fillMaxWidth(),
             isError = confirmError,
@@ -153,7 +151,7 @@ private fun PasswordScreen(
         }
       }
       Button(
-        onClick = onClickNextButton,
+        onClick = { onEvent(PasswordEvent.OnClickNextButton) },
         modifier = Modifier
           .constrainAs(nextButton) {
             bottom.linkTo(parent.bottom, 64.dp)

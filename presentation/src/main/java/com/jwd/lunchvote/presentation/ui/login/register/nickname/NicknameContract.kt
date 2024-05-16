@@ -14,7 +14,7 @@ class NicknameContract {
   }
 
   sealed interface NicknameEvent : ViewModelContract.Event {
-    data class OnNicknameChanged(val nickname: String) : NicknameEvent
+    data class OnNicknameChange(val nickname: String) : NicknameEvent
     data object OnClickNextButton : NicknameEvent
   }
 
