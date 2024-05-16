@@ -2,9 +2,13 @@ package com.jwd.lunchvote.presentation.ui.home
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
+import com.jwd.lunchvote.core.common.error.LoungeError
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.domain.usecase.CheckLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.GetFoodTrendUseCase
+import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeEvent
 import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeReduce
@@ -12,30 +16,47 @@ import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeSideEffect
 import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import okhttp3.internal.platform.Jdk9Platform.Companion.isAvailable
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
   private val getFoodTrendUseCase: GetFoodTrendUseCase,
+  private val checkLoungeUseCase: CheckLoungeUseCase,
   savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<HomeState, HomeEvent, HomeReduce, HomeSideEffect>(savedStateHandle){
   override fun createInitialState(savedState: Parcelable?): HomeState {
     return savedState as? HomeState ?: HomeState()
   }
 
-  init {
-    launch {
-      getFoodTrend()
+  private val _dialogState = MutableStateFlow("")
+  val dialogState: StateFlow<String> = _dialogState.asStateFlow()
+  fun setDialogState(dialogState: String) {
+    viewModelScope.launch {
+      _dialogState.emit(dialogState)
     }
   }
 
   override fun handleEvents(event: HomeEvent) {
     when(event) {
-      is HomeEvent.OnClickLoungeButton -> sendSideEffect(HomeSideEffect.NavigateToLounge)
+      is HomeEvent.ScreenInitialize -> launch { getFoodTrend() }
+      is HomeEvent.OnClickLoungeButton -> sendSideEffect(HomeSideEffect.NavigateToLounge(currentState.loungeId))
       is HomeEvent.OnClickJoinLoungeButton -> sendSideEffect(HomeSideEffect.OpenJoinDialog)
       is HomeEvent.OnClickTemplateButton -> sendSideEffect(HomeSideEffect.NavigateToTemplateList)
       is HomeEvent.OnClickSettingButton -> sendSideEffect(HomeSideEffect.NavigateToSetting)
       is HomeEvent.OnClickTipsButton -> sendSideEffect(HomeSideEffect.NavigateToTips)
+
+      // DialogEvent
+      is HomeEvent.OnLoungeIdChanged -> updateState(HomeReduce.UpdateLoungeId(event.loungeId))
+      is HomeEvent.OnClickCancelButtonJoinDialog -> {
+        updateState(HomeReduce.UpdateLoungeId(null))
+        sendSideEffect(HomeSideEffect.CloseDialog)
+      }
+      is HomeEvent.OnClickConfirmButtonJoinDialog -> launch { checkLoungeExist() }
     }
   }
 
@@ -43,6 +64,7 @@ class HomeViewModel @Inject constructor(
     return when(reduce) {
       is HomeReduce.UpdateFoodTrend -> state.copy(foodTrend = reduce.foodTrend)
       is HomeReduce.UpdateFoodTrendRatio -> state.copy(foodTrendRatio = reduce.foodTrendRatio)
+      is HomeReduce.UpdateLoungeId -> state.copy(loungeId = reduce.loungeId)
     }
   }
 
@@ -55,5 +77,18 @@ class HomeViewModel @Inject constructor(
 
     updateState(HomeReduce.UpdateFoodTrend(foodTrend.first.asUI()))
     updateState(HomeReduce.UpdateFoodTrendRatio(foodTrend.second))
+  }
+
+  private suspend fun checkLoungeExist() {
+    val loungeId = currentState.loungeId ?: return
+    updateState(HomeReduce.UpdateLoungeId(null))
+    sendSideEffect(HomeSideEffect.CloseDialog)
+
+    sendSideEffect(HomeSideEffect.ShowSnackBar(UiText.StringResource(R.string.home_joining_lounge_snackbar)))
+
+    val isAvailable = checkLoungeUseCase(loungeId)
+
+    if (isAvailable) sendSideEffect(HomeSideEffect.NavigateToLounge(loungeId))
+    else throw LoungeError.NoLounge
   }
 }
