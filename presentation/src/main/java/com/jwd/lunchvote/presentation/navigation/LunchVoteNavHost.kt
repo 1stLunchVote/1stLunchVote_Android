@@ -1,6 +1,9 @@
 package com.jwd.lunchvote.presentation.navigation
 
 import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.DialogProperties
@@ -115,15 +118,20 @@ fun LunchVoteNavHost(
         navigateToTips = {
           navController.navigate(LunchVoteNavRoute.Tips)
         },
-        navigateToTest = {
-          // todo : 나중에 지우기
-          navController.navigate(LunchVoteNavRoute.SecondVote)
-        },
-        navigateToFirstVote = {
-          navController.navigate(LunchVoteNavRoute.FirstVote, "loungeId"/*TODO*/)
-        },
         showSnackBar = showSnackBar
       )
+
+      // TODO : 나중에 지우기
+      Row {
+        Button(onClick = {
+          navController.navigate(LunchVoteNavRoute.FirstVote, "loungeId")
+        }) {
+          Text(text = "1차 투표 테스트")
+        }
+        Button(onClick = { navController.navigate(LunchVoteNavRoute.SecondVote) }) {
+          Text(text = "2차 투표 화면 테스트")
+        }
+      }
     }
     composable(LunchVoteNavRoute.Lounge) {
       LoungeRoute(

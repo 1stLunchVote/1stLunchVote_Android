@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import okhttp3.internal.platform.Jdk9Platform.Companion.isAvailable
 import javax.inject.Inject
 
 @HiltViewModel
@@ -83,7 +82,6 @@ class HomeViewModel @Inject constructor(
     val loungeId = currentState.loungeId ?: return
     updateState(HomeReduce.UpdateLoungeId(null))
     sendSideEffect(HomeSideEffect.CloseDialog)
-
     sendSideEffect(HomeSideEffect.ShowSnackBar(UiText.StringResource(R.string.home_joining_lounge_snackbar)))
 
     val isAvailable = checkLoungeUseCase(loungeId)

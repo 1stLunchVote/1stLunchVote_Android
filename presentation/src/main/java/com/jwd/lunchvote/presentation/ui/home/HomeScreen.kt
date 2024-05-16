@@ -1,6 +1,9 @@
 package com.jwd.lunchvote.presentation.ui.home
 
 import android.content.Context
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -47,7 +49,6 @@ import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeEvent
 import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeSideEffect
 import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeState
 import com.jwd.lunchvote.presentation.widget.Gap
-import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.Screen
@@ -61,15 +62,12 @@ fun HomeRoute(
   navigateToTemplateList: () -> Unit,
   navigateToSetting: () -> Unit,
   navigateToTips: () -> Unit,
-  navigateToTest: () -> Unit,
-  navigateToFirstVote: () -> Unit,
   showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: HomeViewModel = hiltViewModel(),
   context: Context = LocalContext.current
 ){
   val state by viewModel.viewState.collectAsStateWithLifecycle()
-  val loading by viewModel.isLoading.collectAsStateWithLifecycle()
   val dialog by viewModel.dialogState.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect){
@@ -99,43 +97,25 @@ fun HomeRoute(
     }
   }
 
-  if (loading) LoadingScreen()
-  else HomeScreen(
+  HomeScreen(
     state = state,
     modifier = modifier,
-    onClickLoungeButton = { viewModel.sendEvent(HomeEvent.OnClickLoungeButton) },
-    onClickJoinLoungeButton = { viewModel.sendEvent(HomeEvent.OnClickJoinLoungeButton) },
-    onClickTemplateButton = { viewModel.sendEvent(HomeEvent.OnClickTemplateButton) },
-    onClickSettingButton = { viewModel.sendEvent(HomeEvent.OnClickSettingButton) },
-    onClickTipsButton = { viewModel.sendEvent(HomeEvent.OnClickTipsButton) }
+    onEvent = viewModel::sendEvent
   )
-
-  Row {
-    Button(onClick = navigateToFirstVote) {
-      Text("1차 투표 테스트")
-    }
-    Button(onClick = navigateToTest) {
-      Text(text = "2차 투표 화면 테스트")
-    }
-  }
 }
 
 @Composable
 private fun HomeScreen(
   state: HomeState,
   modifier: Modifier = Modifier,
-  onClickLoungeButton: () -> Unit = {},
-  onClickJoinLoungeButton: () -> Unit = {},
-  onClickTemplateButton: () -> Unit = {},
-  onClickSettingButton: () -> Unit = {},
-  onClickTipsButton: () -> Unit = {}
+  onEvent: (HomeEvent) -> Unit = {}
 ){
   Screen(
     modifier = modifier.padding(horizontal = 32.dp)
   ) {
     Image(
       painterResource(R.drawable.ic_logo),
-      null,
+      contentDescription = null,
       modifier = Modifier
         .size(48.dp)
         .align(Alignment.CenterHorizontally)
@@ -153,11 +133,11 @@ private fun HomeScreen(
     Gap(height = 24.dp)
     HomeButtonSet(
       modifier = Modifier.fillMaxWidth(),
-      onClickLoungeButton = onClickLoungeButton,
-      onClickJoinLoungeButton = onClickJoinLoungeButton,
-      onClickTemplateButton = onClickTemplateButton,
-      onClickSettingButton = onClickSettingButton,
-      onClickTipsButton = onClickTipsButton,
+      onClickLoungeButton = { onEvent(HomeEvent.OnClickLoungeButton) },
+      onClickJoinLoungeButton = { onEvent(HomeEvent.OnClickJoinLoungeButton) },
+      onClickTemplateButton = { onEvent(HomeEvent.OnClickTemplateButton) },
+      onClickSettingButton = { onEvent(HomeEvent.OnClickSettingButton) },
+      onClickTipsButton = { onEvent(HomeEvent.OnClickTipsButton) },
     )
     Gap(height = 64.dp)
   }
@@ -174,7 +154,7 @@ private fun FoodTrendChart(
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
     Text(
-      stringResource(R.string.home_banner_title),
+      text = stringResource(R.string.home_banner_title),
       style = MaterialTheme.typography.titleMedium
     )
     Gap(height = 24.dp)
@@ -196,7 +176,7 @@ private fun FoodTrendChart(
     }
     Gap(height = 16.dp)
     Text(
-      foodTrend.name,
+      text = foodTrend.name,
       style = MaterialTheme.typography.titleMedium,
       color = MaterialTheme.colorScheme.primary
     )
@@ -218,11 +198,19 @@ private fun CircularChart(
   color: Color = MaterialTheme.colorScheme.primary,
   backgroundCircleColor: Color = MaterialTheme.colorScheme.background
 ) {
-  val sweepAngle = 360 * foodTrendRatio / 100
+  val animatedFoodTrendRatio by animateFloatAsState(
+    targetValue = foodTrendRatio,
+    animationSpec = tween(
+      durationMillis = 1000,
+      delayMillis = 500,
+      easing = LinearEasing
+    ),
+    label = "AnimatedFoodTrendRatio"
+  )
+  val sweepAngle = 360 * animatedFoodTrendRatio / 100
 
   Canvas(
-    modifier = modifier
-      .size(size)
+    modifier = modifier.size(size)
   ) {
     val arcRadius = size.toPx()
     drawCircle(
@@ -256,7 +244,7 @@ private fun HomeDivider(
   ) {
     Image(
       painterResource(R.drawable.ic_triangle),
-      null
+      contentDescription = null
     )
     HorizontalDivider(
       modifier = Modifier.weight(1f),
@@ -265,7 +253,7 @@ private fun HomeDivider(
     )
     Image(
       painterResource(R.drawable.ic_triangle),
-      null,
+      contentDescription = null,
       modifier = Modifier.graphicsLayer(rotationZ = 180f)
     )
   }
@@ -299,7 +287,7 @@ private fun HomeButtonSet(
           .clickable { onClickLoungeButton() }
       ) {
         Text(
-          stringResource(R.string.home_start_button),
+          text = stringResource(R.string.home_start_button),
           modifier = Modifier.padding(top = 16.dp, start = 24.dp),
           style = MaterialTheme.typography.titleMedium,
           color = MaterialTheme.colorScheme.onPrimary
@@ -314,7 +302,7 @@ private fun HomeButtonSet(
           .clickable { onClickJoinLoungeButton() }
       ) {
         Text(
-          stringResource(R.string.home_join_button),
+          text = stringResource(R.string.home_join_button),
           modifier = Modifier.padding(top = 16.dp, start = 24.dp),
           style = MaterialTheme.typography.titleMedium,
           color = MaterialTheme.colorScheme.primary
@@ -331,7 +319,7 @@ private fun HomeButtonSet(
       contentAlignment = Alignment.TopEnd
     ) {
       Text(
-        stringResource(R.string.home_template_button),
+        text = stringResource(R.string.home_template_button),
         modifier = Modifier.padding(top = 16.dp, end = 24.dp),
         style = MaterialTheme.typography.titleMedium,
         color = MaterialTheme.colorScheme.primary
@@ -351,7 +339,7 @@ private fun HomeButtonSet(
       ) {
         Image(
           painterResource(R.drawable.ic_gear),
-          "Setting Button"
+          contentDescription = "Setting Button"
         )
       }
       Box(
@@ -364,7 +352,7 @@ private fun HomeButtonSet(
         contentAlignment = Alignment.CenterEnd
       ) {
         Text(
-          stringResource(R.string.home_tips_button),
+          text = stringResource(R.string.home_tips_button),
           modifier = Modifier.padding(end = 24.dp),
           style = MaterialTheme.typography.titleSmall,
           color = MaterialTheme.colorScheme.outline
