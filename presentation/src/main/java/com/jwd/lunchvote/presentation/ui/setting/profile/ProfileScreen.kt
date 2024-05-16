@@ -90,8 +90,6 @@ fun ProfileRoute(
     }
   }
 
-  LaunchedEffect(Unit) { viewModel.sendEvent(ProfileEvent.ScreenInitialize) }
-
   when (dialog) {
     ProfileContract.EDIT_PROFILE_IMAGE_DIALOG -> {
       EditProfileImageDialog(
@@ -118,6 +116,8 @@ fun ProfileRoute(
     }
   }
 
+  LaunchedEffect(Unit) { viewModel.sendEvent(ProfileEvent.ScreenInitialize) }
+
   if (loading) LoadingScreen()
   else ProfileScreen(
     state = state,
@@ -136,7 +136,6 @@ private fun ProfileScreen(
     topAppBar = {
       LunchVoteTopBar(
         title = stringResource(R.string.profile_title),
-        navIconVisible = true,
         popBackStack = { onEvent(ProfileEvent.OnClickBackButton) }
       )
     },

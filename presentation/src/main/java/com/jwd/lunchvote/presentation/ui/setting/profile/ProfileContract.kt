@@ -21,6 +21,7 @@ class ProfileContract {
 
   sealed interface ProfileEvent : ViewModelContract.Event {
     data object ScreenInitialize : ProfileEvent
+
     data object OnClickBackButton : ProfileEvent
     data object OnClickEditProfileImageButton : ProfileEvent
     data object OnClickEditNameButton : ProfileEvent

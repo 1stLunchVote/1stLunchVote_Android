@@ -56,6 +56,7 @@ class ProfileViewModel @Inject constructor(
   override fun handleEvents(event: ProfileEvent) {
     when(event) {
       is ProfileEvent.ScreenInitialize -> launch { initialize() }
+
       is ProfileEvent.OnClickBackButton -> sendSideEffect(ProfileSideEffect.PopBackStack)
       is ProfileEvent.OnClickEditProfileImageButton -> sendSideEffect(ProfileSideEffect.OpenEditProfileImageDialog)
       is ProfileEvent.OnClickEditNameButton -> sendSideEffect(ProfileSideEffect.OpenEditNameDialog)
@@ -84,12 +85,6 @@ class ProfileViewModel @Inject constructor(
 
   override fun handleErrors(error: Throwable) {
     sendSideEffect(ProfileSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
-    when (error) {
-      is LoginError.NoUser -> {
-        Firebase.auth.signOut()
-        sendSideEffect(ProfileSideEffect.NavigateToLogin)
-      }
-    }
   }
 
   private suspend fun initialize() {
@@ -119,7 +114,6 @@ class ProfileViewModel @Inject constructor(
     updateUserUseCase(user.asDomain())
     
     sendSideEffect(ProfileSideEffect.ShowSnackBar(UiText.StringResource(R.string.profile_edit_profile_image_success_snackbar)))
-    sendSideEffect(ProfileSideEffect.CloseDialog)
     initialize()
   }
 
@@ -130,7 +124,6 @@ class ProfileViewModel @Inject constructor(
 
     updateUserUseCase(user.asDomain())
     sendSideEffect(ProfileSideEffect.ShowSnackBar(UiText.StringResource(R.string.profile_edit_name_success_snackbar)))
-    sendSideEffect(ProfileSideEffect.CloseDialog)
     initialize()
   }
 

@@ -27,6 +27,7 @@ class SettingViewModel @Inject constructor(
   override fun handleEvents(event: SettingEvent) {
     when(event) {
       is SettingEvent.ScreenInitialize -> updateState(SettingReduce.UpdateAppVersion(event.appVersion))
+
       is SettingEvent.OnClickBackButton -> sendSideEffect(SettingSideEffect.PopBackStack)
       is SettingEvent.OnClickProfileButton -> sendSideEffect(SettingSideEffect.NavigateToProfile)
       is SettingEvent.OnClickAlertSettingButton -> sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.DynamicString("알림 설정")))
