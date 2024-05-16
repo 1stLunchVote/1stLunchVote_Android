@@ -2,7 +2,6 @@ package com.jwd.lunchvote.presentation.ui.template.add_template
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.common.error.LoginError
@@ -17,7 +16,6 @@ import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.model.type.FoodStatus
 import com.jwd.lunchvote.presentation.model.updateFoodMap
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
-import com.jwd.lunchvote.presentation.ui.setting.profile.ProfileContract
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateEvent
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateReduce
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateSideEffect
@@ -30,7 +28,6 @@ import javax.inject.Inject
 class AddTemplateViewModel @Inject constructor(
   private val addTemplateUseCase: AddTemplateUseCase,
   private val getFoodListUseCase: GetFoodListUseCase,
-  private val auth: FirebaseAuth,
   private val savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<AddTemplateState, AddTemplateEvent, AddTemplateReduce, AddTemplateSideEffect>(savedStateHandle){
   override fun createInitialState(savedState: Parcelable?): AddTemplateState {
@@ -73,9 +70,6 @@ class AddTemplateViewModel @Inject constructor(
 
   override fun handleErrors(error: Throwable) {
     sendSideEffect(AddTemplateSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
-    when (error) {
-      is LoginError.NoUser -> Firebase.auth.signOut()
-    }
   }
 
   private suspend fun initialize() {
@@ -89,7 +83,7 @@ class AddTemplateViewModel @Inject constructor(
   }
 
   private suspend fun addTemplate() {
-    val userId = auth.currentUser?.uid ?: throw LoginError.NoUser
+    val userId = Firebase.auth.currentUser?.uid ?: throw LoginError.NoUser
     val template = TemplateUIModel(
       userId = userId,
       name = currentState.name,

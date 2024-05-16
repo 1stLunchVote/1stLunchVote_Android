@@ -25,6 +25,7 @@ class EditTemplateContract {
 
   sealed interface EditTemplateEvent : Event {
     data object ScreenInitialize : EditTemplateEvent
+
     data object OnClickBackButton : EditTemplateEvent
     data class OnSearchKeywordChange(val searchKeyword: String) : EditTemplateEvent
     data class OnClickFood(val food: FoodUIModel) : EditTemplateEvent

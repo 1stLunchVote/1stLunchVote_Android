@@ -20,6 +20,7 @@ class TemplateListContract {
 
   sealed interface TemplateListEvent: Event {
     data object ScreenInitialize: TemplateListEvent
+
     data object OnClickBackButton: TemplateListEvent
     data class OnClickTemplate(val templateId: String): TemplateListEvent
     data object OnClickAddButton: TemplateListEvent
