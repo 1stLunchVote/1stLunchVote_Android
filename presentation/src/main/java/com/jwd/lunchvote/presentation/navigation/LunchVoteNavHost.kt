@@ -24,7 +24,6 @@ import com.jwd.lunchvote.presentation.ui.setting.SettingRoute
 import com.jwd.lunchvote.presentation.ui.setting.profile.ProfileRoute
 import com.jwd.lunchvote.presentation.ui.template.TemplateListRoute
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateRoute
-import com.jwd.lunchvote.presentation.ui.template.dialog.TemplateListAddDialog
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateRoute
 import com.jwd.lunchvote.presentation.ui.tips.TipsRoute
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteRoute
