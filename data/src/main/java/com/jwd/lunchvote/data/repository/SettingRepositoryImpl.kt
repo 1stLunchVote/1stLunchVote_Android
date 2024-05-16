@@ -15,4 +15,7 @@ class SettingRepositoryImpl @Inject constructor(
 
   override suspend fun updateUser(user: User) =
     userDataSource.updateUser(user.asData())
+
+  override suspend fun uploadProfileImage(userId: String, image: ByteArray): String =
+    userDataSource.uploadProfileImage(userId, image)
 }

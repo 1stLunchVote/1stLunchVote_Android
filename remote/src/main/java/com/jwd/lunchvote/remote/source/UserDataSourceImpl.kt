@@ -1,6 +1,7 @@
 package com.jwd.lunchvote.remote.source
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.data.model.UserData
 import com.jwd.lunchvote.data.source.remote.UserDataSource
@@ -11,7 +12,8 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class UserDataSourceImpl @Inject constructor(
-  private val fireStore: FirebaseFirestore
+  private val fireStore: FirebaseFirestore,
+  private val storage: FirebaseStorage
 ): UserDataSource {
 
   companion object {
@@ -20,6 +22,8 @@ class UserDataSourceImpl @Inject constructor(
     const val COLUMN_NAME = "name"
     const val COLUMN_PROFILE_IMAGE_URL = "profileImageUrl"
     const val COLUMN_CREATED_AT = "createdAt"
+
+    const val PROFILE_IMAGE_PATH = "Profile"
   }
 
   override suspend fun checkUserExists(
@@ -65,4 +69,19 @@ class UserDataSourceImpl @Inject constructor(
       .set(user.asRemote())
       .await()
   }
+
+  override suspend fun uploadProfileImage(
+    userId: String,
+    image: ByteArray
+  ): String =
+    storage
+      .reference
+      .child(PROFILE_IMAGE_PATH)
+      .child("$userId: ${System.currentTimeMillis()}")
+      .putBytes(image)
+      .await()
+      .storage
+      .downloadUrl
+      .await()
+      .toString()
 }

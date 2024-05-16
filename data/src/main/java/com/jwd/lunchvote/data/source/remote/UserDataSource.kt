@@ -7,4 +7,5 @@ interface UserDataSource {
   suspend fun createUser(user: UserData): String
   suspend fun getUserById(id: String): UserData
   suspend fun updateUser(user: UserData)
+  suspend fun uploadProfileImage(userId: String, image: ByteArray): String
 }
