@@ -10,28 +10,41 @@ class HomeContract {
   @Parcelize
   data class HomeState(
     val foodTrend: FoodUIModel = FoodUIModel(),
-    val foodTrendRatio: Float = 0f
+    val foodTrendRatio: Float = 0f,
+    val loungeId: String? = null
   ) : ViewModelContract.State, Parcelable
 
   sealed interface HomeEvent : ViewModelContract.Event {
+    data object ScreenInitialize : HomeEvent
     data object OnClickLoungeButton : HomeEvent
     data object OnClickJoinLoungeButton : HomeEvent
     data object OnClickTemplateButton : HomeEvent
     data object OnClickSettingButton : HomeEvent
     data object OnClickTipsButton : HomeEvent
+
+    // DialogEvent
+    data class OnLoungeIdChanged(val loungeId: String) : HomeEvent
+    data object OnClickCancelButtonJoinDialog : HomeEvent
+    data object OnClickConfirmButtonJoinDialog : HomeEvent
   }
 
   sealed interface HomeReduce : ViewModelContract.Reduce {
     data class UpdateFoodTrend(val foodTrend: FoodUIModel) : HomeReduce
     data class UpdateFoodTrendRatio(val foodTrendRatio: Float) : HomeReduce
+    data class UpdateLoungeId(val loungeId: String?) : HomeReduce
   }
 
   sealed interface HomeSideEffect : ViewModelContract.SideEffect {
-    data object NavigateToLounge : HomeSideEffect
+    data class NavigateToLounge(val loungeId: String?) : HomeSideEffect
     data object NavigateToTemplateList : HomeSideEffect
     data object NavigateToSetting : HomeSideEffect
     data object NavigateToTips : HomeSideEffect
     data object OpenJoinDialog : HomeSideEffect
+    data object CloseDialog : HomeSideEffect
     data class ShowSnackBar(val message: UiText) : HomeSideEffect
+  }
+
+  companion object {
+    const val JOIN_DIALOG = "join_dialog"
   }
 }

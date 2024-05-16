@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeEvent
@@ -47,6 +48,8 @@ import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeSideEffect
 import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeState
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
+import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
+import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.skydoves.landscapist.coil.CoilImage
@@ -54,37 +57,51 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun HomeRoute(
-  navigateToLounge: () -> Unit,
+  navigateToLounge: (String?) -> Unit,
   navigateToTemplateList: () -> Unit,
   navigateToSetting: () -> Unit,
   navigateToTips: () -> Unit,
   navigateToTest: () -> Unit,
   navigateToFirstVote: () -> Unit,
-  openJoinDialog: () -> Unit,
   showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: HomeViewModel = hiltViewModel(),
   context: Context = LocalContext.current
 ){
-  val homeState by viewModel.viewState.collectAsStateWithLifecycle()
-  val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+  val state by viewModel.viewState.collectAsStateWithLifecycle()
+  val loading by viewModel.isLoading.collectAsStateWithLifecycle()
+  val dialog by viewModel.dialogState.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect){
     viewModel.sideEffect.collectLatest {
       when(it){
-        is HomeSideEffect.NavigateToLounge -> navigateToLounge()
+        is HomeSideEffect.NavigateToLounge -> navigateToLounge(it.loungeId)
         is HomeSideEffect.NavigateToTemplateList -> navigateToTemplateList()
         is HomeSideEffect.NavigateToSetting -> navigateToSetting()
         is HomeSideEffect.NavigateToTips -> navigateToTips()
-        is HomeSideEffect.OpenJoinDialog -> openJoinDialog()
+        is HomeSideEffect.OpenJoinDialog -> viewModel.setDialogState(HomeContract.JOIN_DIALOG)
+        is HomeSideEffect.CloseDialog -> viewModel.setDialogState("")
         is HomeSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
       }
     }
   }
 
-  if (isLoading) LoadingScreen()
+  LaunchedEffect(Unit) { viewModel.sendEvent(HomeEvent.ScreenInitialize) }
+
+  when (dialog) {
+    HomeContract.JOIN_DIALOG -> {
+      JoinDialog(
+        loungeId = state.loungeId ?: "",
+        onDismissRequest = { viewModel.sendEvent(HomeEvent.OnClickCancelButtonJoinDialog) },
+        onLoungeIdChanged = { viewModel.sendEvent(HomeEvent.OnLoungeIdChanged(it)) },
+        onConfirmation = { viewModel.sendEvent(HomeEvent.OnClickConfirmButtonJoinDialog) }
+      )
+    }
+  }
+
+  if (loading) LoadingScreen()
   else HomeScreen(
-    homeState = homeState,
+    state = state,
     modifier = modifier,
     onClickLoungeButton = { viewModel.sendEvent(HomeEvent.OnClickLoungeButton) },
     onClickJoinLoungeButton = { viewModel.sendEvent(HomeEvent.OnClickJoinLoungeButton) },
@@ -105,7 +122,7 @@ fun HomeRoute(
 
 @Composable
 private fun HomeScreen(
-  homeState: HomeState,
+  state: HomeState,
   modifier: Modifier = Modifier,
   onClickLoungeButton: () -> Unit = {},
   onClickJoinLoungeButton: () -> Unit = {},
@@ -125,8 +142,8 @@ private fun HomeScreen(
     )
     Gap(minHeight = 36.dp)
     FoodTrendChart(
-      foodTrend = homeState.foodTrend,
-      foodTrendRatio = homeState.foodTrendRatio,
+      foodTrend = state.foodTrend,
+      foodTrendRatio = state.foodTrendRatio,
       modifier = Modifier.align(Alignment.CenterHorizontally)
     )
     Gap(minHeight = 36.dp)
@@ -357,9 +374,34 @@ private fun HomeButtonSet(
   }
 }
 
+@Composable
+private fun JoinDialog(
+  loungeId: String,
+  modifier: Modifier = Modifier,
+  onDismissRequest: () -> Unit = {},
+  onLoungeIdChanged: (String) -> Unit = {},
+  onConfirmation: () -> Unit = {},
+) {
+  LunchVoteDialog(
+    title = stringResource(R.string.join_dialog_title),
+    dismissText = stringResource(R.string.join_dialog_dismiss_button),
+    onDismissRequest = onDismissRequest,
+    confirmText = stringResource(R.string.join_dialog_confirm_button),
+    onConfirmation = onConfirmation,
+    modifier = modifier,
+    confirmEnabled = loungeId.isNotBlank()
+  ) {
+    LunchVoteTextField(
+      text = loungeId,
+      onTextChange = onLoungeIdChanged,
+      hintText = stringResource(R.string.join_dialog_hint_text)
+    )
+  }
+}
+
 @Preview
 @Composable
-private fun HomeScreenPreview() {
+private fun Preview() {
   ScreenPreview {
     HomeScreen(
       HomeState(
@@ -369,5 +411,13 @@ private fun HomeScreenPreview() {
         foodTrendRatio = 80f
       )
     )
+  }
+}
+
+@Preview
+@Composable
+private fun JoinDialogPreview() {
+  LunchVoteTheme {
+    JoinDialog("1234")
   }
 }

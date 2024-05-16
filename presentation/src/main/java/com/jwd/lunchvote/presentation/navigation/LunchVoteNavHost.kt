@@ -11,7 +11,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import com.jwd.lunchvote.presentation.ui.home.HomeRoute
-import com.jwd.lunchvote.presentation.ui.home.dialog.HomeJoinDialog
 import com.jwd.lunchvote.presentation.ui.login.LoginRoute
 import com.jwd.lunchvote.presentation.ui.login.register.email_verification.EmailVerificationRoute
 import com.jwd.lunchvote.presentation.ui.login.register.nickname.NicknameRoute
@@ -104,8 +103,8 @@ fun LunchVoteNavHost(
     }
     composable(LunchVoteNavRoute.Home) {
       HomeRoute(
-        navigateToLounge = {
-          navController.navigate(LunchVoteNavRoute.Lounge)
+        navigateToLounge = { loungeId ->
+          navController.navigate(LunchVoteNavRoute.Lounge, loungeId)
         },
         navigateToTemplateList = {
           navController.navigate(LunchVoteNavRoute.TemplateList)
@@ -122,9 +121,6 @@ fun LunchVoteNavHost(
         },
         navigateToFirstVote = {
           navController.navigate(LunchVoteNavRoute.FirstVote, "loungeId"/*TODO*/)
-        },
-        openJoinDialog = {
-          navController.navigate(LunchVoteNavRoute.HomeJoinDialog)
         },
         showSnackBar = showSnackBar
       )
@@ -208,15 +204,6 @@ fun LunchVoteNavHost(
       )
     }
 
-    dialog(LunchVoteNavRoute.HomeJoinDialog) {
-      HomeJoinDialog(
-        popBackStack = { navController.popBackStack() },
-        navigateToLounge = { loungeId ->
-          navController.navigate(LunchVoteNavRoute.Lounge, loungeId)
-        },
-        showSnackBar = showSnackBar
-      )
-    }
     dialog(LunchVoteNavRoute.TemplateListAddDialog) {
       TemplateListAddDialog(
         popBackStack = { navController.popBackStack() },

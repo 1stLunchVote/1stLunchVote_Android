@@ -107,6 +107,7 @@ firebase = { group = "com.google.firebase", name = "firebase-bom", version.ref =
 firebase-database = { group = "com.google.firebase", name = "firebase-database-ktx" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore-ktx" }
 firebase-dynamicLinks = { group = "com.google.firebase", name = "firebase-dynamic-links-ktx" }
+firebase-storage = { group = "com.google.firebase", name = "firebase-storage-ktx" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuth" }
 firebase-functions = { group = "com.google.firebase", name = "firebase-functions-ktx", version.ref = "firebaseFunctions" }
 firebase-gmsAuth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "firebaseGmsAuth" }
@@ -133,7 +134,7 @@ hilt = ["hilt", "hilt-android", "hilt-work"]
 hilt-compiler = ["hilt-compiler", "hilt-android-compiler"]
 coroutines = ["coroutines", "coroutines-android"]
 compose = ["compose-material", "compose-foundation", "compose-ui", "compose-ui-tooling", "compose-ui-tooling-preview", "compose-hilt", "compose-lifecycle", "compose-constraintLayout"]
-firebase = ["firebase-database", "firebase-firestore", "firebase-auth", "firebase-functions", "firebase-gmsAuth"]
+firebase = ["firebase-database", "firebase-firestore", "firebase-auth", "firebase-functions", "firebase-gmsAuth", "firebase-storage"]
 room = ["room", "room-runtime"]
 coil = ["coil", "coil-landscapist"]
 

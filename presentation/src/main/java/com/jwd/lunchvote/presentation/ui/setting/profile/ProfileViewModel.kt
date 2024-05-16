@@ -14,6 +14,7 @@ import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.usecase.GetUserByIdUseCase
 import com.jwd.lunchvote.domain.usecase.UpdateUserUseCase
+import com.jwd.lunchvote.domain.usecase.UploadProfileImageUrlUseCase
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
@@ -37,6 +38,7 @@ import javax.inject.Inject
 class ProfileViewModel @Inject constructor(
   private val getUserByIdUseCase: GetUserByIdUseCase,
   private val updateUserUseCase: UpdateUserUseCase,
+  private val uploadProfileImageUrlUseCase: UploadProfileImageUrlUseCase,
   savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<ProfileState, ProfileEvent, ProfileReduce, ProfileSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): ProfileState {
@@ -100,6 +102,8 @@ class ProfileViewModel @Inject constructor(
   }
 
   private suspend fun saveProfileImage(context: Context) {
+    sendSideEffect(ProfileSideEffect.CloseDialog)
+
     val imageBitmap = ImageBitmapFactory().createBitmapFromUri(context, currentState.profileImageUri)
     val directory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "images")
       .apply { if (!exists()) mkdirs() }
@@ -109,7 +113,9 @@ class ProfileViewModel @Inject constructor(
       }
     }
 
-    val user = currentState.user.copy(profileImageUrl = file.absolutePath)
+    val image = file.readBytes()
+    val imageUrl = uploadProfileImageUrlUseCase(currentState.user.id, image)
+    val user = currentState.user.copy(profileImageUrl = imageUrl)
     updateUserUseCase(user.asDomain())
     
     sendSideEffect(ProfileSideEffect.ShowSnackBar(UiText.StringResource(R.string.profile_edit_profile_image_success_snackbar)))
@@ -118,6 +124,8 @@ class ProfileViewModel @Inject constructor(
   }
 
   private suspend fun saveName() {
+    sendSideEffect(ProfileSideEffect.CloseDialog)
+
     val user = currentState.user.copy(name = currentState.name)
 
     updateUserUseCase(user.asDomain())
