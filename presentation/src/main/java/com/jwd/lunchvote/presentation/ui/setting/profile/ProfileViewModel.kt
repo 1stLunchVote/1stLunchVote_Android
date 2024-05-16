@@ -102,6 +102,8 @@ class ProfileViewModel @Inject constructor(
   }
 
   private suspend fun saveProfileImage(context: Context) {
+    sendSideEffect(ProfileSideEffect.CloseDialog)
+
     val imageBitmap = ImageBitmapFactory().createBitmapFromUri(context, currentState.profileImageUri)
     val directory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "images")
       .apply { if (!exists()) mkdirs() }
@@ -122,6 +124,8 @@ class ProfileViewModel @Inject constructor(
   }
 
   private suspend fun saveName() {
+    sendSideEffect(ProfileSideEffect.CloseDialog)
+
     val user = currentState.user.copy(name = currentState.name)
 
     updateUserUseCase(user.asDomain())
