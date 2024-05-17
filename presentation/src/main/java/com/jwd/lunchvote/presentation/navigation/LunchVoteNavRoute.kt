@@ -38,6 +38,9 @@ enum class LunchVoteNavRoute(
     arguments = listOf(
       navArgument("userId") {
         type = NavType.StringType
+      },
+      navArgument("loungeId") {
+        type = NavType.StringType
       }
     )
   ),

@@ -299,10 +299,13 @@ class LoungeDataSourceImpl @Inject constructor(
       .flowOn(dispatcher)
 
   override suspend fun getMemberByUserId(
-    userId: String
+    userId: String,
+    loungeId: String
   ): MemberData =
     database
       .getReference(LOUNGE_PATH)
+      .child(loungeId)
+      .child(LOUNGE_MEMBERS)
       .child(userId)
       .get()
       .await()

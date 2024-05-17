@@ -74,9 +74,12 @@ class LoungeMemberViewModel @Inject constructor(
   }
 
   private suspend fun initialize() {
-    val userIdKey = LunchVoteNavRoute.LoungeMember.arguments.first().toString()
+    val userIdKey = LunchVoteNavRoute.LoungeMember.arguments.first().name
     val userId = checkNotNull(savedStateHandle.get<String>(userIdKey))
-    val member = getMemberByUserIdUseCase(userId).asUI()
+    val loungeIdKey = LunchVoteNavRoute.LoungeMember.arguments.last().name
+    val loungeId = checkNotNull(savedStateHandle.get<String>(loungeIdKey))
+
+    val member = getMemberByUserIdUseCase(userId, loungeId).asUI()
     val user = getUserByIdUseCase(member.userId).asUI()
     val authUser = Firebase.auth.currentUser ?: throw LoginError.NoUser
     val isOwner = authUser.uid == member.userId

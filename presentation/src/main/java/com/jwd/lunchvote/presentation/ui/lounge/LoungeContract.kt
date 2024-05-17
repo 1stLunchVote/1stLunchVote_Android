@@ -47,7 +47,7 @@ class LoungeContract {
 
   sealed interface LoungeSideEffect : ViewModelContract.SideEffect {
     data object PopBackStack : LoungeSideEffect
-    data class NavigateToMember(val member: MemberUIModel, val loungeId: String, val isOwner: Boolean) : LoungeSideEffect
+    data class NavigateToMember(val userId: String, val loungeId: String) : LoungeSideEffect
     data class NavigateToVote(val loungeId: String) : LoungeSideEffect
     data object OpenVoteExitDialog : LoungeSideEffect
     data object CloseDialog : LoungeSideEffect

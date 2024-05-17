@@ -157,7 +157,7 @@
     <!-- ProfileScreen -->
     <string name="profile_title">내 프로필</string>
     <string name="profile_nickname">닉네임</string>
-    <string name="profile_email">연동된 이메일</string>
+    <string name="profile_email">이메일</string>
     <string name="profile_vertical_divider">|</string>
     <string name="profile_edit_profile_image">프로필 이미지 수정</string>
     <string name="profile_edit_name">닉네임 수정</string>
