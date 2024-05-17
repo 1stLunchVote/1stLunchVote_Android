@@ -84,7 +84,7 @@
     <string name="lounge_owner_exited_snackbar">방장이 투표 방을 나갔습니다.</string>
     <string name="lounge_exiled_snackbar">투표 방에서 강퇴되었습니다.</string>
     <string name="lounge_not_ready_to_start_snackbar">모든 멤버가 준비해야합니다.</string>
-    <string name="lounge_exited_snackbar">투표 대기방에서 나왔습니다..</string>
+    <string name="lounge_exited_snackbar">투표 대기방에서 나왔습니다.</string>
 
     <!-- LoungeMemberScreen -->
     <string name="lounge_member_topbar_title">참여자 정보방</string>
