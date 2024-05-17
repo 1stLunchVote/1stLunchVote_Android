@@ -87,7 +87,8 @@ class LoungeViewModel @Inject constructor(
       val user = getUserByIdUseCase(userId).asUI()
       updateState(LoungeReduce.UpdateUser(user))
 
-      val loungeId = savedStateHandle.get<String?>(LunchVoteNavRoute.Lounge.arguments.first().name)
+      val loungeIdKey = LunchVoteNavRoute.Lounge.arguments.first().name
+      val loungeId = savedStateHandle.get<String?>(loungeIdKey)
       if (loungeId != null) joinLounge(loungeId) else createLounge()
     }
   }
@@ -147,8 +148,16 @@ class LoungeViewModel @Inject constructor(
   private suspend fun joinLounge(loungeId: String) {
     withTimeoutOrNull(TIMEOUT) {
       val user = currentState.user
-      val loungeStatus = getLoungeByIdUseCase(loungeId).asUI().status
-      if (loungeStatus != LoungeStatusUIType.CREATED) throw LoungeError.NoLounge
+      getLoungeByIdUseCase(loungeId).asUI().apply {
+        if (status != LoungeStatusUIType.CREATED) {
+          sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_started_snackbar)))
+          sendSideEffect(LoungeSideEffect.PopBackStack)
+        }
+        if (members.size == 6) {
+          sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_full_snackbar)))
+          sendSideEffect(LoungeSideEffect.PopBackStack)
+        }
+      }
 
       val lounge = joinLoungeUseCase(user.asDomain(), loungeId).asUI()
 
@@ -232,8 +241,6 @@ class LoungeViewModel @Inject constructor(
   }
 
   private suspend fun updateReady() {
-    val owner = currentState.memberList.find { it.status == MemberStatusUIType.OWNER }
-      ?: throw LoungeError.NoOwner
     if (currentState.user.id == owner.userId && currentState.memberList.any { it.status != MemberStatusUIType.READY }) {
       sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_not_ready_to_start_snackbar)))
     } else {
