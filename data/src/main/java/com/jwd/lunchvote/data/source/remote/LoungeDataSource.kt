@@ -6,7 +6,6 @@ import com.jwd.lunchvote.data.model.MemberData
 import com.jwd.lunchvote.data.model.UserData
 import com.jwd.lunchvote.data.model.type.LoungeStatusDataType
 import com.jwd.lunchvote.data.model.type.MemberStatusDataType
-import com.jwd.lunchvote.domain.entity.Member
 import kotlinx.coroutines.flow.Flow
 
 interface LoungeDataSource {
