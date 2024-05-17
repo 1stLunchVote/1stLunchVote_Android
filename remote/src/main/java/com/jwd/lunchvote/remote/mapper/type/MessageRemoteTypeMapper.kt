@@ -9,7 +9,8 @@ private object MessageRemoteTypeMapper : BiMapper<Int, MessageDataType> {
       0 -> MessageDataType.NORMAL
       1 -> MessageDataType.CREATE
       2 -> MessageDataType.JOIN
-      else -> MessageDataType.EXIT
+      3 -> MessageDataType.EXIT
+      else -> MessageDataType.EXILE
     }
   }
 
@@ -19,6 +20,7 @@ private object MessageRemoteTypeMapper : BiMapper<Int, MessageDataType> {
       MessageDataType.CREATE -> 1
       MessageDataType.JOIN -> 2
       MessageDataType.EXIT -> 3
+      MessageDataType.EXILE -> 4
     }
   }
 }

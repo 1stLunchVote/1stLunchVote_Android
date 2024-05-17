@@ -22,7 +22,6 @@ import com.jwd.lunchvote.remote.model.MemberRemote
 import com.jwd.lunchvote.remote.util.getValueEventFlow
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
@@ -62,14 +61,7 @@ class LoungeDataSourceImpl @Inject constructor(
     const val CHAT_USER_ID = "userId"
     const val CHAT_USER_PROFILE = "userProfile"
     const val CHAT_MESSAGE = "message"
-    const val CHAT_MESSAGE_CREATE = "투표 방이 생성되었습니다."
-    const val CHAT_MESSAGE_JOIN = "님이 입장했습니다."
-    const val CHAT_MESSAGE_EXIT = "님이 퇴장했습니다."
     const val CHAT_MESSAGE_TYPE = "messageType"
-    const val CHAT_MESSAGE_TYPE_NORMAL = 0
-    const val CHAT_MESSAGE_TYPE_CREATE = 1
-    const val CHAT_MESSAGE_TYPE_JOIN = 2
-    const val CHAT_MESSAGE_TYPE_EXIT = 3
     const val CHAT_CREATED_AT = "createdAt"
   }
 
@@ -189,6 +181,9 @@ class LoungeDataSourceImpl @Inject constructor(
           value?.asData(key) ?: throw Exception("TODO: getMemberList, value is null")
         }
       }
+      .map { flow ->
+        flow.filter { member -> member.status != MemberStatusDataType.EXILED }
+      }
       .flowOn(dispatcher)
   }
 
@@ -210,20 +205,11 @@ class LoungeDataSourceImpl @Inject constructor(
     chat: LoungeChatData
   ) {
     withContext(dispatcher) {
-      val chatRemote = chat.asRemote()
-      val chatMessage = when (chatRemote.messageType) {
-        CHAT_MESSAGE_TYPE_NORMAL -> chatRemote.message
-        CHAT_MESSAGE_TYPE_CREATE -> CHAT_MESSAGE_CREATE
-        CHAT_MESSAGE_TYPE_JOIN -> "${chatRemote.userName} $CHAT_MESSAGE_JOIN"
-        CHAT_MESSAGE_TYPE_EXIT -> "${chatRemote.userName} $CHAT_MESSAGE_EXIT"
-        else -> throw Exception("TODO: sendChat, invalid messageType")
-      }
-
       database
         .getReference(CHAT_PATH)
-        .child(chatRemote.loungeId)
+        .child(chat.loungeId)
         .child(chat.id)
-        .setValue(chatRemote.copy(message = chatMessage))
+        .setValue(chat.asRemote())
     }
   }
 

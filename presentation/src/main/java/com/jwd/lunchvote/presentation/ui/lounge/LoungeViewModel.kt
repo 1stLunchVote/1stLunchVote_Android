@@ -208,8 +208,6 @@ class LoungeViewModel @Inject constructor(
   private suspend fun checkMemberStatus(member: MemberUIModel) {
     checkMemberStatusUseCase(member.asDomain()).collectLatest { status ->
       if (status == MemberStatusType.EXILED) {
-        exitLoungeUseCase(member.asDomain())
-
         sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_exiled_snackbar)))
         sendSideEffect(LoungeSideEffect.PopBackStack)
       }

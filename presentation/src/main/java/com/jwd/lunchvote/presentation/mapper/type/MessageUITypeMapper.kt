@@ -11,6 +11,7 @@ private object MessageUITypeMapper : BiMapper<MessageUIType, MessageType> {
       MessageUIType.CREATE -> MessageType.CREATE
       MessageUIType.JOIN -> MessageType.JOIN
       MessageUIType.EXIT -> MessageType.EXIT
+      MessageUIType.EXILE -> MessageType.EXILE
     }
   }
 
@@ -20,6 +21,7 @@ private object MessageUITypeMapper : BiMapper<MessageUIType, MessageType> {
       MessageType.CREATE -> MessageUIType.CREATE
       MessageType.JOIN -> MessageUIType.JOIN
       MessageType.EXIT -> MessageUIType.EXIT
+      MessageType.EXILE -> MessageUIType.EXILE
     }
   }
 }
