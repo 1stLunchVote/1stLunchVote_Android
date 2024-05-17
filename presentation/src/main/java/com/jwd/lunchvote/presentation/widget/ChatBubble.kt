@@ -99,12 +99,7 @@ fun ChatBubble(
         contentAlignment = Alignment.Center
       ) {
         Text(
-          text = when (chat.messageType) {
-            MessageUIType.CREATE -> "투표 방이 생성되었습니다."
-            MessageUIType.JOIN -> "${chat.userName}님이 입장했습니다."
-            MessageUIType.EXIT -> "${chat.userName}님이 퇴장했습니다."
-            else -> ""
-          },
+          text = chat.message,
           color = MaterialTheme.colorScheme.background,
           style = MaterialTheme.typography.titleSmall
         )

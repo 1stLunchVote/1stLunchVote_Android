@@ -61,14 +61,7 @@ class LoungeDataSourceImpl @Inject constructor(
     const val CHAT_USER_ID = "userId"
     const val CHAT_USER_PROFILE = "userProfile"
     const val CHAT_MESSAGE = "message"
-    const val CHAT_MESSAGE_CREATE = "투표 방이 생성되었습니다."
-    const val CHAT_MESSAGE_JOIN = "님이 입장했습니다."
-    const val CHAT_MESSAGE_EXIT = "님이 퇴장했습니다."
     const val CHAT_MESSAGE_TYPE = "messageType"
-    const val CHAT_MESSAGE_TYPE_NORMAL = 0
-    const val CHAT_MESSAGE_TYPE_CREATE = 1
-    const val CHAT_MESSAGE_TYPE_JOIN = 2
-    const val CHAT_MESSAGE_TYPE_EXIT = 3
     const val CHAT_CREATED_AT = "createdAt"
   }
 
@@ -188,6 +181,9 @@ class LoungeDataSourceImpl @Inject constructor(
           value?.asData(key) ?: throw Exception("TODO: getMemberList, value is null")
         }
       }
+      .map { flow ->
+        flow.filter { member -> member.status != MemberStatusDataType.EXILED }
+      }
       .flowOn(dispatcher)
   }
 
@@ -209,31 +205,11 @@ class LoungeDataSourceImpl @Inject constructor(
     chat: LoungeChatData
   ) {
     withContext(dispatcher) {
-      val chatRemote = chat.asRemote()
-      val chatMessage = when (chatRemote.messageType) {
-        CHAT_MESSAGE_TYPE_NORMAL -> chatRemote.message
-        CHAT_MESSAGE_TYPE_CREATE -> CHAT_MESSAGE_CREATE
-        CHAT_MESSAGE_TYPE_JOIN -> "${chatRemote.userName} $CHAT_MESSAGE_JOIN"
-        CHAT_MESSAGE_TYPE_EXIT -> "${chatRemote.userName} $CHAT_MESSAGE_EXIT"
-        else -> throw Exception("TODO: sendChat, invalid messageType")
-      }
-
       database
         .getReference(CHAT_PATH)
-        .child(chatRemote.loungeId)
+        .child(chat.loungeId)
         .child(chat.id)
-        .setValue(chatRemote.copy(message = chatMessage))
-
-//      val data = JSONObject().apply {
-//        put(CHAT_LOUNGE_ID, chatRemote.loungeId)
-//        put(CHAT_USER_ID, chatRemote.userId)
-//        put(CHAT_USER_PROFILE, chatRemote.userProfile)
-//        put(CHAT_MESSAGE, chatMessage)
-//        put(CHAT_MESSAGE_TYPE, chatRemote.messageType)
-//        put(CHAT_CREATED_AT, chatRemote.createdAt)
-//      }
-//
-//      functions.getHttpsCallable("sendChat").call(data).await()
+        .setValue(chat.asRemote())
     }
   }
 
@@ -307,4 +283,18 @@ class LoungeDataSourceImpl @Inject constructor(
         status?.asMemberStatusDataType() ?: throw Exception("TODO: getMemberStatus, it is null")
       }
       .flowOn(dispatcher)
+
+  override suspend fun getMemberByUserId(
+    userId: String,
+    loungeId: String
+  ): MemberData =
+    database
+      .getReference(LOUNGE_PATH)
+      .child(loungeId)
+      .child(LOUNGE_MEMBERS)
+      .child(userId)
+      .get()
+      .await()
+      .getValue(MemberRemote::class.java)
+      ?.asData(userId) ?: throw LoungeError.InvalidMember
 }

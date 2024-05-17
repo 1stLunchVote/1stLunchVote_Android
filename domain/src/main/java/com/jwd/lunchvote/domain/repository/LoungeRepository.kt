@@ -21,4 +21,5 @@ interface LoungeRepository {
   suspend fun exitLounge(member: Member)
   suspend fun exileMember(member: Member)
   fun getMemberStatus(member: Member): Flow<MemberStatusType>
+  suspend fun getMemberByUserId(userId: String, loungeId: String): Member
 }

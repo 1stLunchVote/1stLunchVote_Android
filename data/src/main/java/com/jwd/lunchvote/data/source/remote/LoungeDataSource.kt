@@ -21,4 +21,5 @@ interface LoungeDataSource {
   suspend fun exitLounge(member: MemberData)
   suspend fun exileMember(member: MemberData)
   fun getMemberStatus(member: MemberData) : Flow<MemberStatusDataType>
+  suspend fun getMemberByUserId(userId: String, loungeId: String): MemberData
 }

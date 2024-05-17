@@ -45,7 +45,7 @@ class LoungeRepositoryImpl @Inject constructor(
       userId = owner.id,
       userName = owner.name,
       userProfile = owner.profileImageUrl,
-      message = "",
+      message = "투표 방이 생성되었습니다.",
       messageType = MessageType.CREATE,
       sendStatus = SendStatusType.SENDING,
       createdAt = LocalDateTime.now().toString()
@@ -67,7 +67,7 @@ class LoungeRepositoryImpl @Inject constructor(
       userId = user.id,
       userName = user.name,
       userProfile = user.profileImageUrl,
-      message = "",
+      message = "${user.name}님이 입장하였습니다.",
       messageType = MessageType.JOIN,
       sendStatus = SendStatusType.SENDING,
       createdAt = LocalDateTime.now().toString()
@@ -117,8 +117,8 @@ class LoungeRepositoryImpl @Inject constructor(
       loungeId = member.loungeId,
       userId = member.userId,
       userName = member.userName,
-      userProfile = "",
-      message = "",
+      userProfile = member.userProfile,
+      message = "${member.userName}님이 퇴장하였습니다.",
       messageType = MessageType.EXIT,
       sendStatus = SendStatusType.SENDING,
       createdAt = LocalDateTime.now().toString()
@@ -129,9 +129,24 @@ class LoungeRepositoryImpl @Inject constructor(
   }
 
   override suspend fun exileMember(member: Member) {
+    val chat = LoungeChat(
+      id = UUID.randomUUID().toString(),
+      loungeId = member.loungeId,
+      userId = member.userId,
+      userName = member.userName,
+      userProfile = member.userProfile,
+      message = "${member.userName}님이 추방되었습니다.",
+      messageType = MessageType.EXILE,
+      sendStatus = SendStatusType.SENDING,
+      createdAt = LocalDateTime.now().toString()
+    )
+    remote.sendChat(chat.asData())
     remote.exileMember(member.asData())
   }
 
   override fun getMemberStatus(member: Member): Flow<MemberStatusType> =
     remote.getMemberStatus(member.asData()).map { it.asDomain() }
+
+  override suspend fun getMemberByUserId(userId: String, loungeId: String): Member =
+    remote.getMemberByUserId(userId, loungeId).asDomain()
 }

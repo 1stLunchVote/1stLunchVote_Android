@@ -72,7 +72,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun LoungeRoute(
   popBackStack: () -> Unit,
-  navigateToMember: (MemberUIModel, String, Boolean) -> Unit,
+  navigateToMember: (String, String) -> Unit,
   navigateToFirstVote: (String) -> Unit,
   showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
@@ -88,7 +88,7 @@ fun LoungeRoute(
     viewModel.sideEffect.collectLatest {
       when (it) {
         is LoungeSideEffect.PopBackStack -> popBackStack()
-        is LoungeSideEffect.NavigateToMember -> navigateToMember(it.member, it.loungeId, it.isOwner)
+        is LoungeSideEffect.NavigateToMember -> navigateToMember(it.userId, it.loungeId)
         is LoungeSideEffect.NavigateToVote -> navigateToFirstVote(it.loungeId)
         is LoungeSideEffect.OpenVoteExitDialog -> viewModel.openDialog(LoungeContract.VOTE_EXIT_DIALOG)
         is LoungeSideEffect.CloseDialog -> viewModel.openDialog("")

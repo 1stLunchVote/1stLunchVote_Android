@@ -135,9 +135,8 @@ fun LunchVoteNavHost(
     composable(LunchVoteNavRoute.Lounge) {
       LoungeRoute(
         popBackStack = { navController.popBackStack(LunchVoteNavRoute.Home) },
-        navigateToMember = { member, loungeId, isOwner ->
-//          navController.navigate(LunchVoteNavRoute.LoungeMember,
-//            id, loungeId, member.uid, member.nickname, member.profileImage, isOwner)
+        navigateToMember = { userId, loungeId ->
+          navController.navigate(LunchVoteNavRoute.LoungeMember, userId, loungeId)
         },
         navigateToFirstVote = { loungeId ->
           navController.navigate(LunchVoteNavRoute.FirstVote, loungeId)

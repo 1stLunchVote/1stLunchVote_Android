@@ -2,100 +2,98 @@ package com.jwd.lunchvote.presentation.ui.lounge.member
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import com.google.firebase.auth.FirebaseAuth
+import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import com.jwd.lunchvote.core.common.error.LoginError
+import com.jwd.lunchvote.core.common.error.LoungeError
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
-import com.jwd.lunchvote.domain.usecase.CheckMemberStatusUseCase
 import com.jwd.lunchvote.domain.usecase.ExileMemberUseCase
+import com.jwd.lunchvote.domain.usecase.GetMemberByUserIdUseCase
+import com.jwd.lunchvote.domain.usecase.GetUserByIdUseCase
+import com.jwd.lunchvote.presentation.mapper.asDomain
+import com.jwd.lunchvote.presentation.mapper.asUI
+import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
 import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberContract.LoungeMemberEvent
 import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberContract.LoungeMemberReduce
 import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberContract.LoungeMemberSideEffect
 import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberContract.LoungeMemberState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LoungeMemberViewModel @Inject constructor(
+  private val getMemberByUserIdUseCase: GetMemberByUserIdUseCase,
+  private val getUserByIdUseCase: GetUserByIdUseCase,
   private val exileMemberUseCase: ExileMemberUseCase,
-  auth: FirebaseAuth,
-  checkMemberStatusUseCase: CheckMemberStatusUseCase,
-  savedStateHandle: SavedStateHandle,
-) :
-  BaseStateViewModel<LoungeMemberState, LoungeMemberEvent, LoungeMemberReduce, LoungeMemberSideEffect>(
-    savedStateHandle
-  ) {
-  private val memberId = checkNotNull(savedStateHandle.get<String?>(MEMBER_EXTRA_KEY))
-  private val loungeId = checkNotNull(savedStateHandle.get<String?>(LOUNGE_EXTRA_KEY))
-  private val nickname = checkNotNull(savedStateHandle.get<String?>(NICKNAME_EXTRA_KEY))
-  private val profileUrl = savedStateHandle.get<String?>(PROFILE_URL_EXTRA_KEY)
-  private val isOwner = savedStateHandle[IS_OWNER_EXTRA_KEY] ?: false
-
+  private val savedStateHandle: SavedStateHandle,
+) : BaseStateViewModel<LoungeMemberState, LoungeMemberEvent, LoungeMemberReduce, LoungeMemberSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): LoungeMemberState {
     return savedState as? LoungeMemberState ?: LoungeMemberState()
   }
 
-  init {
-//    updateState(LoungeMemberReduce.SetMemberInfo(memberId, nickname, profileUrl, isOwner))
-//
-//    val member = MemberUIModel(
-//      id = memberId,
-//      loungeId = loungeId,
-//      status = MemberStatusType.JOINED,
-//      joinedAt = "",
-//    )
-//    checkMemberStatusUseCase(auth.currentUser?.uid!!, loungeId)
-//      .onEach {
-//        when (it) {
-//          MemberStatusType.EXILED, MemberStatusType.EXITED -> {
-//            sendSideEffect(LoungeMemberSideEffect.PopBackStack)
-//          }
-//
-//          else -> {}
-//        }
-//      }
-//      .launchIn(viewModelScope)
-  }
-
-  override fun reduceState(
-    state: LoungeMemberState,
-    reduce: LoungeMemberReduce,
-  ): LoungeMemberState {
-    return when (reduce) {
-      is LoungeMemberReduce.SetMemberInfo -> {
-        state.copy(
-          memberId = reduce.memberId,
-          nickname = reduce.nickname,
-          profileUrl = reduce.profileUrl,
-          isOwner = reduce.isOwner
-        )
-      }
-    }
-  }
-
-  override fun handleErrors(error: Throwable) {
-    sendSideEffect(LoungeMemberSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
-  }
-
-  private fun exileMember() {
-    launch {
-//      exileMemberUseCase(memberId, loungeId)
-
-      sendSideEffect(LoungeMemberSideEffect.PopBackStack)
+  private val _dialogState = MutableStateFlow("")
+  val dialogState: StateFlow<String> = _dialogState.asStateFlow()
+  fun openDialog(dialogState: String) {
+    viewModelScope.launch {
+      _dialogState.emit(dialogState)
     }
   }
 
   override fun handleEvents(event: LoungeMemberEvent) {
     when (event) {
-      is LoungeMemberEvent.OnClickExile -> exileMember()
+      is LoungeMemberEvent.ScreenInitialize -> launch { initialize() }
+      is LoungeMemberEvent.OnClickBackButton -> sendSideEffect(LoungeMemberSideEffect.PopBackStack)
+      is LoungeMemberEvent.OnClickExileButton -> sendSideEffect(LoungeMemberSideEffect.OpenExileConfirmDialog)
+
+      // DialogEvents
+      is LoungeMemberEvent.OnClickCancelButtonExileConfirmDialog -> sendSideEffect(LoungeMemberSideEffect.CloseDialog)
+      is LoungeMemberEvent.OnClickConfirmButtonExileConfirmDialog -> launch { exileMember() }
     }
   }
 
-  companion object {
-    private const val MEMBER_EXTRA_KEY = "id"
-    private const val LOUNGE_EXTRA_KEY = "loungeId"
-    private const val NICKNAME_EXTRA_KEY = "nickname"
-    private const val PROFILE_URL_EXTRA_KEY = "profileUrl"
-    private const val IS_OWNER_EXTRA_KEY = "isOwner"
+  override fun reduceState(state: LoungeMemberState, reduce: LoungeMemberReduce, ): LoungeMemberState {
+    return when (reduce) {
+      is LoungeMemberReduce.UpdateMember -> state.copy(member = reduce.member)
+      is LoungeMemberReduce.UpdateUser -> state.copy(user = reduce.user)
+      is LoungeMemberReduce.UpdateIsMe -> state.copy(isMe = reduce.isMe)
+    }
+  }
+
+  override fun handleErrors(error: Throwable) {
+    sendSideEffect(LoungeMemberSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+    when (error) {
+      is LoungeError.InvalidMember -> sendSideEffect(LoungeMemberSideEffect.PopBackStack)
+    }
+  }
+
+  private suspend fun initialize() {
+    val userIdKey = LunchVoteNavRoute.LoungeMember.arguments.first().name
+    val userId = checkNotNull(savedStateHandle.get<String>(userIdKey))
+    val loungeIdKey = LunchVoteNavRoute.LoungeMember.arguments.last().name
+    val loungeId = checkNotNull(savedStateHandle.get<String>(loungeIdKey))
+
+    val member = getMemberByUserIdUseCase(userId, loungeId).asUI()
+    val user = getUserByIdUseCase(member.userId).asUI()
+    val authUser = Firebase.auth.currentUser ?: throw LoginError.NoUser
+    val isMe = authUser.uid == member.userId
+
+    updateState(LoungeMemberReduce.UpdateMember(member))
+    updateState(LoungeMemberReduce.UpdateUser(user))
+    updateState(LoungeMemberReduce.UpdateIsMe(isMe))
+  }
+
+  private suspend fun exileMember() {
+    sendSideEffect(LoungeMemberSideEffect.CloseDialog)
+
+    exileMemberUseCase(currentState.member.asDomain())
+
+    sendSideEffect(LoungeMemberSideEffect.PopBackStack)
   }
 }

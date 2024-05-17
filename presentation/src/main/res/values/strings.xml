@@ -79,10 +79,12 @@
     <string name="lounge_exit_dialog_confirm_button">나가기</string>
     <string name="lounge_create_lounge_snackbar">방 생성에 실패하였습니다.</string>
     <string name="lounge_join_lounge_snackbar">방 입장에 실패하였습니다.</string>
+    <string name="lounge_started_snackbar">투표가 이미 시작된 방입니다.</string>
+    <string name="lounge_full_snackbar">투표 방이 가득 찼습니다.</string>
     <string name="lounge_owner_exited_snackbar">방장이 투표 방을 나갔습니다.</string>
     <string name="lounge_exiled_snackbar">투표 방에서 강퇴되었습니다.</string>
     <string name="lounge_not_ready_to_start_snackbar">모든 멤버가 준비해야합니다.</string>
-    <string name="lounge_exited_snackbar">투표 대기방에서 나왔습니다..</string>
+    <string name="lounge_exited_snackbar">투표 대기방에서 나왔습니다.</string>
 
     <!-- LoungeMemberScreen -->
     <string name="lounge_member_topbar_title">참여자 정보방</string>
@@ -157,7 +159,7 @@
     <!-- ProfileScreen -->
     <string name="profile_title">내 프로필</string>
     <string name="profile_nickname">닉네임</string>
-    <string name="profile_email">연동된 이메일</string>
+    <string name="profile_email">이메일</string>
     <string name="profile_vertical_divider">|</string>
     <string name="profile_edit_profile_image">프로필 이미지 수정</string>
     <string name="profile_edit_name">닉네임 수정</string>
