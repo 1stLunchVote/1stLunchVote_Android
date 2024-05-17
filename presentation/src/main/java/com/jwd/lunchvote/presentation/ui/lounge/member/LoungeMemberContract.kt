@@ -12,7 +12,7 @@ class LoungeMemberContract {
   data class LoungeMemberState(
     val member: MemberUIModel = MemberUIModel(),
     val user: UserUIModel = UserUIModel(),
-    val isOwner: Boolean = false
+    val isMe: Boolean = false
   ) : ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this
   }
@@ -30,7 +30,7 @@ class LoungeMemberContract {
   sealed interface LoungeMemberReduce : ViewModelContract.Reduce {
     data class UpdateMember(val member: MemberUIModel) : LoungeMemberReduce
     data class UpdateUser(val user: UserUIModel) : LoungeMemberReduce
-    data class UpdateIsOwner(val isOwner: Boolean) : LoungeMemberReduce
+    data class UpdateIsMe(val isMe: Boolean) : LoungeMemberReduce
   }
 
   sealed interface LoungeMemberSideEffect : ViewModelContract.SideEffect {

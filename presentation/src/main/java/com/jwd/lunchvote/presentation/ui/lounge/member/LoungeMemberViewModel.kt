@@ -62,7 +62,7 @@ class LoungeMemberViewModel @Inject constructor(
     return when (reduce) {
       is LoungeMemberReduce.UpdateMember -> state.copy(member = reduce.member)
       is LoungeMemberReduce.UpdateUser -> state.copy(user = reduce.user)
-      is LoungeMemberReduce.UpdateIsOwner -> state.copy(isOwner = reduce.isOwner)
+      is LoungeMemberReduce.UpdateIsMe -> state.copy(isMe = reduce.isMe)
     }
   }
 
@@ -82,11 +82,11 @@ class LoungeMemberViewModel @Inject constructor(
     val member = getMemberByUserIdUseCase(userId, loungeId).asUI()
     val user = getUserByIdUseCase(member.userId).asUI()
     val authUser = Firebase.auth.currentUser ?: throw LoginError.NoUser
-    val isOwner = authUser.uid == member.userId
+    val isMe = authUser.uid == member.userId
 
     updateState(LoungeMemberReduce.UpdateMember(member))
     updateState(LoungeMemberReduce.UpdateUser(user))
-    updateState(LoungeMemberReduce.UpdateIsOwner(isOwner))
+    updateState(LoungeMemberReduce.UpdateIsMe(isMe))
   }
 
   private suspend fun exileMember() {
