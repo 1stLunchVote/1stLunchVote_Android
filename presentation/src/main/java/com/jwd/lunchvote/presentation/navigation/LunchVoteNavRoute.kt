@@ -25,7 +25,22 @@ enum class LunchVoteNavRoute(
   ),
 
   Home,
-  LoungeMember,
+
+  Lounge(
+    arguments = listOf(
+      navArgument("id") {
+        type = NavType.StringType
+        nullable = true
+      }
+    )
+  ),
+  LoungeMember(
+    arguments = listOf(
+      navArgument("userId") {
+        type = NavType.StringType
+      }
+    )
+  ),
 
   FirstVote,
   SecondVote,
@@ -49,14 +64,7 @@ enum class LunchVoteNavRoute(
   Setting,
   Profile,
 
-  Lounge(
-    arguments = listOf(
-      navArgument("id") {
-        type = NavType.StringType
-        nullable = true
-      }
-    )
-  ),
+
   Tips,
 
   HomeJoinDialog,

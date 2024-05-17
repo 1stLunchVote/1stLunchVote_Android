@@ -6,6 +6,7 @@ import com.jwd.lunchvote.data.model.MemberData
 import com.jwd.lunchvote.data.model.UserData
 import com.jwd.lunchvote.data.model.type.LoungeStatusDataType
 import com.jwd.lunchvote.data.model.type.MemberStatusDataType
+import com.jwd.lunchvote.domain.entity.Member
 import kotlinx.coroutines.flow.Flow
 
 interface LoungeDataSource {
@@ -21,4 +22,5 @@ interface LoungeDataSource {
   suspend fun exitLounge(member: MemberData)
   suspend fun exileMember(member: MemberData)
   fun getMemberStatus(member: MemberData) : Flow<MemberStatusDataType>
+  suspend fun getMemberByUserId(userId: String): MemberData
 }

@@ -22,6 +22,7 @@ import com.jwd.lunchvote.remote.model.MemberRemote
 import com.jwd.lunchvote.remote.util.getValueEventFlow
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
@@ -223,17 +224,6 @@ class LoungeDataSourceImpl @Inject constructor(
         .child(chatRemote.loungeId)
         .child(chat.id)
         .setValue(chatRemote.copy(message = chatMessage))
-
-//      val data = JSONObject().apply {
-//        put(CHAT_LOUNGE_ID, chatRemote.loungeId)
-//        put(CHAT_USER_ID, chatRemote.userId)
-//        put(CHAT_USER_PROFILE, chatRemote.userProfile)
-//        put(CHAT_MESSAGE, chatMessage)
-//        put(CHAT_MESSAGE_TYPE, chatRemote.messageType)
-//        put(CHAT_CREATED_AT, chatRemote.createdAt)
-//      }
-//
-//      functions.getHttpsCallable("sendChat").call(data).await()
     }
   }
 
@@ -307,4 +297,15 @@ class LoungeDataSourceImpl @Inject constructor(
         status?.asMemberStatusDataType() ?: throw Exception("TODO: getMemberStatus, it is null")
       }
       .flowOn(dispatcher)
+
+  override suspend fun getMemberByUserId(
+    userId: String
+  ): MemberData =
+    database
+      .getReference(LOUNGE_PATH)
+      .child(userId)
+      .get()
+      .await()
+      .getValue(MemberRemote::class.java)
+      ?.asData(userId) ?: throw LoungeError.InvalidMember
 }

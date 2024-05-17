@@ -134,4 +134,7 @@ class LoungeRepositoryImpl @Inject constructor(
 
   override fun getMemberStatus(member: Member): Flow<MemberStatusType> =
     remote.getMemberStatus(member.asData()).map { it.asDomain() }
+
+  override suspend fun getMemberByUserId(userId: String): Member =
+    remote.getMemberByUserId(userId).asDomain()
 }
