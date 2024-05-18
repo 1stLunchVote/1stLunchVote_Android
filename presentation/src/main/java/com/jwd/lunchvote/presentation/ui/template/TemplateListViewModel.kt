@@ -5,11 +5,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
-import com.jwd.lunchvote.domain.usecase.GetTemplateListUseCase
+import com.jwd.lunchvote.domain.repository.TemplateRepository
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.ui.template.TemplateListContract.TemplateListEvent
 import com.jwd.lunchvote.presentation.ui.template.TemplateListContract.TemplateListReduce
@@ -25,7 +24,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TemplateListViewModel @Inject constructor(
-  private val getTemplateListUseCase: GetTemplateListUseCase,
+  private val templateRepository: TemplateRepository,
   savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<TemplateListState, TemplateListEvent, TemplateListReduce, TemplateListSideEffect>(savedStateHandle){
   override fun createInitialState(savedState: Parcelable?): TemplateListState {
@@ -72,7 +71,7 @@ class TemplateListViewModel @Inject constructor(
 
   private suspend fun initialize() {
     val userId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
-    val templateList = getTemplateListUseCase(userId).map { it.asUI() }
+    val templateList = templateRepository.getTemplateList(userId).map { it.asUI() }
 
     updateState(TemplateListReduce.UpdateTemplateList(templateList))
   }

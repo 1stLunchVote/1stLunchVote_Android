@@ -12,8 +12,8 @@ class AddTemplateContract {
   data class AddTemplateState(
     val name: String = "",
     val foodMap: Map<FoodUIModel, FoodStatus> = emptyMap(),
-    val likeList: List<FoodUIModel> = emptyList(),
-    val dislikeList: List<FoodUIModel> = emptyList(),
+    val likedFoods: List<FoodUIModel> = emptyList(),
+    val dislikedFoods: List<FoodUIModel> = emptyList(),
     val searchKeyword: String = "",
   ) : ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this

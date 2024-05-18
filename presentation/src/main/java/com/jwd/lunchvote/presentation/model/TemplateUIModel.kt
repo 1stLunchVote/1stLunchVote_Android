@@ -9,8 +9,8 @@ data class TemplateUIModel(
   val id: String = "",
   val userId: String = "",
   val name: String = "",
-  val like: List<String> = emptyList(),
-  val dislike: List<String> = emptyList(),
-  val createdAt: String = LocalDateTime.now().toString(),
-  val deletedAt: String? = null
+  val likedFoodIds: List<String> = emptyList(),
+  val dislikedFoodIds: List<String> = emptyList(),
+  val createdAt: LocalDateTime = LocalDateTime.now(),
+  val deletedAt: LocalDateTime? = null
 ): Parcelable

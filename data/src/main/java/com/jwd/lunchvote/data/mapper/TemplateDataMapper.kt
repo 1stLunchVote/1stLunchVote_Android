@@ -10,8 +10,8 @@ object TemplateDataMapper: BiMapper<TemplateData, Template> {
       id = from.id,
       userId = from.userId,
       name = from.name,
-      like = from.like,
-      dislike = from.dislike,
+      likedFoodIds = from.likedFoodIds,
+      dislikedFoodIds = from.dislikedFoodIds,
       createdAt = from.createdAt,
       deletedAt = from.deletedAt
     )
@@ -22,8 +22,8 @@ object TemplateDataMapper: BiMapper<TemplateData, Template> {
       id = from.id,
       userId = from.userId,
       name = from.name,
-      like = from.like,
-      dislike = from.dislike,
+      likedFoodIds = from.likedFoodIds,
+      dislikedFoodIds = from.dislikedFoodIds,
       createdAt = from.createdAt,
       deletedAt = from.deletedAt
     )

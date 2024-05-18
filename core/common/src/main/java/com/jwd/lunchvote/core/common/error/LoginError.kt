@@ -1,6 +1,7 @@
 package com.jwd.lunchvote.core.common.error
 
 interface LoginError {
+
   data object LoginFailure : Throwable() {
     private fun readResolve(): Any = LoginFailure
     override val message: String = "로그인에 실패했습니다."

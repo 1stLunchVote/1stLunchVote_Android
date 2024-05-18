@@ -1,12 +1,12 @@
 package com.jwd.lunchvote.remote.model
 
-import java.time.LocalDateTime
+import com.google.firebase.Timestamp
 
 data class TemplateRemote(
   val userId: String = "",
   val name: String = "",
-  val like: List<String> = emptyList(),
-  val dislike: List<String> = emptyList(),
-  val createdAt: String = LocalDateTime.now().toString(),
-  val deletedAt: String? = null
+  val likedFoodIds: List<String> = emptyList(),
+  val dislikedFoodIds: List<String> = emptyList(),
+  val createdAt: Timestamp = Timestamp.now(),
+  val deletedAt: Timestamp? = null
 )

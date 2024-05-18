@@ -3,6 +3,8 @@ package com.jwd.lunchvote.remote.mapper
 import com.jwd.lunchvote.core.common.mapper.BiMapper
 import com.jwd.lunchvote.data.model.TemplateData
 import com.jwd.lunchvote.remote.model.TemplateRemote
+import com.jwd.lunchvote.remote.util.toLong
+import com.jwd.lunchvote.remote.util.toTimestamp
 
 internal object TemplateRemoteMapper : BiMapper<TemplateRemote, TemplateData> {
   override fun mapToRight(from: TemplateRemote): TemplateData {
@@ -10,10 +12,10 @@ internal object TemplateRemoteMapper : BiMapper<TemplateRemote, TemplateData> {
       id = "",
       userId = from.userId,
       name = from.name,
-      like = from.like,
-      dislike = from.dislike,
-      createdAt = from.createdAt,
-      deletedAt = from.deletedAt
+      likedFoodIds = from.likedFoodIds,
+      dislikedFoodIds = from.dislikedFoodIds,
+      createdAt = from.createdAt.toLong(),
+      deletedAt = from.deletedAt?.toLong()
     )
   }
 
@@ -21,10 +23,10 @@ internal object TemplateRemoteMapper : BiMapper<TemplateRemote, TemplateData> {
     return TemplateRemote(
       userId = from.userId,
       name = from.name,
-      like = from.like,
-      dislike = from.dislike,
-      createdAt = from.createdAt,
-      deletedAt = from.deletedAt
+      likedFoodIds = from.likedFoodIds,
+      dislikedFoodIds = from.dislikedFoodIds,
+      createdAt = from.createdAt.toTimestamp(),
+      deletedAt = from.deletedAt?.toTimestamp()
     )
   }
 }

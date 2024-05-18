@@ -4,8 +4,8 @@ data class TemplateData(
   val id: String,
   val userId: String,
   val name: String,
-  val like: List<String>,
-  val dislike: List<String>,
-  val createdAt: String,
-  val deletedAt: String?
+  val likedFoodIds: List<String>,
+  val dislikedFoodIds: List<String>,
+  val createdAt: Long,
+  val deletedAt: Long?
 )
