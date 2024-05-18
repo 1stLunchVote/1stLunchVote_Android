@@ -154,17 +154,17 @@ fun FirstVoteScreenPreview() {
           foodMap = mapOf(
             FoodUIModel(
               id = "1",
-              imageUrl = "",
+              image = "",
               name = "음식명"
             ) to FoodStatus.DEFAULT,
             FoodUIModel(
               id = "2",
-              imageUrl = "",
+              image = "",
               name = "음식명"
             ) to FoodStatus.DEFAULT,
             FoodUIModel(
               id = "3",
-              imageUrl = "",
+              image = "",
               name = "음식명"
             ) to FoodStatus.DEFAULT,
           ),

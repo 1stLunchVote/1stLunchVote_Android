@@ -5,7 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
-import com.jwd.lunchvote.domain.usecase.GetFoodListUseCase
+import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.usecase.GetTemplateListUseCase
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.type.FoodStatus
@@ -21,8 +21,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FirstVoteViewModel @Inject constructor(
+  private val foodRepository: FoodRepository,
   savedStateHandle: SavedStateHandle,
-  private val getFoodListUseCase: GetFoodListUseCase,
   private val getTemplateListUseCase: GetTemplateListUseCase
 ): BaseStateViewModel<FirstVoteState, FirstVoteEvent, FirstVoteReduce, FirstVoteSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): FirstVoteState =
@@ -77,7 +77,7 @@ class FirstVoteViewModel @Inject constructor(
     updateState(FirstVoteReduce.UpdateLoading(true))
 
     val userId = "PIRjtPnKcmJfNbSNIidD"   // TODO: 임시
-    val foodList = getFoodListUseCase.invoke().map { it.asUI() }
+    val foodList = foodRepository.getAllFood().map { it.asUI() }
     val templateList = getTemplateListUseCase.invoke(userId)
 
     updateState(

@@ -4,12 +4,11 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.usecase.AddTemplateUseCase
-import com.jwd.lunchvote.domain.usecase.GetFoodListUseCase
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
@@ -27,8 +26,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddTemplateViewModel @Inject constructor(
+  private val foodRepository: FoodRepository,
   private val addTemplateUseCase: AddTemplateUseCase,
-  private val getFoodListUseCase: GetFoodListUseCase,
   private val savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<AddTemplateState, AddTemplateEvent, AddTemplateReduce, AddTemplateSideEffect>(savedStateHandle){
   override fun createInitialState(savedState: Parcelable?): AddTemplateState {
@@ -78,7 +77,7 @@ class AddTemplateViewModel @Inject constructor(
     val name = checkNotNull(savedStateHandle.get<String>(nameKey))
     updateState(AddTemplateReduce.UpdateName(name))
 
-    val foodList = getFoodListUseCase()
+    val foodList = foodRepository.getAllFood()
     val foodMap = foodList.associate { it.asUI() to FoodStatus.DEFAULT }
     updateState(AddTemplateReduce.UpdateFoodMap(foodMap))
   }

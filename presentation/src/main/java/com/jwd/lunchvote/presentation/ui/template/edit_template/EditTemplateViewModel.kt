@@ -5,9 +5,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.usecase.DeleteTemplateUseCase
 import com.jwd.lunchvote.domain.usecase.EditTemplateUseCase
-import com.jwd.lunchvote.domain.usecase.GetFoodListUseCase
 import com.jwd.lunchvote.domain.usecase.GetTemplateUseCase
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
@@ -30,7 +30,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EditTemplateViewModel @Inject constructor(
-  private val getFoodListUseCase: GetFoodListUseCase,
+  private val foodRepository: FoodRepository,
   private val getTemplateUseCase: GetTemplateUseCase,
   private val editTemplateUseCase: EditTemplateUseCase,
   private val deleteTemplateUseCase: DeleteTemplateUseCase,
@@ -100,7 +100,7 @@ class EditTemplateViewModel @Inject constructor(
     val templateId = checkNotNull(savedStateHandle.get<String>(templateIdKey))
     val template = getTemplateUseCase(templateId).asUI()
 
-    val foodList = getFoodListUseCase().map { it.asUI() }
+    val foodList = foodRepository.getAllFood().map { it.asUI() }
     val foodMap = foodList.associateWith {
       when (it.name) {
         in template.like -> FoodStatus.LIKE

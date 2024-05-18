@@ -8,16 +8,16 @@ object FoodDataMapper: BiMapper<FoodData, Food> {
   override fun mapToRight(from: FoodData): Food {
     return Food(
       id = from.id,
-      imageUrl = from.imageUrl,
-      name = from.name
+      name = from.name,
+      image = from.image
     )
   }
 
   override fun mapToLeft(from: Food): FoodData {
     return FoodData(
       id = from.id,
-      imageUrl = from.imageUrl,
-      name = from.name
+      name = from.name,
+      image = from.image
     )
   }
 }

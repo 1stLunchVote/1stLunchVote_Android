@@ -51,7 +51,7 @@ fun FoodItem(
       modifier = if (status == FoodStatus.DISLIKE) Modifier.alpha(0.5f) else Modifier
     ) {
       CoilImage(
-        imageModel = { food.imageUrl },
+        imageModel = { food.image },
         modifier = Modifier
           .size(100.dp)
           .let {
@@ -104,7 +104,7 @@ fun FoodItemDefaultPreview() {
       FoodItem(
         FoodUIModel(
           id = "",
-          imageUrl = "",
+          image = "",
           name = "햄버거"
         ),
         status = FoodStatus.DEFAULT,
@@ -113,7 +113,7 @@ fun FoodItemDefaultPreview() {
       FoodItem(
         FoodUIModel(
           id = "",
-          imageUrl = "",
+          image = "",
           name = "햄버거"
         ),
         status = FoodStatus.LIKE,
@@ -122,7 +122,7 @@ fun FoodItemDefaultPreview() {
       FoodItem(
         FoodUIModel(
           id = "",
-          imageUrl = "",
+          image = "",
           name = "햄버거"
         ),
         status = FoodStatus.DISLIKE,

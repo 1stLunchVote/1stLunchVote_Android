@@ -166,7 +166,7 @@ private fun FoodTrendChart(
         foodTrendRatio = foodTrendRatio
       )
       CoilImage(
-        imageModel = { foodTrend.imageUrl },
+        imageModel = { foodTrend.image },
         modifier = Modifier
           .size(160.dp)
           .clip(CircleShape)

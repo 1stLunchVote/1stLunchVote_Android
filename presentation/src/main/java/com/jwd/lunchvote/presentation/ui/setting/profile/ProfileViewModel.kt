@@ -107,9 +107,9 @@ class ProfileViewModel @Inject constructor(
       }
     }
 
-    val image = file.readBytes()
-    val imageUrl = storageRepository.uploadProfileImage(currentState.user.id, image)
-    val user = currentState.user.copy(profileImage = imageUrl)
+    val imageUrl = file.readBytes()
+    val image = storageRepository.uploadProfileImage(currentState.user.id, imageUrl)
+    val user = currentState.user.copy(profileImage = image)
     userRepository.updateUser(user.asDomain())
     
     sendSideEffect(ProfileSideEffect.ShowSnackBar(UiText.StringResource(R.string.profile_edit_profile_image_success_snackbar)))

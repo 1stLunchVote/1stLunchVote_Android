@@ -7,17 +7,16 @@ import com.jwd.lunchvote.remote.model.FoodRemote
 internal object FoodRemoteMapper: BiMapper<FoodRemote, FoodData> {
   override fun mapToRight(from: FoodRemote): FoodData {
     return FoodData(
-      id = from.id,
-      imageUrl = from.imageUrl,
-      name = from.name
+      id = "",
+      name = from.name,
+      image = from.image
     )
   }
 
   override fun mapToLeft(from: FoodData): FoodRemote {
     return FoodRemote(
-      id = from.id,
-      imageUrl = from.imageUrl,
-      name = from.name
+      name = from.name,
+      image = from.image
     )
   }
 }
@@ -26,6 +25,6 @@ internal fun FoodData.asRemote(): FoodRemote {
   return FoodRemoteMapper.mapToLeft(this)
 }
 
-internal fun FoodRemote.asData(): FoodData {
-  return FoodRemoteMapper.mapToRight(this)
+internal fun FoodRemote.asData(id: String): FoodData {
+  return FoodRemoteMapper.mapToRight(this).copy(id = id)
 }

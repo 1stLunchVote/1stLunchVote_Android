@@ -7,8 +7,8 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class FoodUIModel (
   val id: String = "",
-  val imageUrl: String = "",
-  val name: String = ""
+  val name: String = "",
+  val image: String = ""
 ): Parcelable
 
 internal fun Map<FoodUIModel, FoodStatus>.updateFoodMap(food: FoodUIModel): Map<FoodUIModel, FoodStatus> =

@@ -9,11 +9,8 @@ import com.jwd.lunchvote.domain.repository.FirstVoteRepository
 import javax.inject.Inject
 
 class FirstVoteRepositoryImpl @Inject constructor(
-  private val foodDataSource: FoodDataSource,
   private val templateDataSource: TemplateDataSource
 ) : FirstVoteRepository {
-  override suspend fun getFoodList(): List<Food> =
-    foodDataSource.getFoodList().map { it.asDomain() }
 
   override suspend fun getTemplateList(userId: String): List<Template> =
     templateDataSource.getTemplateList(userId).map { it.asDomain() }

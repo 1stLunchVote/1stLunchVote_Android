@@ -15,29 +15,30 @@ class FoodDataSourceImpl @Inject constructor(
 
   companion object {
     const val FOOD_PATH = "Food"
-    const val COLUMN_ID = "id"
-    const val COLUMN_IMAGE_URL = "imageUrl"
+    const val COLUMN_IMAGE = "image"
     const val COLUMN_NAME = "name"
   }
 
-  override suspend fun getFoodList(): List<FoodData> =
+  override suspend fun getAllFood(): List<FoodData> =
     fireStore
       .collection(FOOD_PATH)
       .get()
       .await()
       .documents
-      .map { it.toObject(FoodRemote::class.java)?.asData() ?: throw FoodError.LoadFailure }
+      .mapNotNull {
+        it.toObject(FoodRemote::class.java)?.asData(it.id)
+      }
 
   // TODO: 임시
-  override suspend fun getFoodTrend(): Pair<FoodData, Float> {
-    val foodTrend = fireStore
+  override suspend fun getFoodTrend(): Pair<FoodData, Float> =
+    fireStore
       .collection(FOOD_PATH)
       .get()
       .await()
       .documents
       .first()
-      .toObject(FoodRemote::class.java)?.asData() ?: throw FoodError.LoadFailure
-
-    return foodTrend to 36f
-  }
+      .let {
+        it.toObject(FoodRemote::class.java)
+          ?.asData(it.id) ?: throw FoodError.LoadFailure
+      } to 36f
 }
