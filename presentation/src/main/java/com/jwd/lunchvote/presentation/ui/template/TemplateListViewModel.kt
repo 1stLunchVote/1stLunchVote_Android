@@ -7,6 +7,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.core.common.error.UnknownError
+import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.usecase.GetTemplateListUseCase
 import com.jwd.lunchvote.presentation.mapper.asUI
@@ -70,7 +71,7 @@ class TemplateListViewModel @Inject constructor(
   }
 
   private suspend fun initialize() {
-    val userId = Firebase.auth.currentUser?.uid ?: throw LoginError.NoUser
+    val userId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
     val templateList = getTemplateListUseCase(userId).map { it.asUI() }
 
     updateState(TemplateListReduce.UpdateTemplateList(templateList))

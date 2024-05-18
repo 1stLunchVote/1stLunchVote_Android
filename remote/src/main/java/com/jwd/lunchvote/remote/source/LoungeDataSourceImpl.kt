@@ -89,7 +89,7 @@ class LoungeDataSourceImpl @Inject constructor(
 
     val member = MemberRemote(
       userName = owner.name,
-      userProfile = owner.profileImageUrl,
+      userProfile = owner.profileImage,
       loungeId = loungeId,
       status = MEMBER_STATUS_OWNER
     )
@@ -135,7 +135,7 @@ class LoungeDataSourceImpl @Inject constructor(
   ): LoungeData = withContext(dispatcher) {
     val member = MemberRemote(
       userName = user.name,
-      userProfile = user.profileImageUrl,
+      userProfile = user.profileImage,
       loungeId = loungeId,
       status = MEMBER_STATUS_JOINED
     )

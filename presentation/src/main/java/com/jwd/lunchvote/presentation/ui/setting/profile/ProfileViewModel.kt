@@ -11,10 +11,10 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.core.common.error.UnknownError
+import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
-import com.jwd.lunchvote.domain.usecase.GetUserByIdUseCase
-import com.jwd.lunchvote.domain.usecase.UpdateUserUseCase
-import com.jwd.lunchvote.domain.usecase.UploadProfileImageUrlUseCase
+import com.jwd.lunchvote.domain.repository.StorageRepository
+import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
@@ -36,9 +36,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-  private val getUserByIdUseCase: GetUserByIdUseCase,
-  private val updateUserUseCase: UpdateUserUseCase,
-  private val uploadProfileImageUrlUseCase: UploadProfileImageUrlUseCase,
+  private val userRepository: UserRepository,
+  private val storageRepository: StorageRepository,
   savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<ProfileState, ProfileEvent, ProfileReduce, ProfileSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): ProfileState {
@@ -88,11 +87,11 @@ class ProfileViewModel @Inject constructor(
   }
 
   private suspend fun initialize() {
-    val currentUser = Firebase.auth.currentUser ?: throw LoginError.NoUser
-    val user = getUserByIdUseCase(currentUser.uid).asUI()
+    val currentUser = Firebase.auth.currentUser ?: throw UserError.NoUser
+    val user = userRepository.getUserById(currentUser.uid).asUI()
 
     updateState(ProfileReduce.UpdateUser(user))
-    updateState(ProfileReduce.UpdateProfileImage(user.profileImageUrl.toUri()))
+    updateState(ProfileReduce.UpdateProfileImage(user.profileImage.toUri()))
     updateState(ProfileReduce.UpdateName(user.name))
   }
 
@@ -109,9 +108,9 @@ class ProfileViewModel @Inject constructor(
     }
 
     val image = file.readBytes()
-    val imageUrl = uploadProfileImageUrlUseCase(currentState.user.id, image)
-    val user = currentState.user.copy(profileImageUrl = imageUrl)
-    updateUserUseCase(user.asDomain())
+    val imageUrl = storageRepository.uploadProfileImage(currentState.user.id, image)
+    val user = currentState.user.copy(profileImage = imageUrl)
+    userRepository.updateUser(user.asDomain())
     
     sendSideEffect(ProfileSideEffect.ShowSnackBar(UiText.StringResource(R.string.profile_edit_profile_image_success_snackbar)))
     initialize()
@@ -122,7 +121,7 @@ class ProfileViewModel @Inject constructor(
 
     val user = currentState.user.copy(name = currentState.name)
 
-    updateUserUseCase(user.asDomain())
+    userRepository.updateUser(user.asDomain())
     sendSideEffect(ProfileSideEffect.ShowSnackBar(UiText.StringResource(R.string.profile_edit_name_success_snackbar)))
     initialize()
   }
@@ -130,7 +129,7 @@ class ProfileViewModel @Inject constructor(
   private suspend fun deleteUser() {
     sendSideEffect(ProfileSideEffect.CloseDialog)
 
-    val currentUser = Firebase.auth.currentUser ?: throw LoginError.NoUser
+    val currentUser = Firebase.auth.currentUser ?: throw UserError.NoUser
     currentUser.delete().await()
 
     sendSideEffect(ProfileSideEffect.ShowSnackBar(UiText.StringResource(R.string.profile_delete_user_success_snackbar)))

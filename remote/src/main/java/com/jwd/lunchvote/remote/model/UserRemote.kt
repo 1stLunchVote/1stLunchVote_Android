@@ -1,10 +1,11 @@
 package com.jwd.lunchvote.remote.model
 
-import java.time.LocalDateTime
+import com.google.firebase.Timestamp
 
 data class UserRemote(
   val email: String = "",
   val name: String = "",
-  val profileImageUrl: String = "",
-  val createdAt: String = LocalDateTime.now().toString()
+  val profileImage: String = "",
+  val createdAt: Timestamp = Timestamp.now(),
+  val deletedAt: Timestamp? = null
 )

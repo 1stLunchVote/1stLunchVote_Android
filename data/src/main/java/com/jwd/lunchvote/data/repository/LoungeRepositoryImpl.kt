@@ -28,7 +28,6 @@ import java.util.UUID
 import javax.inject.Inject
 
 class LoungeRepositoryImpl @Inject constructor(
-  private val sendWorkerManager: SendWorkerManager,
   private val local: LoungeLocalDataSource,
   private val remote: LoungeDataSource
 ) : LoungeRepository {
@@ -44,7 +43,7 @@ class LoungeRepositoryImpl @Inject constructor(
       loungeId = loungeId,
       userId = owner.id,
       userName = owner.name,
-      userProfile = owner.profileImageUrl,
+      userProfile = owner.profileImage,
       message = "투표 방이 생성되었습니다.",
       messageType = MessageType.CREATE,
       sendStatus = SendStatusType.SENDING,
@@ -66,7 +65,7 @@ class LoungeRepositoryImpl @Inject constructor(
       loungeId = loungeId,
       userId = user.id,
       userName = user.name,
-      userProfile = user.profileImageUrl,
+      userProfile = user.profileImage,
       message = "${user.name}님이 입장하였습니다.",
       messageType = MessageType.JOIN,
       sendStatus = SendStatusType.SENDING,

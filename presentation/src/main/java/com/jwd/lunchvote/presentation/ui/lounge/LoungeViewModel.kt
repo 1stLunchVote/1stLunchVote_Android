@@ -8,9 +8,11 @@ import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.core.common.error.LoungeError
 import com.jwd.lunchvote.core.common.error.UnknownError
+import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.entity.type.LoungeStatusType
 import com.jwd.lunchvote.domain.entity.type.MemberStatusType
+import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.usecase.CheckMemberStatusUseCase
 import com.jwd.lunchvote.domain.usecase.CreateLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.ExitLoungeUseCase
@@ -18,7 +20,6 @@ import com.jwd.lunchvote.domain.usecase.GetChatListUseCase
 import com.jwd.lunchvote.domain.usecase.GetLoungeByIdUseCase
 import com.jwd.lunchvote.domain.usecase.GetLoungeStatusUseCase
 import com.jwd.lunchvote.domain.usecase.GetMemberListUseCase
-import com.jwd.lunchvote.domain.usecase.GetUserByIdUseCase
 import com.jwd.lunchvote.domain.usecase.JoinLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.SendChatUseCase
 import com.jwd.lunchvote.domain.usecase.UpdateReadyUseCase
@@ -52,7 +53,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoungeViewModel @Inject constructor(
-  private val getUserByIdUseCase: GetUserByIdUseCase,
+  private val userRepository: UserRepository,
   private val joinLoungeUseCase: JoinLoungeUseCase,
   private val createLoungeUseCase: CreateLoungeUseCase,
   private val getLoungeByIdUseCase: GetLoungeByIdUseCase,
@@ -83,8 +84,8 @@ class LoungeViewModel @Inject constructor(
 
   init {
     launch {
-      val userId = Firebase.auth.currentUser?.uid ?: throw LoginError.NoUser
-      val user = getUserByIdUseCase(userId).asUI()
+      val userId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
+      val user = userRepository.getUserById(userId).asUI()
       updateState(LoungeReduce.UpdateUser(user))
 
       val loungeIdKey = LunchVoteNavRoute.Lounge.arguments.first().name
@@ -231,7 +232,7 @@ class LoungeViewModel @Inject constructor(
       loungeId = currentState.lounge.id,
       userId = currentState.user.id,
       userName = currentState.user.name,
-      userProfile = currentState.user.profileImageUrl,
+      userProfile = currentState.user.profileImage,
       message = currentState.text,
       messageType = MessageUIType.NORMAL,
       sendStatus = SendStatusUIType.SENDING,

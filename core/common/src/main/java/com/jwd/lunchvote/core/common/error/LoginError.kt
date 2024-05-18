@@ -11,13 +11,8 @@ interface LoginError {
     override val message: String = "로그인을 취소했습니다."
   }
 
-  data object NoUser : Throwable() {
-    private fun readResolve(): Any = NoUser
-    override val message: String = "유저 정보를 확인할 수 없습니다. 다시 로그인해주세요."
-  }
-
   data object NoEmail : Throwable() {
-    private fun readResolve(): Any = NoUser
+    private fun readResolve(): Any = NoEmail
     override val message: String = "이메일을 확인할 수 없습니다."
   }
 

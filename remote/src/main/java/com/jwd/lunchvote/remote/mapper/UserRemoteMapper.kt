@@ -3,6 +3,8 @@ package com.jwd.lunchvote.remote.mapper
 import com.jwd.lunchvote.core.common.mapper.BiMapper
 import com.jwd.lunchvote.data.model.UserData
 import com.jwd.lunchvote.remote.model.UserRemote
+import com.jwd.lunchvote.remote.util.toLong
+import com.jwd.lunchvote.remote.util.toTimestamp
 
 private object UserRemoteMapper: BiMapper<UserRemote, UserData> {
   override fun mapToRight(from: UserRemote): UserData {
@@ -10,8 +12,9 @@ private object UserRemoteMapper: BiMapper<UserRemote, UserData> {
       id = "",
       email = from.email,
       name = from.name,
-      profileImageUrl = from.profileImageUrl,
-      createdAt = from.createdAt
+      profileImage = from.profileImage,
+      createdAt = from.createdAt.toLong(),
+      deletedAt = from.deletedAt?.toLong()
     )
   }
 
@@ -19,8 +22,9 @@ private object UserRemoteMapper: BiMapper<UserRemote, UserData> {
     return UserRemote(
       email = from.email,
       name = from.name,
-      profileImageUrl = from.profileImageUrl,
-      createdAt = from.createdAt
+      profileImage = from.profileImage,
+      createdAt = from.createdAt.toTimestamp(),
+      deletedAt = from.deletedAt?.toTimestamp()
     )
   }
 }

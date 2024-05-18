@@ -110,7 +110,7 @@ private fun LoungeMemberScreen(
       verticalAlignment = Alignment.CenterVertically
     ) {
       CoilImage(
-        imageModel = { state.user.profileImageUrl },
+        imageModel = { state.user.profileImage },
         modifier = Modifier
           .size(96.dp)
           .clip(CircleShape)

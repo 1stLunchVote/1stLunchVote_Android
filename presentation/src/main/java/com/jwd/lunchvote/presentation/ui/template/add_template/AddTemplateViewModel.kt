@@ -6,6 +6,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.core.common.error.UnknownError
+import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.usecase.AddTemplateUseCase
 import com.jwd.lunchvote.domain.usecase.GetFoodListUseCase
@@ -83,7 +84,7 @@ class AddTemplateViewModel @Inject constructor(
   }
 
   private suspend fun addTemplate() {
-    val userId = Firebase.auth.currentUser?.uid ?: throw LoginError.NoUser
+    val userId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
     val template = TemplateUIModel(
       userId = userId,
       name = currentState.name,

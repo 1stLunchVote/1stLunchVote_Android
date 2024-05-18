@@ -6,6 +6,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.core.common.error.UnknownError
+import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingEvent
@@ -47,7 +48,7 @@ class SettingViewModel @Inject constructor(
   override fun handleErrors(error: Throwable) {
     sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
     when (error) {
-      is LoginError.NoUser -> Firebase.auth.signOut()
+      is UserError.NoUser -> Firebase.auth.signOut()
     }
   }
 

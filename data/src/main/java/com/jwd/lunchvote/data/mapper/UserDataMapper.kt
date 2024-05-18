@@ -10,8 +10,9 @@ object UserDataMapper: BiMapper<UserData, User> {
       id = from.id,
       email = from.email,
       name = from.name,
-      profileImageUrl = from.profileImageUrl,
-      createdAt = from.createdAt
+      profileImage = from.profileImage,
+      createdAt = from.createdAt,
+      deletedAt = from.deletedAt
     )
   }
 
@@ -20,8 +21,9 @@ object UserDataMapper: BiMapper<UserData, User> {
       id = from.id,
       email = from.email,
       name = from.name,
-      profileImageUrl = from.profileImageUrl,
-      createdAt = from.createdAt
+      profileImage = from.profileImage,
+      createdAt = from.createdAt,
+      deletedAt = from.deletedAt
     )
   }
 }

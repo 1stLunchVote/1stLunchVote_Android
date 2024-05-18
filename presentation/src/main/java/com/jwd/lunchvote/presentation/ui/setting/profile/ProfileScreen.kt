@@ -142,7 +142,7 @@ private fun ProfileScreen(
     scrollable = false
   ) {
     ProfileTicket(
-      profileImageUrl = state.user.profileImageUrl,
+      profileImage = state.user.profileImage,
       name = state.user.name,
       email = state.user.email,
       modifier = Modifier
@@ -186,7 +186,7 @@ private fun ProfileScreen(
 
 @Composable
 private fun ProfileTicket(
-  profileImageUrl: String,
+  profileImage: String,
   name: String,
   email: String,
   modifier: Modifier = Modifier
@@ -206,7 +206,7 @@ private fun ProfileTicket(
     ) {
       Gap(height = 24.dp)
       CoilImage(
-        imageModel = { profileImageUrl },
+        imageModel = { profileImage },
         modifier = Modifier
           .size(100.dp)
           .clip(CircleShape)
