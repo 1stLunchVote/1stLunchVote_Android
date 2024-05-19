@@ -11,7 +11,7 @@ private object LoungeDataMapper : BiMapper<LoungeData, Lounge> {
     return Lounge(
       id = from.id,
       status = from.status.asDomain(),
-      members = from.members.map { it.asDomain() }
+      members = from.members
     )
   }
 
@@ -19,7 +19,7 @@ private object LoungeDataMapper : BiMapper<LoungeData, Lounge> {
     return LoungeData(
       id = from.id,
       status = from.status.asData(),
-      members = from.members.map { it.asData() }
+      members = from.members
     )
   }
 }

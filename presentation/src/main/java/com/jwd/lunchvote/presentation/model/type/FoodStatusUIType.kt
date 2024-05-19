@@ -1,9 +1,9 @@
 package com.jwd.lunchvote.presentation.model.type
 
-enum class FoodStatus {
+enum class FoodStatusUIType {
   DEFAULT, LIKE, DISLIKE;
 
-  fun nextStatus(): FoodStatus = when (this) {
+  fun nextStatus(): FoodStatusUIType = when (this) {
     DEFAULT -> LIKE
     LIKE -> DISLIKE
     DISLIKE -> DEFAULT

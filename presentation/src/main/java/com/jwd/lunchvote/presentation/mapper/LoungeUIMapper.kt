@@ -11,7 +11,7 @@ private object LoungeUIMapper : BiMapper<LoungeUIModel, Lounge> {
     return Lounge(
       id = from.id,
       status = from.status.asDomain(),
-      members = from.members.map { it.asDomain() }
+      members = from.members
     )
   }
 
@@ -19,13 +19,13 @@ private object LoungeUIMapper : BiMapper<LoungeUIModel, Lounge> {
     return LoungeUIModel(
       id = from.id,
       status = from.status.asUI(),
-      members = from.members.map { it.asUI() }
+      members = from.members
     )
   }
 }
 
-internal fun LoungeUIModel.asData(id: String): Lounge {
-  return LoungeUIMapper.mapToRight(this).copy(id = id)
+internal fun LoungeUIModel.asData(): Lounge {
+  return LoungeUIMapper.mapToRight(this)
 }
 
 internal fun Lounge.asUI(): LoungeUIModel {

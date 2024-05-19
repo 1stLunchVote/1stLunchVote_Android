@@ -1,31 +1,33 @@
 package com.jwd.lunchvote.data.mapper.type
 
 import com.jwd.lunchvote.core.common.mapper.BiMapper
-import com.jwd.lunchvote.data.model.type.LoungeStatusDataType
-import com.jwd.lunchvote.domain.entity.type.LoungeStatusType
+import com.jwd.lunchvote.data.model.type.LoungeStatusData
+import com.jwd.lunchvote.domain.entity.type.LoungeStatus
 
-private object LoungeStatusRemoteMapper : BiMapper<LoungeStatusDataType, LoungeStatusType> {
-  override fun mapToRight(from: LoungeStatusDataType): LoungeStatusType {
+private object LoungeStatusRemoteMapper : BiMapper<LoungeStatusData, LoungeStatus> {
+  override fun mapToRight(from: LoungeStatusData): LoungeStatus {
     return when (from) {
-      LoungeStatusDataType.CREATED -> LoungeStatusType.CREATED
-      LoungeStatusDataType.STARTED -> LoungeStatusType.STARTED
-      LoungeStatusDataType.FINISHED -> LoungeStatusType.FINISHED
+      LoungeStatusData.CREATED -> LoungeStatus.CREATED
+      LoungeStatusData.QUIT -> LoungeStatus.QUIT
+      LoungeStatusData.STARTED -> LoungeStatus.STARTED
+      LoungeStatusData.FINISHED -> LoungeStatus.FINISHED
     }
   }
 
-  override fun mapToLeft(from: LoungeStatusType): LoungeStatusDataType {
+  override fun mapToLeft(from: LoungeStatus): LoungeStatusData {
     return when (from) {
-      LoungeStatusType.CREATED -> LoungeStatusDataType.CREATED
-      LoungeStatusType.STARTED -> LoungeStatusDataType.STARTED
-      LoungeStatusType.FINISHED -> LoungeStatusDataType.FINISHED
+      LoungeStatus.CREATED -> LoungeStatusData.CREATED
+      LoungeStatus.QUIT -> LoungeStatusData.QUIT
+      LoungeStatus.STARTED -> LoungeStatusData.STARTED
+      LoungeStatus.FINISHED -> LoungeStatusData.FINISHED
     }
   }
 }
 
-internal fun LoungeStatusDataType.asDomain(): LoungeStatusType {
+internal fun LoungeStatusData.asDomain(): LoungeStatus {
   return LoungeStatusRemoteMapper.mapToRight(this)
 }
 
-internal fun LoungeStatusType.asData(): LoungeStatusDataType {
+internal fun LoungeStatus.asData(): LoungeStatusData {
   return LoungeStatusRemoteMapper.mapToLeft(this)
 }

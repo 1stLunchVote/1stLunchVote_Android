@@ -1,9 +1,9 @@
 package com.jwd.lunchvote.data.model
 
-import com.jwd.lunchvote.data.model.type.LoungeStatusDataType
+import com.jwd.lunchvote.data.model.type.LoungeStatusData
 
 data class LoungeData(
   val id: String,
-  val status: LoungeStatusDataType,
-  val members: List<MemberData>
+  val status: LoungeStatusData,
+  val members: Int
 )

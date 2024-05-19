@@ -5,14 +5,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.core.common.error.LoungeError
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
-import com.jwd.lunchvote.domain.usecase.ExileMemberUseCase
-import com.jwd.lunchvote.domain.usecase.GetMemberByUserIdUseCase
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
@@ -31,8 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoungeMemberViewModel @Inject constructor(
   private val userRepository: UserRepository,
-  private val getMemberByUserIdUseCase: GetMemberByUserIdUseCase,
-  private val exileMemberUseCase: ExileMemberUseCase,
+  private val loungeRepository: LoungeRepository,
   private val savedStateHandle: SavedStateHandle,
 ) : BaseStateViewModel<LoungeMemberState, LoungeMemberEvent, LoungeMemberReduce, LoungeMemberSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): LoungeMemberState {
@@ -80,7 +77,7 @@ class LoungeMemberViewModel @Inject constructor(
     val loungeIdKey = LunchVoteNavRoute.LoungeMember.arguments.last().name
     val loungeId = checkNotNull(savedStateHandle.get<String>(loungeIdKey))
 
-    val member = getMemberByUserIdUseCase(userId, loungeId).asUI()
+    val member = loungeRepository.getMemberByUserId(userId, loungeId).asUI()
     val user = userRepository.getUserById(member.userId).asUI()
     val authUser = Firebase.auth.currentUser ?: throw UserError.NoUser
     val isMe = authUser.uid == member.userId
@@ -93,7 +90,7 @@ class LoungeMemberViewModel @Inject constructor(
   private suspend fun exileMember() {
     sendSideEffect(LoungeMemberSideEffect.CloseDialog)
 
-    exileMemberUseCase(currentState.member.asDomain())
+    loungeRepository.exileMember(currentState.member.asDomain())
 
     sendSideEffect(LoungeMemberSideEffect.PopBackStack)
   }

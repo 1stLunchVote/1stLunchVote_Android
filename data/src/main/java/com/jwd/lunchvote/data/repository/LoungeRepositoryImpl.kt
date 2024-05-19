@@ -5,12 +5,11 @@ import com.jwd.lunchvote.data.mapper.asDomain
 import com.jwd.lunchvote.data.mapper.type.asDomain
 import com.jwd.lunchvote.data.source.local.LoungeLocalDataSource
 import com.jwd.lunchvote.data.source.remote.LoungeDataSource
-import com.jwd.lunchvote.data.worker.SendWorkerManager
 import com.jwd.lunchvote.domain.entity.Lounge
 import com.jwd.lunchvote.domain.entity.LoungeChat
 import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.entity.User
-import com.jwd.lunchvote.domain.entity.type.LoungeStatusType
+import com.jwd.lunchvote.domain.entity.type.LoungeStatus
 import com.jwd.lunchvote.domain.entity.type.MemberStatusType
 import com.jwd.lunchvote.domain.entity.type.MessageType
 import com.jwd.lunchvote.domain.entity.type.SendStatusType
@@ -76,7 +75,7 @@ class LoungeRepositoryImpl @Inject constructor(
     return lounge.asDomain()
   }
 
-  override fun getLoungeStatus(loungeId: String): Flow<LoungeStatusType> =
+  override fun getLoungeStatus(loungeId: String): Flow<LoungeStatus> =
     remote.getLoungeStatus(loungeId).map { it.asDomain() }
 
   override fun getMemberList(loungeId: String): Flow<List<Member>> =

@@ -7,7 +7,7 @@ import com.jwd.lunchvote.core.common.error.LoungeError
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.FoodRepository
-import com.jwd.lunchvote.domain.usecase.CheckLoungeUseCase
+import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeEvent
@@ -25,7 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
   private val foodRepository: FoodRepository,
-  private val checkLoungeUseCase: CheckLoungeUseCase,
+  private val loungeRepository: LoungeRepository,
   savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<HomeState, HomeEvent, HomeReduce, HomeSideEffect>(savedStateHandle){
   override fun createInitialState(savedState: Parcelable?): HomeState {
@@ -84,7 +84,7 @@ class HomeViewModel @Inject constructor(
     sendSideEffect(HomeSideEffect.CloseDialog)
     sendSideEffect(HomeSideEffect.ShowSnackBar(UiText.StringResource(R.string.home_joining_lounge_snackbar)))
 
-    val isAvailable = checkLoungeUseCase(loungeId)
+    val isAvailable = loungeRepository.checkLoungeExist(loungeId)
 
     if (isAvailable) sendSideEffect(HomeSideEffect.NavigateToLounge(loungeId))
     else throw LoungeError.NoLounge

@@ -8,5 +8,5 @@ import kotlinx.parcelize.Parcelize
 data class LoungeUIModel(
   val id: String = "",
   val status: LoungeStatusUIType = LoungeStatusUIType.CREATED,
-  val members: List<MemberUIModel> = emptyList()
+  val members: Int = 0
 ): Parcelable

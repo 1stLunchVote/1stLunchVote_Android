@@ -7,7 +7,7 @@ import com.jwd.lunchvote.core.ui.base.ViewModelContract.SideEffect
 import com.jwd.lunchvote.core.ui.base.ViewModelContract.State
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
-import com.jwd.lunchvote.presentation.model.type.FoodStatus
+import com.jwd.lunchvote.presentation.model.type.FoodStatusUIType
 import com.jwd.lunchvote.presentation.util.UiText
 import kotlinx.parcelize.Parcelize
 
@@ -15,7 +15,7 @@ class EditTemplateContract {
   @Parcelize
   data class EditTemplateState(
     val template: TemplateUIModel = TemplateUIModel(),
-    val foodMap: Map<FoodUIModel, FoodStatus> = emptyMap(),
+    val foodMap: Map<FoodUIModel, FoodStatusUIType> = emptyMap(),
     val likedFoods: List<FoodUIModel> = emptyList(),
     val dislikedFoods: List<FoodUIModel> = emptyList(),
     val searchKeyword: String = ""
@@ -41,7 +41,7 @@ class EditTemplateContract {
 
   sealed interface EditTemplateReduce : Reduce {
     data class UpdateTemplate(val template: TemplateUIModel) : EditTemplateReduce
-    data class UpdateFoodMap(val foodMap: Map<FoodUIModel, FoodStatus>) : EditTemplateReduce
+    data class UpdateFoodMap(val foodMap: Map<FoodUIModel, FoodStatusUIType>) : EditTemplateReduce
     data class UpdateLikedFoods(val likedFoods: List<FoodUIModel>) : EditTemplateReduce
     data class UpdateDislikedFoods(val dislikedFoods: List<FoodUIModel>) : EditTemplateReduce
     data class UpdateSearchKeyword(val searchKeyword: String) : EditTemplateReduce

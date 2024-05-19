@@ -2,31 +2,33 @@ package com.jwd.lunchvote.remote.mapper.type
 
 import com.jwd.lunchvote.core.common.error.LoungeError
 import com.jwd.lunchvote.core.common.mapper.BiMapper
-import com.jwd.lunchvote.data.model.type.LoungeStatusDataType
+import com.jwd.lunchvote.data.model.type.LoungeStatusData
 
-private object LoungeStatusRemoteMapper : BiMapper<String, LoungeStatusDataType> {
-  override fun mapToRight(from: String): LoungeStatusDataType {
+private object LoungeStatusRemoteMapper : BiMapper<String, LoungeStatusData> {
+  override fun mapToRight(from: String): LoungeStatusData {
     return when (from) {
-      "created" -> LoungeStatusDataType.CREATED
-      "started" -> LoungeStatusDataType.STARTED
-      "finished" -> LoungeStatusDataType.FINISHED
+      "created" -> LoungeStatusData.CREATED
+      "quit" -> LoungeStatusData.QUIT
+      "started" -> LoungeStatusData.STARTED
+      "finished" -> LoungeStatusData.FINISHED
       else -> throw LoungeError.InvalidLoungeStatus
     }
   }
 
-  override fun mapToLeft(from: LoungeStatusDataType): String {
+  override fun mapToLeft(from: LoungeStatusData): String {
     return when (from) {
-      LoungeStatusDataType.CREATED -> "created"
-      LoungeStatusDataType.STARTED -> "started"
-      LoungeStatusDataType.FINISHED -> "finished"
+      LoungeStatusData.CREATED -> "created"
+      LoungeStatusData.QUIT -> "quit"
+      LoungeStatusData.STARTED -> "started"
+      LoungeStatusData.FINISHED -> "finished"
     }
   }
 }
 
-internal fun String.asLoungeStatusDataType(): LoungeStatusDataType {
+internal fun String.asLoungeStatusDataType(): LoungeStatusData {
   return LoungeStatusRemoteMapper.mapToRight(this)
 }
 
-internal fun LoungeStatusDataType.asRemote(): String {
+internal fun LoungeStatusData.asRemote(): String {
   return LoungeStatusRemoteMapper.mapToLeft(this)
 }

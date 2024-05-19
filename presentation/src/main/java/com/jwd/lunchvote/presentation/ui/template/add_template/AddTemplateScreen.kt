@@ -29,7 +29,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodUIModel
-import com.jwd.lunchvote.presentation.model.type.FoodStatus
+import com.jwd.lunchvote.presentation.model.type.FoodStatusUIType
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateEvent
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateSideEffect
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateState
@@ -122,7 +122,7 @@ private fun AddTemplateScreen(
         items(filteredFoodList) {food ->
           FoodItem(
             food = food,
-            status = state.foodMap[food] ?: FoodStatus.DEFAULT,
+            status = state.foodMap[food] ?: FoodStatusUIType.DEFAULT,
             onClick = { onEvent(AddTemplateEvent.OnClickFood(food)) }
           )
         }
@@ -172,9 +172,9 @@ private fun Preview() {
       AddTemplateState(
         name = "학생회 회식 대표 메뉴",
         foodMap = mapOf(
-          FoodUIModel(name = "음식명") to FoodStatus.DEFAULT,
-          FoodUIModel(name = "음식명") to FoodStatus.DEFAULT,
-          FoodUIModel(name = "음식명") to FoodStatus.DEFAULT,
+          FoodUIModel(name = "음식명") to FoodStatusUIType.DEFAULT,
+          FoodUIModel(name = "음식명") to FoodStatusUIType.DEFAULT,
+          FoodUIModel(name = "음식명") to FoodStatusUIType.DEFAULT,
         )
       )
     )
