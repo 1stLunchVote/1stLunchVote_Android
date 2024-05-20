@@ -3,7 +3,7 @@ package com.jwd.lunchvote.presentation.ui.vote.first
 import android.os.Parcelable
 import com.jwd.lunchvote.core.ui.base.ViewModelContract
 import com.jwd.lunchvote.presentation.model.FoodUIModel
-import com.jwd.lunchvote.presentation.model.type.FoodStatusUIType
+import com.jwd.lunchvote.presentation.model.FoodStatus
 import com.jwd.lunchvote.presentation.util.UiText
 import kotlinx.parcelize.Parcelize
 
@@ -11,7 +11,7 @@ class FirstVoteContract {
   @Parcelize
   data class FirstVoteState(
     val loading: Boolean = false,
-    val foodMap: Map<FoodUIModel, FoodStatusUIType> = emptyMap(),
+    val foodMap: Map<FoodUIModel, FoodStatus> = emptyMap(),
     val likeList: List<FoodUIModel> = emptyList(),
     val dislikeList: List<FoodUIModel> = emptyList(),
     val totalMember: Int = 0,

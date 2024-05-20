@@ -27,14 +27,14 @@ import com.jwd.lunchvote.core.ui.theme.colorSuccess
 import com.jwd.lunchvote.core.ui.util.circleShadow
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodUIModel
-import com.jwd.lunchvote.presentation.model.type.FoodStatusUIType
+import com.jwd.lunchvote.presentation.model.FoodStatus
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 
 @Composable
 fun FoodItem(
   food: FoodUIModel,
-  status: FoodStatusUIType,
+  status: FoodStatus,
   modifier: Modifier = Modifier,
   onClick: () -> Unit
 ) {
@@ -48,7 +48,7 @@ fun FoodItem(
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
     Box(
-      modifier = if (status == FoodStatusUIType.DISLIKE) Modifier.alpha(0.5f) else Modifier
+      modifier = if (status == FoodStatus.DISLIKE) Modifier.alpha(0.5f) else Modifier
     ) {
       CoilImage(
         imageModel = { food.image },
@@ -56,12 +56,12 @@ fun FoodItem(
           .size(100.dp)
           .let {
             when (status) {
-              FoodStatusUIType.DEFAULT -> it
+              FoodStatus.DEFAULT -> it
                 .clip(RoundedCornerShape(16.dp))
                 .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
                 .alpha(0.8f)
 
-              FoodStatusUIType.LIKE -> it
+              FoodStatus.LIKE -> it
                 .clip(RoundedCornerShape(16.dp))
                 .border(2.dp, colorSuccess, RoundedCornerShape(16.dp))
                 .circleShadow(colorSuccess, blurRadius = 8.dp)
@@ -74,7 +74,7 @@ fun FoodItem(
         ),
         previewPlaceholder = R.drawable.ic_food_image_temp
       )
-      if (status == FoodStatusUIType.DISLIKE) {
+      if (status == FoodStatus.DISLIKE) {
         Image(
           painterResource(R.drawable.ic_mask_reversed),
           null,
@@ -107,7 +107,7 @@ fun FoodItemDefaultPreview() {
           image = "",
           name = "햄버거"
         ),
-        status = FoodStatusUIType.DEFAULT,
+        status = FoodStatus.DEFAULT,
         onClick = {}
       )
       FoodItem(
@@ -116,7 +116,7 @@ fun FoodItemDefaultPreview() {
           image = "",
           name = "햄버거"
         ),
-        status = FoodStatusUIType.LIKE,
+        status = FoodStatus.LIKE,
         onClick = {}
       )
       FoodItem(
@@ -125,7 +125,7 @@ fun FoodItemDefaultPreview() {
           image = "",
           name = "햄버거"
         ),
-        status = FoodStatusUIType.DISLIKE,
+        status = FoodStatus.DISLIKE,
         onClick = {}
       )
     }

@@ -8,7 +8,7 @@ import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.repository.TemplateRepository
 import com.jwd.lunchvote.presentation.mapper.asUI
-import com.jwd.lunchvote.presentation.model.type.FoodStatusUIType
+import com.jwd.lunchvote.presentation.model.FoodStatus
 import com.jwd.lunchvote.presentation.model.updateFoodMap
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteEvent
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteReduce
@@ -83,7 +83,7 @@ class FirstVoteViewModel @Inject constructor(
     updateState(
       FirstVoteReduce.Initialize(
         FirstVoteState(
-          foodMap = foodList.associateWith { FoodStatusUIType.DEFAULT },
+          foodMap = foodList.associateWith { FoodStatus.DEFAULT },
           likeList = emptyList(),
           dislikeList = emptyList(),
           totalMember = 3,
@@ -102,9 +102,9 @@ class FirstVoteViewModel @Inject constructor(
 //                loading = false,
 //                foodMap = foodList.associate {
 //                  FoodUIModel(it) to when (it.name) {
-//                    in template?.like ?: emptyList() -> FoodStatusUIType.LIKE
-//                    in template?.dislike ?: emptyList() -> FoodStatusUIType.DISLIKE
-//                    else -> FoodStatusUIType.DEFAULT
+//                    in template?.like ?: emptyList() -> FoodStatus.LIKE
+//                    in template?.dislike ?: emptyList() -> FoodStatus.DISLIKE
+//                    else -> FoodStatus.DEFAULT
 //                  }
 //                },
 //                likeList = foodList.filter { (template?.like ?: emptyList()).contains(it.name) }.map { FoodUIModel(it) },

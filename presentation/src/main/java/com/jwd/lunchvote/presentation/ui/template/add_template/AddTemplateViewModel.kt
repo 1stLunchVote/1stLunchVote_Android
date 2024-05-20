@@ -13,7 +13,7 @@ import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
-import com.jwd.lunchvote.presentation.model.type.FoodStatusUIType
+import com.jwd.lunchvote.presentation.model.FoodStatus
 import com.jwd.lunchvote.presentation.model.updateFoodMap
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateEvent
@@ -78,7 +78,7 @@ class AddTemplateViewModel @Inject constructor(
     updateState(AddTemplateReduce.UpdateName(name))
 
     val foodList = foodRepository.getAllFood()
-    val foodMap = foodList.associate { it.asUI() to FoodStatusUIType.DEFAULT }
+    val foodMap = foodList.associate { it.asUI() to FoodStatus.DEFAULT }
     updateState(AddTemplateReduce.UpdateFoodMap(foodMap))
   }
 

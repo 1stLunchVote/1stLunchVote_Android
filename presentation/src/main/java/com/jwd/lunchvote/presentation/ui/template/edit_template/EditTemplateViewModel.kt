@@ -11,7 +11,7 @@ import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
-import com.jwd.lunchvote.presentation.model.type.FoodStatusUIType
+import com.jwd.lunchvote.presentation.model.FoodStatus
 import com.jwd.lunchvote.presentation.model.updateFoodMap
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateEvent
@@ -99,9 +99,9 @@ class EditTemplateViewModel @Inject constructor(
     val foodList = foodRepository.getAllFood().map { it.asUI() }
     val foodMap = foodList.associateWith {
       when (it.name) {
-        in template.likedFoodIds -> FoodStatusUIType.LIKE
-        in template.dislikedFoodIds -> FoodStatusUIType.DISLIKE
-        else -> FoodStatusUIType.DEFAULT
+        in template.likedFoodIds -> FoodStatus.LIKE
+        in template.dislikedFoodIds -> FoodStatus.DISLIKE
+        else -> FoodStatus.DEFAULT
       }
     }
     val likeList = foodList.filter { template.likedFoodIds.contains(it.name) }

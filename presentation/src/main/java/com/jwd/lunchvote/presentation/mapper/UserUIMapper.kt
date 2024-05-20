@@ -7,8 +7,8 @@ import com.jwd.lunchvote.presentation.util.toLocalDateTime
 import com.jwd.lunchvote.presentation.util.toLong
 
 object UserUIMapper : BiMapper<UserUIModel, User> {
-  override fun mapToRight(from: UserUIModel): User {
-    return User(
+  override fun mapToRight(from: UserUIModel): User =
+    User(
       id = from.id,
       email = from.email,
       name = from.name,
@@ -16,10 +16,9 @@ object UserUIMapper : BiMapper<UserUIModel, User> {
       createdAt = from.createdAt.toLong(),
       deletedAt = from.deletedAt?.toLong()
     )
-  }
 
-  override fun mapToLeft(from: User): UserUIModel {
-    return UserUIModel(
+  override fun mapToLeft(from: User): UserUIModel =
+    UserUIModel(
       id = from.id,
       email = from.email,
       name = from.name,
@@ -27,13 +26,11 @@ object UserUIMapper : BiMapper<UserUIModel, User> {
       createdAt = from.createdAt.toLocalDateTime(),
       deletedAt = from.deletedAt?.toLocalDateTime()
     )
-  }
 }
 
-internal fun User.asUI(): UserUIModel {
-  return UserUIMapper.mapToLeft(this)
-}
 
-internal fun UserUIModel.asDomain(): User {
-  return UserUIMapper.mapToRight(this)
-}
+internal fun UserUIModel.asDomain(): User =
+  UserUIMapper.mapToRight(this)
+
+internal fun User.asUI(): UserUIModel =
+  UserUIMapper.mapToLeft(this)

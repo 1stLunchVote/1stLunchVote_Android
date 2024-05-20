@@ -7,8 +7,8 @@ import com.jwd.lunchvote.presentation.util.toLocalDateTime
 import com.jwd.lunchvote.presentation.util.toLong
 
 private object MemberUIMapper : BiMapper<MemberUIModel, Member> {
-  override fun mapToRight(from: MemberUIModel): Member {
-    return Member(
+  override fun mapToRight(from: MemberUIModel): Member =
+    Member(
       loungeId = from.loungeId,
       userId = from.userId,
       userName = from.userName,
@@ -17,10 +17,9 @@ private object MemberUIMapper : BiMapper<MemberUIModel, Member> {
       createdAt = from.createdAt.toLong(),
       deletedAt = from.deletedAt?.toLong()
     )
-  }
 
-  override fun mapToLeft(from: Member): MemberUIModel {
-    return MemberUIModel(
+  override fun mapToLeft(from: Member): MemberUIModel =
+    MemberUIModel(
       loungeId = from.loungeId,
       userId = from.userId,
       userName = from.userName,
@@ -29,42 +28,34 @@ private object MemberUIMapper : BiMapper<MemberUIModel, Member> {
       createdAt = from.createdAt.toLocalDateTime(),
       deletedAt = from.deletedAt?.toLocalDateTime()
     )
-  }
-
 }
 
-internal fun Member.asUI(): MemberUIModel {
-  return MemberUIMapper.mapToLeft(this)
-}
-
-internal fun MemberUIModel.asDomain(): Member {
-  return MemberUIMapper.mapToRight(this)
-}
-
-private object MemberTypeUIMapper : BiMapper<MemberUIModel.Type, Member.Type> {
-  override fun mapToRight(from: MemberUIModel.Type): Member.Type {
-    return when (from) {
+private object MemberUITypeMapper : BiMapper<MemberUIModel.Type, Member.Type> {
+  override fun mapToRight(from: MemberUIModel.Type): Member.Type =
+    when (from) {
       MemberUIModel.Type.DEFAULT -> Member.Type.DEFAULT
       MemberUIModel.Type.OWNER -> Member.Type.OWNER
       MemberUIModel.Type.READY -> Member.Type.READY
       MemberUIModel.Type.EXILED -> Member.Type.EXILED
     }
-  }
 
-  override fun mapToLeft(from: Member.Type): MemberUIModel.Type {
-    return when (from) {
+  override fun mapToLeft(from: Member.Type): MemberUIModel.Type =
+    when (from) {
       Member.Type.DEFAULT -> MemberUIModel.Type.DEFAULT
       Member.Type.OWNER -> MemberUIModel.Type.OWNER
       Member.Type.READY -> MemberUIModel.Type.READY
       Member.Type.EXILED -> MemberUIModel.Type.EXILED
     }
-  }
 }
 
-internal fun Member.Type.asUI(): MemberUIModel.Type {
-  return MemberTypeUIMapper.mapToLeft(this)
-}
+internal fun MemberUIModel.asDomain(): Member =
+  MemberUIMapper.mapToRight(this)
 
-internal fun MemberUIModel.Type.asDomain(): Member.Type {
-  return MemberTypeUIMapper.mapToRight(this)
-}
+internal fun Member.asUI(): MemberUIModel =
+  MemberUIMapper.mapToLeft(this)
+
+internal fun MemberUIModel.Type.asDomain(): Member.Type =
+  MemberUITypeMapper.mapToRight(this)
+
+internal fun Member.Type.asUI(): MemberUIModel.Type =
+  MemberUITypeMapper.mapToLeft(this)
