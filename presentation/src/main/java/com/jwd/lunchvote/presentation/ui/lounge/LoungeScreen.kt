@@ -49,10 +49,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
-import com.jwd.lunchvote.presentation.model.LoungeChatUIModel
+import com.jwd.lunchvote.presentation.model.ChatUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.UserUIModel
-import com.jwd.lunchvote.presentation.model.type.MessageUIType
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeEvent
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeSideEffect
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeState
@@ -144,7 +143,7 @@ private fun LoungeScreen(
       onClickInviteButton = { onEvent(LoungeEvent.OnClickInviteButton) },
       modifier = Modifier.fillMaxWidth()
     )
-    LoungeChatList(
+    ChatList(
       userId = state.user.id,
       chatList = state.chatList,
       memberList = state.memberList,
@@ -193,9 +192,9 @@ private fun MemberRow(
 }
 
 @Composable
-private fun LoungeChatList(
+private fun ChatList(
   userId: String,
-  chatList: List<LoungeChatUIModel>,
+  chatList: List<ChatUIModel>,
   memberList: List<MemberUIModel>,
   modifier: Modifier = Modifier,
   onClickMember: (MemberUIModel) -> Unit
@@ -339,13 +338,36 @@ private fun Preview() {
           MemberUIModel(userId = "3")
         ),
         chatList = listOf(
-          LoungeChatUIModel(messageType = MessageUIType.EXIT, userId = "3", userName = "김영희"),
-          LoungeChatUIModel(message = "안녕하세요", userId = "3", userName = "김영희"),
-          LoungeChatUIModel(messageType = MessageUIType.JOIN, userId = "3", userName = "김영희"),
-          LoungeChatUIModel(message = "안녕하세요", userId = "2", userName = "김철수"),
-          LoungeChatUIModel(message = "안녕하세요", userId = "1"),
-          LoungeChatUIModel(messageType = MessageUIType.JOIN, userId = "2", userName = "김철수"),
-          LoungeChatUIModel(messageType = MessageUIType.CREATE)
+          ChatUIModel(
+            message = "김영희님이 추방되었습니다.",
+            type = ChatUIModel.Type.SYSTEM
+          ),
+          ChatUIModel(
+            message = "안녕하세요",
+            userId = "3",
+            userName = "김영희"
+          ),
+          ChatUIModel(
+            message = "김영희님이 입장하였습니다.",
+            type = ChatUIModel.Type.SYSTEM,
+          ),
+          ChatUIModel(
+            message = "안녕하세요",
+            userId = "2",
+            userName = "김철수"
+          ),
+          ChatUIModel(
+            message = "안녕하세요",
+            userId = "1"
+          ),
+          ChatUIModel(
+            message = "김철수님이 입장하였습니다.",
+            type = ChatUIModel.Type.SYSTEM
+          ),
+          ChatUIModel(
+            message = "투표 방이 생성되었습니다.",
+            type = ChatUIModel.Type.SYSTEM
+          )
         )
       )
     )

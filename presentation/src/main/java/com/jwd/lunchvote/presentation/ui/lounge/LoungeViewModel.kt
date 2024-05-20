@@ -16,12 +16,10 @@ import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
-import com.jwd.lunchvote.presentation.model.LoungeChatUIModel
+import com.jwd.lunchvote.presentation.model.ChatUIModel
 import com.jwd.lunchvote.presentation.model.LoungeUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.type.LoungeStatusUIType
-import com.jwd.lunchvote.presentation.model.type.MessageUIType
-import com.jwd.lunchvote.presentation.model.type.SendStatusUIType
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeEvent
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeReduce
@@ -37,9 +35,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
-import timber.log.Timber
-import java.nio.file.Files.find
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
 
@@ -205,16 +201,15 @@ class LoungeViewModel @Inject constructor(
   private suspend fun sendChat() {
     updateState(LoungeReduce.UpdateText(""))
 
-    val chat = LoungeChatUIModel(
+    val chat = ChatUIModel(
       id = UUID.randomUUID().toString(),
       loungeId = currentState.lounge.id,
       userId = currentState.user.id,
       userName = currentState.user.name,
       userProfile = currentState.user.profileImage,
       message = currentState.text,
-      messageType = MessageUIType.NORMAL,
-      sendStatus = SendStatusUIType.SENDING,
-      createdAt = ZonedDateTime.now().toString()
+      type = ChatUIModel.Type.DEFAULT,
+      createdAt = LocalDateTime.now()
     )
     loungeRepository.sendChat(chat.asDomain())
   }

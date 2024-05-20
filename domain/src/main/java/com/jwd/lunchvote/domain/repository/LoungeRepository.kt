@@ -1,7 +1,7 @@
 package com.jwd.lunchvote.domain.repository
 
 import com.jwd.lunchvote.domain.entity.Lounge
-import com.jwd.lunchvote.domain.entity.LoungeChat
+import com.jwd.lunchvote.domain.entity.Chat
 import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.entity.User
 import com.jwd.lunchvote.domain.entity.type.LoungeStatus
@@ -15,8 +15,8 @@ interface LoungeRepository {
   suspend fun joinLounge(user: User, loungeId: String): Lounge
   fun getLoungeStatus(loungeId: String): Flow<LoungeStatus>
   fun getMemberList(loungeId: String): Flow<List<Member>>
-  fun getChatList(loungeId: String): Flow<List<LoungeChat>>
-  suspend fun sendChat(chat: LoungeChat)
+  fun getChatList(loungeId: String): Flow<List<Chat>>
+  suspend fun sendChat(chat: Chat)
   suspend fun updateReady(member: Member)
   suspend fun exitLounge(member: Member)
   suspend fun exileMember(member: Member)

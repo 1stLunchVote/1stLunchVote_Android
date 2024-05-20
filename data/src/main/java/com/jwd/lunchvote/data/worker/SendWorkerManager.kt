@@ -7,7 +7,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.jwd.lunchvote.data.model.LoungeChatData
+import com.jwd.lunchvote.data.model.ChatData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -16,7 +16,7 @@ class SendWorkerManager @Inject constructor(
 ) {
   private val workManager = WorkManager.getInstance(context)
 
-  fun startSendWork(chat: LoungeChatData) {
+  fun startSendWork(chat: ChatData) {
     val constraints = Constraints.Builder()
       .setRequiredNetworkType(NetworkType.CONNECTED)
       .build()

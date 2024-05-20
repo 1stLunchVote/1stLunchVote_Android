@@ -6,7 +6,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.values
 import com.google.firebase.functions.FirebaseFunctions
 import com.jwd.lunchvote.core.common.error.LoungeError
-import com.jwd.lunchvote.data.model.LoungeChatData
+import com.jwd.lunchvote.data.model.ChatData
 import com.jwd.lunchvote.data.model.LoungeData
 import com.jwd.lunchvote.data.model.MemberData
 import com.jwd.lunchvote.data.model.UserData
@@ -16,7 +16,7 @@ import com.jwd.lunchvote.remote.mapper.asData
 import com.jwd.lunchvote.remote.mapper.asMemberTypeData
 import com.jwd.lunchvote.remote.mapper.asRemote
 import com.jwd.lunchvote.remote.mapper.type.asLoungeStatusDataType
-import com.jwd.lunchvote.remote.model.LoungeChatRemote
+import com.jwd.lunchvote.remote.model.ChatRemote
 import com.jwd.lunchvote.remote.model.LoungeRemote
 import com.jwd.lunchvote.remote.model.MemberRemote
 import com.jwd.lunchvote.remote.util.getValueEventFlow
@@ -165,11 +165,11 @@ class LoungeDataSourceImpl @Inject constructor(
 
   override fun getChatList(
     loungeId: String
-  ): Flow<List<LoungeChatData>> =
+  ): Flow<List<ChatData>> =
     database
       .getReference(CHAT_PATH)
       .child(loungeId)
-      .getValueEventFlow<LoungeChatRemote>()
+      .getValueEventFlow<ChatRemote>()
       .map {
         it.mapNotNull { (key, value) -> value?.asData(key) }
           .sortedByDescending { chat -> chat.createdAt }
@@ -177,7 +177,7 @@ class LoungeDataSourceImpl @Inject constructor(
       .flowOn(dispatcher)
 
   override suspend fun sendChat(
-    chat: LoungeChatData
+    chat: ChatData
   ) {
     withContext(dispatcher) {
       database

@@ -1,11 +1,9 @@
 package com.jwd.lunchvote.local.source
 
 import com.google.firebase.auth.FirebaseAuth
-import com.jwd.lunchvote.data.model.LoungeChatData
+import com.jwd.lunchvote.data.model.ChatData
 import com.jwd.lunchvote.data.model.MemberData
 import com.jwd.lunchvote.data.model.type.LoungeStatusData
-import com.jwd.lunchvote.data.model.type.MessageDataType
-import com.jwd.lunchvote.data.model.type.SendStatusDataType
 import com.jwd.lunchvote.data.source.local.LoungeLocalDataSource
 import com.jwd.lunchvote.local.room.dao.ChatDao
 import com.jwd.lunchvote.local.room.dao.LoungeDao
@@ -20,6 +18,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import java.time.LocalDateTime
+import java.time.ZoneId
 import javax.inject.Inject
 
 class LoungeLocalDataSourceImpl @Inject constructor(
@@ -31,10 +31,10 @@ class LoungeLocalDataSourceImpl @Inject constructor(
 ) : LoungeLocalDataSource {
   override fun getChatList(
     loungeId: String,
-  ): Flow<List<LoungeChatData>> = chatDao.getAllChat(loungeId).map { it.map(ChatEntity::asData) }
+  ): Flow<List<ChatData>> = chatDao.getAllChat(loungeId).map { it.map(ChatEntity::asData) }
 
   override suspend fun putChatList(
-    chatList: List<LoungeChatData>, loungeId: String
+    chatList: List<ChatData>, loungeId: String
   ) = withContext(dispatcher) {
     val lounge = LoungeEntity(
       loungeId = loungeId,
@@ -43,7 +43,7 @@ class LoungeLocalDataSourceImpl @Inject constructor(
     loungeDao.insertLounge(lounge)
 
     chatDao.deleteAllChat(loungeId)
-    chatDao.insertAllChat(chatList.map(LoungeChatData::asEntity))
+    chatDao.insertAllChat(chatList.map(ChatData::asEntity))
   }
 
   override fun getMemberList(
@@ -68,21 +68,20 @@ class LoungeLocalDataSourceImpl @Inject constructor(
   }
 
   override suspend fun insertChat(
-    id: String, loungeId: String, content: String, type: MessageDataType
+    id: String, loungeId: String, content: String, type: ChatData.Type
   ) {
     withContext(dispatcher) {
       auth.currentUser?.let { user ->
         chatDao.insertChat(
           ChatEntity(
+            loungeId = loungeId,
             id = id,
             userId = user.uid,
             userName = user.displayName.toString(),
             userProfile = user.photoUrl.toString(),
             message = content,
-            messageType = type,
-            createdAt = System.currentTimeMillis().toString(),
-            loungeId = loungeId,
-            sendStatus = SendStatusDataType.SENDING
+            type = ChatEntity.Type.SYSTEM,
+            createdAt = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().epochSecond
           )
         )
       }

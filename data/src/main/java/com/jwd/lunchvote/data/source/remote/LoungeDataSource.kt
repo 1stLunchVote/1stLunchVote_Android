@@ -1,6 +1,6 @@
 package com.jwd.lunchvote.data.source.remote
 
-import com.jwd.lunchvote.data.model.LoungeChatData
+import com.jwd.lunchvote.data.model.ChatData
 import com.jwd.lunchvote.data.model.LoungeData
 import com.jwd.lunchvote.data.model.MemberData
 import com.jwd.lunchvote.data.model.UserData
@@ -15,8 +15,8 @@ interface LoungeDataSource {
   suspend fun joinLounge(user: UserData, loungeId: String): LoungeData
   fun getLoungeStatus(loungeId: String): Flow<LoungeStatusData>
   fun getMemberList(loungeId: String): Flow<List<MemberData>>
-  fun getChatList(loungeId: String): Flow<List<LoungeChatData>>
-  suspend fun sendChat(chat: LoungeChatData)
+  fun getChatList(loungeId: String): Flow<List<ChatData>>
+  suspend fun sendChat(chat: ChatData)
   suspend fun updateReady(member: MemberData)
   suspend fun exitLounge(member: MemberData)
   suspend fun exileMember(member: MemberData)

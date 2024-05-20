@@ -4,16 +4,16 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.jwd.lunchvote.data.model.LoungeChatData
-import com.jwd.lunchvote.data.model.type.MessageDataType
-import com.jwd.lunchvote.data.model.type.SendStatusDataType
+import com.jwd.lunchvote.data.model.ChatData
 import com.jwd.lunchvote.data.source.local.LoungeLocalDataSource
 import com.jwd.lunchvote.data.source.remote.LoungeDataSource
+import com.jwd.lunchvote.data.util.toLong
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 @HiltWorker
@@ -27,16 +27,15 @@ class SendChatWorker @AssistedInject constructor(
 
   override suspend fun doWork(): Result = withContext(dispatcher) {
     try {
-      val chat = LoungeChatData(
+      val chat = ChatData(
         id = workerParams.inputData.getString("id") ?: return@withContext Result.failure(),
         loungeId = workerParams.inputData.getString("loungeId") ?: return@withContext Result.failure(),
         userId = "",
         userName = "",
         userProfile = "",
         message = workerParams.inputData.getString("message") ?: return@withContext Result.failure(),
-        messageType = MessageDataType.NORMAL,
-        sendStatus = SendStatusDataType.SENDING,
-        createdAt = ZonedDateTime.now().toString()
+        type = ChatData.Type.SYSTEM,
+        createdAt = LocalDateTime.now().toLong()
       )
       remoteDataSource.sendChat(chat)
 

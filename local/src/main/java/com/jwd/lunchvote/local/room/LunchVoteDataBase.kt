@@ -20,7 +20,7 @@ import com.jwd.lunchvote.local.room.entity.MemberEntity
     MemberEntity::class,
     FoodEntity::class
   ],
-  version = 6,
+  version = 7,
   exportSchema = false
 )
 
