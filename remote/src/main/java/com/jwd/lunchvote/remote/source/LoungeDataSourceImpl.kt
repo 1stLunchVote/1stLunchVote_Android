@@ -225,6 +225,14 @@ class LoungeDataSourceImpl @Inject constructor(
         .child(member.loungeId)
         .child(member.userId)
         .removeValue()
+
+      if (member.type == MemberData.Type.OWNER) {
+        database
+          .getReference(LOUNGE_PATH)
+          .child(member.loungeId)
+          .child(LOUNGE_STATUS)
+          .setValue(LOUNGE_STATUS_QUIT)
+      }
     }
   }
 
