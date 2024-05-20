@@ -22,7 +22,6 @@ import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.core.ui.theme.colorNeutral90
 import com.jwd.lunchvote.presentation.model.LoungeChatUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
-import com.jwd.lunchvote.presentation.model.type.MemberStatusUIType
 import com.jwd.lunchvote.presentation.model.type.MessageUIType
 import com.jwd.lunchvote.presentation.model.type.SendStatusUIType
 
@@ -141,7 +140,7 @@ private fun ChatBubblePreview() {
           sendStatus = SendStatusUIType.SUCCESS
         ),
         member = MemberUIModel(
-          status = MemberStatusUIType.JOINED
+          type = MemberUIModel.Type.OWNER
         ),
         isMine = false
       )
@@ -163,7 +162,7 @@ private fun ChatBubblePreview() {
           sendStatus = SendStatusUIType.SUCCESS
         ),
         member = MemberUIModel(
-          status = MemberStatusUIType.READY
+          type = MemberUIModel.Type.READY
         ),
         isMine = false
       )

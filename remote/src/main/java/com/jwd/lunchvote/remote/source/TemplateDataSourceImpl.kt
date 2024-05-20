@@ -4,7 +4,6 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.jwd.lunchvote.core.common.error.TemplateError
-import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.data.model.TemplateData
 import com.jwd.lunchvote.data.source.remote.TemplateDataSource
 import com.jwd.lunchvote.remote.mapper.asData
@@ -12,7 +11,6 @@ import com.jwd.lunchvote.remote.mapper.asRemote
 import com.jwd.lunchvote.remote.model.TemplateRemote
 import com.jwd.lunchvote.remote.util.whereNotDeleted
 import kotlinx.coroutines.tasks.await
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 class TemplateDataSourceImpl @Inject constructor(
@@ -69,8 +67,7 @@ class TemplateDataSourceImpl @Inject constructor(
       .await()
       .documents
       .mapNotNull {
-        it.toObject(TemplateRemote::class.java)
-          ?.asData(it.id)
+        it.toObject(TemplateRemote::class.java)?.asData(it.id)
       }
 
   override suspend fun updateTemplate(

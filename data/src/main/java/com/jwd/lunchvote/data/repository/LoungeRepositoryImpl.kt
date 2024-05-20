@@ -10,7 +10,6 @@ import com.jwd.lunchvote.domain.entity.LoungeChat
 import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.entity.User
 import com.jwd.lunchvote.domain.entity.type.LoungeStatus
-import com.jwd.lunchvote.domain.entity.type.MemberStatusType
 import com.jwd.lunchvote.domain.entity.type.MessageType
 import com.jwd.lunchvote.domain.entity.type.SendStatusType
 import com.jwd.lunchvote.domain.repository.LoungeRepository
@@ -30,6 +29,7 @@ class LoungeRepositoryImpl @Inject constructor(
   private val local: LoungeLocalDataSource,
   private val remote: LoungeDataSource
 ) : LoungeRepository {
+
   override suspend fun checkLoungeExist(loungeId: String): Boolean {
     return remote.checkLoungeExist(loungeId)
   }
@@ -142,7 +142,7 @@ class LoungeRepositoryImpl @Inject constructor(
     remote.exileMember(member.asData())
   }
 
-  override fun getMemberStatus(member: Member): Flow<MemberStatusType> =
+  override fun getMemberStatus(member: Member): Flow<Member.Type> =
     remote.getMemberStatus(member.asData()).map { it.asDomain() }
 
   override suspend fun getMemberByUserId(userId: String, loungeId: String): Member =

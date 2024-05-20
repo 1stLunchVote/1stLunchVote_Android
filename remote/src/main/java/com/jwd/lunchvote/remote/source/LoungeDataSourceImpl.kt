@@ -1,22 +1,21 @@
 package com.jwd.lunchvote.remote.source
 
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.values
 import com.google.firebase.functions.FirebaseFunctions
 import com.jwd.lunchvote.core.common.error.LoungeError
-import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.data.model.LoungeChatData
 import com.jwd.lunchvote.data.model.LoungeData
 import com.jwd.lunchvote.data.model.MemberData
 import com.jwd.lunchvote.data.model.UserData
 import com.jwd.lunchvote.data.model.type.LoungeStatusData
-import com.jwd.lunchvote.data.model.type.MemberStatusDataType
 import com.jwd.lunchvote.data.source.remote.LoungeDataSource
 import com.jwd.lunchvote.remote.mapper.asData
+import com.jwd.lunchvote.remote.mapper.asMemberTypeData
 import com.jwd.lunchvote.remote.mapper.asRemote
 import com.jwd.lunchvote.remote.mapper.type.asLoungeStatusDataType
-import com.jwd.lunchvote.remote.mapper.type.asMemberStatusDataType
 import com.jwd.lunchvote.remote.model.LoungeChatRemote
 import com.jwd.lunchvote.remote.model.LoungeRemote
 import com.jwd.lunchvote.remote.model.MemberRemote
@@ -25,6 +24,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.UUID
@@ -39,6 +39,7 @@ class LoungeDataSourceImpl @Inject constructor(
 
   companion object {
     const val LOUNGE_PATH = "Lounge"
+    const val MEMBER_PATH = "Member"
     const val CHAT_PATH = "Chat"
 
     //Lounge
@@ -51,12 +52,11 @@ class LoungeDataSourceImpl @Inject constructor(
 
     //Member
     const val MEMBER_LOUNGE_ID = "loungeId"
-    const val MEMBER_STATUS = "status"
-    const val MEMBER_STATUS_OWNER = "owner"
-    const val MEMBER_STATUS_JOINED = "joined"
-    const val MEMBER_STATUS_READY = "ready"
-    const val MEMBER_STATUS_EXILED = "exiled"
-    const val MEMBER_JOINED_AT = "joinedAt"
+    const val MEMBER_TYPE = "type"
+    const val MEMBER_USER_NAME = "userName"
+    const val MEMBER_USER_PROFILE = "userProfile"
+    const val MEMBER_CREATED_AT = "createdAt"
+    const val MEMBER_DELETED_AT = "deletedAt"
 
     // Chat
     const val CHAT_LOUNGE_ID = "loungeId"
@@ -90,15 +90,14 @@ class LoungeDataSourceImpl @Inject constructor(
       .await()
 
     val member = MemberRemote(
+      loungeId = loungeId,
       userName = owner.name,
       userProfile = owner.profileImage,
-      loungeId = loungeId,
-      status = MEMBER_STATUS_OWNER
+      type = MemberRemote.TYPE_OWNER
     )
     database
-      .getReference(LOUNGE_PATH)
+      .getReference(MEMBER_PATH)
       .child(loungeId)
-      .child(LOUNGE_MEMBERS)
       .child(owner.id)
       .setValue(member)
       .await()
@@ -123,13 +122,11 @@ class LoungeDataSourceImpl @Inject constructor(
     val member = MemberRemote(
       userName = user.name,
       userProfile = user.profileImage,
-      loungeId = loungeId,
-      status = MEMBER_STATUS_JOINED
+      loungeId = loungeId
     )
     database
-      .getReference(LOUNGE_PATH)
+      .getReference(MEMBER_PATH)
       .child(loungeId)
-      .child(LOUNGE_MEMBERS)
       .child(user.id)
       .setValue(member)
       .await()
@@ -151,28 +148,20 @@ class LoungeDataSourceImpl @Inject constructor(
       .child(loungeId)
       .child(LOUNGE_STATUS)
       .values<String>()
-      .map { status ->
-        status?.asLoungeStatusDataType() ?: throw Exception("TODO: getLoungeStatus, it is null")
-      }
+      .mapNotNull { status -> status?.asLoungeStatusDataType() }
 
   override fun getMemberList(
     loungeId: String
-  ): Flow<List<MemberData>> {
-    return database
-      .getReference(LOUNGE_PATH)
+  ): Flow<List<MemberData>> =
+    database
+      .getReference(MEMBER_PATH)
       .child(loungeId)
-      .child(LOUNGE_MEMBERS)
       .getValueEventFlow<MemberRemote>()
       .map {
-        it.map { (key, value) ->
-          value?.asData(key) ?: throw Exception("TODO: getMemberList, value is null")
-        }
-      }
-      .map { flow ->
-        flow.filter { member -> member.status != MemberStatusDataType.EXILED }
+        it.mapNotNull { (key, value) -> value?.asData(key) }
+          .filter { member -> member.type != MemberData.Type.EXILED }
       }
       .flowOn(dispatcher)
-  }
 
   override fun getChatList(
     loungeId: String
@@ -182,9 +171,8 @@ class LoungeDataSourceImpl @Inject constructor(
       .child(loungeId)
       .getValueEventFlow<LoungeChatRemote>()
       .map {
-        it.map { (key, value) ->
-          value?.asData(key) ?: throw Exception("TODO: getChatList, hashMap is null")
-        }.sortedByDescending { chat -> chat.createdAt }
+        it.mapNotNull { (key, value) -> value?.asData(key) }
+          .sortedByDescending { chat -> chat.createdAt }
       }
       .flowOn(dispatcher)
 
@@ -204,26 +192,26 @@ class LoungeDataSourceImpl @Inject constructor(
     member: MemberData
   ) {
     withContext(dispatcher) {
-      if (member.status == MemberStatusDataType.OWNER) {
+      if (member.type == MemberData.Type.OWNER) {
         database
           .getReference(LOUNGE_PATH)
-          .child(member.loungeId)
           .child(LOUNGE_STATUS)
           .setValue(LOUNGE_STATUS_STARTED)
+          .await()
       } else {
         database
-          .getReference(LOUNGE_PATH)
+          .getReference(MEMBER_PATH)
           .child(member.loungeId)
-          .child(LOUNGE_MEMBERS)
           .child(member.userId)
-          .child(MEMBER_STATUS)
+          .child(MEMBER_TYPE)
           .setValue(
-            when (member.status) {
-              MemberStatusDataType.JOINED -> MEMBER_STATUS_READY
-              MemberStatusDataType.READY -> MEMBER_STATUS_JOINED
-              else -> throw Exception("TODO: updateReady, invalid member status")
+            when (member.type) {
+              MemberData.Type.READY -> MemberRemote.TYPE_DEFAULT
+              MemberData.Type.DEFAULT -> MemberRemote.TYPE_READY
+              else -> throw Exception("TODO: updateReady, invalid member type")
             }
           )
+          .await()
       }
     }
   }
@@ -233,9 +221,8 @@ class LoungeDataSourceImpl @Inject constructor(
   ) {
     withContext(dispatcher) {
       database
-        .getReference(LOUNGE_PATH)
+        .getReference(MEMBER_PATH)
         .child(member.loungeId)
-        .child(LOUNGE_MEMBERS)
         .child(member.userId)
         .removeValue()
     }
@@ -246,29 +233,26 @@ class LoungeDataSourceImpl @Inject constructor(
   ) {
     withContext(dispatcher) {
       database
-        .getReference(LOUNGE_PATH)
+        .getReference(MEMBER_PATH)
         .child(member.loungeId)
-        .child(LOUNGE_MEMBERS)
         .child(member.userId)
-        .child(MEMBER_STATUS)
-        .setValue(MEMBER_STATUS_EXILED)
-        .await()
+        .apply {
+          child(MEMBER_TYPE).setValue(MemberRemote.TYPE_EXILED).await()
+          child(MEMBER_DELETED_AT).setValue(Timestamp.now()).await()
+        }
     }
   }
 
   override fun getMemberStatus(
     member: MemberData
-  ): Flow<MemberStatusDataType> =
+  ): Flow<MemberData.Type> =
     database
-      .getReference(LOUNGE_PATH)
+      .getReference(MEMBER_PATH)
       .child(member.loungeId)
-      .child(LOUNGE_MEMBERS)
       .child(member.userId)
-      .child(MEMBER_STATUS)
+      .child(MEMBER_TYPE)
       .values<String>()
-      .map { status ->
-        status?.asMemberStatusDataType() ?: throw Exception("TODO: getMemberStatus, it is null")
-      }
+      .mapNotNull { type -> type?.asMemberTypeData() }
       .flowOn(dispatcher)
 
   override suspend fun getMemberByUserId(
@@ -276,9 +260,8 @@ class LoungeDataSourceImpl @Inject constructor(
     loungeId: String
   ): MemberData =
     database
-      .getReference(LOUNGE_PATH)
+      .getReference(MEMBER_PATH)
       .child(loungeId)
-      .child(LOUNGE_MEMBERS)
       .child(userId)
       .get()
       .await()

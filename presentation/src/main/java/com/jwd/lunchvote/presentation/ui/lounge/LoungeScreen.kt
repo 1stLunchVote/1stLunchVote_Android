@@ -52,7 +52,6 @@ import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.LoungeChatUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.UserUIModel
-import com.jwd.lunchvote.presentation.model.type.MemberStatusUIType
 import com.jwd.lunchvote.presentation.model.type.MessageUIType
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeEvent
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeSideEffect
@@ -104,7 +103,7 @@ fun LoungeRoute(
   BackHandler { viewModel.sendEvent(LoungeEvent.OnClickBackButton) }
 
   val isOwner =
-    state.user.id == state.memberList.find { it.status == MemberStatusUIType.OWNER }?.userId
+    state.user.id == state.memberList.find { it.type == MemberUIModel.Type.OWNER }?.userId
   when (dialog) {
     LoungeContract.VOTE_EXIT_DIALOG -> VoteExitDialog(
       isOwner = isOwner,
@@ -156,7 +155,7 @@ private fun LoungeScreen(
     )
     LoungeBottomBar(
       text = state.text,
-      isOwner = state.user.id == state.memberList.find { it.status == MemberStatusUIType.OWNER }?.userId,
+      isOwner = state.user.id == state.memberList.find { it.type == MemberUIModel.Type.OWNER }?.userId,
       modifier = Modifier.fillMaxWidth(),
       onTextChange = { onEvent(LoungeEvent.OnTextChange(it)) },
       onClickSendChatButton = { onEvent(LoungeEvent.OnClickSendChatButton) },
@@ -335,8 +334,8 @@ private fun Preview() {
       LoungeState(
         user = UserUIModel(id = "1"),
         memberList = listOf(
-          MemberUIModel(userId = "1", status = MemberStatusUIType.OWNER),
-          MemberUIModel(userId = "2", status = MemberStatusUIType.READY),
+          MemberUIModel(userId = "1", type = MemberUIModel.Type.OWNER),
+          MemberUIModel(userId = "2", type = MemberUIModel.Type.READY),
           MemberUIModel(userId = "3")
         ),
         chatList = listOf(

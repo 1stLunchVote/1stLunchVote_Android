@@ -4,7 +4,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.jwd.lunchvote.data.model.LoungeChatData
 import com.jwd.lunchvote.data.model.MemberData
 import com.jwd.lunchvote.data.model.type.LoungeStatusData
-import com.jwd.lunchvote.data.model.type.MemberStatusDataType
 import com.jwd.lunchvote.data.model.type.MessageDataType
 import com.jwd.lunchvote.data.model.type.SendStatusDataType
 import com.jwd.lunchvote.data.source.local.LoungeLocalDataSource
@@ -99,10 +98,10 @@ class LoungeLocalDataSourceImpl @Inject constructor(
   override suspend fun updateMemberReady(
     uid: String, loungeId: String
   ) = withContext(dispatcher) {
-    val status = memberDao.getMemberStatus(uid, loungeId)
+    val type = memberDao.getMemberStatus(uid, loungeId)
     memberDao.updateMemberReady(
       uid, loungeId,
-      if (status == MemberStatusDataType.READY) MemberStatusDataType.JOINED else MemberStatusDataType.READY
+      if (type == MemberEntity.Type.READY) MemberEntity.Type.DEFAULT else MemberEntity.Type.READY
     )
   }
 

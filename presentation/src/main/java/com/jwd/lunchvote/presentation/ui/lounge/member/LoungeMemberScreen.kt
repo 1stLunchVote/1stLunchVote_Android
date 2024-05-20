@@ -30,8 +30,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.UserUIModel
-import com.jwd.lunchvote.presentation.model.type.MemberStatusUIType
 import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberContract.LoungeMemberEvent
 import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberContract.LoungeMemberSideEffect
 import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberContract.LoungeMemberState
@@ -135,7 +135,7 @@ private fun LoungeMemberScreen(
       }
     }
     Gap(minHeight = 32.dp)
-    if (state.member.status == MemberStatusUIType.OWNER && state.isMe.not()) TextButton(
+    if (state.member.type == MemberUIModel.Type.OWNER && state.isMe.not()) TextButton(
       onClick = { onEvent(LoungeMemberEvent.OnClickExileButton) },
       modifier = Modifier
         .padding(64.dp)
