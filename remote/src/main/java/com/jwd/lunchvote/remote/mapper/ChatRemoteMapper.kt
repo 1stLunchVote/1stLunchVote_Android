@@ -1,25 +1,25 @@
 package com.jwd.lunchvote.remote.mapper
 
+import com.jwd.lunchvote.core.common.error.LoungeError
 import com.jwd.lunchvote.core.common.mapper.BiMapper
 import com.jwd.lunchvote.data.model.ChatData
 import com.jwd.lunchvote.remote.model.ChatRemote
 
 private object ChatRemoteMapper : BiMapper<ChatRemote, ChatData> {
-  override fun mapToRight(from: ChatRemote): ChatData {
-    return ChatData(
+  override fun mapToRight(from: ChatRemote): ChatData =
+    ChatData(
       loungeId = from.loungeId,
       id = "",
       userId = from.userId,
       userName = from.userName,
       userProfile = from.userProfile,
       message = from.message,
-      type = from.type.asChatTypeData(),
+      type = from.type.asChatDataType(),
       createdAt = from.createdAt
     )
-  }
 
-  override fun mapToLeft(from: ChatData): ChatRemote {
-    return ChatRemote(
+  override fun mapToLeft(from: ChatData): ChatRemote =
+    ChatRemote(
       loungeId = from.loungeId,
       userId = from.userId,
       userName = from.userName,
@@ -28,38 +28,31 @@ private object ChatRemoteMapper : BiMapper<ChatRemote, ChatData> {
       type = from.type.asRemote(),
       createdAt = from.createdAt
     )
-  }
 }
 
-internal fun ChatRemote.asData(id: String): ChatData {
-  return ChatRemoteMapper.mapToRight(this).copy(id = id)
-}
-
-internal fun ChatData.asRemote(): ChatRemote {
-  return ChatRemoteMapper.mapToLeft(this)
-}
-
-private object ChatTypeRemoteMapper : BiMapper<String, ChatData.Type> {
-  override fun mapToRight(from: String): ChatData.Type {
-    return when (from) {
+private object ChatRemoteTypeMapper : BiMapper<String, ChatData.Type> {
+  override fun mapToRight(from: String): ChatData.Type =
+    when (from) {
       ChatRemote.TYPE_DEFAULT -> ChatData.Type.DEFAULT
       ChatRemote.TYPE_SYSTEM -> ChatData.Type.SYSTEM
-      else -> throw IllegalArgumentException("Invalid chat type")
+      else -> throw LoungeError.InvalidChatType
     }
-  }
 
-  override fun mapToLeft(from: ChatData.Type): String {
-    return when (from) {
+  override fun mapToLeft(from: ChatData.Type): String =
+    when (from) {
       ChatData.Type.DEFAULT -> ChatRemote.TYPE_DEFAULT
       ChatData.Type.SYSTEM -> ChatRemote.TYPE_SYSTEM
     }
-  }
 }
 
-internal fun ChatData.Type.asRemote(): String {
-  return ChatTypeRemoteMapper.mapToLeft(this)
-}
+internal fun ChatRemote.asData(id: String): ChatData =
+  ChatRemoteMapper.mapToRight(this).copy(id = id)
 
-internal fun String.asChatTypeData(): ChatData.Type {
-  return ChatTypeRemoteMapper.mapToRight(this)
-}
+internal fun ChatData.asRemote(): ChatRemote =
+  ChatRemoteMapper.mapToLeft(this)
+
+internal fun String.asChatDataType(): ChatData.Type =
+  ChatRemoteTypeMapper.mapToRight(this)
+
+internal fun ChatData.Type.asRemote(): String =
+  ChatRemoteTypeMapper.mapToLeft(this)

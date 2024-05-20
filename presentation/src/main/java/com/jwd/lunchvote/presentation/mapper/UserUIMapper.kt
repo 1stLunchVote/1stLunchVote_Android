@@ -6,7 +6,7 @@ import com.jwd.lunchvote.presentation.model.UserUIModel
 import com.jwd.lunchvote.presentation.util.toLocalDateTime
 import com.jwd.lunchvote.presentation.util.toLong
 
-object UserUIMapper : BiMapper<UserUIModel, User> {
+private object UserUIMapper : BiMapper<UserUIModel, User> {
   override fun mapToRight(from: UserUIModel): User =
     User(
       id = from.id,

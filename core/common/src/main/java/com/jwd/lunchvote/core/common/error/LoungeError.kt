@@ -32,9 +32,14 @@ interface LoungeError {
     override val message: String = "유효하지 않은 투표 방 상태입니다."
   }
 
-  data object InvalidMemberStatus : Throwable() {
-    private fun readResolve(): Any = InvalidMemberStatus
-    override val message: String = "유효하지 않은 회원 상태입니다."
+  data object InvalidMemberType : Throwable() {
+    private fun readResolve(): Any = InvalidMemberType
+    override val message: String = "유효하지 않은 회원입니다."
+  }
+
+  data object InvalidChatType : Throwable() {
+    private fun readResolve(): Any = InvalidChatType
+    override val message: String = "유효하지 않은 채팅입니다."
   }
 
   data object InvalidMember : Throwable() {

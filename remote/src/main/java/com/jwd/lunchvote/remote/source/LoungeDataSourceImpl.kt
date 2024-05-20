@@ -12,8 +12,8 @@ import com.jwd.lunchvote.data.model.MemberData
 import com.jwd.lunchvote.data.model.UserData
 import com.jwd.lunchvote.data.source.remote.LoungeDataSource
 import com.jwd.lunchvote.remote.mapper.asData
-import com.jwd.lunchvote.remote.mapper.asLoungeStatusData
-import com.jwd.lunchvote.remote.mapper.asMemberTypeData
+import com.jwd.lunchvote.remote.mapper.asLoungeDataStatus
+import com.jwd.lunchvote.remote.mapper.asMemberDataType
 import com.jwd.lunchvote.remote.mapper.asRemote
 import com.jwd.lunchvote.remote.model.ChatRemote
 import com.jwd.lunchvote.remote.model.LoungeRemote
@@ -147,7 +147,7 @@ class LoungeDataSourceImpl @Inject constructor(
       .child(loungeId)
       .child(LOUNGE_STATUS)
       .values<String>()
-      .mapNotNull { status -> status?.asLoungeStatusData() }
+      .mapNotNull { status -> status?.asLoungeDataStatus() }
 
   override fun getMemberList(
     loungeId: String
@@ -259,7 +259,7 @@ class LoungeDataSourceImpl @Inject constructor(
       .child(member.userId)
       .child(MEMBER_TYPE)
       .values<String>()
-      .mapNotNull { type -> type?.asMemberTypeData() }
+      .mapNotNull { type -> type?.asMemberDataType() }
       .flowOn(dispatcher)
 
   override suspend fun getMemberByUserId(

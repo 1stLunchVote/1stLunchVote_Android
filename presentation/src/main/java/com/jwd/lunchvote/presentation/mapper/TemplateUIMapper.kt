@@ -6,7 +6,7 @@ import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.util.toLocalDateTime
 import com.jwd.lunchvote.presentation.util.toLong
 
-object TemplateUIMapper: BiMapper<TemplateUIModel, Template> {
+private object TemplateUIMapper: BiMapper<TemplateUIModel, Template> {
   override fun mapToRight(from: TemplateUIModel): Template =
     Template(
       id = from.id,
