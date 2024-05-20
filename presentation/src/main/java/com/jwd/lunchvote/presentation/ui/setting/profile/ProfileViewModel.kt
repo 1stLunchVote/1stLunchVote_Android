@@ -9,7 +9,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel

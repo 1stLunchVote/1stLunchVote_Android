@@ -1,7 +1,7 @@
 package com.jwd.lunchvote.domain.repository
 
-import com.jwd.lunchvote.domain.entity.Lounge
 import com.jwd.lunchvote.domain.entity.Chat
+import com.jwd.lunchvote.domain.entity.Lounge
 import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.entity.User
 import com.jwd.lunchvote.domain.entity.type.LoungeStatus

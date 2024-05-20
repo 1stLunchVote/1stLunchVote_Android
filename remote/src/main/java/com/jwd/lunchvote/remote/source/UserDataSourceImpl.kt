@@ -1,7 +1,6 @@
 package com.jwd.lunchvote.remote.source
 
 import com.google.firebase.firestore.FirebaseFirestore
-import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.data.model.UserData
 import com.jwd.lunchvote.data.source.remote.UserDataSource
