@@ -10,12 +10,11 @@ import com.jwd.lunchvote.data.model.ChatData
 import com.jwd.lunchvote.data.model.LoungeData
 import com.jwd.lunchvote.data.model.MemberData
 import com.jwd.lunchvote.data.model.UserData
-import com.jwd.lunchvote.data.model.type.LoungeStatusData
 import com.jwd.lunchvote.data.source.remote.LoungeDataSource
 import com.jwd.lunchvote.remote.mapper.asData
+import com.jwd.lunchvote.remote.mapper.asLoungeStatusData
 import com.jwd.lunchvote.remote.mapper.asMemberTypeData
 import com.jwd.lunchvote.remote.mapper.asRemote
-import com.jwd.lunchvote.remote.mapper.type.asLoungeStatusDataType
 import com.jwd.lunchvote.remote.model.ChatRemote
 import com.jwd.lunchvote.remote.model.LoungeRemote
 import com.jwd.lunchvote.remote.model.MemberRemote
@@ -142,13 +141,13 @@ class LoungeDataSourceImpl @Inject constructor(
 
   override fun getLoungeStatus(
     loungeId: String
-  ): Flow<LoungeStatusData> =
+  ): Flow<LoungeData.Status> =
     database
       .getReference(LOUNGE_PATH)
       .child(loungeId)
       .child(LOUNGE_STATUS)
       .values<String>()
-      .mapNotNull { status -> status?.asLoungeStatusDataType() }
+      .mapNotNull { status -> status?.asLoungeStatusData() }
 
   override fun getMemberList(
     loungeId: String

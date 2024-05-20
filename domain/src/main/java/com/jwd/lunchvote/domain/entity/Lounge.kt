@@ -1,9 +1,12 @@
 package com.jwd.lunchvote.domain.entity
 
-import com.jwd.lunchvote.domain.entity.type.LoungeStatus
-
 data class Lounge(
   val id: String,
-  val status: LoungeStatus,
+  val status: Status,
   val members: Int
-)
+) {
+
+  enum class Status {
+    CREATED, QUIT, STARTED, FINISHED
+  }
+}

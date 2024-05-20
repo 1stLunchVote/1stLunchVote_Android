@@ -9,8 +9,8 @@ import com.jwd.lunchvote.core.common.error.LoungeError
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.domain.entity.Lounge
 import com.jwd.lunchvote.domain.entity.Member
-import com.jwd.lunchvote.domain.entity.type.LoungeStatus
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.presentation.R
@@ -19,7 +19,6 @@ import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.ChatUIModel
 import com.jwd.lunchvote.presentation.model.LoungeUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
-import com.jwd.lunchvote.presentation.model.type.LoungeStatusUIType
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeEvent
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeReduce
@@ -129,7 +128,7 @@ class LoungeViewModel @Inject constructor(
     withTimeoutOrNull(TIMEOUT) {
       val user = currentState.user
       loungeRepository.getLoungeById(loungeId).asUI().apply {
-        if (status != LoungeStatusUIType.CREATED) {
+        if (status != LoungeUIModel.Status.CREATED) {
           // TODO: 다양한 투표 방 상태에 따른 스낵바 출력
           sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_started_snackbar)))
           sendSideEffect(LoungeSideEffect.PopBackStack)
@@ -160,11 +159,11 @@ class LoungeViewModel @Inject constructor(
   private suspend fun collectLoungeStatus(loungeId: String) {
     loungeRepository.getLoungeStatus(loungeId).collectLatest { status ->
       when (status) {
-        LoungeStatus.QUIT -> {
+        Lounge.Status.QUIT -> {
           sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_owner_exited_snackbar)))
           sendSideEffect(LoungeSideEffect.PopBackStack)
         }
-        LoungeStatus.STARTED -> {
+        Lounge.Status.STARTED -> {
           sendSideEffect(LoungeSideEffect.NavigateToVote(loungeId))
         }
         else -> Unit

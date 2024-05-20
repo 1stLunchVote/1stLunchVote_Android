@@ -2,7 +2,6 @@ package com.jwd.lunchvote.data.repository
 
 import com.jwd.lunchvote.data.mapper.asData
 import com.jwd.lunchvote.data.mapper.asDomain
-import com.jwd.lunchvote.data.mapper.type.asDomain
 import com.jwd.lunchvote.data.model.ChatData
 import com.jwd.lunchvote.data.source.local.LoungeLocalDataSource
 import com.jwd.lunchvote.data.source.remote.LoungeDataSource
@@ -11,7 +10,6 @@ import com.jwd.lunchvote.domain.entity.Chat
 import com.jwd.lunchvote.domain.entity.Lounge
 import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.entity.User
-import com.jwd.lunchvote.domain.entity.type.LoungeStatus
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.currentCoroutineContext
@@ -73,7 +71,7 @@ class LoungeRepositoryImpl @Inject constructor(
     return lounge.asDomain()
   }
 
-  override fun getLoungeStatus(loungeId: String): Flow<LoungeStatus> =
+  override fun getLoungeStatus(loungeId: String): Flow<Lounge.Status> =
     remote.getLoungeStatus(loungeId).map { it.asDomain() }
 
   override fun getMemberList(loungeId: String): Flow<List<Member>> =

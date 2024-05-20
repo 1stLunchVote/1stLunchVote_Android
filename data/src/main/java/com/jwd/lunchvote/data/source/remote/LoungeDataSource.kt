@@ -4,7 +4,6 @@ import com.jwd.lunchvote.data.model.ChatData
 import com.jwd.lunchvote.data.model.LoungeData
 import com.jwd.lunchvote.data.model.MemberData
 import com.jwd.lunchvote.data.model.UserData
-import com.jwd.lunchvote.data.model.type.LoungeStatusData
 import kotlinx.coroutines.flow.Flow
 
 interface LoungeDataSource {
@@ -13,7 +12,7 @@ interface LoungeDataSource {
   suspend fun createLounge(owner: UserData): String
   suspend fun getLoungeById(id: String): LoungeData
   suspend fun joinLounge(user: UserData, loungeId: String): LoungeData
-  fun getLoungeStatus(loungeId: String): Flow<LoungeStatusData>
+  fun getLoungeStatus(loungeId: String): Flow<LoungeData.Status>
   fun getMemberList(loungeId: String): Flow<List<MemberData>>
   fun getChatList(loungeId: String): Flow<List<ChatData>>
   suspend fun sendChat(chat: ChatData)

@@ -3,7 +3,6 @@ package com.jwd.lunchvote.local.source
 import com.google.firebase.auth.FirebaseAuth
 import com.jwd.lunchvote.data.model.ChatData
 import com.jwd.lunchvote.data.model.MemberData
-import com.jwd.lunchvote.data.model.type.LoungeStatusData
 import com.jwd.lunchvote.data.source.local.LoungeLocalDataSource
 import com.jwd.lunchvote.local.room.dao.ChatDao
 import com.jwd.lunchvote.local.room.dao.LoungeDao
@@ -38,7 +37,8 @@ class LoungeLocalDataSourceImpl @Inject constructor(
   ) = withContext(dispatcher) {
     val lounge = LoungeEntity(
       loungeId = loungeId,
-      status = LoungeStatusData.CREATED
+      status = LoungeEntity.Status.CREATED,
+      members = 0
     )
     loungeDao.insertLounge(lounge)
 
@@ -58,7 +58,8 @@ class LoungeLocalDataSourceImpl @Inject constructor(
     withContext(dispatcher) {
       val lounge = LoungeEntity(
         loungeId = loungeId,
-        status = LoungeStatusData.CREATED
+        status = LoungeEntity.Status.CREATED,
+        members = memberList.size
       )
       loungeDao.insertLounge(lounge)
 
