@@ -1,7 +1,6 @@
 package com.jwd.lunchvote.domain.repository
 
 import com.jwd.lunchvote.domain.entity.Member
-import com.jwd.lunchvote.domain.entity.User
 import kotlinx.coroutines.flow.Flow
 
 interface MemberRepository {

@@ -84,7 +84,7 @@ class HomeViewModel @Inject constructor(
     sendSideEffect(HomeSideEffect.CloseDialog)
     sendSideEffect(HomeSideEffect.ShowSnackBar(UiText.StringResource(R.string.home_joining_lounge_snackbar)))
 
-    val isAvailable = loungeRepository.checkLoungeExist(loungeId)
+    val isAvailable = loungeRepository.checkLoungeExistById(loungeId)
 
     if (isAvailable) sendSideEffect(HomeSideEffect.NavigateToLounge(loungeId))
     else throw LoungeError.NoLounge

@@ -158,7 +158,7 @@ private fun LoungeScreen(
       modifier = Modifier.fillMaxWidth(),
       onTextChange = { onEvent(LoungeEvent.OnTextChange(it)) },
       onClickSendChatButton = { onEvent(LoungeEvent.OnClickSendChatButton) },
-      onClickReadyButton = { onEvent(LoungeEvent.OnClickReadyButton) }
+      onClickActionButton = { onEvent(LoungeEvent.OnClickActionButton) }
     )
   }
 }
@@ -225,7 +225,7 @@ private fun LoungeBottomBar(
   modifier: Modifier = Modifier,
   onTextChange: (String) -> Unit,
   onClickSendChatButton: () -> Unit,
-  onClickReadyButton: () -> Unit,
+  onClickActionButton: () -> Unit,
 ) {
   Column(
     modifier = modifier
@@ -239,7 +239,7 @@ private fun LoungeBottomBar(
       verticalAlignment = Alignment.Top
     ) {
       OutlinedButton(
-        onClick = onClickReadyButton,
+        onClick = onClickActionButton,
         modifier = Modifier.height(48.dp),
         border = BorderStroke(2.dp, MaterialTheme.colorScheme.onBackground),
         contentPadding = PaddingValues(horizontal = 16.dp)

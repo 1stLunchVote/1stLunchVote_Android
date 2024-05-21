@@ -28,7 +28,7 @@ class LoungeContract {
     data object OnClickInviteButton : LoungeEvent
     data class OnTextChange(val text: String) : LoungeEvent
     data object OnClickSendChatButton : LoungeEvent
-    data object OnClickReadyButton : LoungeEvent
+    data object OnClickActionButton : LoungeEvent
     data class OnScrolled(val index: Int) : LoungeEvent
 
     // DialogEvents

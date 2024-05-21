@@ -80,12 +80,6 @@ internal abstract class DataSourceModule {
 
   @Binds
   @Singleton
-  abstract fun bindsLoungeLocalDataSource(
-    loungeLocalDataSourceImpl: LoungeLocalDataSourceImpl
-  ): LoungeLocalDataSource
-
-  @Binds
-  @Singleton
   abstract fun bindsPreferenceDataSource(
     source: PreferenceDataSourceImpl
   ): PreferenceDataSource
