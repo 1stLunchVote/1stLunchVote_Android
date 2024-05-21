@@ -1,6 +1,5 @@
 package com.jwd.lunchvote.di
 
-import com.jwd.lunchvote.data.source.local.LoungeLocalDataSource
 import com.jwd.lunchvote.data.source.local.PreferenceDataSource
 import com.jwd.lunchvote.data.source.remote.ChatDataSource
 import com.jwd.lunchvote.data.source.remote.FoodDataSource
@@ -10,7 +9,6 @@ import com.jwd.lunchvote.data.source.remote.MemberDataSource
 import com.jwd.lunchvote.data.source.remote.StorageDataSource
 import com.jwd.lunchvote.data.source.remote.TemplateDataSource
 import com.jwd.lunchvote.data.source.remote.UserDataSource
-import com.jwd.lunchvote.local.source.LoungeLocalDataSourceImpl
 import com.jwd.lunchvote.local.source.PreferenceDataSourceImpl
 import com.jwd.lunchvote.remote.source.ChatDataSourceImpl
 import com.jwd.lunchvote.remote.source.FoodDataSourceImpl
