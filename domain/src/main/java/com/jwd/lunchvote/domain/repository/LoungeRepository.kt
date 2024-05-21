@@ -1,24 +1,17 @@
 package com.jwd.lunchvote.domain.repository
 
-import com.jwd.lunchvote.domain.entity.Chat
 import com.jwd.lunchvote.domain.entity.Lounge
-import com.jwd.lunchvote.domain.entity.Member
-import com.jwd.lunchvote.domain.entity.User
 import kotlinx.coroutines.flow.Flow
 
 interface LoungeRepository {
 
-  suspend fun checkLoungeExist(loungeId: String): Boolean
-  suspend fun createLounge(owner: User): String
+  suspend fun checkLoungeExistById(id: String): Boolean
+  suspend fun createLounge(): String
+  fun getLoungeStatusFlowById(id: String): Flow<Lounge.Status>
   suspend fun getLoungeById(id: String): Lounge
-  suspend fun joinLounge(user: User, loungeId: String): Lounge
-  fun getLoungeStatus(loungeId: String): Flow<Lounge.Status>
-  fun getMemberList(loungeId: String): Flow<List<Member>>
-  fun getChatList(loungeId: String): Flow<List<Chat>>
-  suspend fun sendChat(chat: Chat)
-  suspend fun updateReady(member: Member)
-  suspend fun exitLounge(member: Member)
-  suspend fun exileMember(member: Member)
-  fun getMemberStatus(member: Member): Flow<Member.Type>
-  suspend fun getMemberByUserId(userId: String, loungeId: String): Member
+  suspend fun joinLoungeById(id: String)
+  suspend fun exitLoungeById(id: String)
+  suspend fun quitLoungeById(id: String)
+  suspend fun startLoungeById(id: String)
+  suspend fun finishLoungeById(id: String)
 }

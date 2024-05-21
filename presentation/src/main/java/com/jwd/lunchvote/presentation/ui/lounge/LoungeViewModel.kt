@@ -157,7 +157,7 @@ class LoungeViewModel @Inject constructor(
   }
 
   private suspend fun collectLoungeStatus(loungeId: String) {
-    loungeRepository.getLoungeStatus(loungeId).collectLatest { status ->
+    loungeRepository.getLoungeStatusFlow(loungeId).collectLatest { status ->
       when (status) {
         Lounge.Status.QUIT -> {
           sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_owner_exited_snackbar)))
@@ -172,7 +172,7 @@ class LoungeViewModel @Inject constructor(
   }
 
   private suspend fun collectMemberList(loungeId: String) {
-    loungeRepository.getMemberList(loungeId).apply {
+    loungeRepository.getMemberListFlow(loungeId).apply {
       collectLatest { memberList ->
         updateState(LoungeReduce.UpdateMemberList(memberList.map { it.asUI() }))
       }
@@ -183,13 +183,13 @@ class LoungeViewModel @Inject constructor(
   }
 
   private suspend fun collectChatList(loungeId: String) {
-    loungeRepository.getChatList(loungeId).collectLatest { chatList ->
+    loungeRepository.getChatListFlow(loungeId).collectLatest { chatList ->
       updateState(LoungeReduce.UpdateChatList(chatList.map { it.asUI() }))
     }
   }
 
   private suspend fun checkMemberStatus(member: MemberUIModel) {
-    loungeRepository.getMemberStatus(member.asDomain()).collectLatest { type ->
+    loungeRepository.getMemberStatusFlow(member.asDomain()).collectLatest { type ->
       if (type == Member.Type.EXILED) {
         sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_exiled_snackbar)))
         sendSideEffect(LoungeSideEffect.PopBackStack)
