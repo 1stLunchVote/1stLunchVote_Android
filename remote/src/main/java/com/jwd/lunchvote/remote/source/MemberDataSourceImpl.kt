@@ -11,14 +11,20 @@ import com.jwd.lunchvote.remote.mapper.asMemberDataType
 import com.jwd.lunchvote.remote.mapper.asRemote
 import com.jwd.lunchvote.remote.model.MemberRemote
 import com.jwd.lunchvote.remote.util.getValueEventFlow
+import com.jwd.lunchvote.remote.util.toLong
 import com.kakao.sdk.common.KakaoSdk.type
+import io.reactivex.rxjava3.internal.util.NotificationLite.getValue
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 class MemberDataSourceImpl @Inject constructor(
@@ -45,7 +51,7 @@ class MemberDataSourceImpl @Inject constructor(
         .getReference(MEMBER_PATH)
         .child(member.loungeId)
         .child(member.userId)
-        .setValue(member)
+        .setValue(member.asRemote())
         .await()
     }
   }
@@ -98,7 +104,7 @@ class MemberDataSourceImpl @Inject constructor(
         .child(member.loungeId)
         .child(member.userId)
         .apply {
-          val type = child(MEMBER_TYPE).get().await().value as String
+          val type = child(MEMBER_TYPE).values<String>().first()
           child(MEMBER_TYPE)
             .setValue(
               when (type) {
@@ -126,7 +132,7 @@ class MemberDataSourceImpl @Inject constructor(
             .await()
 
           child(MEMBER_DELETED_AT)
-            .setValue(Timestamp.now())
+            .setValue(Timestamp.now().toLong())
             .await()
         }
     }

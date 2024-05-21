@@ -16,8 +16,7 @@ class LoungeContract {
     val lounge: LoungeUIModel = LoungeUIModel(),
     val memberList: List<MemberUIModel> = emptyList(),
     val chatList: List<ChatUIModel> = emptyList(),
-    val text: String = "",
-    val scrollIndex: Int = 0
+    val text: String = ""
   ) : ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this
   }
@@ -29,7 +28,6 @@ class LoungeContract {
     data class OnTextChange(val text: String) : LoungeEvent
     data object OnClickSendChatButton : LoungeEvent
     data object OnClickActionButton : LoungeEvent
-    data class OnScrolled(val index: Int) : LoungeEvent
 
     // DialogEvents
     data object OnClickCancelButtonVoteExitDialog : LoungeEvent
@@ -42,7 +40,6 @@ class LoungeContract {
     data class UpdateMemberList(val memberList: List<MemberUIModel>) : LoungeReduce
     data class UpdateChatList(val chatList: List<ChatUIModel>) : LoungeReduce
     data class UpdateText(val text: String) : LoungeReduce
-    data class UpdateScrollIndex(val index: Int) : LoungeReduce
   }
 
   sealed interface LoungeSideEffect : ViewModelContract.SideEffect {

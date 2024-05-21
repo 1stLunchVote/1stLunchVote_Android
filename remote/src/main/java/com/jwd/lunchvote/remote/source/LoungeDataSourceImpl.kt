@@ -26,7 +26,7 @@ class LoungeDataSourceImpl @Inject constructor(
     const val LOUNGE_PATH = "Lounge"
 
     const val LOUNGE_STATUS = "status"
-    const val LOUNGE_MEMBERS = "Members"
+    const val LOUNGE_MEMBERS = "members"
   }
 
   override suspend fun checkLoungeExistById(
@@ -51,7 +51,7 @@ class LoungeDataSourceImpl @Inject constructor(
           .setValue(LoungeRemote.STATUS_CREATED)
           .await()
         child(LOUNGE_MEMBERS)
-          .setValue(1)
+          .setValue(0)
           .await()
       }
     loungeId

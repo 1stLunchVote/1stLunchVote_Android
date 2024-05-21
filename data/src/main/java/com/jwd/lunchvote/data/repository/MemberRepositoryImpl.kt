@@ -1,38 +1,40 @@
 package com.jwd.lunchvote.data.repository
 
-import com.jwd.lunchvote.data.model.MemberData
+import com.jwd.lunchvote.data.mapper.asData
+import com.jwd.lunchvote.data.mapper.asDomain
+import com.jwd.lunchvote.data.source.remote.MemberDataSource
 import com.jwd.lunchvote.domain.entity.Member
-import com.jwd.lunchvote.domain.entity.User
 import com.jwd.lunchvote.domain.repository.MemberRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class MemberRepositoryImpl @Inject constructor(
-  private val memberRepository: MemberRepository
+  private val memberDataSource: MemberDataSource
 ): MemberRepository {
 
   override suspend fun createMember(member: Member) {
-    memberRepository.createMember(member)
+    memberDataSource.createMember(member.asData())
   }
 
   override fun getMemberListFlow(loungeId: String): Flow<List<Member>> =
-    memberRepository.getMemberListFlow(loungeId)
+    memberDataSource.getMemberListFlow(loungeId).map { list -> list.map { it.asDomain() } }
 
   override fun getMemberTypeFlow(member: Member): Flow<Member.Type> =
-    memberRepository.getMemberTypeFlow(member)
+    memberDataSource.getMemberTypeFlow(member.asData()).map { it.asDomain() }
 
   override suspend fun getMemberByUserId(userId: String, loungeId: String): Member =
-    memberRepository.getMemberByUserId(userId, loungeId)
+    memberDataSource.getMemberByUserId(userId, loungeId).asDomain()
 
   override suspend fun updateMemberReadyType(member: Member) {
-    memberRepository.updateMemberReadyType(member)
+    memberDataSource.updateMemberReadyType(member.asData())
   }
 
   override suspend fun exileMember(member: Member) {
-    memberRepository.exileMember(member)
+    memberDataSource.exileMember(member.asData())
   }
 
   override suspend fun deleteMember(member: Member) {
-    memberRepository.deleteMember(member)
+    memberDataSource.deleteMember(member.asData())
   }
 }

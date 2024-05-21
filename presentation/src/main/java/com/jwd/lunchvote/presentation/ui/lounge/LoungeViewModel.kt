@@ -39,6 +39,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
+import timber.log.Timber
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
@@ -80,7 +81,7 @@ class LoungeViewModel @Inject constructor(
 
       val loungeIdKey = LunchVoteNavRoute.Lounge.arguments.first().name
       val loungeId = savedStateHandle.get<String?>(loungeIdKey)
-      if (loungeId != null) joinLounge(loungeId) else createLounge()
+      if (loungeId == null) createLounge() else joinLounge(loungeId)
     }
   }
 
@@ -94,7 +95,6 @@ class LoungeViewModel @Inject constructor(
       is LoungeEvent.OnClickActionButton -> launch(false) {
         if (currentState.user.id == owner.userId) startVote() else updateReady()
       }
-      is LoungeEvent.OnScrolled -> updateState(LoungeReduce.UpdateScrollIndex(event.index))
 
       // DialogEvents
       is LoungeEvent.OnClickCancelButtonVoteExitDialog -> sendSideEffect(LoungeSideEffect.CloseDialog)
@@ -109,7 +109,6 @@ class LoungeViewModel @Inject constructor(
       is LoungeReduce.UpdateMemberList -> state.copy(memberList = reduce.memberList)
       is LoungeReduce.UpdateChatList -> state.copy(chatList = reduce.chatList)
       is LoungeReduce.UpdateText -> state.copy(text = reduce.text)
-      is LoungeReduce.UpdateScrollIndex -> state.copy(scrollIndex = reduce.index)
     }
   }
 
@@ -168,6 +167,8 @@ class LoungeViewModel @Inject constructor(
     launch { collectLoungeStatus(lounge.id) }
     launch { collectMemberList(lounge.id) }
     launch { collectChatList(lounge.id) }
+
+    currentJob = launch { collectMemberType(lounge.id) }
   }
 
   private suspend fun collectLoungeStatus(loungeId: String) {
@@ -186,28 +187,27 @@ class LoungeViewModel @Inject constructor(
   }
 
   private suspend fun collectMemberList(loungeId: String) {
-    memberRepository.getMemberListFlow(loungeId).run {
-      first().find { it.userId == currentState.user.id }?.also { me ->
-        currentJob = launch { collectMemberType(me.asUI()) }
-      }
-      collectLatest { memberList ->
-        updateState(LoungeReduce.UpdateMemberList(memberList.map { it.asUI() }))
-      }
-    }
-  }
-
-  private suspend fun collectMemberType(member: MemberUIModel) {
-    memberRepository.getMemberTypeFlow(member.asDomain()).collectLatest { type ->
-      if (type == Member.Type.EXILED) {
-        sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_exiled_snackbar)))
-        sendSideEffect(LoungeSideEffect.PopBackStack)
-      }
+    memberRepository.getMemberListFlow(loungeId).collectLatest { memberList ->
+      updateState(LoungeReduce.UpdateMemberList(memberList.map { it.asUI() }))
     }
   }
 
   private suspend fun collectChatList(loungeId: String) {
     chatRepository.getChatListFlow(loungeId).collectLatest { chatList ->
       updateState(LoungeReduce.UpdateChatList(chatList.map { it.asUI() }))
+    }
+  }
+
+  private suspend fun collectMemberType(loungeId: String) {
+    val member = MemberUIModel(
+      loungeId = loungeId,
+      userId = currentState.user.id
+    )
+    memberRepository.getMemberTypeFlow(member.asDomain()).collectLatest { type ->
+      if (type == Member.Type.EXILED) {
+        sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_exiled_snackbar)))
+        sendSideEffect(LoungeSideEffect.PopBackStack)
+      }
     }
   }
 

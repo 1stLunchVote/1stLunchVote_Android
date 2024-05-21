@@ -19,6 +19,7 @@ class CreateLoungeUseCase @Inject constructor(
 
   suspend operator fun invoke(user: User): String {
     val loungeId = loungeRepository.createLounge()
+    loungeRepository.joinLoungeById(loungeId)
 
     val member = Member(
       loungeId = loungeId,

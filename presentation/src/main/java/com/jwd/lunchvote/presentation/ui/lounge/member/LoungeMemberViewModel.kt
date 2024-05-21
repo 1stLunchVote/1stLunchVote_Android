@@ -60,9 +60,9 @@ class LoungeMemberViewModel @Inject constructor(
 
   override fun reduceState(state: LoungeMemberState, reduce: LoungeMemberReduce, ): LoungeMemberState {
     return when (reduce) {
+      is LoungeMemberReduce.UpdateMe -> state.copy(me = reduce.me)
       is LoungeMemberReduce.UpdateMember -> state.copy(member = reduce.member)
       is LoungeMemberReduce.UpdateUser -> state.copy(user = reduce.user)
-      is LoungeMemberReduce.UpdateIsMe -> state.copy(isMe = reduce.isMe)
     }
   }
 
@@ -79,14 +79,14 @@ class LoungeMemberViewModel @Inject constructor(
     val loungeIdKey = LunchVoteNavRoute.LoungeMember.arguments.last().name
     val loungeId = checkNotNull(savedStateHandle.get<String>(loungeIdKey))
 
+    val myUserId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
+    val me = memberRepository.getMemberByUserId(myUserId, loungeId).asUI()
     val member = memberRepository.getMemberByUserId(userId, loungeId).asUI()
     val user = userRepository.getUserById(member.userId).asUI()
-    val authUser = Firebase.auth.currentUser ?: throw UserError.NoUser
-    val isMe = authUser.uid == member.userId
 
+    updateState(LoungeMemberReduce.UpdateMe(me))
     updateState(LoungeMemberReduce.UpdateMember(member))
     updateState(LoungeMemberReduce.UpdateUser(user))
-    updateState(LoungeMemberReduce.UpdateIsMe(isMe))
   }
 
   private suspend fun exileMember() {

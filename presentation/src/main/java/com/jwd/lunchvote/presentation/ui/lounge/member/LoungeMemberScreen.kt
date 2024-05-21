@@ -135,7 +135,7 @@ private fun LoungeMemberScreen(
       }
     }
     Gap(minHeight = 32.dp)
-    if (state.member.type == MemberUIModel.Type.OWNER && state.isMe.not()) TextButton(
+    if (state.me.type == MemberUIModel.Type.OWNER && state.me.userId != state.member.userId) TextButton(
       onClick = { onEvent(LoungeMemberEvent.OnClickExileButton) },
       modifier = Modifier
         .padding(64.dp)
