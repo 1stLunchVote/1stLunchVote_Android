@@ -3,7 +3,7 @@ package com.jwd.lunchvote.presentation.mapper
 import com.jwd.lunchvote.core.common.mapper.BiMapper
 import com.jwd.lunchvote.domain.entity.Template
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
-import com.jwd.lunchvote.presentation.util.toLocalDateTime
+import com.jwd.lunchvote.presentation.util.toZonedDateTime
 import com.jwd.lunchvote.presentation.util.toLong
 
 private object TemplateUIMapper: BiMapper<TemplateUIModel, Template> {
@@ -25,8 +25,8 @@ private object TemplateUIMapper: BiMapper<TemplateUIModel, Template> {
       name = from.name,
       likedFoodIds = from.likedFoodIds,
       dislikedFoodIds = from.dislikedFoodIds,
-      createdAt = from.createdAt.toLocalDateTime(),
-      deletedAt = from.deletedAt?.toLocalDateTime()
+      createdAt = from.createdAt.toZonedDateTime(),
+      deletedAt = from.deletedAt?.toZonedDateTime()
     )
 }
 

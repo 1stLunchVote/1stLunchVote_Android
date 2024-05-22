@@ -2,8 +2,8 @@ package com.jwd.lunchvote.presentation.ui.template.add_template
 
 import android.os.Parcelable
 import com.jwd.lunchvote.core.ui.base.ViewModelContract
-import com.jwd.lunchvote.presentation.model.FoodStatus
 import com.jwd.lunchvote.presentation.model.FoodUIModel
+import com.jwd.lunchvote.presentation.model.FoodStatus
 import com.jwd.lunchvote.presentation.util.UiText
 import kotlinx.parcelize.Parcelize
 

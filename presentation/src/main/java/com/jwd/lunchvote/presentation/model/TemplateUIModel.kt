@@ -3,6 +3,9 @@ package com.jwd.lunchvote.presentation.model
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 
 @Parcelize
 data class TemplateUIModel(
@@ -11,6 +14,6 @@ data class TemplateUIModel(
   val name: String = "",
   val likedFoodIds: List<String> = emptyList(),
   val dislikedFoodIds: List<String> = emptyList(),
-  val createdAt: LocalDateTime = LocalDateTime.now(),
-  val deletedAt: LocalDateTime? = null
+  val createdAt: ZonedDateTime = ZonedDateTime.now(ZoneId.of("UTC")),
+  val deletedAt: ZonedDateTime? = null
 ): Parcelable

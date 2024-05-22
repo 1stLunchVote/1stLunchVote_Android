@@ -7,6 +7,8 @@ import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import java.util.UUID
 import javax.inject.Inject
 
@@ -29,7 +31,7 @@ class ExileMemberUseCase @Inject constructor(
       userProfile = member.userProfile,
       message = "${member.userName}님이 추방되었습니다.",
       type = Chat.Type.SYSTEM,
-      createdAt = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().epochSecond
+      createdAt = ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond()
     )
     chatRepository.sendChat(chat)
   }

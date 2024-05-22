@@ -3,7 +3,7 @@ package com.jwd.lunchvote.presentation.mapper
 import com.jwd.lunchvote.core.common.mapper.BiMapper
 import com.jwd.lunchvote.domain.entity.User
 import com.jwd.lunchvote.presentation.model.UserUIModel
-import com.jwd.lunchvote.presentation.util.toLocalDateTime
+import com.jwd.lunchvote.presentation.util.toZonedDateTime
 import com.jwd.lunchvote.presentation.util.toLong
 
 private object UserUIMapper : BiMapper<UserUIModel, User> {
@@ -23,8 +23,8 @@ private object UserUIMapper : BiMapper<UserUIModel, User> {
       email = from.email,
       name = from.name,
       profileImage = from.profileImage,
-      createdAt = from.createdAt.toLocalDateTime(),
-      deletedAt = from.deletedAt?.toLocalDateTime()
+      createdAt = from.createdAt.toZonedDateTime(),
+      deletedAt = from.deletedAt?.toZonedDateTime()
     )
 }
 

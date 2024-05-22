@@ -1,9 +1,10 @@
 package com.jwd.lunchvote.presentation.util
 
 import java.time.Instant
-import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 
-internal fun LocalDateTime.toLong() = this.atZone(ZoneId.systemDefault()).toInstant().epochSecond
+internal fun ZonedDateTime.toLong() = this.toEpochSecond()
 
-internal fun Long.toLocalDateTime() = LocalDateTime.ofInstant(Instant.ofEpochSecond(this), ZoneId.systemDefault())
+internal fun Long.toZonedDateTime() = ZonedDateTime.ofInstant(Instant.ofEpochSecond(this), ZoneId.of("UTC"))

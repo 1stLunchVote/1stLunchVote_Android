@@ -3,6 +3,9 @@ package com.jwd.lunchvote.presentation.model
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 
 @Parcelize
 data class ChatUIModel(
@@ -13,7 +16,7 @@ data class ChatUIModel(
   val userProfile: String = "",
   val message: String = "",
   val type: Type = Type.DEFAULT,
-  val createdAt: LocalDateTime = LocalDateTime.now()
+  val createdAt: ZonedDateTime = ZonedDateTime.now(ZoneId.of("UTC"))
 ) : Parcelable {
 
   enum class Type {
