@@ -36,9 +36,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.model.FoodStatus
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
-import com.jwd.lunchvote.presentation.model.type.FoodStatus
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateEvent
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateSideEffect
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateState
@@ -134,8 +134,8 @@ private fun EditTemplateScreen(
     ) {
       TemplateTitle(
         name = state.template.name,
-        like = state.likeList.size,
-        dislike = state.dislikeList.size,
+        like = state.likedFoods.size,
+        dislike = state.dislikedFoods.size,
         modifier = Modifier.fillMaxWidth()
       )
       LunchVoteTextField(
@@ -166,7 +166,7 @@ private fun EditTemplateScreen(
       Button(
         onClick = { onEvent(EditTemplateEvent.OnClickSaveButton) },
         modifier = Modifier.align(CenterHorizontally),
-        enabled = state.likeList.isNotEmpty() || state.dislikeList.isNotEmpty()
+        enabled = state.likedFoods.isNotEmpty() || state.dislikedFoods.isNotEmpty()
       ) {
         Text(text = stringResource(R.string.edit_template_save_button))
       }

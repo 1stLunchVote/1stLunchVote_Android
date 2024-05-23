@@ -22,7 +22,7 @@ interface ChatDao {
     fun getAllChat(loungeId: String): Flow<List<ChatEntity>>
 
     // 전송중인 채팅 삭제
-    @Query("DELETE FROM ChatTable WHERE sendStatus = 1 AND loungeId = :loungeId")
+    @Query("DELETE FROM ChatTable WHERE loungeId = :loungeId")
     fun deleteSendingChat(loungeId: String)
 
     // 채팅 메시지 전부 삭제

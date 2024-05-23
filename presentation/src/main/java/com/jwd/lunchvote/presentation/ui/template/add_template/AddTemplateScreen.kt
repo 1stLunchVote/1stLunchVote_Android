@@ -28,8 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.model.FoodStatus
 import com.jwd.lunchvote.presentation.model.FoodUIModel
-import com.jwd.lunchvote.presentation.model.type.FoodStatus
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateEvent
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateSideEffect
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateState
@@ -98,8 +98,8 @@ private fun AddTemplateScreen(
     ) {
       TemplateTitle(
         name = state.name,
-        like = state.likeList.size,
-        dislike = state.dislikeList.size,
+        like = state.likedFoods.size,
+        dislike = state.dislikedFoods.size,
         modifier = Modifier.fillMaxWidth()
       )
       LunchVoteTextField(
@@ -130,7 +130,7 @@ private fun AddTemplateScreen(
       Button(
         onClick = { onEvent(AddTemplateEvent.OnClickAddButton) },
         modifier = Modifier.align(CenterHorizontally),
-        enabled = state.likeList.isNotEmpty() || state.dislikeList.isNotEmpty()
+        enabled = state.likedFoods.isNotEmpty() || state.dislikedFoods.isNotEmpty()
       ) {
         Text(text = stringResource(R.string.add_template_add_button))
       }

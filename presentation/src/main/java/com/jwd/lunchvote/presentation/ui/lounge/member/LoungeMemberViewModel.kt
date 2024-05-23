@@ -5,13 +5,13 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.core.common.error.LoungeError
 import com.jwd.lunchvote.core.common.error.UnknownError
+import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.domain.repository.MemberRepository
+import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.usecase.ExileMemberUseCase
-import com.jwd.lunchvote.domain.usecase.GetMemberByUserIdUseCase
-import com.jwd.lunchvote.domain.usecase.GetUserByIdUseCase
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
@@ -29,8 +29,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoungeMemberViewModel @Inject constructor(
-  private val getMemberByUserIdUseCase: GetMemberByUserIdUseCase,
-  private val getUserByIdUseCase: GetUserByIdUseCase,
+  private val userRepository: UserRepository,
+  private val memberRepository: MemberRepository,
   private val exileMemberUseCase: ExileMemberUseCase,
   private val savedStateHandle: SavedStateHandle,
 ) : BaseStateViewModel<LoungeMemberState, LoungeMemberEvent, LoungeMemberReduce, LoungeMemberSideEffect>(savedStateHandle) {
@@ -60,9 +60,9 @@ class LoungeMemberViewModel @Inject constructor(
 
   override fun reduceState(state: LoungeMemberState, reduce: LoungeMemberReduce, ): LoungeMemberState {
     return when (reduce) {
+      is LoungeMemberReduce.UpdateMe -> state.copy(me = reduce.me)
       is LoungeMemberReduce.UpdateMember -> state.copy(member = reduce.member)
       is LoungeMemberReduce.UpdateUser -> state.copy(user = reduce.user)
-      is LoungeMemberReduce.UpdateIsMe -> state.copy(isMe = reduce.isMe)
     }
   }
 
@@ -79,14 +79,14 @@ class LoungeMemberViewModel @Inject constructor(
     val loungeIdKey = LunchVoteNavRoute.LoungeMember.arguments.last().name
     val loungeId = checkNotNull(savedStateHandle.get<String>(loungeIdKey))
 
-    val member = getMemberByUserIdUseCase(userId, loungeId).asUI()
-    val user = getUserByIdUseCase(member.userId).asUI()
-    val authUser = Firebase.auth.currentUser ?: throw LoginError.NoUser
-    val isMe = authUser.uid == member.userId
+    val myUserId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
+    val me = memberRepository.getMemberByUserId(myUserId, loungeId).asUI()
+    val member = memberRepository.getMemberByUserId(userId, loungeId).asUI()
+    val user = userRepository.getUserById(member.userId).asUI()
 
+    updateState(LoungeMemberReduce.UpdateMe(me))
     updateState(LoungeMemberReduce.UpdateMember(member))
     updateState(LoungeMemberReduce.UpdateUser(user))
-    updateState(LoungeMemberReduce.UpdateIsMe(isMe))
   }
 
   private suspend fun exileMember() {

@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.MemberUIModel
-import com.jwd.lunchvote.presentation.model.type.MemberStatusUIType
 import com.skydoves.landscapist.coil.CoilImage
 
 @Composable
@@ -39,9 +38,9 @@ fun MemberProfile(
   modifier: Modifier = Modifier,
   onClick: (MemberUIModel) -> Unit,
 ) {
-  val borderColor = when (member.status) {
-    MemberStatusUIType.READY -> MaterialTheme.colorScheme.primary
-    MemberStatusUIType.OWNER -> MaterialTheme.colorScheme.primary
+  val borderColor = when (member.type) {
+    MemberUIModel.Type.READY -> MaterialTheme.colorScheme.primary
+    MemberUIModel.Type.OWNER -> MaterialTheme.colorScheme.primary
     else -> MaterialTheme.colorScheme.outline
   }
 
@@ -49,7 +48,7 @@ fun MemberProfile(
     modifier = modifier
       .size(48.dp)
       .let {
-        if (member.status == MemberStatusUIType.READY || member.status == MemberStatusUIType.OWNER) {
+        if (member.type == MemberUIModel.Type.READY || member.type == MemberUIModel.Type.OWNER) {
           val glowingColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
 
           it.drawBehind {
@@ -138,15 +137,11 @@ private fun Preview() {
       horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
       MemberProfile(
-        member = MemberUIModel(
-          userProfile = "",
-          status = MemberStatusUIType.JOINED
-        )
+        member = MemberUIModel()
       ) {}
       MemberProfile(
         member = MemberUIModel(
-          userProfile = "",
-          status = MemberStatusUIType.READY
+          type = MemberUIModel.Type.READY
         )
       ) {}
       EmptyProfile()

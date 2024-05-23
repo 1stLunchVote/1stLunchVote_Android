@@ -171,8 +171,8 @@ private fun TemplateListItem(
         style = MaterialTheme.typography.bodyLarge
       )
       LikeDislike(
-        like = template.like.size,
-        dislike = template.dislike.size
+        like = template.likedFoodIds.size,
+        dislike = template.likedFoodIds.size
       )
     }
     Image(
@@ -250,14 +250,14 @@ private fun Preview2() {
           TemplateUIModel(
             id = "1",
             name = "템플릿 1",
-            like = listOf("1", "2"),
-            dislike = listOf("3", "4")
+            likedFoodIds = listOf("1", "2"),
+            dislikedFoodIds = listOf("3", "4")
           ),
           TemplateUIModel(
             id = "2",
             name = "템플릿 2",
-            like = listOf("1", "2"),
-            dislike = listOf("3", "4")
+            likedFoodIds = listOf("1", "2"),
+            dislikedFoodIds = listOf("3", "4")
           )
         )
       )

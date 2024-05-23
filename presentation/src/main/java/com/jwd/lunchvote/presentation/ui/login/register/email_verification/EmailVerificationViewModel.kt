@@ -7,7 +7,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
-import com.jwd.lunchvote.domain.usecase.CheckUserExists
+import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.usecase.SetEmailUseCase
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.ui.login.register.email_verification.EmailVerificationContract.EmailVerificationEvent
@@ -20,7 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EmailVerificationViewModel @Inject constructor(
-  private val checkUserExists: CheckUserExists,
+  private val userRepository: UserRepository,
   private val setEmailUseCase: SetEmailUseCase,
   savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<EmailVerificationState, EmailVerificationEvent, EmailVerificationReduce, EmailVerificationSideEffect>(savedStateHandle) {
@@ -58,7 +58,7 @@ class EmailVerificationViewModel @Inject constructor(
   }
 
   private suspend fun checkEmail() {
-    val exists = checkUserExists(currentState.email)
+    val exists = userRepository.checkUserExists(currentState.email)
     if (exists) sendSideEffect(EmailVerificationSideEffect.ShowSnackBar(UiText.StringResource(R.string.email_verification_user_collision_error_snackbar)))
     else sendEmail()
   }

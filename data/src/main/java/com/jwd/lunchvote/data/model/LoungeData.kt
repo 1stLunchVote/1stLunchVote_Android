@@ -1,9 +1,12 @@
 package com.jwd.lunchvote.data.model
 
-import com.jwd.lunchvote.data.model.type.LoungeStatusDataType
-
 data class LoungeData(
   val id: String,
-  val status: LoungeStatusDataType,
-  val members: List<MemberData>
-)
+  val status: Status,
+  val members: Int
+) {
+
+  enum class Status {
+    CREATED, QUIT, STARTED, FINISHED
+  }
+}

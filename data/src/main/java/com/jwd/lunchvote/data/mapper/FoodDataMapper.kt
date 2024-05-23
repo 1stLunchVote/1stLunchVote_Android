@@ -4,28 +4,26 @@ import com.jwd.lunchvote.core.common.mapper.BiMapper
 import com.jwd.lunchvote.data.model.FoodData
 import com.jwd.lunchvote.domain.entity.Food
 
-object FoodDataMapper: BiMapper<FoodData, Food> {
-  override fun mapToRight(from: FoodData): Food {
-    return Food(
+private object FoodDataMapper: BiMapper<FoodData, Food> {
+  override fun mapToRight(from: FoodData): Food =
+    Food(
       id = from.id,
-      imageUrl = from.imageUrl,
-      name = from.name
+      name = from.name,
+      image = from.image
     )
-  }
 
-  override fun mapToLeft(from: Food): FoodData {
-    return FoodData(
+  override fun mapToLeft(from: Food): FoodData =
+    FoodData(
       id = from.id,
-      imageUrl = from.imageUrl,
-      name = from.name
+      name = from.name,
+      image = from.image
     )
-  }
-}
-
-internal fun Food.asData(): FoodData {
-  return FoodDataMapper.mapToLeft(this)
 }
 
 internal fun FoodData.asDomain(): Food {
   return FoodDataMapper.mapToRight(this)
+}
+
+internal fun Food.asData(): FoodData {
+  return FoodDataMapper.mapToLeft(this)
 }

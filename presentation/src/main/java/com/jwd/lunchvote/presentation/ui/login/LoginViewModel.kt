@@ -6,9 +6,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuthException
 import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.core.common.error.UnknownError
+import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
-import com.jwd.lunchvote.domain.usecase.CheckUserExists
-import com.jwd.lunchvote.domain.usecase.CreateUserUseCase
+import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.usecase.SignInWithEmailAndPassword
 import com.jwd.lunchvote.domain.usecase.SignInWithGoogleIdToken
 import com.jwd.lunchvote.domain.usecase.SignInWithKakaoIdToken
@@ -27,12 +27,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-  savedStateHandle: SavedStateHandle,
+  private val userRepository: UserRepository,
   private val signInWithEmailAndPassword: SignInWithEmailAndPassword,
-  private val checkUserExists: CheckUserExists,
   private val signInWithKakaoIdToken: SignInWithKakaoIdToken,
   private val signInWithGoogleIdToken: SignInWithGoogleIdToken,
-  private val createUserUseCase: CreateUserUseCase
+  savedStateHandle: SavedStateHandle,
 ) : BaseStateViewModel<LoginState, LoginEvent, LoginReduce, LoginSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): LoginState {
     return savedState as? LoginState ?: LoginState()
@@ -79,15 +78,15 @@ class LoginViewModel @Inject constructor(
 
   private suspend fun googleLogin(account: GoogleSignInAccount) {
     val userId = signInWithGoogleIdToken(account.idToken!!)
-    val exists = checkUserExists(account.email ?: throw LoginError.NoEmail)
+    val exists = userRepository.checkUserExists(account.email ?: throw LoginError.NoEmail)
     if (exists.not()) {
       val user = UserUIModel(
         id = userId,
         email = account.email ?: "",
         name = account.givenName ?: "",
-        profileImageUrl = account.photoUrl?.toString() ?: ""
+        profileImage = account.photoUrl?.toString() ?: ""
       )
-      createUserUseCase(user.asDomain())
+      userRepository.createUser(user.asDomain())
     }
     loginSuccess()
   }
@@ -99,19 +98,19 @@ class LoginViewModel @Inject constructor(
       launch {
         when {
           error != null -> throw error
-          user == null -> throw LoginError.NoUser
+          user == null -> throw UserError.NoUser
           oAuthToken.idToken == null -> throw LoginError.TokenFailed
           else -> {
             val userId = signInWithKakaoIdToken(oAuthToken.idToken!!)
-            val exists = checkUserExists(user.kakaoAccount?.email ?: throw LoginError.NoEmail)
+            val exists = userRepository.checkUserExists(user.kakaoAccount?.email ?: throw LoginError.NoEmail)
             if (exists.not()) {
               val newUser = UserUIModel(
                 id = userId,
                 email = user.kakaoAccount?.email ?: "",
                 name = user.kakaoAccount?.profile?.nickname ?: "",
-                profileImageUrl = user.kakaoAccount?.profile?.thumbnailImageUrl ?: ""
+                profileImage = user.kakaoAccount?.profile?.thumbnailImageUrl ?: ""
               )
-              createUserUseCase(newUser.asDomain())
+              userRepository.createUser(newUser.asDomain())
             }
             loginSuccess()
           }

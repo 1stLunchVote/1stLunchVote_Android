@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -49,11 +49,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
-import com.jwd.lunchvote.presentation.model.LoungeChatUIModel
+import com.jwd.lunchvote.presentation.model.ChatUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.UserUIModel
-import com.jwd.lunchvote.presentation.model.type.MemberStatusUIType
-import com.jwd.lunchvote.presentation.model.type.MessageUIType
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeEvent
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeSideEffect
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeState
@@ -104,7 +102,7 @@ fun LoungeRoute(
   BackHandler { viewModel.sendEvent(LoungeEvent.OnClickBackButton) }
 
   val isOwner =
-    state.user.id == state.memberList.find { it.status == MemberStatusUIType.OWNER }?.userId
+    state.user.id == state.memberList.find { it.type == MemberUIModel.Type.OWNER }?.userId
   when (dialog) {
     LoungeContract.VOTE_EXIT_DIALOG -> VoteExitDialog(
       isOwner = isOwner,
@@ -145,7 +143,7 @@ private fun LoungeScreen(
       onClickInviteButton = { onEvent(LoungeEvent.OnClickInviteButton) },
       modifier = Modifier.fillMaxWidth()
     )
-    LoungeChatList(
+    ChatList(
       userId = state.user.id,
       chatList = state.chatList,
       memberList = state.memberList,
@@ -156,11 +154,11 @@ private fun LoungeScreen(
     )
     LoungeBottomBar(
       text = state.text,
-      isOwner = state.user.id == state.memberList.find { it.status == MemberStatusUIType.OWNER }?.userId,
+      isOwner = state.user.id == state.memberList.find { it.type == MemberUIModel.Type.OWNER }?.userId,
       modifier = Modifier.fillMaxWidth(),
       onTextChange = { onEvent(LoungeEvent.OnTextChange(it)) },
       onClickSendChatButton = { onEvent(LoungeEvent.OnClickSendChatButton) },
-      onClickReadyButton = { onEvent(LoungeEvent.OnClickReadyButton) }
+      onClickActionButton = { onEvent(LoungeEvent.OnClickActionButton) }
     )
   }
 }
@@ -173,7 +171,7 @@ private fun MemberRow(
   modifier: Modifier = Modifier
 ) {
   Row(
-    modifier = modifier.padding(horizontal = 32.dp, vertical = 16.dp),
+    modifier = modifier.padding(start = 32.dp, top = 16.dp, end = 32.dp, bottom = 8.dp),
     horizontalArrangement = Arrangement.SpaceBetween
   ) {
     memberList.forEach { member ->
@@ -194,9 +192,9 @@ private fun MemberRow(
 }
 
 @Composable
-private fun LoungeChatList(
+private fun ChatList(
   userId: String,
-  chatList: List<LoungeChatUIModel>,
+  chatList: List<ChatUIModel>,
   memberList: List<MemberUIModel>,
   modifier: Modifier = Modifier,
   onClickMember: (MemberUIModel) -> Unit
@@ -206,14 +204,21 @@ private fun LoungeChatList(
   LazyColumn(
     modifier = modifier.padding(24.dp),
     state = lazyListState,
-    verticalArrangement = Arrangement.spacedBy(16.dp),
+    verticalArrangement = Arrangement.Top,
     reverseLayout = true
   ) {
-    items(chatList) { chat ->
+    itemsIndexed(chatList) { index, chat ->
+      val isSameUserWithPrevious = index < chatList.size - 1
+        && chatList[index + 1].type != ChatUIModel.Type.SYSTEM
+        && chat.userId == chatList[index + 1].userId
+
       ChatBubble(
         chat = chat,
         member = memberList.find { it.userId == chat.userId } ?: MemberUIModel(),
         isMine = chat.userId == userId,
+        modifier = Modifier.padding(top = if (isSameUserWithPrevious) 4.dp else 16.dp),
+        previousChat = chatList.getOrNull(index + 1),
+        nextChat = chatList.getOrNull(index - 1),
         onClickMember = onClickMember
       )
     }
@@ -227,7 +232,7 @@ private fun LoungeBottomBar(
   modifier: Modifier = Modifier,
   onTextChange: (String) -> Unit,
   onClickSendChatButton: () -> Unit,
-  onClickReadyButton: () -> Unit,
+  onClickActionButton: () -> Unit,
 ) {
   Column(
     modifier = modifier
@@ -241,7 +246,7 @@ private fun LoungeBottomBar(
       verticalAlignment = Alignment.Top
     ) {
       OutlinedButton(
-        onClick = onClickReadyButton,
+        onClick = onClickActionButton,
         modifier = Modifier.height(48.dp),
         border = BorderStroke(2.dp, MaterialTheme.colorScheme.onBackground),
         contentPadding = PaddingValues(horizontal = 16.dp)
@@ -335,18 +340,50 @@ private fun Preview() {
       LoungeState(
         user = UserUIModel(id = "1"),
         memberList = listOf(
-          MemberUIModel(userId = "1", status = MemberStatusUIType.OWNER),
-          MemberUIModel(userId = "2", status = MemberStatusUIType.READY),
+          MemberUIModel(userId = "1", type = MemberUIModel.Type.OWNER),
+          MemberUIModel(userId = "2", type = MemberUIModel.Type.READY),
           MemberUIModel(userId = "3")
         ),
         chatList = listOf(
-          LoungeChatUIModel(messageType = MessageUIType.EXIT, userId = "3", userName = "김영희"),
-          LoungeChatUIModel(message = "안녕하세요", userId = "3", userName = "김영희"),
-          LoungeChatUIModel(messageType = MessageUIType.JOIN, userId = "3", userName = "김영희"),
-          LoungeChatUIModel(message = "안녕하세요", userId = "2", userName = "김철수"),
-          LoungeChatUIModel(message = "안녕하세요", userId = "1"),
-          LoungeChatUIModel(messageType = MessageUIType.JOIN, userId = "2", userName = "김철수"),
-          LoungeChatUIModel(messageType = MessageUIType.CREATE)
+          ChatUIModel(
+            message = "김영희님이 추방되었습니다.",
+            type = ChatUIModel.Type.SYSTEM
+          ),
+          ChatUIModel(
+            message = "안녕하세요",
+            userId = "3",
+            userName = "김영희"
+          ),
+          ChatUIModel(
+            message = "김영희님이 입장하였습니다.",
+            type = ChatUIModel.Type.SYSTEM,
+          ),
+          ChatUIModel(
+            message = "안녕하세요",
+            userId = "2",
+            userName = "김철수"
+          ),
+          ChatUIModel(
+            message = "안녕하세요",
+            userId = "2",
+            userName = "김철수"
+          ),
+          ChatUIModel(
+            message = "안녕하세요",
+            userId = "1"
+          ),
+          ChatUIModel(
+            message = "안녕하세요",
+            userId = "1"
+          ),
+          ChatUIModel(
+            message = "김철수님이 입장하였습니다.",
+            type = ChatUIModel.Type.SYSTEM
+          ),
+          ChatUIModel(
+            message = "투표 방이 생성되었습니다.",
+            type = ChatUIModel.Type.SYSTEM
+          )
         )
       )
     )

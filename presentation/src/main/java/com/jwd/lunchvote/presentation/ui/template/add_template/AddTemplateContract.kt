@@ -2,8 +2,8 @@ package com.jwd.lunchvote.presentation.ui.template.add_template
 
 import android.os.Parcelable
 import com.jwd.lunchvote.core.ui.base.ViewModelContract
+import com.jwd.lunchvote.presentation.model.FoodStatus
 import com.jwd.lunchvote.presentation.model.FoodUIModel
-import com.jwd.lunchvote.presentation.model.type.FoodStatus
 import com.jwd.lunchvote.presentation.util.UiText
 import kotlinx.parcelize.Parcelize
 
@@ -12,8 +12,8 @@ class AddTemplateContract {
   data class AddTemplateState(
     val name: String = "",
     val foodMap: Map<FoodUIModel, FoodStatus> = emptyMap(),
-    val likeList: List<FoodUIModel> = emptyList(),
-    val dislikeList: List<FoodUIModel> = emptyList(),
+    val likedFoods: List<FoodUIModel> = emptyList(),
+    val dislikedFoods: List<FoodUIModel> = emptyList(),
     val searchKeyword: String = "",
   ) : ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this

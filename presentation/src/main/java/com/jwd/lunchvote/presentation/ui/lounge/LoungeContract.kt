@@ -2,7 +2,7 @@ package com.jwd.lunchvote.presentation.ui.lounge
 
 import android.os.Parcelable
 import com.jwd.lunchvote.core.ui.base.ViewModelContract
-import com.jwd.lunchvote.presentation.model.LoungeChatUIModel
+import com.jwd.lunchvote.presentation.model.ChatUIModel
 import com.jwd.lunchvote.presentation.model.LoungeUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.UserUIModel
@@ -15,9 +15,8 @@ class LoungeContract {
     val user: UserUIModel = UserUIModel(),
     val lounge: LoungeUIModel = LoungeUIModel(),
     val memberList: List<MemberUIModel> = emptyList(),
-    val chatList: List<LoungeChatUIModel> = emptyList(),
-    val text: String = "",
-    val scrollIndex: Int = 0
+    val chatList: List<ChatUIModel> = emptyList(),
+    val text: String = ""
   ) : ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this
   }
@@ -28,8 +27,7 @@ class LoungeContract {
     data object OnClickInviteButton : LoungeEvent
     data class OnTextChange(val text: String) : LoungeEvent
     data object OnClickSendChatButton : LoungeEvent
-    data object OnClickReadyButton : LoungeEvent
-    data class OnScrolled(val index: Int) : LoungeEvent
+    data object OnClickActionButton : LoungeEvent
 
     // DialogEvents
     data object OnClickCancelButtonVoteExitDialog : LoungeEvent
@@ -40,9 +38,8 @@ class LoungeContract {
     data class UpdateUser(val user: UserUIModel) : LoungeReduce
     data class UpdateLounge(val lounge: LoungeUIModel) : LoungeReduce
     data class UpdateMemberList(val memberList: List<MemberUIModel>) : LoungeReduce
-    data class UpdateChatList(val chatList: List<LoungeChatUIModel>) : LoungeReduce
+    data class UpdateChatList(val chatList: List<ChatUIModel>) : LoungeReduce
     data class UpdateText(val text: String) : LoungeReduce
-    data class UpdateScrollIndex(val index: Int) : LoungeReduce
   }
 
   sealed interface LoungeSideEffect : ViewModelContract.SideEffect {

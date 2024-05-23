@@ -3,7 +3,6 @@ package com.jwd.lunchvote.local.room.entity
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.jwd.lunchvote.data.model.type.MemberStatusDataType
 
 @Entity(
   tableName = "MemberTable",
@@ -18,10 +17,16 @@ import com.jwd.lunchvote.data.model.type.MemberStatusDataType
 )
 
 data class MemberEntity(
+  val loungeId: String,
   @PrimaryKey val userId: String,
   val userName: String,
   val userProfile: String,
-  val loungeId: String,
-  val status: MemberStatusDataType,
-  val joinedAt: String
-)
+  val type: Type,
+  val createdAt: Long,
+  val deletedAt: Long?
+) {
+
+  enum class Type {
+    DEFAULT, OWNER, READY, EXILED
+  }
+}

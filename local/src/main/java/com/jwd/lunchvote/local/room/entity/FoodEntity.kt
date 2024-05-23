@@ -9,6 +9,6 @@ import androidx.room.Entity
 
 data class FoodEntity(
   val id: Long,
-  val imageUrl: String,
+  val image: String,
   val name: String,
 )

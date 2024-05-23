@@ -5,7 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
-import com.jwd.lunchvote.domain.usecase.CreateUserUseCase
+import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.usecase.CreateUserWithEmailAndPassword
 import com.jwd.lunchvote.domain.usecase.SignInWithEmailAndPassword
 import com.jwd.lunchvote.presentation.R
@@ -22,9 +22,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NicknameViewModel @Inject constructor(
+  private val userRepository: UserRepository,
   private val createUserWithEmailAndPassword: CreateUserWithEmailAndPassword,
   private val signInWithEmailAndPassword: SignInWithEmailAndPassword,
-  private val createUserUseCase: CreateUserUseCase,
   private val savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<NicknameState, NicknameEvent, NicknameReduce, NicknameSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): NicknameState {
@@ -64,7 +64,7 @@ class NicknameViewModel @Inject constructor(
       email = email,
       name = nickname
     )
-    createUserUseCase(user.asDomain())
+    userRepository.createUser(user.asDomain())
 
     sendSideEffect(NicknameSideEffect.ShowSnackBar(UiText.StringResource(R.string.nickname_success_snackbar)))
     sendSideEffect(NicknameSideEffect.NavigateToHome)

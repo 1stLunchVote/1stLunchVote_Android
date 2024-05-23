@@ -4,32 +4,30 @@ import com.jwd.lunchvote.core.common.mapper.BiMapper
 import com.jwd.lunchvote.data.model.UserData
 import com.jwd.lunchvote.domain.entity.User
 
-object UserDataMapper: BiMapper<UserData, User> {
-  override fun mapToRight(from: UserData): User {
-    return User(
+private object UserDataMapper: BiMapper<UserData, User> {
+  override fun mapToRight(from: UserData): User =
+    User(
       id = from.id,
       email = from.email,
       name = from.name,
-      profileImageUrl = from.profileImageUrl,
-      createdAt = from.createdAt
+      profileImage = from.profileImage,
+      createdAt = from.createdAt,
+      deletedAt = from.deletedAt
     )
-  }
 
-  override fun mapToLeft(from: User): UserData {
-    return UserData(
+  override fun mapToLeft(from: User): UserData =
+    UserData(
       id = from.id,
       email = from.email,
       name = from.name,
-      profileImageUrl = from.profileImageUrl,
-      createdAt = from.createdAt
+      profileImage = from.profileImage,
+      createdAt = from.createdAt,
+      deletedAt = from.deletedAt
     )
-  }
 }
 
-internal fun User.asData(): UserData {
-  return UserDataMapper.mapToLeft(this)
-}
+internal fun UserData.asDomain(): User =
+  UserDataMapper.mapToRight(this)
 
-internal fun UserData.asDomain(): User {
-  return UserDataMapper.mapToRight(this)
-}
+internal fun User.asData(): UserData =
+  UserDataMapper.mapToLeft(this)
