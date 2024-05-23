@@ -3,8 +3,8 @@ package com.jwd.lunchvote.presentation.mapper
 import com.jwd.lunchvote.core.common.mapper.BiMapper
 import com.jwd.lunchvote.domain.entity.Template
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
-import com.jwd.lunchvote.presentation.util.toZonedDateTime
 import com.jwd.lunchvote.presentation.util.toLong
+import com.jwd.lunchvote.presentation.util.toZonedDateTime
 
 private object TemplateUIMapper: BiMapper<TemplateUIModel, Template> {
   override fun mapToRight(from: TemplateUIModel): Template =
