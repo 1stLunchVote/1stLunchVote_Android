@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,8 +32,25 @@ fun ChatBubble(
   member: MemberUIModel,
   isMine: Boolean,
   modifier: Modifier = Modifier,
+  previousChat: ChatUIModel? = null,
+  nextChat: ChatUIModel? = null,
   onClickMember: (MemberUIModel) -> Unit = {}
 ) {
+  val isSameUserWithPrevious = previousChat != null
+    && previousChat.type != ChatUIModel.Type.SYSTEM
+    && chat.userId == previousChat.userId
+  val isSameTimeWithNext = nextChat != null
+    && nextChat.type != ChatUIModel.Type.SYSTEM
+    && chat.userId == nextChat.userId
+    && chat.createdAt.year == nextChat.createdAt.year
+    && chat.createdAt.month == nextChat.createdAt.month
+    && chat.createdAt.dayOfMonth == nextChat.createdAt.dayOfMonth
+    && chat.createdAt.hour == nextChat.createdAt.hour
+    && chat.createdAt.minute == nextChat.createdAt.minute
+
+  val timeFormatter = DateTimeFormatter.ofPattern("a hh:mm", Locale.KOREA)
+  val round = 20.dp
+
   when (chat.type) {
     ChatUIModel.Type.DEFAULT -> Row(
       modifier = modifier.fillMaxWidth(),
@@ -43,20 +61,21 @@ fun ChatBubble(
           horizontalArrangement = Arrangement.spacedBy(4.dp),
           verticalAlignment = Alignment.Bottom
         ) {
+          val messageShape = if (isSameUserWithPrevious) RoundedCornerShape(round, round, round, round)
+          else RoundedCornerShape(round, 0.dp, round, round)
+
           Text(
-            text = chat.createdAt.format(DateTimeFormatter.ofPattern("a hh:mm", Locale.KOREA)),
-            modifier = Modifier.padding(bottom = 4.dp),
+            text = chat.createdAt.format(timeFormatter),
+            modifier = Modifier
+              .padding(bottom = 4.dp)
+              .alpha(if (isSameTimeWithNext) 0f else 1f),
             color = MaterialTheme.colorScheme.outline,
             style = MaterialTheme.typography.labelMedium
           )
           Box(
             modifier = Modifier
-              .clip(RoundedCornerShape(20.dp, 0.dp, 20.dp, 20.dp))
-              .border(
-                2.dp,
-                MaterialTheme.colorScheme.onBackground,
-                RoundedCornerShape(20.dp, 0.dp, 20.dp, 20.dp)
-              ),
+              .clip(messageShape)
+              .border(2.dp, MaterialTheme.colorScheme.onBackground, messageShape),
             contentAlignment = Alignment.Center
           ) {
             Text(
@@ -69,33 +88,37 @@ fun ChatBubble(
       } else {
         MemberProfile(
           member = member,
+          modifier = Modifier.alpha(if (isSameUserWithPrevious) 0f else 1f),
           onClick = onClickMember
         )
         Column(
           verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-          Text(
-            text = chat.userName,
-            style = MaterialTheme.typography.titleSmall
-          )
+          if (isSameUserWithPrevious.not()) {
+            Text(
+              text = chat.userName,
+              style = MaterialTheme.typography.titleSmall
+            )
+          }
           ReversedRow(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.Bottom
           ) {
+            val messageShape = if (isSameUserWithPrevious) RoundedCornerShape(round, round, round, round)
+            else RoundedCornerShape(0.dp, round, round, round)
+
             Text(
-              text = chat.createdAt.format(DateTimeFormatter.ofPattern("a hh:mm", Locale.KOREA)),
-              modifier = Modifier.padding(bottom = 4.dp),
+              text = chat.createdAt.format(timeFormatter),
+              modifier = Modifier
+                .padding(bottom = 4.dp)
+                .alpha(if (isSameTimeWithNext) 0f else 1f),
               color = MaterialTheme.colorScheme.outline,
               style = MaterialTheme.typography.labelMedium
             )
             Box(
               modifier = Modifier
-                .clip(RoundedCornerShape(0.dp, 20.dp, 20.dp, 20.dp))
-                .border(
-                  2.dp,
-                  MaterialTheme.colorScheme.onBackground,
-                  RoundedCornerShape(0.dp, 20.dp, 20.dp, 20.dp)
-                ),
+                .clip(messageShape)
+                .border(2.dp, MaterialTheme.colorScheme.onBackground, messageShape),
               contentAlignment = Alignment.Center
             ) {
               Text(

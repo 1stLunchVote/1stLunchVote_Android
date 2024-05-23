@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -171,7 +171,7 @@ private fun MemberRow(
   modifier: Modifier = Modifier
 ) {
   Row(
-    modifier = modifier.padding(horizontal = 32.dp, vertical = 16.dp),
+    modifier = modifier.padding(start = 32.dp, top = 16.dp, end = 32.dp, bottom = 8.dp),
     horizontalArrangement = Arrangement.SpaceBetween
   ) {
     memberList.forEach { member ->
@@ -204,14 +204,21 @@ private fun ChatList(
   LazyColumn(
     modifier = modifier.padding(24.dp),
     state = lazyListState,
-    verticalArrangement = Arrangement.spacedBy(16.dp),
+    verticalArrangement = Arrangement.Top,
     reverseLayout = true
   ) {
-    items(chatList) { chat ->
+    itemsIndexed(chatList) { index, chat ->
+      val isSameUserWithPrevious = index < chatList.size - 1
+        && chatList[index + 1].type != ChatUIModel.Type.SYSTEM
+        && chat.userId == chatList[index + 1].userId
+
       ChatBubble(
         chat = chat,
         member = memberList.find { it.userId == chat.userId } ?: MemberUIModel(),
         isMine = chat.userId == userId,
+        modifier = Modifier.padding(top = if (isSameUserWithPrevious) 4.dp else 16.dp),
+        previousChat = chatList.getOrNull(index + 1),
+        nextChat = chatList.getOrNull(index - 1),
         onClickMember = onClickMember
       )
     }
@@ -355,6 +362,15 @@ private fun Preview() {
             message = "안녕하세요",
             userId = "2",
             userName = "김철수"
+          ),
+          ChatUIModel(
+            message = "안녕하세요",
+            userId = "2",
+            userName = "김철수"
+          ),
+          ChatUIModel(
+            message = "안녕하세요",
+            userId = "1"
           ),
           ChatUIModel(
             message = "안녕하세요",
