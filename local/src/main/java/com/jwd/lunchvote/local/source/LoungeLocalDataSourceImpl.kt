@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -84,7 +85,7 @@ class LoungeLocalDataSourceImpl @Inject constructor(
             userProfile = user.photoUrl.toString(),
             message = content,
             type = ChatEntity.Type.SYSTEM,
-            createdAt = ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond()
+            createdAt = Instant.now().epochSecond
           )
         )
       }

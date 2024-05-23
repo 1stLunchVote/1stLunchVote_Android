@@ -61,6 +61,7 @@ class MemberDataSourceImpl @Inject constructor(
       .map {
         it.mapNotNull { (key, value) -> value?.asData(key) }
           .filter { member -> member.type != MemberData.Type.EXILED }
+          .sortedBy { member -> member.createdAt }
       }
       .flowOn(dispatcher)
 

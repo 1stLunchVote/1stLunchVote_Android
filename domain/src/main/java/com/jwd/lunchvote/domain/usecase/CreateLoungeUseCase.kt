@@ -6,6 +6,7 @@ import com.jwd.lunchvote.domain.entity.User
 import com.jwd.lunchvote.domain.repository.ChatRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -29,7 +30,7 @@ class CreateLoungeUseCase @Inject constructor(
       userName = user.name,
       userProfile = user.profileImage,
       type = Member.Type.OWNER,
-      createdAt = ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond(),
+      createdAt = Instant.now().epochSecond,
       deletedAt = null
     )
     memberRepository.createMember(member)
@@ -42,7 +43,7 @@ class CreateLoungeUseCase @Inject constructor(
       userProfile = user.profileImage,
       message = "투표 방이 생성되었습니다.",
       type = Chat.Type.SYSTEM,
-      createdAt = ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond()
+      createdAt = Instant.now().epochSecond
     )
     chatRepository.sendChat(chat)
 

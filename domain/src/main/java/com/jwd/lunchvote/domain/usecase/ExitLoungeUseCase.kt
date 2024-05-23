@@ -5,6 +5,7 @@ import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.repository.ChatRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -32,7 +33,7 @@ class ExitLoungeUseCase @Inject constructor(
       userProfile = member.userProfile,
       message = "${member.userName}님이 퇴장하였습니다.",
       type = Chat.Type.SYSTEM,
-      createdAt = ZonedDateTime.now(ZoneId.of("UTC")).toEpochSecond()
+      createdAt = Instant.now().epochSecond
     )
     chatRepository.sendChat(chat)
   }
