@@ -22,6 +22,8 @@ import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.core.ui.theme.colorNeutral90
 import com.jwd.lunchvote.presentation.model.ChatUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 fun ChatBubble(
@@ -37,21 +39,32 @@ fun ChatBubble(
       horizontalArrangement = if (isMine) Arrangement.End else Arrangement.spacedBy(8.dp, alignment = Alignment.Start),
     ) {
       if (isMine) {
-        Box(
-          modifier = Modifier
-            .clip(RoundedCornerShape(20.dp, 0.dp, 20.dp, 20.dp))
-            .border(
-              2.dp,
-              MaterialTheme.colorScheme.onBackground,
-              RoundedCornerShape(20.dp, 0.dp, 20.dp, 20.dp)
-            ),
-          contentAlignment = Alignment.Center
+        Row(
+          horizontalArrangement = Arrangement.spacedBy(4.dp),
+          verticalAlignment = Alignment.Bottom
         ) {
           Text(
-            text = chat.message,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp)
+            text = chat.createdAt.format(DateTimeFormatter.ofPattern("a hh:mm", Locale.KOREA)),
+            modifier = Modifier.padding(bottom = 4.dp),
+            color = MaterialTheme.colorScheme.outline,
+            style = MaterialTheme.typography.labelMedium
           )
+          Box(
+            modifier = Modifier
+              .clip(RoundedCornerShape(20.dp, 0.dp, 20.dp, 20.dp))
+              .border(
+                2.dp,
+                MaterialTheme.colorScheme.onBackground,
+                RoundedCornerShape(20.dp, 0.dp, 20.dp, 20.dp)
+              ),
+            contentAlignment = Alignment.Center
+          ) {
+            Text(
+              text = chat.message,
+              style = MaterialTheme.typography.titleMedium,
+              modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp)
+            )
+          }
         }
       } else {
         MemberProfile(
@@ -65,21 +78,32 @@ fun ChatBubble(
             text = chat.userName,
             style = MaterialTheme.typography.titleSmall
           )
-          Box(
-            modifier = Modifier
-              .clip(RoundedCornerShape(0.dp, 20.dp, 20.dp, 20.dp))
-              .border(
-                2.dp,
-                MaterialTheme.colorScheme.onBackground,
-                RoundedCornerShape(0.dp, 20.dp, 20.dp, 20.dp)
-              ),
-            contentAlignment = Alignment.Center
+          ReversedRow(
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.Bottom
           ) {
             Text(
-              text = chat.message,
-              style = MaterialTheme.typography.titleMedium,
-              modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp)
+              text = chat.createdAt.format(DateTimeFormatter.ofPattern("a hh:mm", Locale.KOREA)),
+              modifier = Modifier.padding(bottom = 4.dp),
+              color = MaterialTheme.colorScheme.outline,
+              style = MaterialTheme.typography.labelMedium
             )
+            Box(
+              modifier = Modifier
+                .clip(RoundedCornerShape(0.dp, 20.dp, 20.dp, 20.dp))
+                .border(
+                  2.dp,
+                  MaterialTheme.colorScheme.onBackground,
+                  RoundedCornerShape(0.dp, 20.dp, 20.dp, 20.dp)
+                ),
+              contentAlignment = Alignment.Center
+            ) {
+              Text(
+                text = chat.message,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp)
+              )
+            }
           }
         }
       }
@@ -145,13 +169,32 @@ private fun ChatBubblePreview() {
       ChatBubble(
         chat = ChatUIModel(
           userName = "김철수",
+          message = "안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요",
+          type = ChatUIModel.Type.DEFAULT
+        ),
+        member = MemberUIModel(
+          type = MemberUIModel.Type.OWNER
+        ),
+        isMine = false
+      )
+      ChatBubble(
+        chat = ChatUIModel(
+          userName = "김철수",
           message = "안녕하세요",
           type = ChatUIModel.Type.DEFAULT
         ),
         member = MemberUIModel(),
         isMine = true
       )
-
+      ChatBubble(
+        chat = ChatUIModel(
+          userName = "김철수",
+          message = "안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요",
+          type = ChatUIModel.Type.DEFAULT
+        ),
+        member = MemberUIModel(),
+        isMine = true
+      )
       ChatBubble(
         chat = ChatUIModel(
           userName = "김철수",
