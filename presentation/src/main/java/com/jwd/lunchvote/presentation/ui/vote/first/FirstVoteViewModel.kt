@@ -35,11 +35,11 @@ class FirstVoteViewModel @Inject constructor(
 
   override fun handleEvents(event: FirstVoteEvent) {
     when(event) {
+      is FirstVoteEvent.OnClickBackButton -> sendSideEffect(FirstVoteSideEffect.PopBackStack)
       is FirstVoteEvent.StartInitialize -> viewModelScope.launch { initialize(event.loungeId) }
       is FirstVoteEvent.OnClickFood -> updateState(FirstVoteReduce.UpdateFoodStatus(event.food))
       is FirstVoteEvent.SetSearchKeyword -> updateState(FirstVoteReduce.UpdateSearchKeyword(event.searchKeyword))
       is FirstVoteEvent.OnClickFinishButton -> launch(false) { throw NotImplementedError() }
-      is FirstVoteEvent.OnClickExitButton -> launch(false) { throw NotImplementedError() }
     }
   }
 

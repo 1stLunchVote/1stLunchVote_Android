@@ -36,23 +36,25 @@ import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.ProgressTopBar
+import com.jwd.lunchvote.presentation.widget.Screen
+import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.StepProgress
 import com.jwd.lunchvote.presentation.widget.TextFieldType
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun FirstVoteRoute(
+  popBackStack: () -> Unit,
   navigateToSecondVote: () -> Unit,
   openTemplateDialog: () -> Unit,
   openVoteExitDialog: () -> Unit,
-  popBackStack: () -> Unit,
   showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: FirstVoteViewModel = hiltViewModel(),
   context: Context = LocalContext.current
 ) {
-  val firstVoteState by viewModel.viewState.collectAsStateWithLifecycle()
-  val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+  val state by viewModel.viewState.collectAsStateWithLifecycle()
+  val loading by viewModel.isLoading.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
@@ -66,112 +68,34 @@ fun FirstVoteRoute(
     }
   }
 
-  BackHandler {
-    viewModel.sendEvent(FirstVoteEvent.OnClickExitButton)
-  }
+  BackHandler { viewModel.sendEvent(FirstVoteEvent.OnClickBackButton) }
 
-  if (isLoading) LoadingScreen()
+  if (loading) LoadingScreen()
   else FirstVoteScreen(
-    firstVoteState = firstVoteState,
+    state = state,
     modifier = modifier,
-    onClickFood = { food -> viewModel.sendEvent(FirstVoteEvent.OnClickFood(food)) },
-    setSearchKeyword = { search -> viewModel.sendEvent(FirstVoteEvent.SetSearchKeyword(search)) },
-    navigateToSecondVote = navigateToSecondVote
+    onEvent = viewModel::sendEvent
   )
 }
 
 @Composable
-fun FirstVoteScreen(
-  firstVoteState: FirstVoteState,
+private fun FirstVoteScreen(
+  state: FirstVoteState,
   modifier: Modifier = Modifier,
-  onClickFood: (FoodUIModel) -> Unit = {},
-  setSearchKeyword: (String) -> Unit = {},
-  navigateToSecondVote: () -> Unit = {},
+  onEvent: (FirstVoteEvent) -> Unit = {}
 ) {
-  Column(
-    modifier = modifier.fillMaxWidth(),
-    horizontalAlignment = Alignment.CenterHorizontally
+  Screen(
+    modifier = modifier
   ) {
-    ProgressTopBar(
-      title = stringResource(R.string.first_vote_title),
-      onProgressComplete = { navigateToSecondVote() }
-    )
-    Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(top = 16.dp, start = 24.dp, end = 24.dp, bottom = 8.dp),
-      horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.CenterVertically
-    ) {
-      LikeDislike(firstVoteState.likeList.size, firstVoteState.dislikeList.size)
-      Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-      ) {
-        for (i in 1..firstVoteState.totalMember) {
-          StepProgress(i <= firstVoteState.endedMember)
-        }
-      }
-    }
-    LunchVoteTextField(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 24.dp),
-      text = firstVoteState.searchKeyword,
-      hintText = stringResource(R.string.first_vote_hint_text),
-      onTextChange = setSearchKeyword,
-      textFieldType = TextFieldType.Search
-    )
-    LazyVerticalGrid(
-      columns = GridCells.Fixed(3),
-      modifier = Modifier
-        .fillMaxWidth()
-        .weight(1f)
-        .padding(top = 24.dp, start = 24.dp, end = 24.dp, bottom = 16.dp),
-      verticalArrangement = Arrangement.spacedBy(8.dp),
-      horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-      items(firstVoteState.foodMap.keys.filter { it.name.contains(firstVoteState.searchKeyword) }) {food ->
-        FoodItem(food, firstVoteState.foodMap[food]!!) { onClickFood(food) }
-      }
-    }
-    Button(
-      onClick = navigateToSecondVote,
-      modifier = Modifier.padding(bottom = 24.dp),
-      enabled = firstVoteState.likeList.isNotEmpty() && firstVoteState.dislikeList.isNotEmpty()
-    ) {
-      Text("투표 완료")
-    }
+
   }
 }
 
-@Preview(showSystemUi = true, showBackground = true)
 @Composable
-fun FirstVoteScreenPreview() {
-  LunchVoteTheme {
-    Surface {
-      FirstVoteScreen(
-        FirstVoteState(
-          foodMap = mapOf(
-            FoodUIModel(
-              id = "1",
-              image = "",
-              name = "음식명"
-            ) to FoodStatus.DEFAULT,
-            FoodUIModel(
-              id = "2",
-              image = "",
-              name = "음식명"
-            ) to FoodStatus.DEFAULT,
-            FoodUIModel(
-              id = "3",
-              image = "",
-              name = "음식명"
-            ) to FoodStatus.DEFAULT,
-          ),
-          totalMember = 3,
-          endedMember = 1
-        )
-      )
-    }
+private fun Preview() {
+  ScreenPreview {
+    FirstVoteScreen(
+      FirstVoteState()
+    )
   }
 }

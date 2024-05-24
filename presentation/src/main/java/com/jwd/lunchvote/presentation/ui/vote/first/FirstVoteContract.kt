@@ -18,33 +18,33 @@ class FirstVoteContract {
     val endedMember: Int = 0,
     val searchKeyword: String = "",
     val finished: Boolean = false
-  ): ViewModelContract.State, Parcelable {
+  ) : ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this
   }
 
-  sealed interface FirstVoteEvent: ViewModelContract.Event {
-    data class StartInitialize(val loungeId: String): FirstVoteEvent
-    data class OnClickFood(val food: FoodUIModel): FirstVoteEvent
-    data class SetSearchKeyword(val searchKeyword: String): FirstVoteEvent
-    data object OnClickFinishButton: FirstVoteEvent
-    data object OnClickExitButton: FirstVoteEvent
+  sealed interface FirstVoteEvent : ViewModelContract.Event {
+    data class StartInitialize(val loungeId: String) : FirstVoteEvent
+    data object OnClickBackButton : FirstVoteEvent
+    data class OnClickFood(val food: FoodUIModel) : FirstVoteEvent
+    data class SetSearchKeyword(val searchKeyword: String) : FirstVoteEvent
+    data object OnClickFinishButton : FirstVoteEvent
   }
 
-  sealed interface FirstVoteReduce: ViewModelContract.Reduce {
-    data class UpdateLoading(val loading: Boolean): FirstVoteReduce
-    data class Initialize(val state: FirstVoteState): FirstVoteReduce
-    data class UpdateFoodStatus(val food: FoodUIModel): FirstVoteReduce
-    data class UpdateTotalMember(val totalMember: Int): FirstVoteReduce
-    data class UpdateEndedMember(val endedMember: Int): FirstVoteReduce
-    data class UpdateSearchKeyword(val searchKeyword: String): FirstVoteReduce
-    data class UpdateFinished(val finished: Boolean): FirstVoteReduce
+  sealed interface FirstVoteReduce : ViewModelContract.Reduce {
+    data class UpdateLoading(val loading: Boolean) : FirstVoteReduce
+    data class Initialize(val state: FirstVoteState) : FirstVoteReduce
+    data class UpdateFoodStatus(val food: FoodUIModel) : FirstVoteReduce
+    data class UpdateTotalMember(val totalMember: Int) : FirstVoteReduce
+    data class UpdateEndedMember(val endedMember: Int) : FirstVoteReduce
+    data class UpdateSearchKeyword(val searchKeyword: String) : FirstVoteReduce
+    data class UpdateFinished(val finished: Boolean) : FirstVoteReduce
   }
 
-  sealed interface FirstVoteSideEffect: ViewModelContract.SideEffect {
-    data object NavigateToSecondVote: FirstVoteSideEffect
-    data object OpenTemplateDialog: FirstVoteSideEffect
-    data object OpenVoteExitDialog: FirstVoteSideEffect
-    data object PopBackStack: FirstVoteSideEffect
-    data class ShowSnackBar(val message: UiText): FirstVoteSideEffect
+  sealed interface FirstVoteSideEffect : ViewModelContract.SideEffect {
+    data object NavigateToSecondVote : FirstVoteSideEffect
+    data object OpenTemplateDialog : FirstVoteSideEffect
+    data object OpenVoteExitDialog : FirstVoteSideEffect
+    data object PopBackStack : FirstVoteSideEffect
+    data class ShowSnackBar(val message: UiText) : FirstVoteSideEffect
   }
 }
