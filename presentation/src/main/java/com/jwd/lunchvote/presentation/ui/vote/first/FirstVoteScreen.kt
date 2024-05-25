@@ -91,6 +91,7 @@ private fun FirstVoteScreen(
   }
 }
 
+@Preview
 @Composable
 private fun Preview() {
   ScreenPreview {
