@@ -45,7 +45,13 @@ enum class LunchVoteNavRoute(
     )
   ),
 
-  FirstVote,
+  FirstVote(
+    arguments = listOf(
+      navArgument("id") {
+        type = NavType.StringType
+      }
+    )
+  ),
   SecondVote,
 
   TemplateList,
