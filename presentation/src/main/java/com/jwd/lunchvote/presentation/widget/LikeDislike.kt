@@ -26,18 +26,25 @@ import com.jwd.lunchvote.presentation.R
 @Composable
 fun LikeDislike(
   like: Int,
-  dislike: Int
+  dislike: Int,
+  modifier: Modifier = Modifier
 ) {
-  Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+  Row(
+    modifier = modifier,
+    horizontalArrangement = Arrangement.spacedBy(8.dp)
+  ) {
     Like(like)
     Dislike(dislike)
   }
 }
 
 @Composable
-fun Like(amount: Int) {
+fun Like(
+  amount: Int,
+  modifier: Modifier = Modifier
+) {
   Row(
-    modifier = Modifier
+    modifier = modifier
       .padding(bottom = 1.dp)
       .height(21.dp)
       .background(colorSuccess, RoundedCornerShape(10.dp)),
@@ -62,9 +69,12 @@ fun Like(amount: Int) {
 }
 
 @Composable
-fun Dislike(amount: Int) {
+fun Dislike(
+  amount: Int,
+  modifier: Modifier = Modifier
+) {
   Row(
-    modifier = Modifier
+    modifier = modifier
       .padding(bottom = 1.dp)
       .height(21.dp)
       .background(MaterialTheme.colorScheme.error, RoundedCornerShape(10.dp)),
@@ -88,6 +98,6 @@ fun Dislike(amount: Int) {
 
 @Preview
 @Composable
-fun LikeDislikePreview() {
+private fun LikeDislikePreview() {
   LikeDislike(0, 0)
 }

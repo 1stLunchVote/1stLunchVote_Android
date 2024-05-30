@@ -19,7 +19,10 @@ import com.jwd.lunchvote.core.ui.util.circleShadow
 import com.jwd.lunchvote.presentation.R
 
 @Composable
-fun StepProgress(finished: Boolean) {
+fun StepProgress(
+  finished: Boolean,
+  modifier: Modifier = Modifier
+) {
   if (finished) {
     Box(
       modifier = Modifier
@@ -30,7 +33,7 @@ fun StepProgress(finished: Boolean) {
   } else {
     Image(
       painterResource(R.drawable.ic_step_progress),
-      null,
+      contentDescription = null,
       modifier = Modifier.size(16.dp)
     )
   }
@@ -38,7 +41,7 @@ fun StepProgress(finished: Boolean) {
 
 @Preview
 @Composable
-fun StepProgressPreview() {
+private fun StepProgressPreview() {
   LunchVoteTheme {
     Row(
       modifier = Modifier.padding(8.dp),

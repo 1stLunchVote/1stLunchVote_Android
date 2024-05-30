@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.MemberUIModel
+import com.jwd.lunchvote.presentation.util.glow
 import com.skydoves.landscapist.coil.CoilImage
 
 @Composable
@@ -49,21 +50,7 @@ fun MemberProfile(
       .size(48.dp)
       .let {
         if (member.type == MemberUIModel.Type.READY || member.type == MemberUIModel.Type.OWNER) {
-          val glowingColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-
-          it.drawBehind {
-            val canvasSize = size
-            val paint = Paint().apply {
-              isAntiAlias = true
-              setShadowLayer(24.dp.toPx(), 0.dp.toPx(), 0.dp.toPx(), glowingColor.toArgb())
-            }
-            drawContext.canvas.nativeCanvas.apply {
-              drawRoundRect(
-                /*left*/0f,/*top*/0f,/*right*/canvasSize.width,/*bottom*/canvasSize.height,
-                /*radiusX*/24.dp.toPx(),/*radiusY*/24.dp.toPx(),/*paint*/paint
-              )
-            }
-          }
+          it.glow(MaterialTheme.colorScheme.primary)
         } else it
       }
       .clip(CircleShape)
