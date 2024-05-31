@@ -15,8 +15,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
-import com.jwd.lunchvote.core.ui.util.circleShadow
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.util.glow
 
 @Composable
 fun StepProgress(
@@ -25,16 +25,16 @@ fun StepProgress(
 ) {
   if (finished) {
     Box(
-      modifier = Modifier
+      modifier = modifier
         .size(16.dp)
+        .glow(MaterialTheme.colorScheme.primary, 8.dp)
         .background(MaterialTheme.colorScheme.primary, CircleShape)
-        .circleShadow(MaterialTheme.colorScheme.primary, blurRadius = 8.dp)
     )
   } else {
     Image(
       painterResource(R.drawable.ic_step_progress),
       contentDescription = null,
-      modifier = Modifier.size(16.dp)
+      modifier = modifier.size(16.dp)
     )
   }
 }

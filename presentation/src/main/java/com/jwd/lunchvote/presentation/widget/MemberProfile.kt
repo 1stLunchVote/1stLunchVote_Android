@@ -1,6 +1,5 @@
 package com.jwd.lunchvote.presentation.widget
 
-import android.graphics.Paint
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,8 +20,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
@@ -50,7 +47,7 @@ fun MemberProfile(
       .size(48.dp)
       .let {
         if (member.type == MemberUIModel.Type.READY || member.type == MemberUIModel.Type.OWNER) {
-          it.glow(MaterialTheme.colorScheme.primary)
+          it.glow(MaterialTheme.colorScheme.primary, 24.dp)
         } else it
       }
       .clip(CircleShape)
