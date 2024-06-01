@@ -39,7 +39,7 @@ fun LikeDislike(
 }
 
 @Composable
-fun Like(
+private fun Like(
   amount: Int,
   modifier: Modifier = Modifier
 ) {
@@ -69,7 +69,7 @@ fun Like(
 }
 
 @Composable
-fun Dislike(
+private fun Dislike(
   amount: Int,
   modifier: Modifier = Modifier
 ) {

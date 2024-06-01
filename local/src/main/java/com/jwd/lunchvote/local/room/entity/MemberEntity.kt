@@ -22,11 +22,16 @@ data class MemberEntity(
   val userName: String,
   val userProfile: String,
   val type: Type,
+  val status: Status,
   val createdAt: Long,
   val deletedAt: Long?
 ) {
 
   enum class Type {
     DEFAULT, OWNER, READY, EXILED
+  }
+
+  enum class Status {
+    STANDBY, VOTING, VOTED
   }
 }

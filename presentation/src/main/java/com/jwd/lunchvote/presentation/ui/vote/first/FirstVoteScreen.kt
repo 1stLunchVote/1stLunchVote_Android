@@ -28,6 +28,7 @@ import com.jwd.lunchvote.presentation.widget.HorizontalProgressBar
 import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
+import com.jwd.lunchvote.presentation.widget.MemberProgress
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import kotlinx.coroutines.flow.collectLatest
@@ -111,7 +112,7 @@ private fun FirstVoteInformationRow(
     verticalAlignment = Alignment.CenterVertically
   ) {
     LikeDislike(like, dislike)
-
+    MemberProgress(memberList.map { it.status })
   }
 }
 

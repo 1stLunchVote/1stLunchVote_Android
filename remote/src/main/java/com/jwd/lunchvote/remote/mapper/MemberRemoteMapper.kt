@@ -13,6 +13,7 @@ private object MemberRemoteMapper : BiMapper<MemberRemote, MemberData> {
       userName = from.userName,
       userProfile = from.userProfile,
       type = from.type.asMemberDataType(),
+      status = from.status.asMemberDataStatus(),
       createdAt = from.createdAt,
       deletedAt = from.deletedAt
     )
@@ -23,6 +24,7 @@ private object MemberRemoteMapper : BiMapper<MemberRemote, MemberData> {
       userName = from.userName,
       userProfile = from.userProfile,
       type = from.type.asRemote(),
+      status = from.status.asRemote(),
       createdAt = from.createdAt,
       deletedAt = from.deletedAt
     )
@@ -47,6 +49,23 @@ private object MemberRemoteTypeMapper : BiMapper<String, MemberData.Type> {
     }
 }
 
+private object MemberRemoteStatusMapper : BiMapper<String, MemberData.Status> {
+  override fun mapToRight(from: String): MemberData.Status =
+    when (from) {
+      MemberRemote.STATUS_STANDBY -> MemberData.Status.STANDBY
+      MemberRemote.STATUS_VOTING -> MemberData.Status.VOTING
+      MemberRemote.STATUS_VOTED -> MemberData.Status.VOTED
+      else -> throw LoungeError.InvalidMemberStatus
+    }
+
+  override fun mapToLeft(from: MemberData.Status): String =
+    when (from) {
+      MemberData.Status.STANDBY -> MemberRemote.STATUS_STANDBY
+      MemberData.Status.VOTING -> MemberRemote.STATUS_VOTING
+      MemberData.Status.VOTED -> MemberRemote.STATUS_VOTED
+    }
+}
+
 internal fun MemberRemote.asData(userId: String): MemberData =
   MemberRemoteMapper.mapToRight(this).copy(userId = userId)
 
@@ -58,3 +77,9 @@ internal fun String.asMemberDataType(): MemberData.Type =
 
 internal fun MemberData.Type.asRemote(): String =
   MemberRemoteTypeMapper.mapToLeft(this)
+
+internal fun String.asMemberDataStatus(): MemberData.Status =
+  MemberRemoteStatusMapper.mapToRight(this)
+
+internal fun MemberData.Status.asRemote(): String =
+  MemberRemoteStatusMapper.mapToLeft(this)

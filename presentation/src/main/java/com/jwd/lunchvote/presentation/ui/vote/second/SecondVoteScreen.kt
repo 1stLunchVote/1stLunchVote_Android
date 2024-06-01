@@ -47,7 +47,6 @@ import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVo
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVoteSideEffect
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVoteState
 import com.jwd.lunchvote.presentation.util.UiText
-import com.jwd.lunchvote.presentation.widget.ProgressTopBar
 import com.jwd.lunchvote.presentation.widget.VoteExitDialog
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
@@ -104,7 +103,7 @@ private fun SecondVoteScreen(
     onVoteFinished: () -> Unit = {}
 ){
     Scaffold(
-        topBar = { ProgressTopBar(title = "2차 투표", onProgressComplete = onVoteFinished) },
+//        topBar = { ProgressTopBar(title = "2차 투표", onProgressComplete = onVoteFinished) },
         floatingActionButton = {
             Button(onClick = onClickFab, enabled = state.voteIndex != -1) {
                 Text(text = if (state.voteCompleted) stringResource(id = R.string.second_vote_back_fab)

@@ -16,10 +16,26 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.util.glow
 
 @Composable
-fun StepProgress(
+fun MemberProgress(
+  memberStatusList: List<MemberUIModel.Status>,
+  modifier: Modifier = Modifier
+) {
+  Row(
+    modifier = modifier,
+    horizontalArrangement = Arrangement.spacedBy(8.dp)
+  ) {
+    memberStatusList.forEach { status ->
+      StepProgress(status == MemberUIModel.Status.VOTED)
+    }
+  }
+}
+
+@Composable
+private fun StepProgress(
   finished: Boolean,
   modifier: Modifier = Modifier
 ) {

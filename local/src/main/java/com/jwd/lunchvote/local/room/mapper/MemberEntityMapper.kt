@@ -12,6 +12,7 @@ private object MemberLocalMapper : BiMapper<MemberEntity, MemberData> {
       userName = from.userName,
       userProfile = from.userProfile,
       type = from.type.asData(),
+      status = from.status.asData(),
       createdAt = from.createdAt,
       deletedAt = from.deletedAt
     )
@@ -24,18 +25,11 @@ private object MemberLocalMapper : BiMapper<MemberEntity, MemberData> {
       userName = from.userName,
       userProfile = from.userProfile,
       type = from.type.asEntity(),
+      status = from.status.asEntity(),
       createdAt = from.createdAt,
       deletedAt = from.deletedAt
     )
   }
-}
-
-internal fun MemberData.asEntity(): MemberEntity {
-  return MemberLocalMapper.mapToLeft(this)
-}
-
-internal fun MemberEntity.asData(): MemberData {
-  return MemberLocalMapper.mapToRight(this)
 }
 
 private object MemberTypeLocalMapper : BiMapper<MemberEntity.Type, MemberData.Type> {
@@ -58,10 +52,44 @@ private object MemberTypeLocalMapper : BiMapper<MemberEntity.Type, MemberData.Ty
   }
 }
 
-internal fun MemberData.Type.asEntity(): MemberEntity.Type {
-  return MemberTypeLocalMapper.mapToLeft(this)
+private object MemberStatusLocalMapper : BiMapper<MemberEntity.Status, MemberData.Status> {
+  override fun mapToRight(from: MemberEntity.Status): MemberData.Status {
+    return when (from) {
+      MemberEntity.Status.STANDBY -> MemberData.Status.STANDBY
+      MemberEntity.Status.VOTING -> MemberData.Status.VOTING
+      MemberEntity.Status.VOTED -> MemberData.Status.VOTED
+    }
+  }
+
+  override fun mapToLeft(from: MemberData.Status): MemberEntity.Status {
+    return when (from) {
+      MemberData.Status.STANDBY -> MemberEntity.Status.STANDBY
+      MemberData.Status.VOTING -> MemberEntity.Status.VOTING
+      MemberData.Status.VOTED -> MemberEntity.Status.VOTED
+    }
+  }
+}
+
+internal fun MemberEntity.asData(): MemberData {
+  return MemberLocalMapper.mapToRight(this)
+}
+
+internal fun MemberData.asEntity(): MemberEntity {
+  return MemberLocalMapper.mapToLeft(this)
 }
 
 internal fun MemberEntity.Type.asData(): MemberData.Type {
   return MemberTypeLocalMapper.mapToRight(this)
+}
+
+internal fun MemberData.Type.asEntity(): MemberEntity.Type {
+  return MemberTypeLocalMapper.mapToLeft(this)
+}
+
+internal fun MemberEntity.Status.asData(): MemberData.Status {
+  return MemberStatusLocalMapper.mapToRight(this)
+}
+
+internal fun MemberData.Status.asEntity(): MemberEntity.Status {
+  return MemberStatusLocalMapper.mapToLeft(this)
 }

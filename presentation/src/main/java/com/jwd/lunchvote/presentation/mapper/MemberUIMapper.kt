@@ -14,6 +14,7 @@ private object MemberUIMapper : BiMapper<MemberUIModel, Member> {
       userName = from.userName,
       userProfile = from.userProfile,
       type = from.type.asDomain(),
+      status = from.status.asDomain(),
       createdAt = from.createdAt.toLong(),
       deletedAt = from.deletedAt?.toLong()
     )
@@ -48,6 +49,22 @@ private object MemberUITypeMapper : BiMapper<MemberUIModel.Type, Member.Type> {
     }
 }
 
+private object MemberUIStatusMapper : BiMapper<MemberUIModel.Status, Member.Status> {
+  override fun mapToRight(from: MemberUIModel.Status): Member.Status =
+    when (from) {
+      MemberUIModel.Status.STANDBY -> Member.Status.STANDBY
+      MemberUIModel.Status.VOTING -> Member.Status.VOTING
+      MemberUIModel.Status.VOTED -> Member.Status.VOTED
+    }
+
+  override fun mapToLeft(from: Member.Status): MemberUIModel.Status =
+    when (from) {
+      Member.Status.STANDBY -> MemberUIModel.Status.STANDBY
+      Member.Status.VOTING -> MemberUIModel.Status.VOTING
+      Member.Status.VOTED -> MemberUIModel.Status.VOTED
+    }
+}
+
 internal fun MemberUIModel.asDomain(): Member =
   MemberUIMapper.mapToRight(this)
 
@@ -59,3 +76,9 @@ internal fun MemberUIModel.Type.asDomain(): Member.Type =
 
 internal fun Member.Type.asUI(): MemberUIModel.Type =
   MemberUITypeMapper.mapToLeft(this)
+
+internal fun MemberUIModel.Status.asDomain(): Member.Status =
+  MemberUIStatusMapper.mapToRight(this)
+
+internal fun Member.Status.asUI(): MemberUIModel.Status =
+  MemberUIStatusMapper.mapToLeft(this)
