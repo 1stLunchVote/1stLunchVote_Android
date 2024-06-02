@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.lang.reflect.Member
 import javax.inject.Inject
 
 class MemberDataSourceImpl @Inject constructor(
@@ -31,9 +32,10 @@ class MemberDataSourceImpl @Inject constructor(
     const val MEMBER_PATH = "Member"
 
     const val MEMBER_LOUNGE_ID = "loungeId"
-    const val MEMBER_TYPE = "type"
     const val MEMBER_USER_NAME = "userName"
     const val MEMBER_USER_PROFILE = "userProfile"
+    const val MEMBER_TYPE = "type"
+    const val MEMBER_STATUS = "status"
     const val MEMBER_CREATED_AT = "createdAt"
     const val MEMBER_DELETED_AT = "deletedAt"
   }
@@ -111,6 +113,21 @@ class MemberDataSourceImpl @Inject constructor(
             )
             .await()
         }
+    }
+  }
+
+  override suspend fun updateMemberStatus(
+    member: MemberData,
+    status: MemberData.Status
+  ) {
+    withContext(dispatcher) {
+      database
+        .getReference(MEMBER_PATH)
+        .child(member.loungeId)
+        .child(member.userId)
+        .child(MEMBER_STATUS)
+        .setValue(status.asRemote())
+        .await()
     }
   }
 
