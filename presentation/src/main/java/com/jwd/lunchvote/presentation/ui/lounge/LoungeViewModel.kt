@@ -91,6 +91,7 @@ class LoungeViewModel @Inject constructor(
       is LoungeEvent.OnTextChange -> updateState(LoungeReduce.UpdateText(event.text))
       is LoungeEvent.OnClickSendChatButton -> launch(false) { sendChat() }
       is LoungeEvent.OnClickActionButton -> launch(false) {
+        memberRepository.updateMembersStatusByLoungeId(currentState.lounge.id, MemberUIModel.Status.VOTED.asDomain())
         if (currentState.user.id == owner.userId) startVote() else updateReady()
       }
 

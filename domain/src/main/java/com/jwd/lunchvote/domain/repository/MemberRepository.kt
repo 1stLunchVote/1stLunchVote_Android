@@ -11,6 +11,7 @@ interface MemberRepository {
   suspend fun getMemberByUserId(userId: String, loungeId: String): Member
   suspend fun updateMemberReadyType(member: Member)
   suspend fun updateMemberStatus(member: Member, status: Member.Status)
+  suspend fun updateMembersStatusByLoungeId(loungeId: String, status: Member.Status)
   suspend fun exileMember(member: Member)
   suspend fun deleteMember(member: Member)
 }

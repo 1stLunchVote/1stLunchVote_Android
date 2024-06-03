@@ -131,6 +131,21 @@ class MemberDataSourceImpl @Inject constructor(
     }
   }
 
+  override suspend fun updateMembersStatusByLoungeId(
+    loungeId: String,
+    status: MemberData.Status
+  ) {
+    withContext(dispatcher) {
+      database
+        .getReference(MEMBER_PATH)
+        .child(loungeId)
+        .getValueEventFlow<MemberRemote>()
+        .map { it.mapNotNull { (key, value) -> value?.asData(key) } }
+        .first()
+        .forEach { updateMemberStatus(it, status) }
+    }
+  }
+
   override suspend fun exileMember(
     member: MemberData
   ) {
