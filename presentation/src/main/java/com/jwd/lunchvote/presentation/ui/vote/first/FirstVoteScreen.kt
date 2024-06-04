@@ -56,7 +56,6 @@ fun FirstVoteRoute(
   context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
-  val loading by viewModel.isLoading.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
@@ -96,7 +95,8 @@ private fun FirstVoteScreen(
       )
       HorizontalProgressBar(
         timeLimitSecond = 60,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        onProgressComplete = { onEvent(FirstVoteEvent.OnClickFinishButton) }
       )
     },
     scrollable = false

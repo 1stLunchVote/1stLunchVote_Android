@@ -8,11 +8,14 @@ import com.jwd.lunchvote.core.common.error.LoungeError
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.domain.entity.Member
+import com.jwd.lunchvote.domain.repository.FirstVoteRepository
 import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
 import com.jwd.lunchvote.domain.repository.TemplateRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
+import com.jwd.lunchvote.domain.usecase.CalculateFirstVoteResult
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.FoodStatus
@@ -37,11 +40,15 @@ class FirstVoteViewModel @Inject constructor(
   private val memberRepository: MemberRepository,
   private val foodRepository: FoodRepository,
   private val templateRepository: TemplateRepository,
+  private val firstVoteRepository: FirstVoteRepository,
+  private val calculateFirstVoteResult: CalculateFirstVoteResult,
   private val savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<FirstVoteState, FirstVoteEvent, FirstVoteReduce, FirstVoteSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): FirstVoteState =
     savedState as? FirstVoteState ?: FirstVoteState()
 
+  private val owner: MemberUIModel
+    get() = currentState.memberList.find { it.type == MemberUIModel.Type.OWNER } ?: throw LoungeError.NoOwner
   private val me: MemberUIModel
     get() = currentState.memberList.find { it.userId == currentState.user.id } ?: throw LoungeError.InvalidMember
 
@@ -52,8 +59,9 @@ class FirstVoteViewModel @Inject constructor(
       is FirstVoteEvent.OnClickBackButton -> sendSideEffect(FirstVoteSideEffect.PopBackStack)
       is FirstVoteEvent.OnSearchKeywordChange -> updateState(FirstVoteReduce.UpdateSearchKeyword(event.searchKeyword))
       is FirstVoteEvent.OnClickFood -> updateState(FirstVoteReduce.UpdateFoodStatus(event.food))
-      is FirstVoteEvent.OnClickFinishButton -> launch { finishVote() }
-      is FirstVoteEvent.OnClickReVoteButton -> launch { reVote() }
+      is FirstVoteEvent.OnClickFinishButton -> launch(false) { finishVote() }
+      is FirstVoteEvent.OnClickReVoteButton -> launch(false) { reVote() }
+      is FirstVoteEvent.OnVoteFinish -> launch { submitVote() }
     }
   }
 
@@ -84,6 +92,7 @@ class FirstVoteViewModel @Inject constructor(
         )
       }
       is FirstVoteReduce.UpdateFinished -> state.copy(finished = reduce.finished)
+      is FirstVoteReduce.UpdateCalculating -> state.copy(calculating = reduce.calculating)
     }
   }
 
@@ -101,7 +110,7 @@ class FirstVoteViewModel @Inject constructor(
     val lounge = loungeRepository.getLoungeById(loungeId).asUI()
     updateState(FirstVoteReduce.UpdateLounge(lounge))
 
-    launch { collectMemberList(loungeId) }
+    launch(false) { collectMemberList(loungeId) }
 
     val templateList = templateRepository.getTemplateList(userId).map { it.asUI() }
     updateState(FirstVoteReduce.UpdateTemplateList(templateList))
@@ -115,8 +124,9 @@ class FirstVoteViewModel @Inject constructor(
 
   private suspend fun collectMemberList(loungeId: String) {
     memberRepository.getMemberListFlow(loungeId).collectLatest { memberList ->
-      Timber.w("💛 ===ktw=== ${memberList.map { it.asUI() }}")
       updateState(FirstVoteReduce.UpdateMemberList(memberList.map { it.asUI() }))
+
+      if (memberList.all { it.status == Member.Status.VOTED }) submitVote()
     }
   }
 
@@ -149,5 +159,20 @@ class FirstVoteViewModel @Inject constructor(
     memberRepository.updateMemberStatus(me.asDomain(), MemberUIModel.Status.VOTING.asDomain())
 
     updateState(FirstVoteReduce.UpdateFinished(false))
+  }
+
+  private suspend fun submitVote() {
+    updateState(FirstVoteReduce.UpdateCalculating(true))
+
+    firstVoteRepository.submitVote(
+      loungeId = currentState.lounge.id,
+      userId = me.userId,
+      likedFoodIds = currentState.likedFoods.map { it.id },
+      dislikedFoodIds = currentState.dislikedFoods.map { it.id }
+    )
+
+    if (me.userId == owner.userId) {
+      val selectedFoodIds = calculateFirstVoteResult(currentState.lounge.id)
+    }
   }
 }

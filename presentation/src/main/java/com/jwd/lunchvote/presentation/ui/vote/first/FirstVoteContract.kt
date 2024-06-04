@@ -23,7 +23,8 @@ class FirstVoteContract {
     val likedFoods: List<FoodUIModel> = emptyList(),
     val dislikedFoods: List<FoodUIModel> = emptyList(),
     val searchKeyword: String = "",
-    val finished: Boolean = false
+    val finished: Boolean = false,
+    val calculating: Boolean = false
   ) : ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this
   }
@@ -36,6 +37,7 @@ class FirstVoteContract {
     data class OnClickFood(val food: FoodUIModel) : FirstVoteEvent
     data object OnClickFinishButton : FirstVoteEvent
     data object OnClickReVoteButton : FirstVoteEvent
+    data object OnVoteFinish : FirstVoteEvent
   }
 
   sealed interface FirstVoteReduce : ViewModelContract.Reduce {
@@ -50,6 +52,7 @@ class FirstVoteContract {
     data class UpdateSearchKeyword(val searchKeyword: String) : FirstVoteReduce
     data class UpdateFoodStatus(val food: FoodUIModel) : FirstVoteReduce
     data class UpdateFinished(val finished: Boolean) : FirstVoteReduce
+    data class UpdateCalculating(val calculating: Boolean) : FirstVoteReduce
   }
 
   sealed interface FirstVoteSideEffect : ViewModelContract.SideEffect {
