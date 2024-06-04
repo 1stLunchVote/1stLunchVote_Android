@@ -70,18 +70,14 @@ internal fun MemberData.asDomain(): Member =
 internal fun Member.asData(): MemberData =
   MemberDataMapper.mapToLeft(this)
 
-internal fun MemberData.Type.asDomain(): Member.Type {
-  return MemberDataTypeMapper.mapToRight(this)
-}
+internal fun MemberData.Type.asDomain(): Member.Type =
+  MemberDataTypeMapper.mapToRight(this)
 
-internal fun Member.Type.asData(): MemberData.Type {
-  return MemberDataTypeMapper.mapToLeft(this)
-}
+internal fun Member.Type.asData(): MemberData.Type =
+  MemberDataTypeMapper.mapToLeft(this)
 
-internal fun MemberData.Status.asDomain(): Member.Status {
-  return MemberDataStatusMapper.mapToRight(this)
-}
+internal fun MemberData.Status.asDomain(): Member.Status =
+  MemberDataStatusMapper.mapToRight(this)
 
-internal fun Member.Status.asData(): MemberData.Status {
-  return MemberDataStatusMapper.mapToLeft(this)
-}
+internal fun Member.Status.asData(): MemberData.Status =
+  MemberDataStatusMapper.mapToLeft(this)

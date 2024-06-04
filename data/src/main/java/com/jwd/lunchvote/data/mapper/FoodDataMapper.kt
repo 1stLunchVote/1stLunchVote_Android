@@ -20,10 +20,8 @@ private object FoodDataMapper: BiMapper<FoodData, Food> {
     )
 }
 
-internal fun FoodData.asDomain(): Food {
-  return FoodDataMapper.mapToRight(this)
-}
+internal fun FoodData.asDomain(): Food =
+  FoodDataMapper.mapToRight(this)
 
-internal fun Food.asData(): FoodData {
-  return FoodDataMapper.mapToLeft(this)
-}
+internal fun Food.asData(): FoodData =
+  FoodDataMapper.mapToLeft(this)

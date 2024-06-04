@@ -15,6 +15,7 @@ class FoodDataSourceImpl @Inject constructor(
 
   companion object {
     const val FOOD_PATH = "Food"
+
     const val COLUMN_IMAGE = "image"
     const val COLUMN_NAME = "name"
   }

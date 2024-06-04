@@ -1,6 +1,7 @@
 package com.jwd.lunchvote.di
 
 import com.jwd.lunchvote.data.repository.ChatRepositoryImpl
+import com.jwd.lunchvote.data.repository.FirstVoteRepositoryImpl
 import com.jwd.lunchvote.data.repository.FoodRepositoryImpl
 import com.jwd.lunchvote.data.repository.LoginRepositoryImpl
 import com.jwd.lunchvote.data.repository.LoungeRepositoryImpl
@@ -10,6 +11,7 @@ import com.jwd.lunchvote.data.repository.StorageRepositoryImpl
 import com.jwd.lunchvote.data.repository.TemplateRepositoryImpl
 import com.jwd.lunchvote.data.repository.UserRepositoryImpl
 import com.jwd.lunchvote.domain.repository.ChatRepository
+import com.jwd.lunchvote.domain.repository.FirstVoteRepository
 import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.repository.LoginRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
@@ -33,6 +35,12 @@ internal abstract class RepositoryModule {
   abstract fun bindsChatRepository(
     repository: ChatRepositoryImpl
   ): ChatRepository
+
+  @Binds
+  @Singleton
+  abstract fun bindsFirstVoteRepository(
+    repository: FirstVoteRepositoryImpl
+  ): FirstVoteRepository
 
   @Binds
   @Singleton
