@@ -3,7 +3,6 @@ package com.jwd.lunchvote.presentation.ui.vote.first
 import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,9 +27,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodStatus
-import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
-import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteEvent
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteSideEffect
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteState
@@ -45,6 +42,7 @@ import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.TextFieldType
 import kotlinx.coroutines.flow.collectLatest
+import timber.log.Timber
 
 @Composable
 fun FirstVoteRoute(
@@ -74,8 +72,9 @@ fun FirstVoteRoute(
 
   BackHandler { viewModel.sendEvent(FirstVoteEvent.OnClickBackButton) }
 
-  if (loading) LoadingScreen()
-  else FirstVoteScreen(
+  LaunchedEffect(Unit) { viewModel.sendEvent(FirstVoteEvent.ScreenInitialize) }
+
+  FirstVoteScreen(
     state = state,
     modifier = modifier,
     onEvent = viewModel::sendEvent
@@ -208,10 +207,10 @@ private fun FirstVoteWaitingScreen(
       )
     }
     Button(
-      onClick = { onEvent(FirstVoteEvent.OnClickFinishButton) },
+      onClick = { onEvent(FirstVoteEvent.OnClickReVoteButton) },
       modifier = Modifier.align(Alignment.CenterHorizontally)
     ) {
-      Text(text = stringResource(R.string.first_vote_return_button))
+      Text(text = stringResource(R.string.first_vote_re_vote_button))
     }
   }
 }

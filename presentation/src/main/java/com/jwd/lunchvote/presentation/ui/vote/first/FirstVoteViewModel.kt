@@ -4,6 +4,7 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.jwd.lunchvote.core.common.error.LoungeError
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
@@ -12,8 +13,10 @@ import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
 import com.jwd.lunchvote.domain.repository.TemplateRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
+import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.FoodStatus
+import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.model.updateFoodMap
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
@@ -24,6 +27,7 @@ import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteS
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,6 +42,9 @@ class FirstVoteViewModel @Inject constructor(
   override fun createInitialState(savedState: Parcelable?): FirstVoteState =
     savedState as? FirstVoteState ?: FirstVoteState()
 
+  private val me: MemberUIModel
+    get() = currentState.memberList.find { it.userId == currentState.user.id } ?: throw LoungeError.InvalidMember
+
   override fun handleEvents(event: FirstVoteEvent) {
     when(event) {
       is FirstVoteEvent.ScreenInitialize -> launch { initialize() }
@@ -45,7 +52,8 @@ class FirstVoteViewModel @Inject constructor(
       is FirstVoteEvent.OnClickBackButton -> sendSideEffect(FirstVoteSideEffect.PopBackStack)
       is FirstVoteEvent.OnSearchKeywordChange -> updateState(FirstVoteReduce.UpdateSearchKeyword(event.searchKeyword))
       is FirstVoteEvent.OnClickFood -> updateState(FirstVoteReduce.UpdateFoodStatus(event.food))
-      is FirstVoteEvent.OnClickFinishButton -> updateState(FirstVoteReduce.UpdateFinished(true))
+      is FirstVoteEvent.OnClickFinishButton -> launch { finishVote() }
+      is FirstVoteEvent.OnClickReVoteButton -> launch { reVote() }
     }
   }
 
@@ -102,11 +110,12 @@ class FirstVoteViewModel @Inject constructor(
     val foodMap = foodList.associateWith { FoodStatus.DEFAULT }
     updateState(FirstVoteReduce.UpdateFoodMap(foodMap))
 
-    sendSideEffect(FirstVoteSideEffect.OpenTemplateDialog)
+//    sendSideEffect(FirstVoteSideEffect.OpenTemplateDialog)
   }
 
   private suspend fun collectMemberList(loungeId: String) {
     memberRepository.getMemberListFlow(loungeId).collectLatest { memberList ->
+      Timber.w("💛 ===ktw=== ${memberList.map { it.asUI() }}")
       updateState(FirstVoteReduce.UpdateMemberList(memberList.map { it.asUI() }))
     }
   }
@@ -128,5 +137,17 @@ class FirstVoteViewModel @Inject constructor(
     updateState(FirstVoteReduce.UpdateFoodMap(foodMap))
     updateState(FirstVoteReduce.UpdateLikedFoods(likeList))
     updateState(FirstVoteReduce.UpdateDislikedFoods(dislikeList))
+  }
+
+  private suspend fun finishVote() {
+    memberRepository.updateMemberStatus(me.asDomain(), MemberUIModel.Status.VOTED.asDomain())
+
+    updateState(FirstVoteReduce.UpdateFinished(true))
+  }
+
+  private suspend fun reVote() {
+    memberRepository.updateMemberStatus(me.asDomain(), MemberUIModel.Status.VOTING.asDomain())
+
+    updateState(FirstVoteReduce.UpdateFinished(false))
   }
 }

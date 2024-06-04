@@ -35,6 +35,7 @@ class FirstVoteContract {
     data class OnSearchKeywordChange(val searchKeyword: String) : FirstVoteEvent
     data class OnClickFood(val food: FoodUIModel) : FirstVoteEvent
     data object OnClickFinishButton : FirstVoteEvent
+    data object OnClickReVoteButton : FirstVoteEvent
   }
 
   sealed interface FirstVoteReduce : ViewModelContract.Reduce {

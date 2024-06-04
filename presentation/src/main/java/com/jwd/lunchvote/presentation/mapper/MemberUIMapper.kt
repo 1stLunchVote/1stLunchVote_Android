@@ -26,6 +26,7 @@ private object MemberUIMapper : BiMapper<MemberUIModel, Member> {
       userName = from.userName,
       userProfile = from.userProfile,
       type = from.type.asUI(),
+      status = from.status.asUI(),
       createdAt = from.createdAt.toZonedDateTime(),
       deletedAt = from.deletedAt?.toZonedDateTime()
     )
