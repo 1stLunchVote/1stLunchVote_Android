@@ -45,6 +45,7 @@ class FirstVoteViewModel @Inject constructor(
       is FirstVoteEvent.OnClickBackButton -> sendSideEffect(FirstVoteSideEffect.PopBackStack)
       is FirstVoteEvent.OnSearchKeywordChange -> updateState(FirstVoteReduce.UpdateSearchKeyword(event.searchKeyword))
       is FirstVoteEvent.OnClickFood -> updateState(FirstVoteReduce.UpdateFoodStatus(event.food))
+      is FirstVoteEvent.OnClickFinishButton -> updateState(FirstVoteReduce.UpdateFinished(true))
     }
   }
 
@@ -74,6 +75,7 @@ class FirstVoteViewModel @Inject constructor(
           likedFoods = state.likedFoods + reduce.food
         )
       }
+      is FirstVoteReduce.UpdateFinished -> state.copy(finished = reduce.finished)
     }
   }
 

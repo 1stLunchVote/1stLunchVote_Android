@@ -100,6 +100,10 @@
     <!-- FirstVoteScreen -->
     <string name="first_vote_title">1차 투표</string>
     <string name="first_vote_hint_text">검색</string>
+    <string name="first_vote_finish_button">투표 완료</string>
+    <string name="first_vote_waiting_title">다른 참가자 대기중…</string>
+    <string name="first_vote_waiting_body">현재 %d명이 투표 완료했습니다!</string>
+    <string name="first_vote_return_button">다시 투표하기</string>
 
     <string name="exit_dialog_title">투표 나가기</string>
     <string name="exit_from_vote">투표 방에서 나왔습니다.</string>
