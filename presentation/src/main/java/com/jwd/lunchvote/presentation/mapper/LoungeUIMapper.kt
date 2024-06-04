@@ -25,7 +25,8 @@ private object LoungeUIStatusMapper : BiMapper<LoungeUIModel.Status, Lounge.Stat
     when (from) {
       LoungeUIModel.Status.CREATED -> Lounge.Status.CREATED
       LoungeUIModel.Status.QUIT -> Lounge.Status.QUIT
-      LoungeUIModel.Status.STARTED -> Lounge.Status.STARTED
+      LoungeUIModel.Status.FIRST_VOTE -> Lounge.Status.FIRST_VOTE
+      LoungeUIModel.Status.SECOND_VOTE -> Lounge.Status.SECOND_VOTE
       LoungeUIModel.Status.FINISHED -> Lounge.Status.FINISHED
     }
 
@@ -33,7 +34,8 @@ private object LoungeUIStatusMapper : BiMapper<LoungeUIModel.Status, Lounge.Stat
     when (from) {
       Lounge.Status.CREATED -> LoungeUIModel.Status.CREATED
       Lounge.Status.QUIT -> LoungeUIModel.Status.QUIT
-      Lounge.Status.STARTED -> LoungeUIModel.Status.STARTED
+      Lounge.Status.FIRST_VOTE -> LoungeUIModel.Status.FIRST_VOTE
+      Lounge.Status.SECOND_VOTE -> LoungeUIModel.Status.SECOND_VOTE
       Lounge.Status.FINISHED -> LoungeUIModel.Status.FINISHED
     }
 }

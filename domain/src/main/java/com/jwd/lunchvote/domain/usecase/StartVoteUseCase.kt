@@ -1,5 +1,6 @@
 package com.jwd.lunchvote.domain.usecase
 
+import com.jwd.lunchvote.domain.entity.Lounge
 import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
@@ -10,10 +11,9 @@ class StartVoteUseCase @Inject constructor(
   private val memberRepository: MemberRepository
 ) {
 
-  suspend operator fun invoke(id: String) {
-    val memberList = memberRepository.updateMembersStatusByLoungeId(id, Member.Status.VOTING)
+  suspend operator fun invoke(loungeId: String) {
+    memberRepository.updateMembersStatusByLoungeId(loungeId, Member.Status.VOTING)
 
-    loungeRepository.startLoungeById(id)
-
+    loungeRepository.updateLoungeStatusById(loungeId, Lounge.Status.FIRST_VOTE)
   }
 }

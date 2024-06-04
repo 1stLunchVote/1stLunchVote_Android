@@ -25,7 +25,8 @@ private object LoungeStatusDataMapper : BiMapper<LoungeData.Status, Lounge.Statu
     when (from) {
       LoungeData.Status.CREATED -> Lounge.Status.CREATED
       LoungeData.Status.QUIT -> Lounge.Status.QUIT
-      LoungeData.Status.STARTED -> Lounge.Status.STARTED
+      LoungeData.Status.FIRST_VOTE -> Lounge.Status.FIRST_VOTE
+      LoungeData.Status.SECOND_VOTE -> Lounge.Status.SECOND_VOTE
       LoungeData.Status.FINISHED -> Lounge.Status.FINISHED
     }
 
@@ -33,7 +34,8 @@ private object LoungeStatusDataMapper : BiMapper<LoungeData.Status, Lounge.Statu
     when (from) {
       Lounge.Status.CREATED -> LoungeData.Status.CREATED
       Lounge.Status.QUIT -> LoungeData.Status.QUIT
-      Lounge.Status.STARTED -> LoungeData.Status.STARTED
+      Lounge.Status.FIRST_VOTE -> LoungeData.Status.FIRST_VOTE
+      Lounge.Status.SECOND_VOTE -> LoungeData.Status.SECOND_VOTE
       Lounge.Status.FINISHED -> LoungeData.Status.FINISHED
     }
 }

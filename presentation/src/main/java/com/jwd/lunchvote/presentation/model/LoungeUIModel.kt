@@ -11,6 +11,6 @@ data class LoungeUIModel(
 ): Parcelable {
 
   enum class Status {
-    CREATED, QUIT, STARTED, FINISHED
+    CREATED, QUIT, FIRST_VOTE, SECOND_VOTE, FINISHED
   }
 }

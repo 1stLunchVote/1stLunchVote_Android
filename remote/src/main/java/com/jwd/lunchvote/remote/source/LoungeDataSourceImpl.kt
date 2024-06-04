@@ -7,6 +7,7 @@ import com.jwd.lunchvote.data.model.LoungeData
 import com.jwd.lunchvote.data.source.remote.LoungeDataSource
 import com.jwd.lunchvote.remote.mapper.asData
 import com.jwd.lunchvote.remote.mapper.asLoungeDataStatus
+import com.jwd.lunchvote.remote.mapper.asRemote
 import com.jwd.lunchvote.remote.model.LoungeRemote
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -134,28 +135,16 @@ class LoungeDataSourceImpl @Inject constructor(
     }
   }
 
-  override suspend fun startLoungeById(
-    id: String
+  override suspend fun updateLoungeStatusById(
+    id: String,
+    status: LoungeData.Status
   ) {
     withContext(dispatcher) {
       database
         .getReference(LOUNGE_PATH)
         .child(id)
         .child(LOUNGE_STATUS)
-        .setValue(LoungeRemote.STATUS_STARTED)
-        .await()
-    }
-  }
-
-  override suspend fun finishLoungeById(
-    id: String
-  ) {
-    withContext(dispatcher) {
-      database
-        .getReference(LOUNGE_PATH)
-        .child(id)
-        .child(LOUNGE_STATUS)
-        .setValue(LoungeRemote.STATUS_FINISHED)
+        .setValue(status.asRemote())
         .await()
     }
   }

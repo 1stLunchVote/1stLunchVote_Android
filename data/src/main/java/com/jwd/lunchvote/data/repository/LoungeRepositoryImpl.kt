@@ -1,5 +1,6 @@
 package com.jwd.lunchvote.data.repository
 
+import com.jwd.lunchvote.data.mapper.asData
 import com.jwd.lunchvote.data.mapper.asDomain
 import com.jwd.lunchvote.data.source.remote.LoungeDataSource
 import com.jwd.lunchvote.domain.entity.Lounge
@@ -36,11 +37,7 @@ class LoungeRepositoryImpl @Inject constructor(
     loungeDataSource.quitLoungeById(id)
   }
 
-  override suspend fun startLoungeById(id: String) {
-    loungeDataSource.startLoungeById(id)
-  }
-
-  override suspend fun finishLoungeById(id: String) {
-    loungeDataSource.finishLoungeById(id)
+  override suspend fun updateLoungeStatusById(id: String, status: Lounge.Status) {
+    loungeDataSource.updateLoungeStatusById(id, status.asData())
   }
 }

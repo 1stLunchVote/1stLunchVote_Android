@@ -12,6 +12,5 @@ interface LoungeRepository {
   suspend fun joinLoungeById(id: String)
   suspend fun exitLoungeById(id: String)
   suspend fun quitLoungeById(id: String)
-  suspend fun startLoungeById(id: String)
-  suspend fun finishLoungeById(id: String)
+  suspend fun updateLoungeStatusById(id: String, status: Lounge.Status)
 }
