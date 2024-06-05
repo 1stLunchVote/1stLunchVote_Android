@@ -8,6 +8,7 @@ import com.jwd.lunchvote.core.common.error.LoungeError
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.domain.entity.Lounge
 import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.repository.FirstVoteRepository
 import com.jwd.lunchvote.domain.repository.FoodRepository
@@ -16,6 +17,7 @@ import com.jwd.lunchvote.domain.repository.MemberRepository
 import com.jwd.lunchvote.domain.repository.TemplateRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.usecase.CalculateFirstVoteResult
+import com.jwd.lunchvote.domain.usecase.StartSecondVoteUseCase
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.FoodStatus
@@ -30,7 +32,6 @@ import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteS
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,6 +43,7 @@ class FirstVoteViewModel @Inject constructor(
   private val templateRepository: TemplateRepository,
   private val firstVoteRepository: FirstVoteRepository,
   private val calculateFirstVoteResult: CalculateFirstVoteResult,
+  private val startSecondVoteUseCase: StartSecondVoteUseCase,
   private val savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<FirstVoteState, FirstVoteEvent, FirstVoteReduce, FirstVoteSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): FirstVoteState =
@@ -111,6 +113,7 @@ class FirstVoteViewModel @Inject constructor(
     updateState(FirstVoteReduce.UpdateLounge(lounge))
 
     launch(false) { collectMemberList(loungeId) }
+    launch(false) { collectLoungeStatus(loungeId) }
 
     val templateList = templateRepository.getTemplateList(userId).map { it.asUI() }
     updateState(FirstVoteReduce.UpdateTemplateList(templateList))
@@ -126,7 +129,13 @@ class FirstVoteViewModel @Inject constructor(
     memberRepository.getMemberListFlow(loungeId).collectLatest { memberList ->
       updateState(FirstVoteReduce.UpdateMemberList(memberList.map { it.asUI() }))
 
-      if (memberList.all { it.status == Member.Status.VOTED }) submitVote()
+      if (memberList.all { it.status == Member.Status.VOTED }) launch { submitVote() }
+    }
+  }
+
+  private suspend fun collectLoungeStatus(loungeId: String) {
+    loungeRepository.getLoungeStatusFlowById(loungeId).collectLatest { status ->
+      if (status == Lounge.Status.SECOND_VOTE) sendSideEffect(FirstVoteSideEffect.NavigateToSecondVote)
     }
   }
 
@@ -173,6 +182,9 @@ class FirstVoteViewModel @Inject constructor(
 
     if (me.userId == owner.userId) {
       val selectedFoodIds = calculateFirstVoteResult(currentState.lounge.id)
+      // TODO: 투표 결과 활용하기
+
+      startSecondVoteUseCase(currentState.lounge.id)
     }
   }
 }

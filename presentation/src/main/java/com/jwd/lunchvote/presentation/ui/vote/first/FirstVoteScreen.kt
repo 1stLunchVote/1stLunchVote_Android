@@ -42,7 +42,6 @@ import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.TextFieldType
 import kotlinx.coroutines.flow.collectLatest
-import timber.log.Timber
 
 @Composable
 fun FirstVoteRoute(
@@ -73,7 +72,8 @@ fun FirstVoteRoute(
 
   LaunchedEffect(Unit) { viewModel.sendEvent(FirstVoteEvent.ScreenInitialize) }
 
-  FirstVoteScreen(
+  if (state.calculating) LoadingScreen(message = stringResource(R.string.first_vote_calculating_message),)
+  else FirstVoteScreen(
     state = state,
     modifier = modifier,
     onEvent = viewModel::sendEvent
@@ -96,7 +96,7 @@ private fun FirstVoteScreen(
       HorizontalProgressBar(
         timeLimitSecond = 60,
         modifier = Modifier.fillMaxWidth(),
-        onProgressComplete = { onEvent(FirstVoteEvent.OnClickFinishButton) }
+        onProgressComplete = { onEvent(FirstVoteEvent.OnVoteFinish) }
       )
     },
     scrollable = false

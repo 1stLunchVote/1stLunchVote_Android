@@ -1,7 +1,6 @@
 package com.jwd.lunchvote.remote.source
 
 import com.google.firebase.firestore.FirebaseFirestore
-import com.jwd.lunchvote.core.common.error.FoodError
 import com.jwd.lunchvote.data.model.FoodData
 import com.jwd.lunchvote.data.source.remote.FoodDataSource
 import com.jwd.lunchvote.remote.mapper.asData
@@ -26,9 +25,7 @@ class FoodDataSourceImpl @Inject constructor(
       .get()
       .await()
       .documents
-      .mapNotNull {
-        it.toObject(FoodRemote::class.java)?.asData(it.id)
-      }
+      .mapNotNull { it.toObject(FoodRemote::class.java)?.asData(it.id) }
 
   // TODO: 임시
   override suspend fun getFoodTrend(): Pair<FoodData, Float> =
@@ -37,9 +34,5 @@ class FoodDataSourceImpl @Inject constructor(
       .get()
       .await()
       .documents
-      .first()
-      .let {
-        it.toObject(FoodRemote::class.java)
-          ?.asData(it.id) ?: throw FoodError.LoadFailure
-      } to 36f
+      .firstNotNullOf { it.toObject(FoodRemote::class.java)?.asData(it.id) } to 36f
 }

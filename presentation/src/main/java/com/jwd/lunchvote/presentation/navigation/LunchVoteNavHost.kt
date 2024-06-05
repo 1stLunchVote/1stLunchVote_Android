@@ -153,9 +153,7 @@ fun LunchVoteNavHost(
     composable(LunchVoteNavRoute.FirstVote) {
       FirstVoteRoute(
         popBackStack = { navController.popBackStack(LunchVoteNavRoute.Home) },
-        navigateToSecondVote = {
-          navController.navigate(LunchVoteNavRoute.SecondVote.name)
-        },
+        navigateToSecondVote = { navController.navigate(LunchVoteNavRoute.SecondVote.name) },
         openTemplateDialog = { navController.navigate(LunchVoteNavRoute.FirstVoteTemplateDialog) },
         openVoteExitDialog = { navController.navigate(LunchVoteNavRoute.VoteExitDialog) },
         showSnackBar = showSnackBar

@@ -12,7 +12,7 @@ class CalculateFirstVoteResult @Inject constructor(
 
   suspend operator fun invoke(loungeId: String): List<String> {
     // 모든 사용자가 정보를 저장한 이후에 받을 수 있도록 임의로 대기
-    delay(1000)
+    delay(100)
 
     val firstVotes = firstVoteRepository.getAllFirstVotes(loungeId)
 

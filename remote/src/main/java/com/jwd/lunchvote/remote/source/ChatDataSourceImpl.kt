@@ -7,17 +7,13 @@ import com.jwd.lunchvote.remote.mapper.asData
 import com.jwd.lunchvote.remote.mapper.asRemote
 import com.jwd.lunchvote.remote.model.ChatRemote
 import com.jwd.lunchvote.remote.util.getValueEventFlow
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class ChatDataSourceImpl @Inject constructor(
-  private val database: FirebaseDatabase,
-  private val dispatcher: CoroutineDispatcher
+  private val database: FirebaseDatabase
 ): ChatDataSource {
 
   companion object {
@@ -42,18 +38,15 @@ class ChatDataSourceImpl @Inject constructor(
         it.mapNotNull { (key, value) -> value?.asData(key) }
           .sortedByDescending { chat -> chat.createdAt }
       }
-      .flowOn(dispatcher)
 
   override suspend fun sendChat(
     chat: ChatData
   ) {
-    withContext(dispatcher) {
-      database
-        .getReference(CHAT_PATH)
-        .child(chat.loungeId)
-        .child(chat.id)
-        .setValue(chat.asRemote())
-        .await()
-    }
+    database
+      .getReference(CHAT_PATH)
+      .child(chat.loungeId)
+      .child(chat.id)
+      .setValue(chat.asRemote())
+      .await()
   }
 }

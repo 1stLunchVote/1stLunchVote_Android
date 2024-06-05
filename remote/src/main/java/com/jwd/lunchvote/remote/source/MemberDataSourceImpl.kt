@@ -12,20 +12,15 @@ import com.jwd.lunchvote.remote.mapper.asRemote
 import com.jwd.lunchvote.remote.model.MemberRemote
 import com.jwd.lunchvote.remote.util.getValueEventFlow
 import com.jwd.lunchvote.remote.util.toLong
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
-import java.lang.reflect.Member
 import javax.inject.Inject
 
 class MemberDataSourceImpl @Inject constructor(
-  private val database: FirebaseDatabase,
-  private val dispatcher: CoroutineDispatcher
+  private val database: FirebaseDatabase
 ): MemberDataSource {
 
   companion object {
@@ -43,14 +38,12 @@ class MemberDataSourceImpl @Inject constructor(
   override suspend fun createMember(
     member: MemberData
   ) {
-    withContext(dispatcher) {
-      database
-        .getReference(MEMBER_PATH)
-        .child(member.loungeId)
-        .child(member.userId)
-        .setValue(member.asRemote())
-        .await()
-    }
+    database
+      .getReference(MEMBER_PATH)
+      .child(member.loungeId)
+      .child(member.userId)
+      .setValue(member.asRemote())
+      .await()
   }
 
   override fun getMemberListFlow(
@@ -65,7 +58,6 @@ class MemberDataSourceImpl @Inject constructor(
           .filter { member -> member.type != MemberData.Type.EXILED }
           .sortedBy { member -> member.createdAt }
       }
-      .flowOn(dispatcher)
 
   override fun getMemberTypeFlow(
     member: MemberData
@@ -77,12 +69,11 @@ class MemberDataSourceImpl @Inject constructor(
       .child(MEMBER_TYPE)
       .values<String>()
       .mapNotNull { type -> type?.asMemberDataType() }
-      .flowOn(dispatcher)
 
   override suspend fun getMemberByUserId(
     userId: String,
     loungeId: String
-  ): MemberData = withContext(dispatcher) {
+  ): MemberData =
     database
       .getReference(MEMBER_PATH)
       .child(loungeId)
@@ -91,91 +82,80 @@ class MemberDataSourceImpl @Inject constructor(
       .await()
       .getValue(MemberRemote::class.java)
       ?.asData(userId) ?: throw LoungeError.InvalidMember
-  }
 
   override suspend fun updateMemberReadyType(
     member: MemberData
   ) {
-    withContext(dispatcher) {
-      database
-        .getReference(MEMBER_PATH)
-        .child(member.loungeId)
-        .child(member.userId)
-        .apply {
-          val type = child(MEMBER_TYPE).values<String>().first()
-          child(MEMBER_TYPE)
-            .setValue(
-              when (type) {
-                MemberRemote.TYPE_DEFAULT -> MemberRemote.TYPE_READY
-                MemberRemote.TYPE_READY -> MemberRemote.TYPE_DEFAULT
-                else -> type
-              }
-            )
-            .await()
-        }
-    }
+    database
+      .getReference(MEMBER_PATH)
+      .child(member.loungeId)
+      .child(member.userId)
+      .apply {
+        val type = child(MEMBER_TYPE).values<String>().first()
+        child(MEMBER_TYPE)
+          .setValue(
+            when (type) {
+              MemberRemote.TYPE_DEFAULT -> MemberRemote.TYPE_READY
+              MemberRemote.TYPE_READY -> MemberRemote.TYPE_DEFAULT
+              else -> type
+            }
+          )
+          .await()
+      }
   }
 
   override suspend fun updateMemberStatus(
     member: MemberData,
     status: MemberData.Status
   ) {
-    withContext(dispatcher) {
-      database
-        .getReference(MEMBER_PATH)
-        .child(member.loungeId)
-        .child(member.userId)
-        .child(MEMBER_STATUS)
-        .setValue(status.asRemote())
-        .await()
-    }
+    database
+      .getReference(MEMBER_PATH)
+      .child(member.loungeId)
+      .child(member.userId)
+      .child(MEMBER_STATUS)
+      .setValue(status.asRemote())
+      .await()
   }
 
   override suspend fun updateMembersStatusByLoungeId(
     loungeId: String,
     status: MemberData.Status
   ) {
-    withContext(dispatcher) {
-      database
-        .getReference(MEMBER_PATH)
-        .child(loungeId)
-        .getValueEventFlow<MemberRemote>()
-        .map { it.mapNotNull { (key, value) -> value?.asData(key) } }
-        .first()
-        .forEach { updateMemberStatus(it, status) }
-    }
+    database
+      .getReference(MEMBER_PATH)
+      .child(loungeId)
+      .getValueEventFlow<MemberRemote>()
+      .map { it.mapNotNull { (key, value) -> value?.asData(key) } }
+      .first()
+      .forEach { updateMemberStatus(it, status) }
   }
 
   override suspend fun exileMember(
     member: MemberData
   ) {
-    withContext(dispatcher) {
-      database
-        .getReference(MEMBER_PATH)
-        .child(member.loungeId)
-        .child(member.userId)
-        .apply {
-          child(MEMBER_TYPE)
-            .setValue(MemberRemote.TYPE_EXILED)
-            .await()
+    database
+      .getReference(MEMBER_PATH)
+      .child(member.loungeId)
+      .child(member.userId)
+      .apply {
+        child(MEMBER_TYPE)
+          .setValue(MemberRemote.TYPE_EXILED)
+          .await()
 
-          child(MEMBER_DELETED_AT)
-            .setValue(Timestamp.now().toLong())
-            .await()
-        }
-    }
+        child(MEMBER_DELETED_AT)
+          .setValue(Timestamp.now().toLong())
+          .await()
+      }
   }
 
   override suspend fun deleteMember(
     member: MemberData
   ) {
-    withContext(dispatcher) {
-      database
-        .getReference(MEMBER_PATH)
-        .child(member.loungeId)
-        .child(member.userId)
-        .removeValue()
-        .await()
-    }
+    database
+      .getReference(MEMBER_PATH)
+      .child(member.loungeId)
+      .child(member.userId)
+      .removeValue()
+      .await()
   }
 }
