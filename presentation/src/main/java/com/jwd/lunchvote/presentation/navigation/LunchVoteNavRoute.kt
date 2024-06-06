@@ -73,13 +73,7 @@ enum class LunchVoteNavRoute(
   Setting,
   Profile,
 
-
-  Tips,
-
-  HomeJoinDialog,
-  TemplateListAddDialog,
-  VoteExitDialog,
-  FirstVoteTemplateDialog,
+  Tips
 }
 
 internal val LunchVoteNavRoute.route: String

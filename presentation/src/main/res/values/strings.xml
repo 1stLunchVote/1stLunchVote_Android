@@ -106,6 +106,12 @@
     <string name="first_vote_re_vote_button">다시 투표하기</string>
     <string name="first_vote_calculating_message">투표 결과를 집계하고 있습니다…</string>
 
+    <!--  VoteExitDialog  -->
+    <string name="vote_exit_dialog_title">투표를 종료하시겠습니까?</string>
+    <string name="vote_exit_dialog_body">방을 나갈 경우 무효표 처리되며, 다시 참여할 수 없습니다.</string>
+    <string name="vote_exit_dialog_dismiss_button">취소</string>
+    <string name="vote_exit_dialog_confirm_button">나가기</string>
+
     <string name="exit_dialog_title">투표 나가기</string>
     <string name="exit_from_vote">투표 방에서 나왔습니다.</string>
     <string name="vote_exit_alert">투표에서 나가면 다시 돌아올 수 없으며,\n투표를 한 경우 투표 결과에 반영됩니다.</string>

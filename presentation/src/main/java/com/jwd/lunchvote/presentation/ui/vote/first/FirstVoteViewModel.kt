@@ -2,6 +2,7 @@ package com.jwd.lunchvote.presentation.ui.vote.first
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.common.error.LoungeError
@@ -17,6 +18,7 @@ import com.jwd.lunchvote.domain.repository.MemberRepository
 import com.jwd.lunchvote.domain.repository.TemplateRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.usecase.CalculateFirstVoteResult
+import com.jwd.lunchvote.domain.usecase.ExitLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.StartSecondVoteUseCase
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
@@ -25,13 +27,14 @@ import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.model.updateFoodMap
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
-import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteEvent
-import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteReduce
-import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteSideEffect
-import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteState
+import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.*
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -44,10 +47,19 @@ class FirstVoteViewModel @Inject constructor(
   private val firstVoteRepository: FirstVoteRepository,
   private val calculateFirstVoteResult: CalculateFirstVoteResult,
   private val startSecondVoteUseCase: StartSecondVoteUseCase,
+  private val exitLoungeUseCase: ExitLoungeUseCase,
   private val savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<FirstVoteState, FirstVoteEvent, FirstVoteReduce, FirstVoteSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): FirstVoteState =
     savedState as? FirstVoteState ?: FirstVoteState()
+
+  private val _dialogState = MutableStateFlow<FirstVoteDialog?>(null)
+  val dialogState: StateFlow<FirstVoteDialog?> = _dialogState.asStateFlow()
+  private fun setDialogState(dialogState: FirstVoteDialog?) {
+    viewModelScope.launch {
+      _dialogState.emit(dialogState)
+    }
+  }
 
   private val owner: MemberUIModel
     get() = currentState.memberList.find { it.type == MemberUIModel.Type.OWNER } ?: throw LoungeError.NoOwner
@@ -58,12 +70,19 @@ class FirstVoteViewModel @Inject constructor(
     when(event) {
       is FirstVoteEvent.ScreenInitialize -> launch { initialize() }
 
-      is FirstVoteEvent.OnClickBackButton -> sendSideEffect(FirstVoteSideEffect.PopBackStack)
+      is FirstVoteEvent.OnClickBackButton -> setDialogState(FirstVoteDialog.ExitDialog)
       is FirstVoteEvent.OnSearchKeywordChange -> updateState(FirstVoteReduce.UpdateSearchKeyword(event.searchKeyword))
       is FirstVoteEvent.OnClickFood -> updateState(FirstVoteReduce.UpdateFoodStatus(event.food))
       is FirstVoteEvent.OnClickFinishButton -> launch(false) { finishVote() }
       is FirstVoteEvent.OnClickReVoteButton -> launch(false) { reVote() }
       is FirstVoteEvent.OnVoteFinish -> launch { submitVote() }
+
+      // DialogEvents
+      is FirstVoteEvent.OnClickCancelButtonInSelectTemplateDialog -> setDialogState(null)
+      is FirstVoteEvent.OnTemplateChangeInSelectTemplateDialog -> updateState(FirstVoteReduce.UpdateTemplate(event.template))
+      is FirstVoteEvent.OnClickApplyButtonInSelectTemplateDialog -> launch { selectTemplate(currentState.template) }
+      is FirstVoteEvent.OnClickCancelButtonInExitDialog -> setDialogState(null)
+      is FirstVoteEvent.OnClickConfirmButtonInExitDialog -> launch { exitVote() }
     }
   }
 
@@ -72,8 +91,6 @@ class FirstVoteViewModel @Inject constructor(
       is FirstVoteReduce.UpdateLounge -> state.copy(lounge = reduce.lounge)
       is FirstVoteReduce.UpdateUser -> state.copy(user = reduce.user)
       is FirstVoteReduce.UpdateMemberList -> state.copy(memberList = reduce.memberList)
-      is FirstVoteReduce.UpdateTemplateList -> state.copy(templateList = reduce.templateList)
-      is FirstVoteReduce.UpdateTemplate -> state.copy(template = reduce.template)
       is FirstVoteReduce.UpdateFoodMap -> state.copy(foodMap = reduce.foodMap)
       is FirstVoteReduce.UpdateLikedFoods -> state.copy(likedFoods = reduce.likedFoods)
       is FirstVoteReduce.UpdateDislikedFoods -> state.copy(dislikedFoods = reduce.dislikedFoods)
@@ -95,6 +112,8 @@ class FirstVoteViewModel @Inject constructor(
       }
       is FirstVoteReduce.UpdateFinished -> state.copy(finished = reduce.finished)
       is FirstVoteReduce.UpdateCalculating -> state.copy(calculating = reduce.calculating)
+
+      is FirstVoteReduce.UpdateTemplate -> state.copy(template = reduce.template)
     }
   }
 
@@ -115,14 +134,13 @@ class FirstVoteViewModel @Inject constructor(
     launch(false) { collectMemberList(loungeId) }
     launch(false) { collectLoungeStatus(loungeId) }
 
-    val templateList = templateRepository.getTemplateList(userId).map { it.asUI() }
-    updateState(FirstVoteReduce.UpdateTemplateList(templateList))
-
     val foodList = foodRepository.getAllFood().map { it.asUI() }
     val foodMap = foodList.associateWith { FoodStatus.DEFAULT }
     updateState(FirstVoteReduce.UpdateFoodMap(foodMap))
 
-//    sendSideEffect(FirstVoteSideEffect.OpenTemplateDialog)
+    val templateList = templateRepository.getTemplateList(userId).map { it.asUI() }
+
+    setDialogState(FirstVoteDialog.SelectTemplateDialog(templateList))
   }
 
   private suspend fun collectMemberList(loungeId: String) {
@@ -139,23 +157,29 @@ class FirstVoteViewModel @Inject constructor(
     }
   }
 
-  private suspend fun selectTemplate(template: TemplateUIModel) {
-    updateState(FirstVoteReduce.UpdateTemplate(template))
-
+  private suspend fun selectTemplate(template: TemplateUIModel?) {
     val foodList = foodRepository.getAllFood().map { it.asUI() }
-    val foodMap = foodList.associateWith {
-      when (it.name) {
-        in template.likedFoodIds -> FoodStatus.LIKE
-        in template.dislikedFoodIds -> FoodStatus.DISLIKE
-        else -> FoodStatus.DEFAULT
-      }
-    }
-    val likeList = foodList.filter { template.likedFoodIds.contains(it.name) }
-    val dislikeList = foodList.filter { template.dislikedFoodIds.contains(it.name) }
 
-    updateState(FirstVoteReduce.UpdateFoodMap(foodMap))
-    updateState(FirstVoteReduce.UpdateLikedFoods(likeList))
-    updateState(FirstVoteReduce.UpdateDislikedFoods(dislikeList))
+    if (template == null) {
+      val foodMap = foodList.associateWith { FoodStatus.DEFAULT }
+
+      updateState(FirstVoteReduce.UpdateFoodMap(foodMap))
+    } else {
+      val foodMap = foodList.associateWith {
+        when (it.name) {
+          in template.likedFoodIds -> FoodStatus.LIKE
+          in template.dislikedFoodIds -> FoodStatus.DISLIKE
+          else -> FoodStatus.DEFAULT
+        }
+      }
+
+      val likeList = foodList.filter { template.likedFoodIds.contains(it.name) }
+      val dislikeList = foodList.filter { template.dislikedFoodIds.contains(it.name) }
+
+      updateState(FirstVoteReduce.UpdateFoodMap(foodMap))
+      updateState(FirstVoteReduce.UpdateLikedFoods(likeList))
+      updateState(FirstVoteReduce.UpdateDislikedFoods(dislikeList))
+    }
   }
 
   private suspend fun finishVote() {
@@ -186,5 +210,11 @@ class FirstVoteViewModel @Inject constructor(
 
       startSecondVoteUseCase(currentState.lounge.id)
     }
+  }
+
+  private suspend fun exitVote() {
+    exitLoungeUseCase(me.asDomain())
+
+    sendSideEffect(FirstVoteSideEffect.PopBackStack)
   }
 }

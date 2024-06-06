@@ -8,10 +8,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,13 +32,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodStatus
 import com.jwd.lunchvote.presentation.model.MemberUIModel
-import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteEvent
-import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteSideEffect
-import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteState
+import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.*
 import com.jwd.lunchvote.presentation.widget.FoodItem
 import com.jwd.lunchvote.presentation.widget.HorizontalProgressBar
 import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
+import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.MemberProgress
@@ -47,22 +50,19 @@ import kotlinx.coroutines.flow.collectLatest
 fun FirstVoteRoute(
   popBackStack: () -> Unit,
   navigateToSecondVote: () -> Unit,
-  openTemplateDialog: () -> Unit,
-  openVoteExitDialog: () -> Unit,
   showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: FirstVoteViewModel = hiltViewModel(),
   context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
+  val dialog by viewModel.dialogState.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
       when(it) {
         is FirstVoteSideEffect.PopBackStack -> popBackStack()
         is FirstVoteSideEffect.NavigateToSecondVote -> navigateToSecondVote()
-        is FirstVoteSideEffect.OpenTemplateDialog -> openTemplateDialog()
-        is FirstVoteSideEffect.OpenVoteExitDialog -> openVoteExitDialog()
         is FirstVoteSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
       }
     }
@@ -71,6 +71,16 @@ fun FirstVoteRoute(
   BackHandler { viewModel.sendEvent(FirstVoteEvent.OnClickBackButton) }
 
   LaunchedEffect(Unit) { viewModel.sendEvent(FirstVoteEvent.ScreenInitialize) }
+
+  when (dialog) {
+    is FirstVoteDialog.ExitDialog -> ExitDialog(
+      onDismissRequest = { viewModel.sendEvent(FirstVoteEvent.OnClickBackButton) },
+      onConfirmation = { viewModel.sendEvent(FirstVoteEvent.OnClickBackButton) }
+    )
+    is FirstVoteDialog.SelectTemplateDialog -> {
+
+    }
+  }
 
   if (state.calculating) LoadingScreen(message = stringResource(R.string.first_vote_calculating_message),)
   else FirstVoteScreen(
@@ -212,6 +222,31 @@ private fun FirstVoteWaitingScreen(
     ) {
       Text(text = stringResource(R.string.first_vote_re_vote_button))
     }
+  }
+}
+
+@Composable
+private fun ExitDialog(
+  modifier: Modifier = Modifier,
+  onDismissRequest: () -> Unit = {},
+  onConfirmation: () -> Unit = {}
+) {
+  LunchVoteDialog(
+    title = stringResource(R.string.vote_exit_dialog_title),
+    dismissText = stringResource(R.string.vote_exit_dialog_dismiss_button),
+    onDismissRequest = onDismissRequest,
+    confirmText = stringResource(R.string.vote_exit_dialog_confirm_button),
+    onConfirmation = onConfirmation,
+    modifier = modifier,
+    icon = {
+      Icon(
+        Icons.Rounded.Warning,
+        contentDescription = null,
+        modifier = Modifier.size(28.dp)
+      )
+    }
+  ) {
+    Text(text = stringResource(R.string.vote_exit_dialog_body))
   }
 }
 

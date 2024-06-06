@@ -17,14 +17,14 @@ class FirstVoteContract {
     val user: UserUIModel = UserUIModel(),
     val lounge: LoungeUIModel = LoungeUIModel(),
     val memberList: List<MemberUIModel> = emptyList(),
-    val templateList: List<TemplateUIModel> = emptyList(),
-    val template: TemplateUIModel? = null,
     val foodMap: Map<FoodUIModel, FoodStatus> = emptyMap(),
     val likedFoods: List<FoodUIModel> = emptyList(),
     val dislikedFoods: List<FoodUIModel> = emptyList(),
     val searchKeyword: String = "",
     val finished: Boolean = false,
-    val calculating: Boolean = false
+    val calculating: Boolean = false,
+
+    val template: TemplateUIModel? = null
   ) : ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this
   }
@@ -38,14 +38,19 @@ class FirstVoteContract {
     data object OnClickFinishButton : FirstVoteEvent
     data object OnClickReVoteButton : FirstVoteEvent
     data object OnVoteFinish : FirstVoteEvent
+
+    // DialogEvents
+    data object OnClickCancelButtonInSelectTemplateDialog : FirstVoteEvent
+    data class OnTemplateChangeInSelectTemplateDialog(val template: TemplateUIModel) : FirstVoteEvent
+    data object OnClickApplyButtonInSelectTemplateDialog : FirstVoteEvent
+    data object OnClickCancelButtonInExitDialog : FirstVoteEvent
+    data object OnClickConfirmButtonInExitDialog : FirstVoteEvent
   }
 
   sealed interface FirstVoteReduce : ViewModelContract.Reduce {
     data class UpdateUser(val user: UserUIModel) : FirstVoteReduce
     data class UpdateLounge(val lounge: LoungeUIModel) : FirstVoteReduce
     data class UpdateMemberList(val memberList: List<MemberUIModel>) : FirstVoteReduce
-    data class UpdateTemplateList(val templateList: List<TemplateUIModel>) : FirstVoteReduce
-    data class UpdateTemplate(val template: TemplateUIModel) : FirstVoteReduce
     data class UpdateFoodMap(val foodMap: Map<FoodUIModel, FoodStatus>) : FirstVoteReduce
     data class UpdateLikedFoods(val likedFoods: List<FoodUIModel>) : FirstVoteReduce
     data class UpdateDislikedFoods(val dislikedFoods: List<FoodUIModel>) : FirstVoteReduce
@@ -53,13 +58,18 @@ class FirstVoteContract {
     data class UpdateFoodStatus(val food: FoodUIModel) : FirstVoteReduce
     data class UpdateFinished(val finished: Boolean) : FirstVoteReduce
     data class UpdateCalculating(val calculating: Boolean) : FirstVoteReduce
+
+    data class UpdateTemplate(val template: TemplateUIModel?) : FirstVoteReduce
   }
 
   sealed interface FirstVoteSideEffect : ViewModelContract.SideEffect {
     data object PopBackStack : FirstVoteSideEffect
     data object NavigateToSecondVote : FirstVoteSideEffect
-    data object OpenTemplateDialog : FirstVoteSideEffect
-    data object OpenVoteExitDialog : FirstVoteSideEffect
     data class ShowSnackBar(val message: UiText) : FirstVoteSideEffect
+  }
+
+  sealed interface FirstVoteDialog {
+    data object ExitDialog : FirstVoteDialog
+    data class SelectTemplateDialog(val templateList: List<TemplateUIModel>) : FirstVoteDialog
   }
 }
