@@ -164,7 +164,9 @@ fun LunchVoteNavHost(
     }
     composable(LunchVoteNavRoute.TemplateList) {
       TemplateListRoute(
-        navigateToAddTemplate = { navController.navigate(LunchVoteNavRoute.AddTemplate) },
+        navigateToAddTemplate = { templateName ->
+          navController.navigate(LunchVoteNavRoute.AddTemplate, templateName)
+        },
         navigateToEditTemplate = { templateId ->
           navController.navigate(LunchVoteNavRoute.EditTemplate, templateId)
         },

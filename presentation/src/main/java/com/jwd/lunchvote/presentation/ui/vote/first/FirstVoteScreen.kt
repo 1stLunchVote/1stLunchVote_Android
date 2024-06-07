@@ -15,12 +15,20 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -29,11 +37,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodStatus
 import com.jwd.lunchvote.presentation.model.MemberUIModel
+import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.*
 import com.jwd.lunchvote.presentation.widget.FoodItem
+import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.HorizontalProgressBar
 import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
@@ -74,12 +85,17 @@ fun FirstVoteRoute(
 
   when (dialog) {
     is FirstVoteDialog.ExitDialog -> ExitDialog(
-      onDismissRequest = { viewModel.sendEvent(FirstVoteEvent.OnClickBackButton) },
-      onConfirmation = { viewModel.sendEvent(FirstVoteEvent.OnClickBackButton) }
+      onDismissRequest = { viewModel.sendEvent(FirstVoteEvent.OnClickCancelButtonInExitDialog) },
+      onConfirmation = { viewModel.sendEvent(FirstVoteEvent.OnClickConfirmButtonInExitDialog) }
     )
-    is FirstVoteDialog.SelectTemplateDialog -> {
-
-    }
+    is FirstVoteDialog.SelectTemplateDialog -> SelectTemplateDialog(
+      templateList = (dialog as FirstVoteDialog.SelectTemplateDialog).templateList,
+      template = state.template,
+      onDismissRequest = { viewModel.sendEvent(FirstVoteEvent.OnClickCancelButtonInSelectTemplateDialog) },
+      onTemplateChange = { viewModel.sendEvent(FirstVoteEvent.OnTemplateChangeInSelectTemplateDialog(it)) },
+      onConfirmation = { viewModel.sendEvent(FirstVoteEvent.OnClickApplyButtonInSelectTemplateDialog) }
+    )
+    null -> Unit
   }
 
   if (state.calculating) LoadingScreen(message = stringResource(R.string.first_vote_calculating_message),)
@@ -225,6 +241,79 @@ private fun FirstVoteWaitingScreen(
   }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SelectTemplateDialog(
+  templateList: List<TemplateUIModel>,
+  template: TemplateUIModel?,
+  modifier: Modifier = Modifier,
+  onDismissRequest: () -> Unit = {},
+  onTemplateChange: (TemplateUIModel) -> Unit = {},
+  onConfirmation: () -> Unit = {}
+) {
+  LunchVoteDialog(
+    title = "투표가 시작되었습니다!",
+    dismissText = "건너뛰기",
+    onDismissRequest = onDismissRequest,
+    confirmText = "적용",
+    onConfirmation = onConfirmation,
+    confirmEnabled = template != null,
+    modifier = modifier
+  ) {
+    Text(
+      text = "음식을 터치하여 호불호를 선택할 수 있습니다.\n" +
+        "좋아한다고 투표한 멤버당 1점이 추가되며\n" +
+        "싫어한다고 투표한 멤버당 5점이 감점됩니다.\n\n" +
+        "템플릿을 골라 빠르게 투표해보세요!"
+    )
+    Gap(height = 16.dp)
+
+    var expended by remember { mutableStateOf(false) }
+    ExposedDropdownMenuBox(
+      expanded = expended,
+      onExpandedChange = { expended = it },
+    ) {
+      if (templateList.isEmpty()) {
+        OutlinedTextField(
+          value = "템플릿이 없습니다.",
+          onValueChange = { },
+          modifier = Modifier
+            .fillMaxWidth()
+            .menuAnchor(),
+          readOnly = true,
+          trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expended) },
+          singleLine = true
+        )
+      } else {
+        OutlinedTextField(
+          value = template?.name ?: "템플릿을 선택해주세요",
+          onValueChange = { },
+          modifier = Modifier
+            .fillMaxWidth()
+            .menuAnchor(),
+          readOnly = true,
+          trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expended) },
+          singleLine = true
+        )
+        ExposedDropdownMenu(
+          expanded = expended,
+          onDismissRequest = { expended = false }
+        ) {
+          templateList.forEach { template ->
+            DropdownMenuItem(
+              text = { Text(text = template.name) },
+              onClick = {
+                onTemplateChange(template)
+                expended = false
+              }
+            )
+          }
+        }
+      }
+    }
+  }
+}
+
 @Composable
 private fun ExitDialog(
   modifier: Modifier = Modifier,
@@ -286,5 +375,28 @@ private fun Preview2() {
         finished = true
       )
     )
+  }
+}
+
+@Preview
+@Composable
+private fun SelectTemplateDialogPreview() {
+  LunchVoteTheme {
+    SelectTemplateDialog(
+      templateList = listOf(
+        TemplateUIModel(name = "템플릿1"),
+        TemplateUIModel(name = "템플릿2"),
+        TemplateUIModel(name = "템플릿3")
+      ),
+      template = null
+    )
+  }
+}
+
+@Preview
+@Composable
+private fun ExitDialogPreview() {
+  LunchVoteTheme {
+    ExitDialog()
   }
 }
