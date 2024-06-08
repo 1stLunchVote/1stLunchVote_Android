@@ -252,20 +252,15 @@ private fun SelectTemplateDialog(
   onConfirmation: () -> Unit = {}
 ) {
   LunchVoteDialog(
-    title = "투표가 시작되었습니다!",
-    dismissText = "건너뛰기",
+    title = stringResource(R.string.select_template_dialog_title),
+    dismissText = stringResource(R.string.select_template_dialog_dismiss_button),
     onDismissRequest = onDismissRequest,
-    confirmText = "적용",
+    confirmText = stringResource(R.string.select_template_dialog_confirm_button),
     onConfirmation = onConfirmation,
     confirmEnabled = template != null,
     modifier = modifier
   ) {
-    Text(
-      text = "음식을 터치하여 호불호를 선택할 수 있습니다.\n" +
-        "좋아한다고 투표한 멤버당 1점이 추가되며\n" +
-        "싫어한다고 투표한 멤버당 5점이 감점됩니다.\n\n" +
-        "템플릿을 골라 빠르게 투표해보세요!"
-    )
+    Text(text = stringResource(R.string.select_template_dialog_body))
     Gap(height = 16.dp)
 
     var expended by remember { mutableStateOf(false) }
@@ -275,7 +270,7 @@ private fun SelectTemplateDialog(
     ) {
       if (templateList.isEmpty()) {
         OutlinedTextField(
-          value = "템플릿이 없습니다.",
+          value = stringResource(R.string.select_template_dialog_no_template_text),
           onValueChange = { },
           modifier = Modifier
             .fillMaxWidth()
@@ -286,7 +281,7 @@ private fun SelectTemplateDialog(
         )
       } else {
         OutlinedTextField(
-          value = template?.name ?: "템플릿을 선택해주세요",
+          value = template?.name ?: stringResource(R.string.select_template_dialog_hint_text),
           onValueChange = { },
           modifier = Modifier
             .fillMaxWidth()

@@ -105,7 +105,13 @@
     <string name="first_vote_waiting_body">현재 %d명이 투표 완료했습니다!</string>
     <string name="first_vote_re_vote_button">다시 투표하기</string>
     <string name="first_vote_calculating_message">투표 결과를 집계하고 있습니다…</string>
-
+    <!--  SelectTemplateDialog  -->
+    <string name="select_template_dialog_title">투표가 시작되었습니다!</string>
+    <string name="select_template_dialog_body">음식을 터치하여 호불호를 선택할 수 있습니다.\n좋아한다고 투표한 멤버당 1점이 추가되며\n싫어한다고 투표한 멤버당 5점이 감점됩니다.\n\n템플릿을 골라 빠르게 투표해보세요!</string>
+    <string name="select_template_dialog_hint_text">템플릿을 선택해주세요</string>
+    <string name="select_template_dialog_no_template_text">템플릿이 없습니다.</string>
+    <string name="select_template_dialog_dismiss_button">건너뛰기</string>
+    <string name="select_template_dialog_confirm_button">적용</string>
     <!--  VoteExitDialog  -->
     <string name="vote_exit_dialog_title">투표를 종료하시겠습니까?</string>
     <string name="vote_exit_dialog_body">방을 나갈 경우 무효표 처리되며, 다시 참여할 수 없습니다.</string>
