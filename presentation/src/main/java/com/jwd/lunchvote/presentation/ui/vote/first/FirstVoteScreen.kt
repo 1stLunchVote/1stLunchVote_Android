@@ -42,7 +42,10 @@ import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodStatus
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
-import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.*
+import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteDialog
+import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteEvent
+import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteSideEffect
+import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteState
 import com.jwd.lunchvote.presentation.widget.FoodItem
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.HorizontalProgressBar
