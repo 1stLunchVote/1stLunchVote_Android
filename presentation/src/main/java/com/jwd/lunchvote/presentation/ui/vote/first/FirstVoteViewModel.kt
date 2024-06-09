@@ -20,6 +20,7 @@ import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.usecase.CalculateFirstVoteResult
 import com.jwd.lunchvote.domain.usecase.ExitLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.StartSecondVoteUseCase
+import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.FoodStatus
@@ -27,6 +28,7 @@ import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.model.updateFoodMap
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
+import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.*
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -147,13 +149,24 @@ class FirstVoteViewModel @Inject constructor(
     memberRepository.getMemberListFlow(loungeId).collectLatest { memberList ->
       updateState(FirstVoteReduce.UpdateMemberList(memberList.map { it.asUI() }))
 
+      if (memberList.size <= 1) {
+        sendSideEffect(FirstVoteSideEffect.ShowSnackBar(UiText.StringResource(R.string.first_vote_only_owner_snackbar)))
+        sendSideEffect(FirstVoteSideEffect.PopBackStack)
+      }
       if (memberList.all { it.status == Member.Status.VOTED }) launch { submitVote() }
     }
   }
 
   private suspend fun collectLoungeStatus(loungeId: String) {
     loungeRepository.getLoungeStatusFlowById(loungeId).collectLatest { status ->
-      if (status == Lounge.Status.SECOND_VOTE) sendSideEffect(FirstVoteSideEffect.NavigateToSecondVote)
+      when(status) {
+        Lounge.Status.QUIT -> {
+          sendSideEffect(FirstVoteSideEffect.ShowSnackBar(UiText.StringResource(R.string.first_vote_owner_exited_snackbar)))
+          sendSideEffect(FirstVoteSideEffect.PopBackStack)
+        }
+        Lounge.Status.SECOND_VOTE -> sendSideEffect(FirstVoteSideEffect.NavigateToSecondVote)
+        else -> Unit
+      }
     }
   }
 
