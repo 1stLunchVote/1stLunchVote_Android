@@ -8,7 +8,8 @@ data class LoungeRemote(
   companion object {
     const val STATUS_CREATED = "created"
     const val STATUS_QUIT = "quit"
-    const val STATUS_STARTED = "started"
+    const val STATUS_FIRST_VOTE = "first_vote"
+    const val STATUS_SECOND_VOTE = "second_vote"
     const val STATUS_FINISHED = "finished"
   }
 }

@@ -25,7 +25,8 @@ private object LoungeRemoteStatusMapper : BiMapper<String, LoungeData.Status> {
     when (from) {
       LoungeRemote.STATUS_CREATED -> LoungeData.Status.CREATED
       LoungeRemote.STATUS_QUIT -> LoungeData.Status.QUIT
-      LoungeRemote.STATUS_STARTED -> LoungeData.Status.STARTED
+      LoungeRemote.STATUS_FIRST_VOTE -> LoungeData.Status.FIRST_VOTE
+      LoungeRemote.STATUS_SECOND_VOTE -> LoungeData.Status.SECOND_VOTE
       LoungeRemote.STATUS_FINISHED -> LoungeData.Status.FINISHED
       else -> throw LoungeError.InvalidLoungeStatus
     }
@@ -34,7 +35,8 @@ private object LoungeRemoteStatusMapper : BiMapper<String, LoungeData.Status> {
     when (from) {
       LoungeData.Status.CREATED -> LoungeRemote.STATUS_CREATED
       LoungeData.Status.QUIT -> LoungeRemote.STATUS_QUIT
-      LoungeData.Status.STARTED -> LoungeRemote.STATUS_STARTED
+      LoungeData.Status.FIRST_VOTE -> LoungeRemote.STATUS_FIRST_VOTE
+      LoungeData.Status.SECOND_VOTE -> LoungeRemote.STATUS_SECOND_VOTE
       LoungeData.Status.FINISHED -> LoungeRemote.STATUS_FINISHED
     }
 }

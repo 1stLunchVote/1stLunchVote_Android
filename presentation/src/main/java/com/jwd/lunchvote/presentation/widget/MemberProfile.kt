@@ -1,6 +1,5 @@
 package com.jwd.lunchvote.presentation.widget
 
-import android.graphics.Paint
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,8 +20,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
@@ -30,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.MemberUIModel
+import com.jwd.lunchvote.presentation.util.glow
 import com.skydoves.landscapist.coil.CoilImage
 
 @Composable
@@ -49,21 +47,7 @@ fun MemberProfile(
       .size(48.dp)
       .let {
         if (member.type == MemberUIModel.Type.READY || member.type == MemberUIModel.Type.OWNER) {
-          val glowingColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-
-          it.drawBehind {
-            val canvasSize = size
-            val paint = Paint().apply {
-              isAntiAlias = true
-              setShadowLayer(24.dp.toPx(), 0.dp.toPx(), 0.dp.toPx(), glowingColor.toArgb())
-            }
-            drawContext.canvas.nativeCanvas.apply {
-              drawRoundRect(
-                /*left*/0f,/*top*/0f,/*right*/canvasSize.width,/*bottom*/canvasSize.height,
-                /*radiusX*/24.dp.toPx(),/*radiusY*/24.dp.toPx(),/*paint*/paint
-              )
-            }
-          }
+          it.glow(MaterialTheme.colorScheme.primary, 24.dp)
         } else it
       }
       .clip(CircleShape)

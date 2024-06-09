@@ -26,6 +26,7 @@ class CreateLoungeUseCase @Inject constructor(
       userName = user.name,
       userProfile = user.profileImage,
       type = Member.Type.OWNER,
+      status = Member.Status.STANDBY,
       createdAt = Instant.now().epochSecond,
       deletedAt = null
     )

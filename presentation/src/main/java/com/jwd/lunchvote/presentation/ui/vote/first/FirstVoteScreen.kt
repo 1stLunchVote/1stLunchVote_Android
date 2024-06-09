@@ -5,17 +5,30 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.Button
-import androidx.compose.material3.Surface
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,151 +40,361 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodStatus
-import com.jwd.lunchvote.presentation.model.FoodUIModel
+import com.jwd.lunchvote.presentation.model.MemberUIModel
+import com.jwd.lunchvote.presentation.model.TemplateUIModel
+import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteDialog
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteEvent
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteSideEffect
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteState
 import com.jwd.lunchvote.presentation.widget.FoodItem
+import com.jwd.lunchvote.presentation.widget.Gap
+import com.jwd.lunchvote.presentation.widget.HorizontalProgressBar
 import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
+import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
-import com.jwd.lunchvote.presentation.widget.ProgressTopBar
-import com.jwd.lunchvote.presentation.widget.StepProgress
+import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
+import com.jwd.lunchvote.presentation.widget.MemberProgress
+import com.jwd.lunchvote.presentation.widget.Screen
+import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.TextFieldType
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun FirstVoteRoute(
-  navigateToSecondVote: () -> Unit,
-  openTemplateDialog: () -> Unit,
-  openVoteExitDialog: () -> Unit,
   popBackStack: () -> Unit,
+  navigateToSecondVote: () -> Unit,
   showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: FirstVoteViewModel = hiltViewModel(),
   context: Context = LocalContext.current
 ) {
-  val firstVoteState by viewModel.viewState.collectAsStateWithLifecycle()
-  val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+  val state by viewModel.viewState.collectAsStateWithLifecycle()
+  val dialog by viewModel.dialogState.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
       when(it) {
-        is FirstVoteSideEffect.NavigateToSecondVote -> navigateToSecondVote()
-        is FirstVoteSideEffect.OpenTemplateDialog -> openTemplateDialog()
-        is FirstVoteSideEffect.OpenVoteExitDialog -> openVoteExitDialog()
         is FirstVoteSideEffect.PopBackStack -> popBackStack()
+        is FirstVoteSideEffect.NavigateToSecondVote -> navigateToSecondVote()
         is FirstVoteSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
       }
     }
   }
 
-  BackHandler {
-    viewModel.sendEvent(FirstVoteEvent.OnClickExitButton)
+  BackHandler { viewModel.sendEvent(FirstVoteEvent.OnClickBackButton) }
+
+  LaunchedEffect(Unit) { viewModel.sendEvent(FirstVoteEvent.ScreenInitialize) }
+
+  when (dialog) {
+    is FirstVoteDialog.ExitDialog -> ExitDialog(
+      onDismissRequest = { viewModel.sendEvent(FirstVoteEvent.OnClickCancelButtonInExitDialog) },
+      onConfirmation = { viewModel.sendEvent(FirstVoteEvent.OnClickConfirmButtonInExitDialog) }
+    )
+    is FirstVoteDialog.SelectTemplateDialog -> SelectTemplateDialog(
+      templateList = (dialog as FirstVoteDialog.SelectTemplateDialog).templateList,
+      template = state.template,
+      onDismissRequest = { viewModel.sendEvent(FirstVoteEvent.OnClickCancelButtonInSelectTemplateDialog) },
+      onTemplateChange = { viewModel.sendEvent(FirstVoteEvent.OnTemplateChangeInSelectTemplateDialog(it)) },
+      onConfirmation = { viewModel.sendEvent(FirstVoteEvent.OnClickApplyButtonInSelectTemplateDialog) }
+    )
+    null -> Unit
   }
 
-  if (isLoading) LoadingScreen()
+  if (state.calculating) LoadingScreen(message = stringResource(R.string.first_vote_calculating_message),)
   else FirstVoteScreen(
-    firstVoteState = firstVoteState,
+    state = state,
     modifier = modifier,
-    onClickFood = { food -> viewModel.sendEvent(FirstVoteEvent.OnClickFood(food)) },
-    setSearchKeyword = { search -> viewModel.sendEvent(FirstVoteEvent.SetSearchKeyword(search)) },
-    navigateToSecondVote = navigateToSecondVote
+    onEvent = viewModel::sendEvent
   )
 }
 
 @Composable
-fun FirstVoteScreen(
-  firstVoteState: FirstVoteState,
+private fun FirstVoteScreen(
+  state: FirstVoteState,
   modifier: Modifier = Modifier,
-  onClickFood: (FoodUIModel) -> Unit = {},
-  setSearchKeyword: (String) -> Unit = {},
-  navigateToSecondVote: () -> Unit = {},
+  onEvent: (FirstVoteEvent) -> Unit = {}
+) {
+  Screen(
+    modifier = modifier,
+    topAppBar = {
+      LunchVoteTopBar(
+        title = stringResource(R.string.first_vote_title),
+        navIconVisible = false
+      )
+      HorizontalProgressBar(
+        timeLimitSecond = 60,
+        modifier = Modifier.fillMaxWidth(),
+        onProgressComplete = { onEvent(FirstVoteEvent.OnVoteFinish) }
+      )
+    },
+    scrollable = false
+  ) {
+    if (state.finished) FirstVoteWaitingScreen(state = state, onEvent = onEvent)
+    else FirstVotingScreen(state = state, onEvent = onEvent)
+  }
+}
+
+@Composable
+private fun FirstVotingScreen(
+  state: FirstVoteState,
+  modifier: Modifier = Modifier,
+  onEvent: (FirstVoteEvent) -> Unit = {}
 ) {
   Column(
-    modifier = modifier.fillMaxWidth(),
-    horizontalAlignment = Alignment.CenterHorizontally
+    modifier = modifier
+      .fillMaxSize()
+      .padding(start = 32.dp, top = 16.dp, end = 32.dp, bottom = 24.dp),
+    verticalArrangement = Arrangement.spacedBy(16.dp)
   ) {
-    ProgressTopBar(
-      title = stringResource(R.string.first_vote_title),
-      onProgressComplete = { navigateToSecondVote() }
+    FirstVoteInformationRow(
+      like = state.likedFoods.size,
+      dislike = state.dislikedFoods.size,
+      memberList = state.memberList,
+      modifier = Modifier.fillMaxWidth()
     )
-    Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(top = 16.dp, start = 24.dp, end = 24.dp, bottom = 8.dp),
-      horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.CenterVertically
-    ) {
-      LikeDislike(firstVoteState.likeList.size, firstVoteState.dislikeList.size)
-      Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-      ) {
-        for (i in 1..firstVoteState.totalMember) {
-          StepProgress(i <= firstVoteState.endedMember)
-        }
-      }
-    }
     LunchVoteTextField(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 24.dp),
-      text = firstVoteState.searchKeyword,
+      text = state.searchKeyword,
+      onTextChange = { onEvent(FirstVoteEvent.OnSearchKeywordChange(it)) },
       hintText = stringResource(R.string.first_vote_hint_text),
-      onTextChange = setSearchKeyword,
+      modifier = Modifier.fillMaxWidth(),
       textFieldType = TextFieldType.Search
     )
     LazyVerticalGrid(
       columns = GridCells.Fixed(3),
       modifier = Modifier
         .fillMaxWidth()
-        .weight(1f)
-        .padding(top = 24.dp, start = 24.dp, end = 24.dp, bottom = 16.dp),
+        .weight(1f),
       verticalArrangement = Arrangement.spacedBy(8.dp),
       horizontalArrangement = Arrangement.SpaceBetween
     ) {
-      items(firstVoteState.foodMap.keys.filter { it.name.contains(firstVoteState.searchKeyword) }) {food ->
-        FoodItem(food, firstVoteState.foodMap[food]!!) { onClickFood(food) }
+      val filteredFoodList = state.foodMap.keys.filter { it.name.contains(state.searchKeyword) }
+
+      items(filteredFoodList) {food ->
+        FoodItem(
+          food = food,
+          status = state.foodMap[food] ?: FoodStatus.DEFAULT,
+          onClick = { onEvent(FirstVoteEvent.OnClickFood(food)) }
+        )
       }
     }
     Button(
-      onClick = navigateToSecondVote,
-      modifier = Modifier.padding(bottom = 24.dp),
-      enabled = firstVoteState.likeList.isNotEmpty() && firstVoteState.dislikeList.isNotEmpty()
+      onClick = { onEvent(FirstVoteEvent.OnClickFinishButton) },
+      modifier = Modifier.align(Alignment.CenterHorizontally),
+      enabled = state.likedFoods.isNotEmpty() || state.dislikedFoods.isNotEmpty()
     ) {
-      Text("투표 완료")
+      Text(text = stringResource(R.string.first_vote_finish_button))
     }
   }
 }
 
-@Preview(showSystemUi = true, showBackground = true)
 @Composable
-fun FirstVoteScreenPreview() {
-  LunchVoteTheme {
-    Surface {
-      FirstVoteScreen(
-        FirstVoteState(
-          foodMap = mapOf(
-            FoodUIModel(
-              id = "1",
-              image = "",
-              name = "음식명"
-            ) to FoodStatus.DEFAULT,
-            FoodUIModel(
-              id = "2",
-              image = "",
-              name = "음식명"
-            ) to FoodStatus.DEFAULT,
-            FoodUIModel(
-              id = "3",
-              image = "",
-              name = "음식명"
-            ) to FoodStatus.DEFAULT,
-          ),
-          totalMember = 3,
-          endedMember = 1
-        )
+private fun FirstVoteInformationRow(
+  like: Int,
+  dislike: Int,
+  memberList: List<MemberUIModel>,
+  modifier: Modifier = Modifier
+) {
+  Row(
+    modifier = modifier,
+    horizontalArrangement = Arrangement.SpaceBetween,
+    verticalAlignment = Alignment.CenterVertically
+  ) {
+    LikeDislike(like, dislike)
+    MemberProgress(memberList.map { it.status })
+  }
+}
+
+@Composable
+private fun FirstVoteWaitingScreen(
+  state: FirstVoteState,
+  modifier: Modifier = Modifier,
+  onEvent: (FirstVoteEvent) -> Unit = {}
+) {
+  Column(
+    modifier = modifier
+      .fillMaxSize()
+      .padding(24.dp),
+    verticalArrangement = Arrangement.spacedBy(40.dp),
+    horizontalAlignment = Alignment.CenterHorizontally
+  ) {
+    Column(
+      modifier = Modifier
+        .fillMaxWidth()
+        .weight(1f),
+      verticalArrangement = Arrangement.spacedBy(40.dp, alignment = Alignment.CenterVertically),
+      horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+      Text(
+        text = stringResource(R.string.first_vote_waiting_title),
+        style = MaterialTheme.typography.titleLarge
+      )
+      MemberProgress(state.memberList.map { it.status })
+      Text(
+        text = stringResource(R.string.first_vote_waiting_body, state.memberList.count { it.status == MemberUIModel.Status.VOTED }),
+        style = MaterialTheme.typography.bodyMedium
       )
     }
+    Button(
+      onClick = { onEvent(FirstVoteEvent.OnClickReVoteButton) },
+      modifier = Modifier.align(Alignment.CenterHorizontally)
+    ) {
+      Text(text = stringResource(R.string.first_vote_re_vote_button))
+    }
+  }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SelectTemplateDialog(
+  templateList: List<TemplateUIModel>,
+  template: TemplateUIModel?,
+  modifier: Modifier = Modifier,
+  onDismissRequest: () -> Unit = {},
+  onTemplateChange: (TemplateUIModel) -> Unit = {},
+  onConfirmation: () -> Unit = {}
+) {
+  LunchVoteDialog(
+    title = stringResource(R.string.select_template_dialog_title),
+    dismissText = stringResource(R.string.select_template_dialog_dismiss_button),
+    onDismissRequest = onDismissRequest,
+    confirmText = stringResource(R.string.select_template_dialog_confirm_button),
+    onConfirmation = onConfirmation,
+    confirmEnabled = template != null,
+    modifier = modifier
+  ) {
+    Text(text = stringResource(R.string.select_template_dialog_body))
+    Gap(height = 16.dp)
+
+    var expended by remember { mutableStateOf(false) }
+    ExposedDropdownMenuBox(
+      expanded = expended,
+      onExpandedChange = { expended = it },
+    ) {
+      if (templateList.isEmpty()) {
+        OutlinedTextField(
+          value = stringResource(R.string.select_template_dialog_no_template_text),
+          onValueChange = { },
+          modifier = Modifier
+            .fillMaxWidth()
+            .menuAnchor(),
+          readOnly = true,
+          trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expended) },
+          singleLine = true
+        )
+      } else {
+        OutlinedTextField(
+          value = template?.name ?: stringResource(R.string.select_template_dialog_hint_text),
+          onValueChange = { },
+          modifier = Modifier
+            .fillMaxWidth()
+            .menuAnchor(),
+          readOnly = true,
+          trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expended) },
+          singleLine = true
+        )
+        ExposedDropdownMenu(
+          expanded = expended,
+          onDismissRequest = { expended = false }
+        ) {
+          templateList.forEach { template ->
+            DropdownMenuItem(
+              text = { Text(text = template.name) },
+              onClick = {
+                onTemplateChange(template)
+                expended = false
+              }
+            )
+          }
+        }
+      }
+    }
+  }
+}
+
+@Composable
+private fun ExitDialog(
+  modifier: Modifier = Modifier,
+  onDismissRequest: () -> Unit = {},
+  onConfirmation: () -> Unit = {}
+) {
+  LunchVoteDialog(
+    title = stringResource(R.string.vote_exit_dialog_title),
+    dismissText = stringResource(R.string.vote_exit_dialog_dismiss_button),
+    onDismissRequest = onDismissRequest,
+    confirmText = stringResource(R.string.vote_exit_dialog_confirm_button),
+    onConfirmation = onConfirmation,
+    modifier = modifier,
+    icon = {
+      Icon(
+        Icons.Rounded.Warning,
+        contentDescription = null,
+        modifier = Modifier.size(28.dp)
+      )
+    }
+  ) {
+    Text(text = stringResource(R.string.vote_exit_dialog_body))
+  }
+}
+
+@Preview
+@Composable
+private fun Preview1() {
+  ScreenPreview {
+    FirstVoteScreen(
+      FirstVoteState(
+        memberList = listOf(
+          MemberUIModel(status = MemberUIModel.Status.VOTING),
+          MemberUIModel(status = MemberUIModel.Status.VOTED),
+          MemberUIModel(status = MemberUIModel.Status.VOTED),
+          MemberUIModel(status = MemberUIModel.Status.VOTING),
+          MemberUIModel(status = MemberUIModel.Status.VOTED),
+          MemberUIModel(status = MemberUIModel.Status.VOTING)
+        )
+      )
+    )
+  }
+}
+
+@Preview
+@Composable
+private fun Preview2() {
+  ScreenPreview {
+    FirstVoteScreen(
+      FirstVoteState(
+        memberList = listOf(
+          MemberUIModel(status = MemberUIModel.Status.VOTING),
+          MemberUIModel(status = MemberUIModel.Status.VOTED),
+          MemberUIModel(status = MemberUIModel.Status.VOTED),
+          MemberUIModel(status = MemberUIModel.Status.VOTING),
+          MemberUIModel(status = MemberUIModel.Status.VOTED),
+          MemberUIModel(status = MemberUIModel.Status.VOTING)
+        ),
+        finished = true
+      )
+    )
+  }
+}
+
+@Preview
+@Composable
+private fun SelectTemplateDialogPreview() {
+  LunchVoteTheme {
+    SelectTemplateDialog(
+      templateList = listOf(
+        TemplateUIModel(name = "템플릿1"),
+        TemplateUIModel(name = "템플릿2"),
+        TemplateUIModel(name = "템플릿3")
+      ),
+      template = null
+    )
+  }
+}
+
+@Preview
+@Composable
+private fun ExitDialogPreview() {
+  LunchVoteTheme {
+    ExitDialog()
   }
 }

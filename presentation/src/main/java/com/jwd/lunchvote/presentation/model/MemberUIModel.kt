@@ -13,11 +13,16 @@ data class MemberUIModel(
   val userName: String = "",
   val userProfile: String = "",
   val type: Type = Type.DEFAULT,
+  val status: Status = Status.STANDBY,
   val createdAt: ZonedDateTime = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("Asia/Seoul")),
   val deletedAt: ZonedDateTime? = null
 ) : Parcelable {
 
   enum class Type {
     DEFAULT, OWNER, READY, EXILED
+  }
+
+  enum class Status {
+    STANDBY, VOTING, VOTED
   }
 }

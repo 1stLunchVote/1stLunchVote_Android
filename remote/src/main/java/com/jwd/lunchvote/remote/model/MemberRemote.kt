@@ -8,6 +8,7 @@ data class MemberRemote(
   val userName: String = "",
   val userProfile: String = "",
   val type: String = TYPE_DEFAULT,
+  val status: String = STATUS_STANDBY,
   val createdAt: Long = Timestamp.now().toLong(),
   val deletedAt: Long? = null
 ) {
@@ -17,5 +18,9 @@ data class MemberRemote(
     const val TYPE_OWNER = "owner"
     const val TYPE_READY = "ready"
     const val TYPE_EXILED = "exiled"
+
+    const val STATUS_STANDBY = "standby"
+    const val STATUS_VOTING = "voting"
+    const val STATUS_VOTED = "voted"
   }
 }

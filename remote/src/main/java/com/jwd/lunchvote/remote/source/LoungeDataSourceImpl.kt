@@ -7,19 +7,16 @@ import com.jwd.lunchvote.data.model.LoungeData
 import com.jwd.lunchvote.data.source.remote.LoungeDataSource
 import com.jwd.lunchvote.remote.mapper.asData
 import com.jwd.lunchvote.remote.mapper.asLoungeDataStatus
+import com.jwd.lunchvote.remote.mapper.asRemote
 import com.jwd.lunchvote.remote.model.LoungeRemote
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
 
 class LoungeDataSourceImpl @Inject constructor(
-  private val database: FirebaseDatabase,
-  private val dispatcher: CoroutineDispatcher
+  private val database: FirebaseDatabase
 ) : LoungeDataSource {
 
   companion object {
@@ -31,17 +28,16 @@ class LoungeDataSourceImpl @Inject constructor(
 
   override suspend fun checkLoungeExistById(
     id: String
-  ): Boolean = withContext(dispatcher) {
+  ): Boolean =
     database
       .getReference(LOUNGE_PATH)
       .child(id)
       .get()
       .await()
       .exists()
-  }
 
 
-  override suspend fun createLounge(): String = withContext(dispatcher) {
+  override suspend fun createLounge(): String {
     val loungeId = UUID.randomUUID().toString()
     database
       .getReference(LOUNGE_PATH)
@@ -54,7 +50,8 @@ class LoungeDataSourceImpl @Inject constructor(
           .setValue(0)
           .await()
       }
-    loungeId
+
+    return loungeId
   }
 
   override fun getLoungeStatusFlowById(
@@ -66,11 +63,10 @@ class LoungeDataSourceImpl @Inject constructor(
       .child(LOUNGE_STATUS)
       .values<String>()
       .mapNotNull { status -> status?.asLoungeDataStatus() }
-      .flowOn(dispatcher)
 
   override suspend fun getLoungeById(
     id: String
-  ): LoungeData = withContext(dispatcher) {
+  ): LoungeData =
     database
       .getReference(LOUNGE_PATH)
       .child(id)
@@ -78,85 +74,64 @@ class LoungeDataSourceImpl @Inject constructor(
       .await()
       .getValue(LoungeRemote::class.java)
       ?.asData(id) ?: throw LoungeError.NoLounge
-  }
 
   override suspend fun joinLoungeById(
     id: String
   ) {
-    withContext(dispatcher) {
-      database
-        .getReference(LOUNGE_PATH)
-        .child(id)
-        .child(LOUNGE_MEMBERS)
-        .apply {
-          val members = get().await().value as Long
-          if (members >= 6) throw LoungeError.FullMember
-          setValue(members + 1).await()
-        }
-    }
+    database
+      .getReference(LOUNGE_PATH)
+      .child(id)
+      .child(LOUNGE_MEMBERS)
+      .apply {
+        val members = get().await().value as Long
+        if (members >= 6) throw LoungeError.FullMember
+        setValue(members + 1).await()
+      }
   }
 
   override suspend fun exitLoungeById(
     id: String
   ) {
-    withContext(dispatcher) {
-      database
-        .getReference(LOUNGE_PATH)
-        .child(id)
-        .child(LOUNGE_MEMBERS)
-        .apply {
-          val members = get().await().value as Long
-          if (members <= 0) throw LoungeError.NoMember
-          setValue(members - 1).await()
-        }
-    }
+    database
+      .getReference(LOUNGE_PATH)
+      .child(id)
+      .child(LOUNGE_MEMBERS)
+      .apply {
+        val members = get().await().value as Long
+        if (members <= 0) throw LoungeError.NoMember
+        setValue(members - 1).await()
+      }
   }
 
   override suspend fun quitLoungeById(
     id: String
   ) {
-    withContext(dispatcher) {
-      database
-        .getReference(LOUNGE_PATH)
-        .child(id)
-        .apply {
-          child(LOUNGE_STATUS)
-            .setValue(LoungeRemote.STATUS_QUIT)
-            .await()
+    database
+      .getReference(LOUNGE_PATH)
+      .child(id)
+      .apply {
+        child(LOUNGE_STATUS)
+          .setValue(LoungeRemote.STATUS_QUIT)
+          .await()
 
-          child(LOUNGE_MEMBERS)
-            .apply {
-              val members = get().await().value as Long
-              if (members <= 0) throw LoungeError.NoMember
-              setValue(members - 1).await()
-            }
-        }
-    }
+        child(LOUNGE_MEMBERS)
+          .apply {
+            val members = get().await().value as Long
+            if (members <= 0) throw LoungeError.NoMember
+            setValue(members - 1).await()
+          }
+      }
   }
 
-  override suspend fun startLoungeById(
-    id: String
+  override suspend fun updateLoungeStatusById(
+    id: String,
+    status: LoungeData.Status
   ) {
-    withContext(dispatcher) {
-      database
-        .getReference(LOUNGE_PATH)
-        .child(id)
-        .child(LOUNGE_STATUS)
-        .setValue(LoungeRemote.STATUS_STARTED)
-        .await()
-    }
-  }
-
-  override suspend fun finishLoungeById(
-    id: String
-  ) {
-    withContext(dispatcher) {
-      database
-        .getReference(LOUNGE_PATH)
-        .child(id)
-        .child(LOUNGE_STATUS)
-        .setValue(LoungeRemote.STATUS_FINISHED)
-        .await()
-    }
+    database
+      .getReference(LOUNGE_PATH)
+      .child(id)
+      .child(LOUNGE_STATUS)
+      .setValue(status.asRemote())
+      .await()
   }
 }

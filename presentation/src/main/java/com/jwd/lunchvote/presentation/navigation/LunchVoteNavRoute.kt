@@ -45,7 +45,13 @@ enum class LunchVoteNavRoute(
     )
   ),
 
-  FirstVote,
+  FirstVote(
+    arguments = listOf(
+      navArgument("loungeId") {
+        type = NavType.StringType
+      }
+    )
+  ),
   SecondVote,
 
   TemplateList,
@@ -67,13 +73,7 @@ enum class LunchVoteNavRoute(
   Setting,
   Profile,
 
-
-  Tips,
-
-  HomeJoinDialog,
-  TemplateListAddDialog,
-  VoteExitDialog,
-  FirstVoteTemplateDialog,
+  Tips
 }
 
 internal val LunchVoteNavRoute.route: String

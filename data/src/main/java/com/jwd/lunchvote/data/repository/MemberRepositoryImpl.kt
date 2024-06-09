@@ -30,6 +30,14 @@ class MemberRepositoryImpl @Inject constructor(
     memberDataSource.updateMemberReadyType(member.asData())
   }
 
+  override suspend fun updateMemberStatus(member: Member, status: Member.Status) {
+    memberDataSource.updateMemberStatus(member.asData(), status.asData())
+  }
+
+  override suspend fun updateMembersStatusByLoungeId(loungeId: String, status: Member.Status) {
+    memberDataSource.updateMembersStatusByLoungeId(loungeId, status.asData())
+  }
+
   override suspend fun exileMember(member: Member) {
     memberDataSource.exileMember(member.asData())
   }

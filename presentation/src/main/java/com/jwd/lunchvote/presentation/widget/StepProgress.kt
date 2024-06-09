@@ -15,30 +15,49 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
-import com.jwd.lunchvote.core.ui.util.circleShadow
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.model.MemberUIModel
+import com.jwd.lunchvote.presentation.util.glow
 
 @Composable
-fun StepProgress(finished: Boolean) {
+fun MemberProgress(
+  memberStatusList: List<MemberUIModel.Status>,
+  modifier: Modifier = Modifier
+) {
+  Row(
+    modifier = modifier,
+    horizontalArrangement = Arrangement.spacedBy(8.dp)
+  ) {
+    memberStatusList.forEach { status ->
+      StepProgress(status == MemberUIModel.Status.VOTED)
+    }
+  }
+}
+
+@Composable
+private fun StepProgress(
+  finished: Boolean,
+  modifier: Modifier = Modifier
+) {
   if (finished) {
     Box(
-      modifier = Modifier
+      modifier = modifier
         .size(16.dp)
+        .glow(MaterialTheme.colorScheme.primary, 8.dp)
         .background(MaterialTheme.colorScheme.primary, CircleShape)
-        .circleShadow(MaterialTheme.colorScheme.primary, blurRadius = 8.dp)
     )
   } else {
     Image(
       painterResource(R.drawable.ic_step_progress),
-      null,
-      modifier = Modifier.size(16.dp)
+      contentDescription = null,
+      modifier = modifier.size(16.dp)
     )
   }
 }
 
 @Preview
 @Composable
-fun StepProgressPreview() {
+private fun StepProgressPreview() {
   LunchVoteTheme {
     Row(
       modifier = Modifier.padding(8.dp),

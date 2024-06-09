@@ -26,6 +26,7 @@ class JoinLoungeUseCase @Inject constructor(
       userName = user.name,
       userProfile = user.profileImage,
       type = Member.Type.DEFAULT,
+      status = Member.Status.STANDBY,
       createdAt = Instant.now().epochSecond,
       deletedAt = null
     )
