@@ -59,9 +59,7 @@ fun SecondVoteRoute(
 ) {
   val secondVoteState: SecondVoteState by viewModel.viewState.collectAsStateWithLifecycle()
 
-  BackHandler() {
-    viewModel.sendEvent(SecondVoteEvent.OnTryExit)
-  }
+  BackHandler { viewModel.sendEvent(SecondVoteEvent.OnTryExit) }
 
   if (secondVoteState.exitDialogShown) {
     VoteExitDialog(isOwner = false,
