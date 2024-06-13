@@ -5,6 +5,7 @@ import androidx.navigation.NavDeepLink
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.jwd.lunchvote.domain.config.VoteConfig
 
 enum class LunchVoteNavRoute(
   val arguments: List<NamedNavArgument> = emptyList(),
@@ -52,7 +53,13 @@ enum class LunchVoteNavRoute(
       }
     )
   ),
-  SecondVote,
+  SecondVote(
+    arguments = listOf(
+      navArgument("loungeId") {
+        type = NavType.StringType
+      }
+    )
+  ),
 
   TemplateList,
   EditTemplate(

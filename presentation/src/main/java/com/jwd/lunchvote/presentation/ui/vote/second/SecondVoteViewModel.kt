@@ -3,16 +3,25 @@ package com.jwd.lunchvote.presentation.ui.vote.second
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.common.error.LoungeError
 import com.jwd.lunchvote.core.common.error.UnknownError
+import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.domain.entity.Lounge
+import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
+import com.jwd.lunchvote.domain.repository.SecondVoteRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.usecase.ExitLoungeUseCase
+import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
+import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.MemberUIModel
+import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVoteDialog
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVoteEvent
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVoteReduce
@@ -23,6 +32,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -32,6 +42,7 @@ class SecondVoteViewModel @Inject constructor(
   private val loungeRepository: LoungeRepository,
   private val memberRepository: MemberRepository,
   private val foodRepository: FoodRepository,
+  private val secondVoteRepository: SecondVoteRepository,
   private val exitLoungeUseCase: ExitLoungeUseCase,
   private val savedStateHandle: SavedStateHandle
 ) : BaseStateViewModel<SecondVoteState, SecondVoteEvent, SecondVoteReduce, SecondVoteSideEffect>(savedStateHandle) {
@@ -65,9 +76,7 @@ class SecondVoteViewModel @Inject constructor(
       }
       is SecondVoteEvent.OnClickFinishButton -> launch(false) { finishVote() }
       is SecondVoteEvent.OnClickReVoteButton -> launch(false) { reVote() }
-      is SecondVoteEvent.OnVoteFinish -> {
-        // TODO: Vote Finish
-      }
+      is SecondVoteEvent.OnVoteFinish -> launch { submitVote() }
 
       // DialogEvents
       is SecondVoteEvent.OnClickCancelButtonInExitDialog -> setDialogState(null)
@@ -93,7 +102,46 @@ class SecondVoteViewModel @Inject constructor(
   }
 
   private suspend fun initialize() {
-    // TODO: Initialize
+    val userId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
+    val user = userRepository.getUserById(userId).asUI()
+    updateState(SecondVoteReduce.UpdateUser(user))
+
+    val loungeIdKey = LunchVoteNavRoute.SecondVote.arguments.first().name
+    val loungeId = checkNotNull(savedStateHandle.get<String>(loungeIdKey))
+    val lounge = loungeRepository.getLoungeById(loungeId).asUI()
+    updateState(SecondVoteReduce.UpdateLounge(lounge))
+
+    launch(false) { collectMemberList(loungeId) }
+    launch(false) { collectLoungeStatus(loungeId) }
+
+    val electedFoodIds = secondVoteRepository.getElectedFoodIdsByLoungeId(loungeId)
+    val foodList = electedFoodIds.map { id -> foodRepository.getFoodById(id).asUI() }
+    updateState(SecondVoteReduce.UpdateFoodList(foodList))
+  }
+
+  private suspend fun collectMemberList(loungeId: String) {
+    memberRepository.getMemberListFlow(loungeId).collectLatest { memberList ->
+      updateState(SecondVoteReduce.UpdateMemberList(memberList.map { it.asUI() }))
+
+      if (memberList.size <= 1) {
+        sendSideEffect(SecondVoteSideEffect.ShowSnackBar(UiText.StringResource(R.string.first_vote_only_owner_snackbar)))
+        sendSideEffect(SecondVoteSideEffect.PopBackStack)
+      }
+      if (memberList.all { it.status == Member.Status.VOTED }) launch { submitVote() }
+    }
+  }
+
+  private suspend fun collectLoungeStatus(loungeId: String) {
+    loungeRepository.getLoungeStatusFlowById(loungeId).collectLatest { status ->
+      when(status) {
+        Lounge.Status.QUIT -> {
+          sendSideEffect(SecondVoteSideEffect.ShowSnackBar(UiText.StringResource(R.string.first_vote_owner_exited_snackbar)))
+          sendSideEffect(SecondVoteSideEffect.PopBackStack)
+        }
+        Lounge.Status.FINISHED -> sendSideEffect(SecondVoteSideEffect.NavigateToResult)
+        else -> Unit
+      }
+    }
   }
 
   private suspend fun finishVote() {
@@ -106,6 +154,16 @@ class SecondVoteViewModel @Inject constructor(
     memberRepository.updateMemberStatus(me.asDomain(), MemberUIModel.Status.VOTING.asDomain())
 
     updateState(SecondVoteReduce.UpdateFinished(false))
+  }
+
+  private suspend fun submitVote() {
+    updateState(SecondVoteReduce.UpdateCalculating(true))
+
+    // 투표 제출
+
+    if (me.userId == owner.userId) {
+      // TODO: 투표 결과 집계
+    }
   }
 
   private suspend fun exitVote() {
