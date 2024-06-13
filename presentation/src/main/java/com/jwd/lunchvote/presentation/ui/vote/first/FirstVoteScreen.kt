@@ -63,7 +63,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun FirstVoteRoute(
   popBackStack: () -> Unit,
-  navigateToSecondVote: () -> Unit,
+  navigateToSecondVote: (String) -> Unit,
   showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: FirstVoteViewModel = hiltViewModel(),
@@ -76,7 +76,7 @@ fun FirstVoteRoute(
     viewModel.sideEffect.collectLatest {
       when(it) {
         is FirstVoteSideEffect.PopBackStack -> popBackStack()
-        is FirstVoteSideEffect.NavigateToSecondVote -> navigateToSecondVote()
+        is FirstVoteSideEffect.NavigateToSecondVote -> navigateToSecondVote(it.loungeId)
         is FirstVoteSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
       }
     }

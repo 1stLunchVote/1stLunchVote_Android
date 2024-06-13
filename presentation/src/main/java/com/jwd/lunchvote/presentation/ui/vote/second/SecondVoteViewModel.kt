@@ -138,7 +138,7 @@ class SecondVoteViewModel @Inject constructor(
           sendSideEffect(SecondVoteSideEffect.ShowSnackBar(UiText.StringResource(R.string.first_vote_owner_exited_snackbar)))
           sendSideEffect(SecondVoteSideEffect.PopBackStack)
         }
-        Lounge.Status.FINISHED -> sendSideEffect(SecondVoteSideEffect.NavigateToResult)
+        Lounge.Status.FINISHED -> sendSideEffect(SecondVoteSideEffect.NavigateToVoteResult(currentState.lounge.id))
         else -> Unit
       }
     }
