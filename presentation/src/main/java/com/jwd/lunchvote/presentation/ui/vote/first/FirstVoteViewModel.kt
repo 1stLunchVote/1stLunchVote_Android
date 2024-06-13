@@ -197,6 +197,8 @@ class FirstVoteViewModel @Inject constructor(
       updateState(FirstVoteReduce.UpdateFoodMap(foodMap))
       updateState(FirstVoteReduce.UpdateLikedFoods(likeList))
       updateState(FirstVoteReduce.UpdateDislikedFoods(dislikeList))
+
+      setDialogState(null)
     }
   }
 
