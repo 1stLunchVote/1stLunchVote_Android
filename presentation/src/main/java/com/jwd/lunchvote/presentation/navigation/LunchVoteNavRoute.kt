@@ -52,7 +52,20 @@ enum class LunchVoteNavRoute(
       }
     )
   ),
-  SecondVote,
+  SecondVote(
+    arguments = listOf(
+      navArgument("loungeId") {
+        type = NavType.StringType
+      }
+    )
+  ),
+  VoteResult(
+    arguments = listOf(
+      navArgument("loungeId") {
+        type = NavType.StringType
+      }
+    )
+  ),
 
   TemplateList,
   EditTemplate(

@@ -1,5 +1,6 @@
 package com.jwd.lunchvote.domain.usecase
 
+import com.jwd.lunchvote.domain.config.VoteConfig
 import com.jwd.lunchvote.domain.repository.FirstVoteRepository
 import com.jwd.lunchvote.domain.repository.FoodRepository
 import kotlinx.coroutines.delay
@@ -12,7 +13,7 @@ class CalculateFirstVoteResult @Inject constructor(
 
   suspend operator fun invoke(loungeId: String): List<String> {
     // 모든 사용자가 정보를 저장한 이후에 받을 수 있도록 임의로 대기
-    delay(100)
+    delay(1000)
 
     val firstVotes = firstVoteRepository.getAllFirstVotes(loungeId)
 
@@ -27,7 +28,7 @@ class CalculateFirstVoteResult @Inject constructor(
       }
     }
 
-    val limit = 5
+    val limit = VoteConfig.SECOND_VOTE_FOOD_COUNT
     return scoreMap.entries.sortedByDescending { it.value }.map { it.key }.take(limit)
   }
 }

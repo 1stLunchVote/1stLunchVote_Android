@@ -120,9 +120,14 @@
     <string name="vote_exit_dialog_dismiss_button">취소</string>
     <string name="vote_exit_dialog_confirm_button">나가기</string>
 
-    <string name="exit_dialog_title">투표 나가기</string>
-    <string name="exit_from_vote">투표 방에서 나왔습니다.</string>
-    <string name="vote_exit_alert">투표에서 나가면 다시 돌아올 수 없으며,\n투표를 한 경우 투표 결과에 반영됩니다.</string>
+    <!-- SecondVoteScreen -->
+    <string name="second_vote_title">2차 투표</string>
+    <string name="second_vote_paper_title">%s 님의 투표</string>
+    <string name="second_vote_finish_button">투표 완료</string>
+    <string name="second_vote_waiting_title">다른 참가자 대기중…</string>
+    <string name="second_vote_waiting_body">현재 %d명이 투표 완료했습니다!</string>
+    <string name="second_vote_re_vote_button">다시 투표하기</string>
+    <string name="second_vote_calculating_message">투표 결과를 집계하고 있습니다…</string>
 
     <!-- ResultScreen -->
     <string name="result_toolbar_title">투표 결과</string>

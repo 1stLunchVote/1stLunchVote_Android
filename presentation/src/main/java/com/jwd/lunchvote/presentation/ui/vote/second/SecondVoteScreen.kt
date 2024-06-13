@@ -8,19 +8,20 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.Button
-import androidx.compose.material3.FabPosition
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,241 +31,323 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
-import com.jwd.lunchvote.core.ui.util.noRippleClickable
 import com.jwd.lunchvote.presentation.R
-import com.jwd.lunchvote.presentation.model.SecondVoteTileUIModel
+import com.jwd.lunchvote.presentation.model.FoodUIModel
+import com.jwd.lunchvote.presentation.model.MemberUIModel
+import com.jwd.lunchvote.presentation.model.UserUIModel
+import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVoteDialog
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVoteEvent
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVoteSideEffect
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVoteState
-import com.jwd.lunchvote.presentation.util.UiText
-import com.jwd.lunchvote.presentation.widget.VoteExitDialog
+import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
+import com.jwd.lunchvote.presentation.widget.HorizontalProgressBar
+import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
+import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
+import com.jwd.lunchvote.presentation.widget.MemberProgress
+import com.jwd.lunchvote.presentation.widget.Screen
+import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.coil.CoilImage
 import kotlinx.coroutines.flow.collectLatest
-import timber.log.Timber
 
 @Composable
 fun SecondVoteRoute(
-    viewModel: SecondVoteViewModel = hiltViewModel(),
-    popBackStack: (String) -> Unit,
-    context: Context = LocalContext.current
-){
-    val secondVoteState : SecondVoteState by viewModel.viewState.collectAsStateWithLifecycle()
+  popBackStack: () -> Unit,
+  navigateToVoteResult: (String) -> Unit,
+  showSnackBar: suspend (String) -> Unit,
+  modifier: Modifier = Modifier,
+  viewModel: SecondVoteViewModel = hiltViewModel(),
+  context: Context = LocalContext.current
+) {
+  val state by viewModel.viewState.collectAsStateWithLifecycle()
+  val dialog by viewModel.dialogState.collectAsStateWithLifecycle()
 
-    BackHandler() {
-        viewModel.sendEvent(SecondVoteEvent.OnTryExit)
+  LaunchedEffect(viewModel.sideEffect) {
+    viewModel.sideEffect.collectLatest {
+      when(it) {
+        is SecondVoteSideEffect.PopBackStack -> popBackStack()
+        is SecondVoteSideEffect.NavigateToVoteResult -> navigateToVoteResult(it.loungeId)
+        is SecondVoteSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
+      }
     }
+  }
 
-    if (secondVoteState.exitDialogShown){
-        VoteExitDialog(
-            isOwner = false,
-            onDismissRequest = { viewModel.sendEvent(SecondVoteEvent.OnClickExitDialog(false)) },
-            onConfirmation = { viewModel.sendEvent(SecondVoteEvent.OnClickExitDialog(true)) }
-        )
-    }
+  BackHandler { viewModel.sendEvent(SecondVoteEvent.OnClickBackButton) }
 
-    LaunchedEffect(viewModel.sideEffect){
-        viewModel.sideEffect.collectLatest {
-            when(it){
-                is SecondVoteSideEffect.ShowSnackBar -> {
-                    // Todo : 스낵바 표시
-                }
-                is SecondVoteSideEffect.PopBackStack -> {
-                    popBackStack(UiText.StringResource(R.string.exit_from_vote).asString(context))
-                }
-            }
-        }
-    }
+  LaunchedEffect(Unit) { viewModel.sendEvent(SecondVoteEvent.ScreenInitialize) }
 
-    SecondVoteScreen(
-        state = secondVoteState,
-        onClickVote = { viewModel.sendEvent(SecondVoteEvent.OnClickVote(it)) },
-        onClickFab = { viewModel.sendEvent(SecondVoteEvent.OnClickFab) },
-        onVoteFinished = {
-            // Todo : 투표 종료시 호출
-            Timber.e("60 seconds finished")
-        }
+  when (dialog) {
+    is SecondVoteDialog.ExitDialog -> ExitDialog(
+      onDismissRequest = { viewModel.sendEvent(SecondVoteEvent.OnClickCancelButtonInExitDialog) },
+      onConfirmation = { viewModel.sendEvent(SecondVoteEvent.OnClickConfirmButtonInExitDialog) }
     )
+    null -> Unit
+  }
+
+  SecondVoteScreen(
+    state = state,
+    modifier = modifier,
+    onEvent = viewModel::sendEvent
+  )
 }
 
 @Composable
 private fun SecondVoteScreen(
-    state: SecondVoteState = SecondVoteState(),
-    onClickVote: (Int) -> Unit = {},
-    onClickFab: () -> Unit = {},
-    onVoteFinished: () -> Unit = {}
-){
-    Scaffold(
-//        topBar = { ProgressTopBar(title = "2차 투표", onProgressComplete = onVoteFinished) },
-        floatingActionButton = {
-            Button(onClick = onClickFab, enabled = state.voteIndex != -1) {
-                Text(text = if (state.voteCompleted) stringResource(id = R.string.second_vote_back_fab)
-                        else stringResource(id = R.string.second_vote_fab)
-                )
-            }
-        },
-        floatingActionButtonPosition = FabPosition.Center
-    ) { padding ->
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(padding)
-        ) {
-            if (state.voteCompleted){
-                SecondVoteComplete()
-            } else {
-                Spacer(modifier = Modifier.height(16.dp))
-                SecondVoteContent(state = state, onClickVote = onClickVote)
-            }
-        }
-    }
+  state: SecondVoteState,
+  modifier: Modifier = Modifier,
+  onEvent: (SecondVoteEvent) -> Unit = {}
+) {
+  Screen(
+    modifier = modifier,
+    topAppBar = {
+      LunchVoteTopBar(
+        title = stringResource(R.string.second_vote_title),
+        navIconVisible = false
+      )
+      HorizontalProgressBar(
+        timeLimitSecond = 60,
+        modifier = Modifier.fillMaxWidth(),
+        onProgressComplete = { onEvent(SecondVoteEvent.OnVoteFinish) }
+      )
+    },
+    scrollable = false
+  ) {
+    if (state.finished) SecondVoteWaitingScreen(state = state, onEvent = onEvent)
+    else SecondVotingScreen(state = state, onEvent = onEvent)
+  }
 }
 
 @Composable
-private fun SecondVoteContent(
-    state: SecondVoteState,
-    onClickVote: (Int) -> Unit = {}
-){
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp)
-            .border(color = MaterialTheme.colorScheme.outline, width = 1.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+private fun SecondVotingScreen(
+  state: SecondVoteState,
+  modifier: Modifier = Modifier,
+  onEvent: (SecondVoteEvent) -> Unit = {}
+) {
+  Column(
+    modifier = modifier
+      .fillMaxSize()
+      .padding(start = 32.dp, top = 16.dp, end = 32.dp, bottom = 24.dp),
+    verticalArrangement = Arrangement.spacedBy(16.dp)
+  ) {
+    SecondVoteInformationRow(
+      memberList = state.memberList,
+      modifier = Modifier.fillMaxWidth()
+    )
+    SecondVotePaper(
+      userName = state.user.name,
+      foodList = state.foodList,
+      selectedFood = state.selectedFood ?: FoodUIModel(),
+      onClickFood = { onEvent(SecondVoteEvent.OnClickFood(it)) },
+      modifier = Modifier
+        .weight(1f)
+        .fillMaxWidth()
+    )
+    Button(
+      onClick = { onEvent(SecondVoteEvent.OnClickFinishButton) },
+      modifier = Modifier.align(Alignment.CenterHorizontally),
+      enabled = state.selectedFood != null
     ) {
-        Spacer(modifier = Modifier.height(30.dp))
-
-        val nicknameString = buildAnnotatedString {
-            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)){
-                append(state.nickname)
-            }
-            append(" 님의 투표")
-        }
-        Text(text = nicknameString, style = MaterialTheme.typography.titleLarge.copy(fontSize = 28.sp))
-
-        Spacer(modifier = Modifier.height(30.dp))
-
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-        ){
-            itemsIndexed(state.voteList){ index, item ->
-                SecondVoteTile(
-                    tile = item,
-                    isVoted = state.voteIndex == index,
-                    onClickVote = { onClickVote(index) }
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
+      Text(text = stringResource(R.string.second_vote_finish_button))
     }
+  }
+}
+
+@Composable
+private fun SecondVoteInformationRow(
+  memberList: List<MemberUIModel>,
+  modifier: Modifier = Modifier
+) {
+  Row(
+    modifier = modifier,
+    horizontalArrangement = Arrangement.End
+  ) {
+    MemberProgress(memberList.map { it.status })
+  }
+}
+
+@Composable
+private fun SecondVotePaper(
+  userName: String,
+  foodList: List<FoodUIModel>,
+  selectedFood: FoodUIModel,
+  modifier: Modifier = Modifier,
+  onClickFood: (FoodUIModel) -> Unit = {}
+) {
+  Column(
+    modifier = modifier
+      .border(1.dp, MaterialTheme.colorScheme.onBackground)
+      .padding(start = 20.dp, top = 30.dp, end = 20.dp, bottom = 20.dp)
+      .verticalScroll(rememberScrollState()),
+    verticalArrangement = Arrangement.spacedBy(30.dp),
+    horizontalAlignment = Alignment.CenterHorizontally
+  ) {
+    Text(
+      text = stringResource(R.string.second_vote_paper_title, userName),
+      style = MaterialTheme.typography.titleLarge
+    )
+    Column(
+      modifier = Modifier.fillMaxWidth(),
+      verticalArrangement = Arrangement.spacedBy(20.dp)
+    ) {
+      foodList.forEach { food ->
+        SecondVoteTile(
+          food = food,
+          selected = selectedFood == food,
+          modifier = Modifier.fillMaxWidth(),
+          onClick = { onClickFood(food) }
+        )
+      }
+    }
+  }
 }
 
 @Composable
 private fun SecondVoteTile(
-    tile: SecondVoteTileUIModel,
-    isVoted: Boolean,
-    onClickVote: () -> Unit = {}
-){
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp)
-            .noRippleClickable { onClickVote() }
-            .border(color = MaterialTheme.colorScheme.outline, width = 1.dp),
-        verticalAlignment = Alignment.CenterVertically
+  food: FoodUIModel,
+  selected: Boolean,
+  modifier: Modifier = Modifier,
+  onClick: () -> Unit = {}
+) {
+  Row(
+    modifier = modifier
+      .height(80.dp)
+      .border(1.dp, MaterialTheme.colorScheme.outline)
+      .clickableWithoutEffect(onClick),
+    verticalAlignment = Alignment.CenterVertically
+  ) {
+    CoilImage(
+      imageModel = { food.image },
+      modifier = Modifier.size(80.dp),
+      imageOptions = ImageOptions(
+        contentScale = ContentScale.Crop
+      ),
+      previewPlaceholder = R.drawable.ic_food_image_temp
+    )
+    VerticalDivider(
+      color = MaterialTheme.colorScheme.outline
+    )
+    Text(
+      text = food.name,
+      style = MaterialTheme.typography.titleMedium,
+      modifier = Modifier
+        .weight(1f)
+        .padding(horizontal = 16.dp)
+    )
+    VerticalDivider(
+      color = MaterialTheme.colorScheme.outline
+    )
+    Box(
+      modifier = Modifier.size(80.dp),
+      contentAlignment = Alignment.Center
     ) {
-
-        AsyncImage(
-            model = tile.foodImg, contentDescription = "food",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.size(80.dp)
-        )
-
-
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .height(80.dp)
-                .border(width = 1.dp, color = MaterialTheme.colorScheme.outline),
-        ){
-            Text(
-                text = tile.foodName,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .padding(horizontal = 16.dp),
-            )
-        }
-
-
-        Box(
-            modifier = Modifier
-                .size(80.dp),
-        ) {
-            if (isVoted){
-                Image(
-                    painter = painterResource(id = R.drawable.ic_second_voted),
-                    contentDescription = "voted",
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                )
-            }
-        }
+      if (selected) Image(
+        painter = painterResource(R.drawable.ic_second_voted),
+        contentDescription = "selected",
+        modifier = Modifier.size(48.dp)
+      )
     }
+  }
 }
 
 @Composable
-private fun SecondVoteComplete(
-    voteCount: Int = 1,
-    totalCount: Int = 0
-){
+private fun SecondVoteWaitingScreen(
+  state: SecondVoteState,
+  modifier: Modifier = Modifier,
+  onEvent: (SecondVoteEvent) -> Unit = {}
+) {
+  Column(
+    modifier = modifier
+      .fillMaxSize()
+      .padding(24.dp),
+    verticalArrangement = Arrangement.spacedBy(40.dp),
+    horizontalAlignment = Alignment.CenterHorizontally
+  ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+      modifier = Modifier
+        .fillMaxWidth()
+        .weight(1f),
+      verticalArrangement = Arrangement.spacedBy(40.dp, alignment = Alignment.CenterVertically),
+      horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = stringResource(id = R.string.second_vote_complete_wait),
-            style = MaterialTheme.typography.titleLarge)
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        // Todo : 투표 인디케이터 표시
-        Text(text = "인디케이터 표시 예정")
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        Text(
-            text = "현재 $voteCount" + stringResource(id = R.string.second_vote_complete_content),
-            style = MaterialTheme.typography.titleSmall
-        )
-
+      Text(
+        text = stringResource(R.string.second_vote_waiting_title),
+        style = MaterialTheme.typography.titleLarge
+      )
+      MemberProgress(state.memberList.map { it.status })
+      Text(
+        text = stringResource(R.string.second_vote_waiting_body, state.memberList.count { it.status == MemberUIModel.Status.VOTED }),
+        style = MaterialTheme.typography.bodyMedium
+      )
     }
+    Button(
+      onClick = { onEvent(SecondVoteEvent.OnClickReVoteButton) },
+      modifier = Modifier.align(Alignment.CenterHorizontally)
+    ) {
+      Text(text = stringResource(R.string.second_vote_re_vote_button))
+    }
+  }
 }
 
-@Preview(showBackground = true)
 @Composable
-private fun SecondVoteCompletePreview(){
-    LunchVoteTheme {
-        SecondVoteComplete()
+private fun ExitDialog(
+  modifier: Modifier = Modifier,
+  onDismissRequest: () -> Unit = {},
+  onConfirmation: () -> Unit = {}
+) {
+  LunchVoteDialog(
+    title = stringResource(R.string.vote_exit_dialog_title),
+    dismissText = stringResource(R.string.vote_exit_dialog_dismiss_button),
+    onDismissRequest = onDismissRequest,
+    confirmText = stringResource(R.string.vote_exit_dialog_confirm_button),
+    onConfirmation = onConfirmation,
+    modifier = modifier,
+    icon = {
+      Icon(
+        Icons.Rounded.Warning,
+        contentDescription = null,
+        modifier = Modifier.size(28.dp)
+      )
     }
+  ) {
+    Text(text = stringResource(R.string.vote_exit_dialog_body))
+  }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
-private fun SecondVoteScreenPreview(){
-    LunchVoteTheme {
-        SecondVoteScreen(
-            SecondVoteState(nickname = "이동건")
-        )
-    }
+private fun Preview() {
+  ScreenPreview {
+    SecondVoteScreen(
+      SecondVoteState(
+        user = UserUIModel(name = "조유리"),
+        memberList = listOf(
+          MemberUIModel(status = MemberUIModel.Status.VOTING),
+          MemberUIModel(status = MemberUIModel.Status.VOTED),
+          MemberUIModel(status = MemberUIModel.Status.VOTED),
+          MemberUIModel(status = MemberUIModel.Status.VOTING),
+          MemberUIModel(status = MemberUIModel.Status.VOTED),
+          MemberUIModel(status = MemberUIModel.Status.VOTING)
+        ),
+        foodList = List(5) { FoodUIModel(
+          name = "음식 $it",
+        ) },
+        selectedFood = FoodUIModel(
+          name = "음식 2"
+        ),
+      )
+    )
+  }
+}
+
+@Preview
+@Composable
+private fun ExitDialogPreview() {
+  LunchVoteTheme {
+    ExitDialog()
+  }
 }
