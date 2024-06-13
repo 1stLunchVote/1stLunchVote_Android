@@ -42,7 +42,7 @@ class SecondVoteContract {
     data class UpdateLounge(val lounge: LoungeUIModel) : SecondVoteReduce
     data class UpdateMemberList(val memberList: List<MemberUIModel>) : SecondVoteReduce
     data class UpdateFoodList(val foodList: List<FoodUIModel>) : SecondVoteReduce
-    data class UpdateSelectedFood(val food: FoodUIModel) : SecondVoteReduce
+    data class UpdateSelectedFood(val food: FoodUIModel?) : SecondVoteReduce
     data class UpdateFinished(val finished: Boolean) : SecondVoteReduce
     data class UpdateCalculating(val calculating: Boolean) : SecondVoteReduce
   }
