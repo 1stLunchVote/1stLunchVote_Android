@@ -16,7 +16,9 @@ import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
 import com.jwd.lunchvote.domain.repository.SecondVoteRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
+import com.jwd.lunchvote.domain.usecase.CalculateSecondVoteResult
 import com.jwd.lunchvote.domain.usecase.ExitLoungeUseCase
+import com.jwd.lunchvote.domain.usecase.FinishVoteUseCase
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
@@ -43,6 +45,8 @@ class SecondVoteViewModel @Inject constructor(
   private val memberRepository: MemberRepository,
   private val foodRepository: FoodRepository,
   private val secondVoteRepository: SecondVoteRepository,
+  private val calculateSecondVoteResult: CalculateSecondVoteResult,
+  private val finishVoteUseCase: FinishVoteUseCase,
   private val exitLoungeUseCase: ExitLoungeUseCase,
   private val savedStateHandle: SavedStateHandle
 ) : BaseStateViewModel<SecondVoteState, SecondVoteEvent, SecondVoteReduce, SecondVoteSideEffect>(savedStateHandle) {
@@ -168,7 +172,9 @@ class SecondVoteViewModel @Inject constructor(
       )
 
       if (me.userId == owner.userId) {
-        // TODO: 투표 결과 집계
+        val electedFoodId = calculateSecondVoteResult(currentState.lounge.id)
+
+        finishVoteUseCase(currentState.lounge.id, electedFoodId)
       }
     }
   }

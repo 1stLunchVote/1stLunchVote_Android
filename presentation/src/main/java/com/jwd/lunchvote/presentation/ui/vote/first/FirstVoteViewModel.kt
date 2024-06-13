@@ -224,9 +224,8 @@ class FirstVoteViewModel @Inject constructor(
 
     if (me.userId == owner.userId) {
       val selectedFoodIds = calculateFirstVoteResult(currentState.lounge.id)
-      secondVoteRepository.createSecondVote(currentState.lounge.id, selectedFoodIds)
 
-      startSecondVoteUseCase(currentState.lounge.id)
+      startSecondVoteUseCase(currentState.lounge.id, selectedFoodIds)
     }
   }
 

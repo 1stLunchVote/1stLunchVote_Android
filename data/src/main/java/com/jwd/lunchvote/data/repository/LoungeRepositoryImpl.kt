@@ -40,4 +40,11 @@ class LoungeRepositoryImpl @Inject constructor(
   override suspend fun updateLoungeStatusById(id: String, status: Lounge.Status) {
     loungeDataSource.updateLoungeStatusById(id, status.asData())
   }
+
+  override suspend fun saveVoteResultById(id: String, electedFoodId: String) {
+    loungeDataSource.saveVoteResultById(id, electedFoodId)
+  }
+
+  override suspend fun getAllVoteResults(): List<String> =
+    loungeDataSource.getAllVoteResults()
 }
