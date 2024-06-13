@@ -18,7 +18,7 @@ class SecondVoteDataSourceImpl @Inject constructor(
 
     const val COLUMN_LOUNGE_ID = "loungeId"
     const val COLUMN_FOODS = "foods"
-    const val COLUMN_FOODS_ID = "foodId"
+    const val COLUMN_FOOD_ID = "foodId"
     const val COLUMN_USER_IDS = "userIds"
   }
 
@@ -26,16 +26,15 @@ class SecondVoteDataSourceImpl @Inject constructor(
     loungeId: String,
     foodIds: List<String>
   ) {
-    fireStore
-      .collection(SECOND_VOTE_PATH)
-      .document(loungeId)
-      .set(
-        mapOf(
-          COLUMN_LOUNGE_ID to loungeId,
-          COLUMN_FOODS to foodIds
-        )
-      )
-      .await()
+    foodIds.forEach { foodId ->
+      fireStore
+        .collection(SECOND_VOTE_PATH)
+        .document(loungeId)
+        .collection(COLUMN_FOODS)
+        .document(foodId)
+        .set(mapOf(COLUMN_FOOD_ID to foodId))
+        .await()
+    }
   }
 
   override suspend fun getElectedFoodIdsByLoungeId(
@@ -44,11 +43,11 @@ class SecondVoteDataSourceImpl @Inject constructor(
     fireStore
       .collection(SECOND_VOTE_PATH)
       .document(loungeId)
+      .collection(COLUMN_FOODS)
       .get()
       .await()
-      .get(COLUMN_FOODS, List::class.java)
-      ?.map { it as String }
-      ?: emptyList()
+      .documents
+      .map { it.id }
 
   override suspend fun submitVote(
     loungeId: String,
@@ -61,21 +60,31 @@ class SecondVoteDataSourceImpl @Inject constructor(
       .collection(COLUMN_FOODS)
       .document(foodId)
       .collection(COLUMN_USER_IDS)
-      .add(userId)
+      .document(userId)
+      .set(mapOf("message" to "내가 먹고 싶은 메뉴는 바로 너야!"))
       .await()
   }
 
   override suspend fun getSecondVoteResult(
     loungeId: String
   ): SecondVoteData {
-    val foods = fireStore
-      .collection(SECOND_VOTE_PATH)
-      .document(loungeId)
-      .collection(COLUMN_FOODS)
-      .get()
-      .await()
-      .documents
-      .mapNotNull { it.toObject(SecondVoteFoodRemote::class.java) }
+    val foodIds = getElectedFoodIdsByLoungeId(loungeId)
+
+    val foods = foodIds.map { foodId ->
+      SecondVoteFoodRemote(
+        foodId = foodId,
+        userIds = fireStore
+          .collection(SECOND_VOTE_PATH)
+          .document(loungeId)
+          .collection(COLUMN_FOODS)
+          .document(foodId)
+          .collection(COLUMN_USER_IDS)
+          .get()
+          .await()
+          .documents
+          .map { it.id }
+      )
+    }
 
     return SecondVoteRemote(
       loungeId = loungeId,

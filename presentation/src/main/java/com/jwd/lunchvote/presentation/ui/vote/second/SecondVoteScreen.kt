@@ -44,6 +44,7 @@ import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVo
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVoteEvent
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVoteSideEffect
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVoteState
+import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.widget.HorizontalProgressBar
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
@@ -215,7 +216,8 @@ private fun SecondVoteTile(
   Row(
     modifier = modifier
       .height(80.dp)
-      .border(1.dp, MaterialTheme.colorScheme.outline),
+      .border(1.dp, MaterialTheme.colorScheme.outline)
+      .clickableWithoutEffect(onClick),
     verticalAlignment = Alignment.CenterVertically
   ) {
     CoilImage(

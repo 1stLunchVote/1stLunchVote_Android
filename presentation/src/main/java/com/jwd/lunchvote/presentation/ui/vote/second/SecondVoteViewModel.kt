@@ -157,12 +157,19 @@ class SecondVoteViewModel @Inject constructor(
   }
 
   private suspend fun submitVote() {
-    updateState(SecondVoteReduce.UpdateCalculating(true))
+    if (currentState.selectedFood != null) {
+      updateState(SecondVoteReduce.UpdateCalculating(true))
 
-    // 투표 제출
 
-    if (me.userId == owner.userId) {
-      // TODO: 투표 결과 집계
+      secondVoteRepository.submitVote(
+        loungeId = currentState.lounge.id,
+        userId = currentState.user.id,
+        foodId = currentState.selectedFood!!.id
+      )
+
+      if (me.userId == owner.userId) {
+        // TODO: 투표 결과 집계
+      }
     }
   }
 
