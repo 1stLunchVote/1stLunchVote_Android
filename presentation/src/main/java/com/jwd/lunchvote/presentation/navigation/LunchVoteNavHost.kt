@@ -1,18 +1,13 @@
 package com.jwd.lunchvote.presentation.navigation
 
 import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.foundation.layout.Row
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.dialog
 import com.jwd.lunchvote.presentation.ui.home.HomeRoute
 import com.jwd.lunchvote.presentation.ui.login.LoginRoute
 import com.jwd.lunchvote.presentation.ui.login.register.email_verification.EmailVerificationRoute
@@ -27,6 +22,7 @@ import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateRoute
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateRoute
 import com.jwd.lunchvote.presentation.ui.tips.TipsRoute
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteRoute
+import com.jwd.lunchvote.presentation.ui.vote.result.VoteResultRoute
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteRoute
 
 @Composable
@@ -55,18 +51,6 @@ fun LunchVoteNavHost(
     route = route.route,
     arguments = route.arguments,
     deepLinks = route.deepLinks,
-    content = content
-  )
-
-  fun NavGraphBuilder.dialog(
-    route: LunchVoteNavRoute,
-    dialogProperties: DialogProperties = DialogProperties(),
-    content: @Composable (NavBackStackEntry) -> Unit
-  ) = dialog(
-    route = route.route,
-    arguments = route.arguments,
-    deepLinks = route.deepLinks,
-    dialogProperties = dialogProperties,
     content = content
   )
 
@@ -119,18 +103,6 @@ fun LunchVoteNavHost(
         },
         showSnackBar = showSnackBar
       )
-
-      // TODO : 나중에 지우기
-      Row {
-        Button(onClick = {
-          navController.navigate(LunchVoteNavRoute.FirstVote, "loungeId")
-        }) {
-          Text(text = "1차 투표 테스트")
-        }
-        Button(onClick = { navController.navigate(LunchVoteNavRoute.SecondVote) }) {
-          Text(text = "2차 투표 화면 테스트")
-        }
-      }
     }
     composable(LunchVoteNavRoute.Lounge) {
       LoungeRoute(
@@ -165,6 +137,12 @@ fun LunchVoteNavHost(
         navigateToVoteResult = { loungeId ->
           navController.navigate(LunchVoteNavRoute.VoteResult, loungeId)
         },
+        showSnackBar = showSnackBar
+      )
+    }
+    composable(LunchVoteNavRoute.VoteResult) {
+      VoteResultRoute(
+        navigateToHome = { navController.navigateWithPop(LunchVoteNavRoute.Home) },
         showSnackBar = showSnackBar
       )
     }

@@ -13,6 +13,4 @@ interface LoungeRepository {
   suspend fun exitLoungeById(id: String)
   suspend fun quitLoungeById(id: String)
   suspend fun updateLoungeStatusById(id: String, status: Lounge.Status)
-  suspend fun saveVoteResultById(id: String, electedFoodId: String)
-  suspend fun getAllVoteResults(): List<String>
 }

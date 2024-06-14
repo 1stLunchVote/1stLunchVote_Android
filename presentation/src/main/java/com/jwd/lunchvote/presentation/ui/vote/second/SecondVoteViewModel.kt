@@ -11,18 +11,20 @@ import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.entity.Lounge
 import com.jwd.lunchvote.domain.entity.Member
+import com.jwd.lunchvote.domain.repository.BallotRepository
 import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
-import com.jwd.lunchvote.domain.repository.SecondVoteRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
-import com.jwd.lunchvote.domain.usecase.CalculateSecondVoteResult
+import com.jwd.lunchvote.domain.repository.VoteResultRepository
+import com.jwd.lunchvote.domain.usecase.CalculateSecondVote
 import com.jwd.lunchvote.domain.usecase.ExitLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.FinishVoteUseCase
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.MemberUIModel
+import com.jwd.lunchvote.presentation.model.SecondBallotUIModel
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVoteDialog
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVoteEvent
@@ -43,9 +45,10 @@ class SecondVoteViewModel @Inject constructor(
   private val userRepository: UserRepository,
   private val loungeRepository: LoungeRepository,
   private val memberRepository: MemberRepository,
+  private val voteResultRepository: VoteResultRepository,
   private val foodRepository: FoodRepository,
-  private val secondVoteRepository: SecondVoteRepository,
-  private val calculateSecondVoteResult: CalculateSecondVoteResult,
+  private val ballotRepository: BallotRepository,
+  private val calculateSecondVote: CalculateSecondVote,
   private val finishVoteUseCase: FinishVoteUseCase,
   private val exitLoungeUseCase: ExitLoungeUseCase,
   private val savedStateHandle: SavedStateHandle
@@ -118,8 +121,8 @@ class SecondVoteViewModel @Inject constructor(
     launch(false) { collectMemberList(loungeId) }
     launch(false) { collectLoungeStatus(loungeId) }
 
-    val electedFoodIds = secondVoteRepository.getElectedFoodIdsByLoungeId(loungeId)
-    val foodList = electedFoodIds.map { id -> foodRepository.getFoodById(id).asUI() }
+    val firstVoteResult = voteResultRepository.getFirstVoteResultByLoungeId(loungeId)
+    val foodList = firstVoteResult.foodIds.map { id -> foodRepository.getFoodById(id).asUI() }
     updateState(SecondVoteReduce.UpdateFoodList(foodList))
   }
 
@@ -164,17 +167,16 @@ class SecondVoteViewModel @Inject constructor(
     if (currentState.selectedFood != null) {
       updateState(SecondVoteReduce.UpdateCalculating(true))
 
-
-      secondVoteRepository.submitVote(
+      val ballot = SecondBallotUIModel(
         loungeId = currentState.lounge.id,
         userId = currentState.user.id,
         foodId = currentState.selectedFood!!.id
       )
+      ballotRepository.submitSecondBallot(ballot.asDomain())
 
       if (me.userId == owner.userId) {
-        val electedFoodId = calculateSecondVoteResult(currentState.lounge.id)
-
-        finishVoteUseCase(currentState.lounge.id, electedFoodId)
+        calculateSecondVote(currentState.lounge.id)
+        finishVoteUseCase(currentState.lounge.id)
       }
     }
   }

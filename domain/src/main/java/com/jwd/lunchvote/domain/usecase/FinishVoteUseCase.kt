@@ -8,8 +8,7 @@ class FinishVoteUseCase @Inject constructor(
   private val loungeRepository: LoungeRepository
 ) {
 
-  suspend operator fun invoke(loungeId: String, electedFoodId: String) {
-    loungeRepository.saveVoteResultById(loungeId, electedFoodId)
+  suspend operator fun invoke(loungeId: String) {
     loungeRepository.updateLoungeStatusById(loungeId, Lounge.Status.FINISHED)
   }
 }
