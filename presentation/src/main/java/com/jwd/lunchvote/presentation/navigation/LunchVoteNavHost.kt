@@ -27,6 +27,7 @@ import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateRoute
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateRoute
 import com.jwd.lunchvote.presentation.ui.tips.TipsRoute
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteRoute
+import com.jwd.lunchvote.presentation.ui.vote.result.VoteResultRoute
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteRoute
 
 @Composable
@@ -165,6 +166,12 @@ fun LunchVoteNavHost(
         navigateToVoteResult = { loungeId ->
           navController.navigate(LunchVoteNavRoute.VoteResult, loungeId)
         },
+        showSnackBar = showSnackBar
+      )
+    }
+    composable(LunchVoteNavRoute.VoteResult) {
+      VoteResultRoute(
+        navigateToHome = { navController.navigateWithPop(LunchVoteNavRoute.Home) },
         showSnackBar = showSnackBar
       )
     }
