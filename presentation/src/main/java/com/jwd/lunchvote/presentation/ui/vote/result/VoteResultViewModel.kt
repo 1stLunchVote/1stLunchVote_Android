@@ -4,6 +4,10 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.domain.repository.FoodRepository
+import com.jwd.lunchvote.domain.repository.VoteResultRepository
+import com.jwd.lunchvote.presentation.mapper.asUI
+import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
 import com.jwd.lunchvote.presentation.ui.vote.result.VoteResultContract.VoteResultEvent
 import com.jwd.lunchvote.presentation.ui.vote.result.VoteResultContract.VoteResultReduce
 import com.jwd.lunchvote.presentation.ui.vote.result.VoteResultContract.VoteResultSideEffect
@@ -14,7 +18,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class VoteResultViewModel @Inject constructor(
-  savedStateHandle: SavedStateHandle
+  private val voteResultRepository: VoteResultRepository,
+  private val foodRepository: FoodRepository,
+  private val savedStateHandle: SavedStateHandle
 ) : BaseStateViewModel<VoteResultState, VoteResultEvent, VoteResultReduce, VoteResultSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): VoteResultState {
     return savedState as? VoteResultState ?: VoteResultState()
@@ -39,6 +45,12 @@ class VoteResultViewModel @Inject constructor(
   }
 
   private suspend fun initialize() {
+    val loungeIdKey = LunchVoteNavRoute.SecondVote.arguments.first().name
+    val loungeId = checkNotNull(savedStateHandle.get<String>(loungeIdKey))
+    val voteResult = voteResultRepository.getVoteResultByLoungeId(loungeId)
+    val food = foodRepository.getFoodById(voteResult.foodId).asUI()
 
+    updateState(VoteResultReduce.UpdateFood(food))
+    updateState(VoteResultReduce.UpdateVoteRatio(voteResult.voteRatio))
   }
 }

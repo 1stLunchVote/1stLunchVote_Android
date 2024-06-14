@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -58,8 +59,10 @@ fun VoteResultRoute(
     }
   }
 
+  LaunchedEffect(Unit) { viewModel.sendEvent(VoteResultEvent.ScreenInitialize) }
+
   if (loading) LoadingScreen(
-    message = "투표 결과를 집계중입니다..."
+    message = stringResource(R.string.vote_result_loading)
   ) else VoteResultScreen(
     state = state,
     modifier = modifier,
@@ -77,7 +80,7 @@ private fun VoteResultScreen(
     modifier = modifier,
     topAppBar = {
       LunchVoteTopBar(
-        title = "투표 결과",
+        title = stringResource(R.string.vote_result_title),
         navIconVisible = false
       )
     },
@@ -89,7 +92,7 @@ private fun VoteResultScreen(
       horizontalAlignment = Alignment.CenterHorizontally
     ) {
       Text(
-        text = "오늘의 메뉴는...",
+        text = stringResource(R.string.vote_result_header),
         style = MaterialTheme.typography.bodyLarge
       )
       Gap(height = 8.dp)
@@ -108,7 +111,7 @@ private fun VoteResultScreen(
         onClick = { onEvent(VoteResultEvent.OnClickHomeButton) }
       ) {
         Text(
-          text = "메인 화면으로 돌아가기"
+          text = stringResource(R.string.vote_result_home_button)
         )
       }
     }
@@ -143,7 +146,7 @@ private fun VoteResultImage(
         modifier = Modifier.size(92.dp)
       )
       Text(
-        text = "${(voteRatio * 100).toInt()}%의\n선택!",
+        text = stringResource(R.string.vote_result_badge, (voteRatio * 100).toInt()),
         color = MaterialTheme.colorScheme.background,
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.titleMedium

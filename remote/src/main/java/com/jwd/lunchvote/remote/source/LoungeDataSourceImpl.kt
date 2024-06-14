@@ -2,7 +2,6 @@ package com.jwd.lunchvote.remote.source
 
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.values
-import com.google.firebase.firestore.FirebaseFirestore
 import com.jwd.lunchvote.core.common.error.LoungeError
 import com.jwd.lunchvote.data.model.LoungeData
 import com.jwd.lunchvote.data.source.remote.LoungeDataSource
@@ -17,8 +16,7 @@ import java.util.UUID
 import javax.inject.Inject
 
 class LoungeDataSourceImpl @Inject constructor(
-  private val database: FirebaseDatabase,
-  private val fireStore: FirebaseFirestore
+  private val database: FirebaseDatabase
 ) : LoungeDataSource {
 
   companion object {
@@ -26,8 +24,6 @@ class LoungeDataSourceImpl @Inject constructor(
 
     const val LOUNGE_STATUS = "status"
     const val LOUNGE_MEMBERS = "members"
-
-    const val LOUNGE_ELECTED_FOOD_ID = "electedFoodId"
   }
 
   override suspend fun checkLoungeExistById(
@@ -138,23 +134,4 @@ class LoungeDataSourceImpl @Inject constructor(
       .setValue(status.asRemote())
       .await()
   }
-
-  override suspend fun saveVoteResultById(
-    id: String,
-    electedFoodId: String
-  ) {
-    fireStore
-      .collection(LOUNGE_PATH)
-      .document(id)
-      .set(mapOf(LOUNGE_ELECTED_FOOD_ID to electedFoodId))
-      .await()
-  }
-
-  override suspend fun getAllVoteResults(): List<String> =
-    fireStore
-      .collection(LOUNGE_PATH)
-      .get()
-      .await()
-      .documents
-      .mapNotNull { it.getString(LOUNGE_ELECTED_FOOD_ID) }
 }

@@ -172,9 +172,9 @@ class SecondVoteViewModel @Inject constructor(
       )
 
       if (me.userId == owner.userId) {
-        val electedFoodId = calculateSecondVoteResult(currentState.lounge.id)
+        val (foodId, voteRatio) = calculateSecondVoteResult(currentState.lounge.id)
 
-        finishVoteUseCase(currentState.lounge.id, electedFoodId)
+        finishVoteUseCase(currentState.lounge.id, foodId, voteRatio)
       }
     }
   }

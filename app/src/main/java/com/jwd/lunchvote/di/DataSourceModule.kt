@@ -11,6 +11,7 @@ import com.jwd.lunchvote.data.source.remote.SecondVoteDataSource
 import com.jwd.lunchvote.data.source.remote.StorageDataSource
 import com.jwd.lunchvote.data.source.remote.TemplateDataSource
 import com.jwd.lunchvote.data.source.remote.UserDataSource
+import com.jwd.lunchvote.data.source.remote.VoteResultDataSource
 import com.jwd.lunchvote.local.source.PreferenceDataSourceImpl
 import com.jwd.lunchvote.remote.source.ChatDataSourceImpl
 import com.jwd.lunchvote.remote.source.FirstVoteDataSourceImpl
@@ -22,6 +23,7 @@ import com.jwd.lunchvote.remote.source.SecondVoteDataSourceImpl
 import com.jwd.lunchvote.remote.source.StorageDataSourceImpl
 import com.jwd.lunchvote.remote.source.TemplateDataSourceImpl
 import com.jwd.lunchvote.remote.source.UserDataSourceImpl
+import com.jwd.lunchvote.remote.source.VoteResultDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -97,6 +99,12 @@ internal abstract class DataSourceModule {
   abstract fun bindsPreferenceDataSource(
     source: PreferenceDataSourceImpl
   ): PreferenceDataSource
+
+  @Binds
+  @Singleton
+  abstract fun bindsVoteResultDataSource(
+    source: VoteResultDataSourceImpl
+  ): VoteResultDataSource
 }
 
 
