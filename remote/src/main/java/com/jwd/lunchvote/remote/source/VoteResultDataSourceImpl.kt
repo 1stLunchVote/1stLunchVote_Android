@@ -1,55 +1,80 @@
 package com.jwd.lunchvote.remote.source
 
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.FirebaseDatabase
 import com.jwd.lunchvote.core.common.error.VoteError
-import com.jwd.lunchvote.data.model.VoteResultData
+import com.jwd.lunchvote.data.model.FirstVoteResultData
+import com.jwd.lunchvote.data.model.SecondVoteResultData
 import com.jwd.lunchvote.data.source.remote.VoteResultDataSource
 import com.jwd.lunchvote.remote.mapper.asData
 import com.jwd.lunchvote.remote.mapper.asRemote
-import com.jwd.lunchvote.remote.model.VoteResultRemote
+import com.jwd.lunchvote.remote.model.FirstVoteResultRemote
+import com.jwd.lunchvote.remote.model.SecondVoteResultRemote
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class VoteResultDataSourceImpl @Inject constructor(
-  private val fireStore: FirebaseFirestore
+  private val database: FirebaseDatabase
 ): VoteResultDataSource {
 
   companion object {
-    private const val COLLECTION_VOTE_RESULT = "VoteResult"
+    private const val REFERENCE_VOTE_RESULT = "VoteResult"
 
-    private const val COLUMN_LOUNGE_ID = "loungeId"
-    private const val COLUMN_FOOD_ID = "foodId"
-    private const val COLUMN_VOTE_COUNT = "voteCount"
+    private const val CHILD_FIRST_VOTE_RESULT = "First"
+    private const val CHILD_SECOND_VOTE_RESULT = "Second"
   }
 
-  override suspend fun saveVoteResult(
-    voteResult: VoteResultData
+  override suspend fun saveFirstVoteResult(
+    firstVoteResult: FirstVoteResultData
   ) {
-    fireStore
-      .collection(COLLECTION_VOTE_RESULT)
-      .document(voteResult.loungeId)
-      .set(voteResult.asRemote())
-      .await()
+    database
+      .getReference(REFERENCE_VOTE_RESULT)
+      .child(firstVoteResult.loungeId)
+      .child(CHILD_FIRST_VOTE_RESULT)
+      .setValue(firstVoteResult.asRemote())
   }
 
-  override suspend fun getVoteResultByLoungeId(
+  override suspend fun getFirstVoteResultByLoungeId(
     loungeId: String
-  ): VoteResultData =
-    fireStore
-      .collection(COLLECTION_VOTE_RESULT)
-      .document(loungeId)
+  ): FirstVoteResultData =
+    database
+      .getReference(REFERENCE_VOTE_RESULT)
+      .child(loungeId)
+      .child(CHILD_FIRST_VOTE_RESULT)
       .get()
       .await()
-      .toObject(VoteResultRemote::class.java)
+      .getValue(FirstVoteResultRemote::class.java)
       ?.asData(loungeId) ?: throw VoteError.NoVoteResult
 
-  override suspend fun getAllVoteResults(): List<VoteResultData> =
-    fireStore
-      .collection(COLLECTION_VOTE_RESULT)
+  override suspend fun saveSecondVoteResult(
+    secondVoteResult: SecondVoteResultData
+  ) {
+    database
+      .getReference(REFERENCE_VOTE_RESULT)
+      .child(secondVoteResult.loungeId)
+      .child(CHILD_SECOND_VOTE_RESULT)
+      .setValue(secondVoteResult.asRemote())
+  }
+
+  override suspend fun getSecondVoteResultByLoungeId(
+    loungeId: String
+  ): SecondVoteResultData =
+    database
+      .getReference(REFERENCE_VOTE_RESULT)
+      .child(loungeId)
+      .child(CHILD_SECOND_VOTE_RESULT)
       .get()
       .await()
-      .documents
+      .getValue(SecondVoteResultRemote::class.java)
+      ?.asData(loungeId) ?: throw VoteError.NoVoteResult
+
+  override suspend fun getAllVoteResults(): List<SecondVoteResultData> =
+    database
+      .getReference(REFERENCE_VOTE_RESULT)
+      .get()
+      .await()
+      .children
       .mapNotNull {
-        it.toObject(VoteResultRemote::class.java)?.asData(it.id)
+        it.getValue(SecondVoteResultRemote::class.java)
+          ?.asData(it.key!!)
       }
 }

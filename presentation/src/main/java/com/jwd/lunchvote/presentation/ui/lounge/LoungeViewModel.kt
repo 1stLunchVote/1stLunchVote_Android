@@ -18,7 +18,7 @@ import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.usecase.CreateLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.ExitLoungeUseCase
 import com.jwd.lunchvote.domain.usecase.JoinLoungeUseCase
-import com.jwd.lunchvote.domain.usecase.StartFirstVoteUseCase
+import com.jwd.lunchvote.domain.usecase.StartFirstVote
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
@@ -52,7 +52,7 @@ class LoungeViewModel @Inject constructor(
   private val createLoungeUseCase: CreateLoungeUseCase,
   private val joinLoungeUseCase: JoinLoungeUseCase,
   private val exitLoungeUseCase: ExitLoungeUseCase,
-  private val startFirstVoteUseCase: StartFirstVoteUseCase,
+  private val startFirstVote: StartFirstVote,
   savedStateHandle: SavedStateHandle
 ) : BaseStateViewModel<LoungeState, LoungeEvent, LoungeReduce, LoungeSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): LoungeState {
@@ -231,7 +231,7 @@ class LoungeViewModel @Inject constructor(
     if (currentState.memberList.any { it.type == MemberUIModel.Type.DEFAULT }) {
       sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_not_ready_to_start_snackbar)))
     } else {
-      startFirstVoteUseCase(currentState.lounge.id)
+      startFirstVote(currentState.lounge.id)
     }
   }
 

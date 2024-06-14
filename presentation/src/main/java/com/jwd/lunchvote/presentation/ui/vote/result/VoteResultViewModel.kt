@@ -47,7 +47,7 @@ class VoteResultViewModel @Inject constructor(
   private suspend fun initialize() {
     val loungeIdKey = LunchVoteNavRoute.SecondVote.arguments.first().name
     val loungeId = checkNotNull(savedStateHandle.get<String>(loungeIdKey))
-    val voteResult = voteResultRepository.getVoteResultByLoungeId(loungeId)
+    val voteResult = voteResultRepository.getSecondVoteResultByLoungeId(loungeId)
     val food = foodRepository.getFoodById(voteResult.foodId).asUI()
 
     updateState(VoteResultReduce.UpdateFood(food))

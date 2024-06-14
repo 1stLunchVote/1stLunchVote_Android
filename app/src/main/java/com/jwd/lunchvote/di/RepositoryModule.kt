@@ -1,25 +1,23 @@
 package com.jwd.lunchvote.di
 
 import com.jwd.lunchvote.data.repository.ChatRepositoryImpl
-import com.jwd.lunchvote.data.repository.FirstVoteRepositoryImpl
+import com.jwd.lunchvote.data.repository.BallotRepositoryImpl
 import com.jwd.lunchvote.data.repository.FoodRepositoryImpl
 import com.jwd.lunchvote.data.repository.LoginRepositoryImpl
 import com.jwd.lunchvote.data.repository.LoungeRepositoryImpl
 import com.jwd.lunchvote.data.repository.MemberRepositoryImpl
 import com.jwd.lunchvote.data.repository.PreferenceRepositoryImpl
-import com.jwd.lunchvote.data.repository.SecondVoteRepositoryImpl
 import com.jwd.lunchvote.data.repository.StorageRepositoryImpl
 import com.jwd.lunchvote.data.repository.TemplateRepositoryImpl
 import com.jwd.lunchvote.data.repository.UserRepositoryImpl
 import com.jwd.lunchvote.data.repository.VoteResultRepositoryImpl
 import com.jwd.lunchvote.domain.repository.ChatRepository
-import com.jwd.lunchvote.domain.repository.FirstVoteRepository
+import com.jwd.lunchvote.domain.repository.BallotRepository
 import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.repository.LoginRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
 import com.jwd.lunchvote.domain.repository.PreferenceRepository
-import com.jwd.lunchvote.domain.repository.SecondVoteRepository
 import com.jwd.lunchvote.domain.repository.StorageRepository
 import com.jwd.lunchvote.domain.repository.TemplateRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
@@ -36,15 +34,15 @@ internal abstract class RepositoryModule {
 
   @Binds
   @Singleton
-  abstract fun bindsChatRepository(
-    repository: ChatRepositoryImpl
-  ): ChatRepository
+  abstract fun bindsBallotRepository(
+    repository: BallotRepositoryImpl
+  ): BallotRepository
 
   @Binds
   @Singleton
-  abstract fun bindsFirstVoteRepository(
-    repository: FirstVoteRepositoryImpl
-  ): FirstVoteRepository
+  abstract fun bindsChatRepository(
+    repository: ChatRepositoryImpl
+  ): ChatRepository
 
   @Binds
   @Singleton
@@ -75,12 +73,6 @@ internal abstract class RepositoryModule {
   abstract fun bindsPreferenceRepository(
     repository: PreferenceRepositoryImpl
   ): PreferenceRepository
-
-  @Binds
-  @Singleton
-  abstract fun bindsSecondVoteRepository(
-    repository: SecondVoteRepositoryImpl
-  ): SecondVoteRepository
 
   @Binds
   @Singleton
