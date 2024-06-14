@@ -15,7 +15,6 @@ import com.jwd.lunchvote.domain.repository.FirstVoteRepository
 import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
-import com.jwd.lunchvote.domain.repository.SecondVoteRepository
 import com.jwd.lunchvote.domain.repository.TemplateRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.usecase.CalculateFirstVoteResult
@@ -51,7 +50,6 @@ class FirstVoteViewModel @Inject constructor(
   private val foodRepository: FoodRepository,
   private val templateRepository: TemplateRepository,
   private val firstVoteRepository: FirstVoteRepository,
-  private val secondVoteRepository: SecondVoteRepository,
   private val calculateFirstVoteResult: CalculateFirstVoteResult,
   private val startSecondVoteUseCase: StartSecondVoteUseCase,
   private val exitLoungeUseCase: ExitLoungeUseCase,

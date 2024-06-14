@@ -2,18 +2,28 @@ package com.jwd.lunchvote.core.ui.base
 
 import android.os.Parcelable
 
-sealed interface ViewModelContract{
-    interface State: ViewModelContract {
-        // 저장하고 싶은 값이 없으면 구현 안해도 된다.
-        fun toParcelable(): Parcelable? = null
-    }
+sealed interface ViewModelContract {
+  /**
+   * 화면에 표시되는 상태
+   */
+  interface State : ViewModelContract {
+    fun toParcelable(): Parcelable? = null
+  }
 
-    // View에서 일어난 이벤트 -> ViewModel 에서 처리
-    interface Event: ViewModelContract
+  /**
+   * 사용자로부터 발생하는 이벤트
+   */
+  interface Event : ViewModelContract
 
-    // 단순한 상태 변화 , Immutable한 상태로 변경시키기 위해
-    interface Reduce: ViewModelContract
+  /**
+   * 상태가 변경되는 시나리오
+   *
+   * 상태를 immutable하게 관리하기 위함
+   */
+  interface Reduce : ViewModelContract
 
-    // View 에서 처리 (상태 변경 없이 처리 해야 할 것 혹은 외부의 상태 변화)
-    interface SideEffect: ViewModelContract
+  /**
+   * 상태에 영향을 주지 않지만, 암시적으로 화면에 영향을 주는 부수 효과
+   */
+  interface SideEffect : ViewModelContract
 }
