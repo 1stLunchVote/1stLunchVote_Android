@@ -1,7 +1,6 @@
 package com.jwd.lunchvote.remote.source
 
 import com.google.firebase.firestore.FirebaseFirestore
-import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.data.model.UserData
 import com.jwd.lunchvote.data.source.remote.UserDataSource
 import com.jwd.lunchvote.remote.mapper.asData
@@ -9,6 +8,7 @@ import com.jwd.lunchvote.remote.mapper.asRemote
 import com.jwd.lunchvote.remote.model.UserRemote
 import com.jwd.lunchvote.remote.util.whereNotDeleted
 import kotlinx.coroutines.tasks.await
+import kr.co.inbody.config.error.UserError
 import javax.inject.Inject
 
 class UserDataSourceImpl @Inject constructor(

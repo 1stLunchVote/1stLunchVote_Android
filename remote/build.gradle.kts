@@ -35,6 +35,7 @@ android {
 
 dependencies {
   implementation(project(":data"))
+  implementation(project(":core:config"))
   implementation(project(":core:common"))
 
   implementation(libs.bundles.android)

@@ -33,8 +33,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.jwd.lunchvote.core.common.error.LoginError
-import com.jwd.lunchvote.domain.config.EmailConfig
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.ui.login.LoginContract.LoginEvent
 import com.jwd.lunchvote.presentation.ui.login.LoginContract.LoginSideEffect
@@ -52,6 +50,8 @@ import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
 import kotlinx.coroutines.flow.collectLatest
+import kr.co.inbody.config.config.EmailConfig
+import kr.co.inbody.config.error.LoginError
 
 @Composable
 fun LoginRoute(

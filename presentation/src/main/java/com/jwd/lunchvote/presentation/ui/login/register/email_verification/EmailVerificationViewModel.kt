@@ -5,7 +5,6 @@ import androidx.lifecycle.SavedStateHandle
 import com.google.firebase.auth.actionCodeSettings
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.usecase.SetEmailUseCase
@@ -44,7 +43,7 @@ class EmailVerificationViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(EmailVerificationSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+    sendSideEffect(EmailVerificationSideEffect.ShowSnackBar(UiText.ErrorString(error)))
   }
 
   private val actionCodeSettings = actionCodeSettings {

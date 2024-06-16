@@ -7,6 +7,7 @@ import com.jwd.lunchvote.domain.entity.User
 import com.jwd.lunchvote.domain.repository.ChatRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
+import kr.co.inbody.config.error.LoungeError
 import java.time.Instant
 import java.util.UUID
 import javax.inject.Inject
@@ -18,6 +19,17 @@ class JoinLoungeUseCase @Inject constructor(
 ) {
 
   suspend operator fun invoke(user: User, loungeId: String): Lounge {
+    val lounge = loungeRepository.getLoungeById(loungeId)
+
+    when (lounge.status) {
+      Lounge.Status.CREATED -> Unit
+      Lounge.Status.QUIT -> throw LoungeError.LoungeQuit
+      Lounge.Status.FIRST_VOTE -> throw LoungeError.LoungeStarted
+      Lounge.Status.SECOND_VOTE -> throw LoungeError.LoungeStarted
+      Lounge.Status.FINISHED -> throw LoungeError.LoungeFinished
+    }
+    if (lounge.members == 6) throw LoungeError.FullMember
+
     loungeRepository.joinLoungeById(loungeId)
 
     val member = Member(

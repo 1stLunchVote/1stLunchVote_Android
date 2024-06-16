@@ -5,9 +5,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.jwd.lunchvote.core.common.error.LoungeError
-import com.jwd.lunchvote.core.common.error.UnknownError
-import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.entity.Lounge
 import com.jwd.lunchvote.domain.entity.Member
@@ -39,6 +36,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
+import kr.co.inbody.config.error.LoungeError
+import kr.co.inbody.config.error.UserError
 import java.time.ZonedDateTime
 import java.util.UUID
 import javax.inject.Inject
@@ -113,9 +112,12 @@ class LoungeViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+    sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.ErrorString(error)))
     when (error) {
+      is LoungeError.LoungeQuit -> sendSideEffect(LoungeSideEffect.PopBackStack)
+      is LoungeError.FullMember -> sendSideEffect(LoungeSideEffect.PopBackStack)
       is LoungeError.NoLounge -> sendSideEffect(LoungeSideEffect.PopBackStack)
+      is LoungeError.JoinLoungeFailed -> sendSideEffect(LoungeSideEffect.PopBackStack)
       is LoungeError.InvalidMember -> sendSideEffect(LoungeSideEffect.PopBackStack)
       is LoungeError.InvalidLounge -> sendSideEffect(LoungeSideEffect.PopBackStack)
       else -> Unit
@@ -131,36 +133,17 @@ class LoungeViewModel @Inject constructor(
       updateState(LoungeReduce.UpdateLounge(lounge))
 
       collectLoungeData(lounge)
-    } ?: {
-      sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_create_lounge_snackbar)))
-      sendSideEffect(LoungeSideEffect.PopBackStack)
-    }
+    } ?: throw LoungeError.CreateLoungeFailed
   }
 
   private suspend fun joinLounge(loungeId: String) {
     withTimeoutOrNull(TIMEOUT) {
       val user = currentState.user
-      loungeRepository.getLoungeById(loungeId).asUI().apply {
-        if (status != LoungeUIModel.Status.CREATED) {
-          // TODO: 다양한 투표 방 상태에 따른 스낵바 출력
-          sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_started_snackbar)))
-          sendSideEffect(LoungeSideEffect.PopBackStack)
-        }
-        if (members == 6) {
-          sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_full_snackbar)))
-          sendSideEffect(LoungeSideEffect.PopBackStack)
-        }
-      }
-
       val lounge = joinLoungeUseCase(user.asDomain(), loungeId).asUI()
+      collectLoungeData(lounge)
 
       updateState(LoungeReduce.UpdateLounge(lounge))
-
-      collectLoungeData(lounge)
-    } ?: {
-      sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_join_lounge_snackbar)))
-      sendSideEffect(LoungeSideEffect.PopBackStack)
-    }
+    } ?: throw LoungeError.JoinLoungeFailed
   }
 
   private fun collectLoungeData(lounge: LoungeUIModel) {

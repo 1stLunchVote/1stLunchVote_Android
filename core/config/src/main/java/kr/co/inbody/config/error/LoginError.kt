@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.core.common.error
+package kr.co.inbody.config.error
 
 interface LoginError {
 

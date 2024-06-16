@@ -1,9 +1,9 @@
 package com.jwd.lunchvote.remote.mapper
 
-import com.jwd.lunchvote.core.common.error.LoungeError
 import com.jwd.lunchvote.core.common.mapper.BiMapper
 import com.jwd.lunchvote.data.model.LoungeData
 import com.jwd.lunchvote.remote.model.LoungeRemote
+import kr.co.inbody.config.error.LoungeError
 
 private object LoungeRemoteMapper: BiMapper<LoungeRemote, LoungeData> {
   override fun mapToRight(from: LoungeRemote): LoungeData =

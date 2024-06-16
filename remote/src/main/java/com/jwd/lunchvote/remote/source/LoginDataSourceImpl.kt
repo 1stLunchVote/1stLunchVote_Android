@@ -3,9 +3,9 @@ package com.jwd.lunchvote.remote.source
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.oAuthCredential
-import com.jwd.lunchvote.core.common.error.LoginError
 import com.jwd.lunchvote.data.source.remote.LoginDataSource
 import kotlinx.coroutines.tasks.await
+import kr.co.inbody.config.error.LoginError
 import javax.inject.Inject
 
 class LoginDataSourceImpl @Inject constructor(

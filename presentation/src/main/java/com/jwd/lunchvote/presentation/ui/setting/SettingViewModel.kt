@@ -4,8 +4,6 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.jwd.lunchvote.core.common.error.UnknownError
-import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingEvent
@@ -14,6 +12,7 @@ import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingSideEffe
 import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kr.co.inbody.config.error.UserError
 import javax.inject.Inject
 
 @HiltViewModel
@@ -45,7 +44,7 @@ class SettingViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+    sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.ErrorString(error)))
     when (error) {
       is UserError.NoUser -> Firebase.auth.signOut()
     }

@@ -1,12 +1,12 @@
 package com.jwd.lunchvote.remote.source
 
 import com.google.firebase.firestore.FirebaseFirestore
-import com.jwd.lunchvote.core.common.error.FoodError
 import com.jwd.lunchvote.data.model.FoodData
 import com.jwd.lunchvote.data.source.remote.FoodDataSource
 import com.jwd.lunchvote.remote.mapper.asData
 import com.jwd.lunchvote.remote.model.FoodRemote
 import kotlinx.coroutines.tasks.await
+import kr.co.inbody.config.error.FoodError
 import javax.inject.Inject
 
 class FoodDataSourceImpl @Inject constructor(

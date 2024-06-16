@@ -2,7 +2,6 @@ package com.jwd.lunchvote.remote.source
 
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.values
-import com.jwd.lunchvote.core.common.error.LoungeError
 import com.jwd.lunchvote.data.model.LoungeData
 import com.jwd.lunchvote.data.source.remote.LoungeDataSource
 import com.jwd.lunchvote.remote.mapper.asData
@@ -12,6 +11,7 @@ import com.jwd.lunchvote.remote.model.LoungeRemote
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.tasks.await
+import kr.co.inbody.config.error.LoungeError
 import java.util.UUID
 import javax.inject.Inject
 

@@ -1,7 +1,6 @@
 package com.jwd.lunchvote.remote.source
 
 import com.google.firebase.database.FirebaseDatabase
-import com.jwd.lunchvote.core.common.error.VoteError
 import com.jwd.lunchvote.data.model.FirstVoteResultData
 import com.jwd.lunchvote.data.model.SecondVoteResultData
 import com.jwd.lunchvote.data.source.remote.VoteResultDataSource
@@ -10,6 +9,7 @@ import com.jwd.lunchvote.remote.mapper.asRemote
 import com.jwd.lunchvote.remote.model.FirstVoteResultRemote
 import com.jwd.lunchvote.remote.model.SecondVoteResultRemote
 import kotlinx.coroutines.tasks.await
+import kr.co.inbody.config.error.VoteError
 import javax.inject.Inject
 
 class VoteResultDataSourceImpl @Inject constructor(

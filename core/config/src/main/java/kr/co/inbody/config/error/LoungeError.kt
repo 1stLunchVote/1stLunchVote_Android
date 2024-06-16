@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.core.common.error
+package kr.co.inbody.config.error
 
 interface LoungeError {
 
@@ -20,6 +20,16 @@ interface LoungeError {
   data object LoungeFinished : Throwable() {
     private fun readResolve(): Any = LoungeFinished
     override val message: String = "이미 종료된 투표 방입니다."
+  }
+
+  data object CreateLoungeFailed : Throwable() {
+    private fun readResolve(): Any = CreateLoungeFailed
+    override val message: String = "투표 방 생성에 실패했습니다."
+  }
+
+  data object JoinLoungeFailed : Throwable() {
+    private fun readResolve(): Any = JoinLoungeFailed
+    override val message: String = "투표 방 참가에 실패했습니다."
   }
 
   data object InvalidLounge : Throwable() {

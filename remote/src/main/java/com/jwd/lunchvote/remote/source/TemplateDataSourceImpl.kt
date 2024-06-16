@@ -2,7 +2,6 @@ package com.jwd.lunchvote.remote.source
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.jwd.lunchvote.core.common.error.TemplateError
 import com.jwd.lunchvote.data.model.TemplateData
 import com.jwd.lunchvote.data.source.remote.TemplateDataSource
 import com.jwd.lunchvote.remote.mapper.asData
@@ -11,6 +10,7 @@ import com.jwd.lunchvote.remote.model.TemplateRemote
 import com.jwd.lunchvote.remote.util.deleteDocument
 import com.jwd.lunchvote.remote.util.whereNotDeleted
 import kotlinx.coroutines.tasks.await
+import kr.co.inbody.config.error.TemplateError
 import javax.inject.Inject
 
 class TemplateDataSourceImpl @Inject constructor(

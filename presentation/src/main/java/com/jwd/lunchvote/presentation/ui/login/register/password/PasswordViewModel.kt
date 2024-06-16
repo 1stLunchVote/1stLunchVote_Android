@@ -2,8 +2,6 @@ package com.jwd.lunchvote.presentation.ui.login.register.password
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import com.jwd.lunchvote.core.common.error.LoginError
-import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.usecase.GetEmailUseCase
 import com.jwd.lunchvote.domain.usecase.SetEmailUseCase
@@ -13,6 +11,7 @@ import com.jwd.lunchvote.presentation.ui.login.register.password.PasswordContrac
 import com.jwd.lunchvote.presentation.ui.login.register.password.PasswordContract.PasswordState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kr.co.inbody.config.error.LoginError
 import javax.inject.Inject
 
 @HiltViewModel
@@ -44,7 +43,7 @@ class PasswordViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(PasswordSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+    sendSideEffect(PasswordSideEffect.ShowSnackBar(UiText.ErrorString(error)))
     when (error) {
       is LoginError.NoEmail -> sendSideEffect(PasswordSideEffect.NavigateToLogin)
     }

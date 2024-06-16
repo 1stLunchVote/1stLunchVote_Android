@@ -4,8 +4,6 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.jwd.lunchvote.core.common.error.UnknownError
-import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.repository.TemplateRepository
@@ -22,6 +20,7 @@ import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContra
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kr.co.inbody.config.error.UserError
 import javax.inject.Inject
 
 @HiltViewModel
@@ -69,7 +68,7 @@ class AddTemplateViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(AddTemplateSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+    sendSideEffect(AddTemplateSideEffect.ShowSnackBar(UiText.ErrorString(error)))
   }
 
   private suspend fun initialize() {

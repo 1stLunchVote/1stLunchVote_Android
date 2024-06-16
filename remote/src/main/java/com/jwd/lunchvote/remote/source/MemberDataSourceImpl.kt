@@ -2,7 +2,6 @@ package com.jwd.lunchvote.remote.source
 
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.values
-import com.jwd.lunchvote.core.common.error.LoungeError
 import com.jwd.lunchvote.data.model.MemberData
 import com.jwd.lunchvote.data.source.remote.MemberDataSource
 import com.jwd.lunchvote.remote.mapper.asData
@@ -16,6 +15,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.tasks.await
+import kr.co.inbody.config.error.LoungeError
 import javax.inject.Inject
 
 class MemberDataSourceImpl @Inject constructor(

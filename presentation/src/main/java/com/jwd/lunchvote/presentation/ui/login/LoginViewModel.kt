@@ -4,9 +4,6 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuthException
-import com.jwd.lunchvote.core.common.error.LoginError
-import com.jwd.lunchvote.core.common.error.UnknownError
-import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.usecase.SignInWithEmailAndPassword
@@ -23,6 +20,8 @@ import com.jwd.lunchvote.presentation.util.UiText
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.user.UserApiClient
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kr.co.inbody.config.error.LoginError
+import kr.co.inbody.config.error.UserError
 import javax.inject.Inject
 
 @HiltViewModel
@@ -64,10 +63,10 @@ class LoginViewModel @Inject constructor(
           "ERROR_USER_NOT_FOUND" -> sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.StringResource(R.string.login_user_not_found_error_snackbar)))
           "ERROR_WRONG_PASSWORD" -> sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.StringResource(R.string.login_wrong_password_error_snackbar)))
           "ERROR_USER_DISABLED" -> sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.StringResource(R.string.login_user_disabled_error_snackbar)))
-          else -> sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+          else -> sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.ErrorString(error)))
         }
       }
-      else -> sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+      else -> sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.ErrorString(error)))
     }
   }
 
