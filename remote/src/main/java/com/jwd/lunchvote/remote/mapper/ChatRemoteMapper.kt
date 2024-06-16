@@ -8,7 +8,7 @@ import com.jwd.lunchvote.remote.model.ChatRemote
 private object ChatRemoteMapper : BiMapper<ChatRemote, ChatData> {
   override fun mapToRight(from: ChatRemote): ChatData =
     ChatData(
-      loungeId = from.loungeId,
+      loungeId = "",
       id = "",
       userId = from.userId,
       userName = from.userName,
@@ -20,7 +20,6 @@ private object ChatRemoteMapper : BiMapper<ChatRemote, ChatData> {
 
   override fun mapToLeft(from: ChatData): ChatRemote =
     ChatRemote(
-      loungeId = from.loungeId,
       userId = from.userId,
       userName = from.userName,
       userProfile = from.userProfile,
@@ -45,8 +44,8 @@ private object ChatRemoteTypeMapper : BiMapper<String, ChatData.Type> {
     }
 }
 
-internal fun ChatRemote.asData(id: String): ChatData =
-  ChatRemoteMapper.mapToRight(this).copy(id = id)
+internal fun ChatRemote.asData(loungeId: String, id: String): ChatData =
+  ChatRemoteMapper.mapToRight(this).copy(loungeId = loungeId, id = id)
 
 internal fun ChatData.asRemote(): ChatRemote =
   ChatRemoteMapper.mapToLeft(this)

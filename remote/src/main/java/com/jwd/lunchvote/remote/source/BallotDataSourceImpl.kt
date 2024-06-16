@@ -21,7 +21,7 @@ class BallotDataSourceImpl @Inject constructor(
     private const val CHILD_FIRST_BALLOT = "First"
     private const val CHILD_SECOND_BALLOT = "Second"
   }
-  
+
   override suspend fun submitFirstBallot(
     firstBallot: FirstBallotData
   ) {

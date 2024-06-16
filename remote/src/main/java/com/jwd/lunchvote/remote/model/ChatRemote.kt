@@ -4,7 +4,6 @@ import com.google.firebase.Timestamp
 import com.jwd.lunchvote.remote.util.toLong
 
 data class ChatRemote(
-  val loungeId: String = "",
   val userId: String = "",
   val userName: String = "",
   val userProfile: String = "",

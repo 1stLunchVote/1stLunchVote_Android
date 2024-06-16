@@ -20,17 +20,17 @@ class LoungeDataSourceImpl @Inject constructor(
 ) : LoungeDataSource {
 
   companion object {
-    const val LOUNGE_PATH = "Lounge"
+    private const val REFERENCE_LOUNGE = "Lounge"
 
-    const val LOUNGE_STATUS = "status"
-    const val LOUNGE_MEMBERS = "members"
+    private const val COLUMN_STATUS = "status"
+    private const val COLUMN_MEMBERS = "members"
   }
 
   override suspend fun checkLoungeExistById(
     id: String
   ): Boolean =
     database
-      .getReference(LOUNGE_PATH)
+      .getReference(REFERENCE_LOUNGE)
       .child(id)
       .get()
       .await()
@@ -40,13 +40,13 @@ class LoungeDataSourceImpl @Inject constructor(
   override suspend fun createLounge(): String {
     val loungeId = UUID.randomUUID().toString()
     database
-      .getReference(LOUNGE_PATH)
+      .getReference(REFERENCE_LOUNGE)
       .child(loungeId)
       .apply {
-        child(LOUNGE_STATUS)
+        child(COLUMN_STATUS)
           .setValue(LoungeRemote.STATUS_CREATED)
           .await()
-        child(LOUNGE_MEMBERS)
+        child(COLUMN_MEMBERS)
           .setValue(0)
           .await()
       }
@@ -58,9 +58,9 @@ class LoungeDataSourceImpl @Inject constructor(
     id: String
   ): Flow<LoungeData.Status> =
     database
-      .getReference(LOUNGE_PATH)
+      .getReference(REFERENCE_LOUNGE)
       .child(id)
-      .child(LOUNGE_STATUS)
+      .child(COLUMN_STATUS)
       .values<String>()
       .mapNotNull { status -> status?.asLoungeDataStatus() }
 
@@ -68,7 +68,7 @@ class LoungeDataSourceImpl @Inject constructor(
     id: String
   ): LoungeData =
     database
-      .getReference(LOUNGE_PATH)
+      .getReference(REFERENCE_LOUNGE)
       .child(id)
       .get()
       .await()
@@ -79,9 +79,9 @@ class LoungeDataSourceImpl @Inject constructor(
     id: String
   ) {
     database
-      .getReference(LOUNGE_PATH)
+      .getReference(REFERENCE_LOUNGE)
       .child(id)
-      .child(LOUNGE_MEMBERS)
+      .child(COLUMN_MEMBERS)
       .apply {
         val members = get().await().value as Long
         if (members >= 6) throw LoungeError.FullMember
@@ -93,9 +93,9 @@ class LoungeDataSourceImpl @Inject constructor(
     id: String
   ) {
     database
-      .getReference(LOUNGE_PATH)
+      .getReference(REFERENCE_LOUNGE)
       .child(id)
-      .child(LOUNGE_MEMBERS)
+      .child(COLUMN_MEMBERS)
       .apply {
         val members = get().await().value as Long
         if (members <= 0) throw LoungeError.NoMember
@@ -107,14 +107,14 @@ class LoungeDataSourceImpl @Inject constructor(
     id: String
   ) {
     database
-      .getReference(LOUNGE_PATH)
+      .getReference(REFERENCE_LOUNGE)
       .child(id)
       .apply {
-        child(LOUNGE_STATUS)
+        child(COLUMN_STATUS)
           .setValue(LoungeRemote.STATUS_QUIT)
           .await()
 
-        child(LOUNGE_MEMBERS)
+        child(COLUMN_MEMBERS)
           .apply {
             val members = get().await().value as Long
             if (members <= 0) throw LoungeError.NoMember
@@ -128,9 +128,9 @@ class LoungeDataSourceImpl @Inject constructor(
     status: LoungeData.Status
   ) {
     database
-      .getReference(LOUNGE_PATH)
+      .getReference(REFERENCE_LOUNGE)
       .child(id)
-      .child(LOUNGE_STATUS)
+      .child(COLUMN_STATUS)
       .setValue(status.asRemote())
       .await()
   }

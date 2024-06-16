@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 class VoteResultDataSourceImpl @Inject constructor(
   private val database: FirebaseDatabase
-): VoteResultDataSource {
+) : VoteResultDataSource {
 
   companion object {
     private const val REFERENCE_VOTE_RESULT = "VoteResult"

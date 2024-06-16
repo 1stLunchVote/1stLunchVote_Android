@@ -1,6 +1,5 @@
 package com.jwd.lunchvote.remote.source
 
-import com.google.firebase.Timestamp
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.values
 import com.jwd.lunchvote.core.common.error.LoungeError
@@ -10,8 +9,8 @@ import com.jwd.lunchvote.remote.mapper.asData
 import com.jwd.lunchvote.remote.mapper.asMemberDataType
 import com.jwd.lunchvote.remote.mapper.asRemote
 import com.jwd.lunchvote.remote.model.MemberRemote
+import com.jwd.lunchvote.remote.util.deleteChild
 import com.jwd.lunchvote.remote.util.getValueEventFlow
-import com.jwd.lunchvote.remote.util.toLong
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -21,10 +20,10 @@ import javax.inject.Inject
 
 class MemberDataSourceImpl @Inject constructor(
   private val database: FirebaseDatabase
-): MemberDataSource {
+) : MemberDataSource {
 
   companion object {
-    const val MEMBER_PATH = "Member"
+    const val REFERENCE_MEMBER = "Member"
 
     const val MEMBER_LOUNGE_ID = "loungeId"
     const val MEMBER_USER_NAME = "userName"
@@ -39,7 +38,7 @@ class MemberDataSourceImpl @Inject constructor(
     member: MemberData
   ) {
     database
-      .getReference(MEMBER_PATH)
+      .getReference(REFERENCE_MEMBER)
       .child(member.loungeId)
       .child(member.userId)
       .setValue(member.asRemote())
@@ -50,7 +49,7 @@ class MemberDataSourceImpl @Inject constructor(
     loungeId: String
   ): Flow<List<MemberData>> =
     database
-      .getReference(MEMBER_PATH)
+      .getReference(REFERENCE_MEMBER)
       .child(loungeId)
       .getValueEventFlow<MemberRemote>()
       .map {
@@ -63,7 +62,7 @@ class MemberDataSourceImpl @Inject constructor(
     member: MemberData
   ): Flow<MemberData.Type> =
     database
-      .getReference(MEMBER_PATH)
+      .getReference(REFERENCE_MEMBER)
       .child(member.loungeId)
       .child(member.userId)
       .child(MEMBER_TYPE)
@@ -75,7 +74,7 @@ class MemberDataSourceImpl @Inject constructor(
     loungeId: String
   ): MemberData =
     database
-      .getReference(MEMBER_PATH)
+      .getReference(REFERENCE_MEMBER)
       .child(loungeId)
       .child(userId)
       .get()
@@ -87,7 +86,7 @@ class MemberDataSourceImpl @Inject constructor(
     member: MemberData
   ) {
     database
-      .getReference(MEMBER_PATH)
+      .getReference(REFERENCE_MEMBER)
       .child(member.loungeId)
       .child(member.userId)
       .apply {
@@ -109,7 +108,7 @@ class MemberDataSourceImpl @Inject constructor(
     status: MemberData.Status
   ) {
     database
-      .getReference(MEMBER_PATH)
+      .getReference(REFERENCE_MEMBER)
       .child(member.loungeId)
       .child(member.userId)
       .child(MEMBER_STATUS)
@@ -122,10 +121,12 @@ class MemberDataSourceImpl @Inject constructor(
     status: MemberData.Status
   ) {
     database
-      .getReference(MEMBER_PATH)
+      .getReference(REFERENCE_MEMBER)
       .child(loungeId)
       .getValueEventFlow<MemberRemote>()
-      .map { it.mapNotNull { (key, value) -> value?.asData(key) } }
+      .map {
+        it.mapNotNull { (key, value) -> value?.asData(key) }
+      }
       .first()
       .forEach { updateMemberStatus(it, status) }
   }
@@ -134,17 +135,14 @@ class MemberDataSourceImpl @Inject constructor(
     member: MemberData
   ) {
     database
-      .getReference(MEMBER_PATH)
+      .getReference(REFERENCE_MEMBER)
       .child(member.loungeId)
       .child(member.userId)
       .apply {
         child(MEMBER_TYPE)
           .setValue(MemberRemote.TYPE_EXILED)
           .await()
-
-        child(MEMBER_DELETED_AT)
-          .setValue(Timestamp.now().toLong())
-          .await()
+        deleteChild()
       }
   }
 
@@ -152,7 +150,7 @@ class MemberDataSourceImpl @Inject constructor(
     member: MemberData
   ) {
     database
-      .getReference(MEMBER_PATH)
+      .getReference(REFERENCE_MEMBER)
       .child(member.loungeId)
       .child(member.userId)
       .removeValue()

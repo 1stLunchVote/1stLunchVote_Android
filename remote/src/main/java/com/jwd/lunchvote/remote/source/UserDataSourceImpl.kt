@@ -13,23 +13,23 @@ import javax.inject.Inject
 
 class UserDataSourceImpl @Inject constructor(
   private val fireStore: FirebaseFirestore
-): UserDataSource {
+) : UserDataSource {
 
   companion object {
-    const val USER_PATH = "User"
+    private const val COLLECTION_USER = "User"
 
-    const val COLUMN_EMAIL = "email"
-    const val COLUMN_NAME = "name"
-    const val COLUMN_PROFILE_IMAGE = "profileImage"
-    const val COLUMN_CREATED_AT = "createdAt"
-    const val COLUMN_DELETED_AT = "deletedAt"
+    private const val COLUMN_EMAIL = "email"
+    private const val COLUMN_NAME = "name"
+    private const val COLUMN_PROFILE_IMAGE = "profileImage"
+    private const val COLUMN_CREATED_AT = "createdAt"
+    private const val COLUMN_DELETED_AT = "deletedAt"
   }
 
   override suspend fun checkUserExists(
     email: String
   ): Boolean =
     fireStore
-      .collection(USER_PATH)
+      .collection(COLLECTION_USER)
       .whereNotDeleted()
       .whereEqualTo(COLUMN_EMAIL, email)
       .get()
@@ -41,7 +41,7 @@ class UserDataSourceImpl @Inject constructor(
     user: UserData
   ): String =
     fireStore
-      .collection(USER_PATH)
+      .collection(COLLECTION_USER)
       .document(user.id)
       .apply {
         set(user.asRemote())
@@ -53,7 +53,7 @@ class UserDataSourceImpl @Inject constructor(
     id: String
   ): UserData =
     fireStore
-      .collection(USER_PATH)
+      .collection(COLLECTION_USER)
       .document(id)
       .get()
       .await()
@@ -61,16 +61,15 @@ class UserDataSourceImpl @Inject constructor(
       .let { user ->
         if (user == null) throw UserError.NoUser
         else if (user.deletedAt != null) throw UserError.DeletedUser
-        else user
+        else user.asData(id)
       }
-      .asData(id)
 
 
   override suspend fun updateUser(
     user: UserData
   ) {
     fireStore
-      .collection(USER_PATH)
+      .collection(COLLECTION_USER)
       .document(user.id)
       .set(user.asRemote())
       .await()

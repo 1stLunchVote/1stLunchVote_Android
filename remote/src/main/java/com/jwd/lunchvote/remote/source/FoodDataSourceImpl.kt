@@ -11,41 +11,46 @@ import javax.inject.Inject
 
 class FoodDataSourceImpl @Inject constructor(
   private val fireStore: FirebaseFirestore
-): FoodDataSource {
+) : FoodDataSource {
 
   companion object {
-    const val FOOD_PATH = "Food"
+    private const val COLLECTION_FOOD = "Food"
 
-    const val COLUMN_IMAGE = "image"
-    const val COLUMN_NAME = "name"
+    private const val COLUMN_IMAGE = "image"
+    private const val COLUMN_NAME = "name"
   }
 
   override suspend fun getAllFood(): List<FoodData> =
     fireStore
-      .collection(FOOD_PATH)
+      .collection(COLLECTION_FOOD)
       .get()
       .await()
       .documents
-      .mapNotNull { it.toObject(FoodRemote::class.java)?.asData(it.id) }
+      .mapNotNull {
+        it.toObject(FoodRemote::class.java)
+          ?.asData(it.id)
+      }
 
   override suspend fun getFoodById(
     id: String
   ): FoodData =
     fireStore
-      .collection(FOOD_PATH)
+      .collection(COLLECTION_FOOD)
       .document(id)
       .get()
       .await()
       .toObject(FoodRemote::class.java)
-      ?.asData(id)
-      ?: throw FoodError.LoadFailure
+      ?.asData(id) ?: throw FoodError.LoadFailure
 
   // TODO: 임시
   override suspend fun getFoodTrend(): Pair<FoodData, Float> =
     fireStore
-      .collection(FOOD_PATH)
+      .collection(COLLECTION_FOOD)
       .get()
       .await()
       .documents
-      .firstNotNullOf { it.toObject(FoodRemote::class.java)?.asData(it.id) } to 36f
+      .firstNotNullOf {
+        it.toObject(FoodRemote::class.java)
+          ?.asData(it.id)
+      } to 36f
 }
