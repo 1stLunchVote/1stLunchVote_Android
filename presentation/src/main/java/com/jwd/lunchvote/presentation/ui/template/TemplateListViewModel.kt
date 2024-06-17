@@ -72,7 +72,6 @@ class TemplateListViewModel @Inject constructor(
   private suspend fun initialize() {
     val userId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
     val templateList = templateRepository.getTemplateList(userId).map { it.asUI() }
-    Timber.w("💛 ===ktw=== ${templateList}")
 
     updateState(TemplateListReduce.UpdateTemplateList(templateList))
   }
