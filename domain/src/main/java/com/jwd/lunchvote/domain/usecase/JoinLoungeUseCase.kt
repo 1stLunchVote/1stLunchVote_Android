@@ -50,7 +50,7 @@ class JoinLoungeUseCase @Inject constructor(
       userId = user.id,
       userName = user.name,
       userProfile = user.profileImage,
-      message = "${user.name}님이 입장하였습니다.",
+      message = Chat.JOIN_SYSTEM_MESSAGE,
       type = Chat.Type.SYSTEM,
       createdAt = Instant.now().epochSecond
     )

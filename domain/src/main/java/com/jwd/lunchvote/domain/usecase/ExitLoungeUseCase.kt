@@ -27,7 +27,7 @@ class ExitLoungeUseCase @Inject constructor(
       userId = member.userId,
       userName = member.userName,
       userProfile = member.userProfile,
-      message = "${member.userName}님이 퇴장하였습니다.",
+      message = Chat.EXIT_SYSTEM_MESSAGE,
       type = Chat.Type.SYSTEM,
       createdAt = Instant.now().epochSecond
     )

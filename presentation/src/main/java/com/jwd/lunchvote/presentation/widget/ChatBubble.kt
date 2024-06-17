@@ -19,10 +19,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.core.ui.theme.colorNeutral90
+import com.jwd.lunchvote.domain.entity.Chat
 import com.jwd.lunchvote.presentation.model.ChatUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import java.time.format.DateTimeFormatter
@@ -137,17 +139,25 @@ fun ChatBubble(
       modifier = modifier.fillMaxWidth(),
       contentAlignment = Alignment.Center
     ) {
-      Box(
+      ReversedRow(
         modifier = Modifier
           .width(256.dp)
-          .clip(RoundedCornerShape(12.dp))
+          .clip(RoundedCornerShape(100))
           .background(color = colorNeutral90)
-          .padding(horizontal = 8.dp, vertical = 4.dp),
-        contentAlignment = Alignment.Center
+          .padding(horizontal = 12.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
       ) {
         Text(
           text = chat.message,
           color = MaterialTheme.colorScheme.background,
+          style = MaterialTheme.typography.titleSmall
+        )
+        Text(
+          text = chat.userName,
+          color = MaterialTheme.colorScheme.background,
+          overflow = TextOverflow.Ellipsis,
+          maxLines = 1,
           style = MaterialTheme.typography.titleSmall
         )
       }
@@ -167,7 +177,7 @@ private fun ChatBubblePreview() {
     ) {
       ChatBubble(
         chat = ChatUIModel(
-          message = "투표 방이 생성되었습니다.",
+          message = Chat.CREATE_SYSTEM_MESSAGE,
           type = ChatUIModel.Type.SYSTEM
         ),
         member = MemberUIModel(),
@@ -175,7 +185,8 @@ private fun ChatBubblePreview() {
       )
       ChatBubble(
         chat = ChatUIModel(
-          message = "김철수님이 입장하였습니다.",
+          userName = "김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수",
+          message = Chat.JOIN_SYSTEM_MESSAGE,
           type = ChatUIModel.Type.SYSTEM
         ),
         member = MemberUIModel(),
@@ -223,8 +234,8 @@ private fun ChatBubblePreview() {
       )
       ChatBubble(
         chat = ChatUIModel(
-          userName = "김철수",
-          message = "김철수님이 추방되었습니다.",
+          userName = "김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수",
+          message = Chat.EXILE_SYSTEM_MESSAGE,
           type = ChatUIModel.Type.SYSTEM
         ),
         member = MemberUIModel(),

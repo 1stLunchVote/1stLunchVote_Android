@@ -36,9 +36,9 @@ class CreateLoungeUseCase @Inject constructor(
       id = UUID.randomUUID().toString(),
       loungeId = loungeId,
       userId = user.id,
-      userName = user.name,
+      userName = "",
       userProfile = user.profileImage,
-      message = "투표 방이 생성되었습니다.",
+      message = Chat.CREATE_SYSTEM_MESSAGE,
       type = Chat.Type.SYSTEM,
       createdAt = Instant.now().epochSecond
     )
