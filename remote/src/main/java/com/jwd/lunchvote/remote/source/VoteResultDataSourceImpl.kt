@@ -74,7 +74,8 @@ class VoteResultDataSourceImpl @Inject constructor(
       .await()
       .children
       .mapNotNull {
-        it.getValue(SecondVoteResultRemote::class.java)
+        it.child(CHILD_SECOND_VOTE_RESULT)
+          .getValue(SecondVoteResultRemote::class.java)
           ?.asData(it.key!!)
       }
 }
