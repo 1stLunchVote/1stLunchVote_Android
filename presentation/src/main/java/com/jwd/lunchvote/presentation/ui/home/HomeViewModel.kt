@@ -15,6 +15,7 @@ import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeSideEffect
 import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -44,6 +45,7 @@ class HomeViewModel @Inject constructor(
   override fun handleEvents(event: HomeEvent) {
     when(event) {
       is HomeEvent.ScreenInitialize -> launch { initialize() }
+
       is HomeEvent.OnClickLoungeButton -> sendSideEffect(HomeSideEffect.NavigateToLounge(currentState.loungeId))
       is HomeEvent.OnClickJoinLoungeButton -> sendSideEffect(HomeSideEffect.OpenJoinDialog)
       is HomeEvent.OnClickTemplateButton -> sendSideEffect(HomeSideEffect.NavigateToTemplateList)

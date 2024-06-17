@@ -40,7 +40,7 @@ class FoodDataSourceImpl @Inject constructor(
       .get()
       .await()
       .toObject(FoodRemote::class.java)
-      ?.asData(id) ?: throw FoodError.LoadFailure
+      ?.asData(id) ?: throw FoodError.NoFood
 
   // TODO: 임시
   override suspend fun getFoodTrend(): Pair<FoodData, Float> =

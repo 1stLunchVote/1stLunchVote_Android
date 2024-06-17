@@ -157,7 +157,7 @@ class FirstVoteViewModel @Inject constructor(
       when(status) {
         Lounge.Status.QUIT -> {
           sendSideEffect(FirstVoteSideEffect.ShowSnackBar(UiText.StringResource(R.string.first_vote_owner_exited_snackbar)))
-          popBackStackAfterJobCancel()
+          sendSideEffect(FirstVoteSideEffect.PopBackStack)
         }
         Lounge.Status.SECOND_VOTE -> sendSideEffect(FirstVoteSideEffect.NavigateToSecondVote(currentState.lounge.id))
         else -> Unit
@@ -171,7 +171,7 @@ class FirstVoteViewModel @Inject constructor(
 
       if (memberList.size <= 1) {
         sendSideEffect(FirstVoteSideEffect.ShowSnackBar(UiText.StringResource(R.string.first_vote_only_owner_snackbar)))
-        popBackStackAfterJobCancel()
+        sendSideEffect(FirstVoteSideEffect.PopBackStack)
       }
       if (memberList.all { it.status == Member.Status.VOTED }) launch { submitVote() }
     }
@@ -234,14 +234,10 @@ class FirstVoteViewModel @Inject constructor(
   }
 
   private suspend fun exitVote() {
-    exitLoungeUseCase(me.asDomain())
-
-    popBackStackAfterJobCancel()
-  }
-
-  private fun popBackStackAfterJobCancel() {
     loungeStatusFlow.cancel()
     memberListFlow.cancel()
+
+    exitLoungeUseCase(me.asDomain())
 
     sendSideEffect(FirstVoteSideEffect.PopBackStack)
   }

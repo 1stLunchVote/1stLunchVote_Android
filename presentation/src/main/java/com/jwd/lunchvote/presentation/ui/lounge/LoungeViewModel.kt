@@ -118,12 +118,12 @@ class LoungeViewModel @Inject constructor(
   override fun handleErrors(error: Throwable) {
     sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.ErrorString(error)))
     when (error) {
-      is LoungeError.LoungeQuit -> popBackStackAfterJobCancel()
-      is LoungeError.FullMember -> popBackStackAfterJobCancel()
-      is LoungeError.NoLounge -> popBackStackAfterJobCancel()
-      is LoungeError.JoinLoungeFailed -> popBackStackAfterJobCancel()
-      is LoungeError.InvalidMember -> popBackStackAfterJobCancel()
-      is LoungeError.InvalidLounge -> popBackStackAfterJobCancel()
+      is LoungeError.LoungeQuit -> sendSideEffect(LoungeSideEffect.PopBackStack)
+      is LoungeError.FullMember -> sendSideEffect(LoungeSideEffect.PopBackStack)
+      is LoungeError.NoLounge -> sendSideEffect(LoungeSideEffect.PopBackStack)
+      is LoungeError.JoinLoungeFailed -> sendSideEffect(LoungeSideEffect.PopBackStack)
+      is LoungeError.InvalidMember -> sendSideEffect(LoungeSideEffect.PopBackStack)
+      is LoungeError.InvalidLounge -> sendSideEffect(LoungeSideEffect.PopBackStack)
       else -> Unit
     }
   }
@@ -162,7 +162,7 @@ class LoungeViewModel @Inject constructor(
       when (status) {
         Lounge.Status.QUIT -> {
           sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_owner_exited_snackbar)))
-          popBackStackAfterJobCancel()
+          sendSideEffect(LoungeSideEffect.PopBackStack)
         }
         Lounge.Status.FIRST_VOTE -> {
           sendSideEffect(LoungeSideEffect.NavigateToVote(loungeId))
@@ -182,7 +182,7 @@ class LoungeViewModel @Inject constructor(
     memberRepository.getMemberTypeFlow(loungeId, currentState.user.id).collectLatest { type ->
       if (type == Member.Type.EXILED) {
         sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_exiled_snackbar)))
-        popBackStackAfterJobCancel()
+        sendSideEffect(LoungeSideEffect.PopBackStack)
       }
     }
   }
@@ -222,20 +222,14 @@ class LoungeViewModel @Inject constructor(
   }
 
   private suspend fun exitLounge() {
-    exitLoungeUseCase(me.asDomain())
-
-    sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_exited_snackbar)))
-    sendSideEffect(LoungeSideEffect.CloseDialog)
-
-    popBackStackAfterJobCancel()
-  }
-
-  private fun popBackStackAfterJobCancel() {
     loungeStatusFlow.cancel()
     memberListFlow.cancel()
     memberTypeFlow.cancel()
     chatListFlow.cancel()
 
+    exitLoungeUseCase(me.asDomain())
+
+    sendSideEffect(LoungeSideEffect.CloseDialog)
     sendSideEffect(LoungeSideEffect.PopBackStack)
   }
 

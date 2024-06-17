@@ -27,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -68,6 +69,7 @@ fun HomeRoute(
   context: Context = LocalContext.current
 ){
   val state by viewModel.viewState.collectAsStateWithLifecycle()
+  val loading by viewModel.isLoading.collectAsStateWithLifecycle()
   val dialog by viewModel.dialogState.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect){
@@ -111,16 +113,19 @@ private fun HomeScreen(
   onEvent: (HomeEvent) -> Unit = {}
 ){
   Screen(
-    modifier = modifier.padding(horizontal = 32.dp)
+    modifier = modifier.padding(horizontal = 32.dp),
+    topAppBar = {
+      Image(
+        painterResource(R.drawable.ic_logo),
+        contentDescription = null,
+        modifier = Modifier
+          .padding(vertical = 8.dp)
+          .size(48.dp)
+          .align(Alignment.CenterHorizontally)
+      )
+    }
   ) {
-    Image(
-      painterResource(R.drawable.ic_logo),
-      contentDescription = null,
-      modifier = Modifier
-        .size(48.dp)
-        .align(Alignment.CenterHorizontally)
-    )
-    Gap(minHeight = 36.dp)
+    Gap(minHeight = 24.dp)
     FoodTrendChart(
       foodTrend = state.foodTrend,
       foodTrendRatio = state.foodTrendRatio,
@@ -139,13 +144,13 @@ private fun HomeScreen(
       onClickSettingButton = { onEvent(HomeEvent.OnClickSettingButton) },
       onClickTipsButton = { onEvent(HomeEvent.OnClickTipsButton) },
     )
-    Gap(height = 64.dp)
+    Gap(height = 32.dp)
   }
 }
 
 @Composable
 private fun FoodTrendChart(
-  foodTrend: FoodUIModel,
+  foodTrend: FoodUIModel?,
   foodTrendRatio: Float,
   modifier: Modifier = Modifier
 ) {
@@ -165,24 +170,38 @@ private fun FoodTrendChart(
       CircularChart(
         foodTrendRatio = foodTrendRatio
       )
-      CoilImage(
-        imageModel = { foodTrend.image },
-        modifier = Modifier
-          .size(160.dp)
-          .clip(CircleShape)
-          .border(4.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape),
-        previewPlaceholder = R.drawable.ic_food_image_temp
-      )
+      if (foodTrend == null) {
+        Box(
+          modifier = Modifier.size(192.dp),
+          contentAlignment = Alignment.Center
+        ) {
+          Text(
+            text = stringResource(R.string.home_banner_loading),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.outline
+          )
+        }
+      } else {
+        CoilImage(
+          imageModel = { foodTrend.image },
+          modifier = Modifier
+            .size(160.dp)
+            .clip(CircleShape)
+            .border(4.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape),
+          previewPlaceholder = R.drawable.ic_food_image_temp
+        )
+      }
     }
     Gap(height = 16.dp)
     Text(
-      text = foodTrend.name,
+      text = foodTrend?.name ?: "",
       style = MaterialTheme.typography.titleMedium,
       color = MaterialTheme.colorScheme.primary
     )
     Gap(height = 8.dp)
     Text(
       text = stringResource(R.string.home_banner_score, foodTrendRatio.toInt()),
+      modifier = Modifier.alpha(if (foodTrend == null) 0f else 1f),
       style = MaterialTheme.typography.bodySmall,
       color = MaterialTheme.colorScheme.outline
     )
@@ -202,7 +221,7 @@ private fun CircularChart(
     targetValue = foodTrendRatio,
     animationSpec = tween(
       durationMillis = 1000,
-      delayMillis = 500,
+      delayMillis = 1000,
       easing = LinearEasing
     ),
     label = "AnimatedFoodTrendRatio"
