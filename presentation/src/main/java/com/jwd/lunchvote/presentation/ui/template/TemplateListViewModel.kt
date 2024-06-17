@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.co.inbody.config.error.UserError
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -52,6 +51,7 @@ class TemplateListViewModel @Inject constructor(
       is TemplateListEvent.OnClickDismissButtonAddDialog -> sendSideEffect(TemplateListSideEffect.CloseDialog)
       is TemplateListEvent.OnClickConfirmButtonAddDialog -> {
         val templateName = currentState.templateName ?: return
+        
         sendSideEffect(TemplateListSideEffect.CloseDialog)
         sendSideEffect(TemplateListSideEffect.NavigateToAddTemplate(templateName))
       }
