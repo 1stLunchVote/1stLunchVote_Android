@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -137,9 +139,10 @@ fun ChatBubble(
     ) {
       Box(
         modifier = Modifier
-          .size(256.dp, 24.dp)
-          .clip(RoundedCornerShape(100))
-          .background(color = colorNeutral90),
+          .width(256.dp)
+          .clip(RoundedCornerShape(12.dp))
+          .background(color = colorNeutral90)
+          .padding(horizontal = 8.dp, vertical = 4.dp),
         contentAlignment = Alignment.Center
       ) {
         Text(
