@@ -59,12 +59,13 @@ class MemberDataSourceImpl @Inject constructor(
       }
 
   override fun getMemberTypeFlow(
-    member: MemberData
+    loungeId: String,
+    userId: String
   ): Flow<MemberData.Type> =
     database
       .getReference(REFERENCE_MEMBER)
-      .child(member.loungeId)
-      .child(member.userId)
+      .child(loungeId)
+      .child(userId)
       .child(MEMBER_TYPE)
       .values<String>()
       .mapNotNull { type -> type?.asMemberDataType() }

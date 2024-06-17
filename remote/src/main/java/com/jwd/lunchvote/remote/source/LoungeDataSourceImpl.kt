@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.tasks.await
 import kr.co.inbody.config.error.LoungeError
+import timber.log.Timber
 import java.util.UUID
 import javax.inject.Inject
 
@@ -113,13 +114,6 @@ class LoungeDataSourceImpl @Inject constructor(
         child(COLUMN_STATUS)
           .setValue(LoungeRemote.STATUS_QUIT)
           .await()
-
-        child(COLUMN_MEMBERS)
-          .apply {
-            val members = get().await().value as Long
-            if (members <= 0) throw LoungeError.NoMember
-            setValue(members - 1).await()
-          }
       }
   }
 

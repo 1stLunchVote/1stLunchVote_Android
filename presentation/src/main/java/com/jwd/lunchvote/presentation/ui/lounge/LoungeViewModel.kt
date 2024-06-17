@@ -66,7 +66,11 @@ class LoungeViewModel @Inject constructor(
     }
   }
 
-  private var currentJob: Job? = null
+  private lateinit var loungeStatusFlow: Job
+  private lateinit var memberListFlow: Job
+  private lateinit var memberTypeFlow: Job
+  private lateinit var chatListFlow: Job
+
   private val owner: MemberUIModel
     get() = currentState.memberList.find { it.type == MemberUIModel.Type.OWNER } ?: throw LoungeError.NoOwner
   private val me: MemberUIModel
@@ -114,12 +118,12 @@ class LoungeViewModel @Inject constructor(
   override fun handleErrors(error: Throwable) {
     sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.ErrorString(error)))
     when (error) {
-      is LoungeError.LoungeQuit -> sendSideEffect(LoungeSideEffect.PopBackStack)
-      is LoungeError.FullMember -> sendSideEffect(LoungeSideEffect.PopBackStack)
-      is LoungeError.NoLounge -> sendSideEffect(LoungeSideEffect.PopBackStack)
-      is LoungeError.JoinLoungeFailed -> sendSideEffect(LoungeSideEffect.PopBackStack)
-      is LoungeError.InvalidMember -> sendSideEffect(LoungeSideEffect.PopBackStack)
-      is LoungeError.InvalidLounge -> sendSideEffect(LoungeSideEffect.PopBackStack)
+      is LoungeError.LoungeQuit -> popBackStackAfterJobCancel()
+      is LoungeError.FullMember -> popBackStackAfterJobCancel()
+      is LoungeError.NoLounge -> popBackStackAfterJobCancel()
+      is LoungeError.JoinLoungeFailed -> popBackStackAfterJobCancel()
+      is LoungeError.InvalidMember -> popBackStackAfterJobCancel()
+      is LoungeError.InvalidLounge -> popBackStackAfterJobCancel()
       else -> Unit
     }
   }
@@ -147,11 +151,10 @@ class LoungeViewModel @Inject constructor(
   }
 
   private fun collectLoungeData(lounge: LoungeUIModel) {
-    launch { collectLoungeStatus(lounge.id) }
-    launch { collectMemberList(lounge.id) }
-    launch { collectChatList(lounge.id) }
-
-    currentJob = launch { collectMemberType(lounge.id) }
+    loungeStatusFlow = launch { collectLoungeStatus(lounge.id) }
+    memberListFlow = launch { collectMemberList(lounge.id) }
+    memberTypeFlow = launch { collectMemberType(lounge.id) }
+    chatListFlow = launch { collectChatList(lounge.id) }
   }
 
   private suspend fun collectLoungeStatus(loungeId: String) {
@@ -159,7 +162,7 @@ class LoungeViewModel @Inject constructor(
       when (status) {
         Lounge.Status.QUIT -> {
           sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_owner_exited_snackbar)))
-          sendSideEffect(LoungeSideEffect.PopBackStack)
+          popBackStackAfterJobCancel()
         }
         Lounge.Status.FIRST_VOTE -> {
           sendSideEffect(LoungeSideEffect.NavigateToVote(loungeId))
@@ -175,22 +178,18 @@ class LoungeViewModel @Inject constructor(
     }
   }
 
-  private suspend fun collectChatList(loungeId: String) {
-    chatRepository.getChatListFlow(loungeId).collectLatest { chatList ->
-      updateState(LoungeReduce.UpdateChatList(chatList.map { it.asUI() }))
+  private suspend fun collectMemberType(loungeId: String) {
+    memberRepository.getMemberTypeFlow(loungeId, currentState.user.id).collectLatest { type ->
+      if (type == Member.Type.EXILED) {
+        sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_exiled_snackbar)))
+        popBackStackAfterJobCancel()
+      }
     }
   }
 
-  private suspend fun collectMemberType(loungeId: String) {
-    val member = MemberUIModel(
-      loungeId = loungeId,
-      userId = currentState.user.id
-    )
-    memberRepository.getMemberTypeFlow(member.asDomain()).collectLatest { type ->
-      if (type == Member.Type.EXILED) {
-        sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_exiled_snackbar)))
-        sendSideEffect(LoungeSideEffect.PopBackStack)
-      }
+  private suspend fun collectChatList(loungeId: String) {
+    chatRepository.getChatListFlow(loungeId).collectLatest { chatList ->
+      updateState(LoungeReduce.UpdateChatList(chatList.map { it.asUI() }))
     }
   }
 
@@ -223,13 +222,21 @@ class LoungeViewModel @Inject constructor(
   }
 
   private suspend fun exitLounge() {
-    currentJob?.cancel()
-
     exitLoungeUseCase(me.asDomain())
 
     sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_exited_snackbar)))
     sendSideEffect(LoungeSideEffect.CloseDialog)
-    sendSideEffect(LoungeSideEffect.PopBackStack)
+
+    popBackStackAfterJobCancel()
+  }
+
+  private fun popBackStackAfterJobCancel() {
+    loungeStatusFlow.cancel()
+    memberListFlow.cancel()
+    memberTypeFlow.cancel()
+    chatListFlow.cancel()
+
+    popBackStackAfterJobCancel()
   }
 
   companion object {

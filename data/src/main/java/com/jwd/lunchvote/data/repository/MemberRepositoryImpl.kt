@@ -2,6 +2,7 @@ package com.jwd.lunchvote.data.repository
 
 import com.jwd.lunchvote.data.mapper.asData
 import com.jwd.lunchvote.data.mapper.asDomain
+import com.jwd.lunchvote.data.model.MemberData
 import com.jwd.lunchvote.data.source.remote.MemberDataSource
 import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.repository.MemberRepository
@@ -20,8 +21,8 @@ class MemberRepositoryImpl @Inject constructor(
   override fun getMemberListFlow(loungeId: String): Flow<List<Member>> =
     memberDataSource.getMemberListFlow(loungeId).map { list -> list.map { it.asDomain() } }
 
-  override fun getMemberTypeFlow(member: Member): Flow<Member.Type> =
-    memberDataSource.getMemberTypeFlow(member.asData()).map { it.asDomain() }
+  override fun getMemberTypeFlow(loungeId: String, userId: String): Flow<Member.Type> =
+    memberDataSource.getMemberTypeFlow(loungeId, userId).map { it.asDomain() }
 
   override suspend fun getMemberByUserId(userId: String, loungeId: String): Member =
     memberDataSource.getMemberByUserId(userId, loungeId).asDomain()
