@@ -236,7 +236,7 @@ class LoungeViewModel @Inject constructor(
     memberTypeFlow.cancel()
     chatListFlow.cancel()
 
-    popBackStackAfterJobCancel()
+    sendSideEffect(LoungeSideEffect.PopBackStack)
   }
 
   companion object {

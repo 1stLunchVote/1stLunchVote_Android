@@ -30,6 +30,7 @@ import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVo
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVoteState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -62,6 +63,9 @@ class SecondVoteViewModel @Inject constructor(
       _dialogState.emit(dialogState)
     }
   }
+
+  private lateinit var loungeStatusFlow: Job
+  private lateinit var memberListFlow: Job
 
   private val owner: MemberUIModel
     get() = currentState.memberList.find { it.type == MemberUIModel.Type.OWNER } ?: throw LoungeError.NoOwner
@@ -117,8 +121,8 @@ class SecondVoteViewModel @Inject constructor(
     val lounge = loungeRepository.getLoungeById(loungeId).asUI()
     updateState(SecondVoteReduce.UpdateLounge(lounge))
 
-    launch(false) { collectMemberList(loungeId) }
-    launch(false) { collectLoungeStatus(loungeId) }
+    loungeStatusFlow = launch { collectLoungeStatus(lounge.id) }
+    memberListFlow = launch { collectMemberList(lounge.id) }
 
     val firstVoteResult = voteResultRepository.getFirstVoteResultByLoungeId(loungeId)
     val foodList = firstVoteResult.foodIds.map { id -> foodRepository.getFoodById(id).asUI() }
@@ -131,7 +135,7 @@ class SecondVoteViewModel @Inject constructor(
 
       if (memberList.size <= 1) {
         sendSideEffect(SecondVoteSideEffect.ShowSnackBar(UiText.StringResource(R.string.first_vote_only_owner_snackbar)))
-        sendSideEffect(SecondVoteSideEffect.PopBackStack)
+        popBackStackAfterJobCancel()
       }
       if (memberList.all { it.status == Member.Status.VOTED }) launch { submitVote() }
     }
@@ -142,7 +146,7 @@ class SecondVoteViewModel @Inject constructor(
       when(status) {
         Lounge.Status.QUIT -> {
           sendSideEffect(SecondVoteSideEffect.ShowSnackBar(UiText.StringResource(R.string.first_vote_owner_exited_snackbar)))
-          sendSideEffect(SecondVoteSideEffect.PopBackStack)
+          popBackStackAfterJobCancel()
         }
         Lounge.Status.FINISHED -> sendSideEffect(SecondVoteSideEffect.NavigateToVoteResult(currentState.lounge.id))
         else -> Unit
@@ -182,6 +186,13 @@ class SecondVoteViewModel @Inject constructor(
 
   private suspend fun exitVote() {
     exitLoungeUseCase(me.asDomain())
+
+    popBackStackAfterJobCancel()
+  }
+
+  private fun popBackStackAfterJobCancel() {
+    loungeStatusFlow.cancel()
+    memberListFlow.cancel()
 
     sendSideEffect(SecondVoteSideEffect.PopBackStack)
   }

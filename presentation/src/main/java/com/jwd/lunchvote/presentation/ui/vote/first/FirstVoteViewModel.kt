@@ -33,6 +33,7 @@ import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteS
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -65,6 +66,9 @@ class FirstVoteViewModel @Inject constructor(
       _dialogState.emit(dialogState)
     }
   }
+
+  private lateinit var loungeStatusFlow: Job
+  private lateinit var memberListFlow: Job
 
   private val owner: MemberUIModel
     get() = currentState.memberList.find { it.type == MemberUIModel.Type.OWNER } ?: throw LoungeError.NoOwner
@@ -136,8 +140,8 @@ class FirstVoteViewModel @Inject constructor(
     val lounge = loungeRepository.getLoungeById(loungeId).asUI()
     updateState(FirstVoteReduce.UpdateLounge(lounge))
 
-    launch(false) { collectMemberList(loungeId) }
-    launch(false) { collectLoungeStatus(loungeId) }
+    loungeStatusFlow = launch { collectLoungeStatus(lounge.id) }
+    memberListFlow = launch { collectMemberList(lounge.id) }
 
     val foodList = foodRepository.getAllFood().map { it.asUI() }
     val foodMap = foodList.associateWith { FoodStatus.DEFAULT }
@@ -148,28 +152,28 @@ class FirstVoteViewModel @Inject constructor(
     setDialogState(FirstVoteDialog.SelectTemplateDialog(templateList))
   }
 
+  private suspend fun collectLoungeStatus(loungeId: String) {
+    loungeRepository.getLoungeStatusFlowById(loungeId).collectLatest { status ->
+      when(status) {
+        Lounge.Status.QUIT -> {
+          sendSideEffect(FirstVoteSideEffect.ShowSnackBar(UiText.StringResource(R.string.first_vote_owner_exited_snackbar)))
+          popBackStackAfterJobCancel()
+        }
+        Lounge.Status.SECOND_VOTE -> sendSideEffect(FirstVoteSideEffect.NavigateToSecondVote(currentState.lounge.id))
+        else -> Unit
+      }
+    }
+  }
+
   private suspend fun collectMemberList(loungeId: String) {
     memberRepository.getMemberListFlow(loungeId).collectLatest { memberList ->
       updateState(FirstVoteReduce.UpdateMemberList(memberList.map { it.asUI() }))
 
       if (memberList.size <= 1) {
         sendSideEffect(FirstVoteSideEffect.ShowSnackBar(UiText.StringResource(R.string.first_vote_only_owner_snackbar)))
-        sendSideEffect(FirstVoteSideEffect.PopBackStack)
+        popBackStackAfterJobCancel()
       }
       if (memberList.all { it.status == Member.Status.VOTED }) launch { submitVote() }
-    }
-  }
-
-  private suspend fun collectLoungeStatus(loungeId: String) {
-    loungeRepository.getLoungeStatusFlowById(loungeId).collectLatest { status ->
-      when(status) {
-        Lounge.Status.QUIT -> {
-          sendSideEffect(FirstVoteSideEffect.ShowSnackBar(UiText.StringResource(R.string.first_vote_owner_exited_snackbar)))
-          sendSideEffect(FirstVoteSideEffect.PopBackStack)
-        }
-        Lounge.Status.SECOND_VOTE -> sendSideEffect(FirstVoteSideEffect.NavigateToSecondVote(currentState.lounge.id))
-        else -> Unit
-      }
     }
   }
 
@@ -231,6 +235,13 @@ class FirstVoteViewModel @Inject constructor(
 
   private suspend fun exitVote() {
     exitLoungeUseCase(me.asDomain())
+
+    popBackStackAfterJobCancel()
+  }
+
+  private fun popBackStackAfterJobCancel() {
+    loungeStatusFlow.cancel()
+    memberListFlow.cancel()
 
     sendSideEffect(FirstVoteSideEffect.PopBackStack)
   }
