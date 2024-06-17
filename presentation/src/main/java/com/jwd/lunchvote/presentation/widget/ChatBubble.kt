@@ -172,7 +172,7 @@ private fun ChatBubblePreview() {
     Column(
       modifier = Modifier
         .fillMaxWidth()
-        .padding(horizontal = 24.dp),
+        .padding(24.dp),
       verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
       ChatBubble(
