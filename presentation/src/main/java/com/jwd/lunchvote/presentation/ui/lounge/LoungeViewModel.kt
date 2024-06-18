@@ -12,9 +12,9 @@ import com.jwd.lunchvote.domain.repository.ChatRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
-import com.jwd.lunchvote.domain.usecase.CreateLoungeUseCase
-import com.jwd.lunchvote.domain.usecase.ExitLoungeUseCase
-import com.jwd.lunchvote.domain.usecase.JoinLoungeUseCase
+import com.jwd.lunchvote.domain.usecase.CreateLounge
+import com.jwd.lunchvote.domain.usecase.ExitLounge
+import com.jwd.lunchvote.domain.usecase.JoinLounge
 import com.jwd.lunchvote.domain.usecase.StartFirstVote
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
@@ -49,9 +49,9 @@ class LoungeViewModel @Inject constructor(
   private val loungeRepository: LoungeRepository,
   private val memberRepository: MemberRepository,
   private val chatRepository: ChatRepository,
-  private val createLoungeUseCase: CreateLoungeUseCase,
-  private val joinLoungeUseCase: JoinLoungeUseCase,
-  private val exitLoungeUseCase: ExitLoungeUseCase,
+  private val createLounge: CreateLounge,
+  private val joinLounge: JoinLounge,
+  private val exitLounge: ExitLounge,
   private val startFirstVote: StartFirstVote,
   savedStateHandle: SavedStateHandle
 ) : BaseStateViewModel<LoungeState, LoungeEvent, LoungeReduce, LoungeSideEffect>(savedStateHandle) {
@@ -131,7 +131,7 @@ class LoungeViewModel @Inject constructor(
   private suspend fun createLounge() {
     withTimeoutOrNull(TIMEOUT) {
       val user = currentState.user
-      val loungeId = createLoungeUseCase(user.asDomain())
+      val loungeId = createLounge(user.asDomain())
       val lounge = loungeRepository.getLoungeById(loungeId).asUI()
 
       updateState(LoungeReduce.UpdateLounge(lounge))
@@ -143,7 +143,7 @@ class LoungeViewModel @Inject constructor(
   private suspend fun joinLounge(loungeId: String) {
     withTimeoutOrNull(TIMEOUT) {
       val user = currentState.user
-      val lounge = joinLoungeUseCase(user.asDomain(), loungeId).asUI()
+      val lounge = joinLounge(user.asDomain(), loungeId).asUI()
       collectLoungeData(lounge)
 
       updateState(LoungeReduce.UpdateLounge(lounge))
@@ -227,7 +227,7 @@ class LoungeViewModel @Inject constructor(
     memberTypeFlow.cancel()
     chatListFlow.cancel()
 
-    exitLoungeUseCase(me.asDomain())
+    exitLounge(me.asDomain())
 
     sendSideEffect(LoungeSideEffect.CloseDialog)
     sendSideEffect(LoungeSideEffect.PopBackStack)

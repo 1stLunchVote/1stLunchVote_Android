@@ -7,7 +7,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.UserRepository
-import com.jwd.lunchvote.domain.usecase.SetEmailUseCase
+import com.jwd.lunchvote.domain.usecase.SetEmail
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.ui.login.register.email_verification.EmailVerificationContract.EmailVerificationEvent
 import com.jwd.lunchvote.presentation.ui.login.register.email_verification.EmailVerificationContract.EmailVerificationReduce
@@ -20,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class EmailVerificationViewModel @Inject constructor(
   private val userRepository: UserRepository,
-  private val setEmailUseCase: SetEmailUseCase,
+  private val setEmail: SetEmail,
   savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<EmailVerificationState, EmailVerificationEvent, EmailVerificationReduce, EmailVerificationSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): EmailVerificationState {
@@ -66,7 +66,7 @@ class EmailVerificationViewModel @Inject constructor(
     Firebase.auth.sendSignInLinkToEmail(currentState.email, actionCodeSettings)
       .addOnCompleteListener { task ->
         if (task.isSuccessful) {
-          setEmailUseCase(currentState.email)
+          setEmail(currentState.email)
 
           sendSideEffect(EmailVerificationSideEffect.ShowSnackBar(UiText.StringResource(R.string.email_verification_email_send_snackbar)))
           updateState(EmailVerificationReduce.UpdateEmailSent(true))

@@ -9,7 +9,7 @@ import java.time.Instant
 import java.util.UUID
 import javax.inject.Inject
 
-class ExitLoungeUseCase @Inject constructor(
+class ExitLounge @Inject constructor(
   private val loungeRepository: LoungeRepository,
   private val memberRepository: MemberRepository,
   private val chatRepository: ChatRepository

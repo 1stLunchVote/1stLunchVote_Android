@@ -3,8 +3,8 @@ package com.jwd.lunchvote.presentation.ui.login.register.password
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
-import com.jwd.lunchvote.domain.usecase.GetEmailUseCase
-import com.jwd.lunchvote.domain.usecase.SetEmailUseCase
+import com.jwd.lunchvote.domain.usecase.GetEmail
+import com.jwd.lunchvote.domain.usecase.SetEmail
 import com.jwd.lunchvote.presentation.ui.login.register.password.PasswordContract.PasswordEvent
 import com.jwd.lunchvote.presentation.ui.login.register.password.PasswordContract.PasswordReduce
 import com.jwd.lunchvote.presentation.ui.login.register.password.PasswordContract.PasswordSideEffect
@@ -16,8 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PasswordViewModel @Inject constructor(
-  private val getEmailUseCase: GetEmailUseCase,
-  private val setEmailUseCase: SetEmailUseCase,
+  private val getEmail: GetEmail,
+  private val setEmail: SetEmail,
   savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<PasswordState, PasswordEvent, PasswordReduce, PasswordSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): PasswordState {
@@ -50,8 +50,8 @@ class PasswordViewModel @Inject constructor(
   }
 
   private fun initialize() {
-    val email = getEmailUseCase() ?: throw LoginError.NoEmail
-    setEmailUseCase(null)
+    val email = getEmail() ?: throw LoginError.NoEmail
+    setEmail(null)
     updateState(PasswordReduce.UpdateEmail(email))
   }
 }

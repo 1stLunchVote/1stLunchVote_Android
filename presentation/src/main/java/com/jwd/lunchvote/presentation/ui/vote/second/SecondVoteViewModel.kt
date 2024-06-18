@@ -15,8 +15,8 @@ import com.jwd.lunchvote.domain.repository.MemberRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.repository.VoteResultRepository
 import com.jwd.lunchvote.domain.usecase.CalculateSecondVote
-import com.jwd.lunchvote.domain.usecase.ExitLoungeUseCase
-import com.jwd.lunchvote.domain.usecase.FinishVoteUseCase
+import com.jwd.lunchvote.domain.usecase.ExitLounge
+import com.jwd.lunchvote.domain.usecase.FinishVote
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
@@ -50,8 +50,8 @@ class SecondVoteViewModel @Inject constructor(
   private val foodRepository: FoodRepository,
   private val ballotRepository: BallotRepository,
   private val calculateSecondVote: CalculateSecondVote,
-  private val finishVoteUseCase: FinishVoteUseCase,
-  private val exitLoungeUseCase: ExitLoungeUseCase,
+  private val finishVote: FinishVote,
+  private val exitLounge: ExitLounge,
   private val savedStateHandle: SavedStateHandle
 ) : BaseStateViewModel<SecondVoteState, SecondVoteEvent, SecondVoteReduce, SecondVoteSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): SecondVoteState =
@@ -180,7 +180,7 @@ class SecondVoteViewModel @Inject constructor(
 
       if (me.userId == owner.userId) {
         calculateSecondVote(currentState.lounge.id)
-        finishVoteUseCase(currentState.lounge.id)
+        finishVote(currentState.lounge.id)
       }
     }
   }
@@ -189,7 +189,7 @@ class SecondVoteViewModel @Inject constructor(
     loungeStatusFlow.cancel()
     memberListFlow.cancel()
 
-    exitLoungeUseCase(me.asDomain())
+    exitLounge(me.asDomain())
 
     sendSideEffect(SecondVoteSideEffect.PopBackStack)
   }

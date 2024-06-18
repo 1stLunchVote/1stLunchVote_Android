@@ -15,7 +15,7 @@ import com.jwd.lunchvote.domain.repository.MemberRepository
 import com.jwd.lunchvote.domain.repository.TemplateRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.usecase.CalculateFirstVote
-import com.jwd.lunchvote.domain.usecase.ExitLoungeUseCase
+import com.jwd.lunchvote.domain.usecase.ExitLounge
 import com.jwd.lunchvote.domain.usecase.StartSecondVote
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
@@ -54,7 +54,7 @@ class FirstVoteViewModel @Inject constructor(
   private val ballotRepository: BallotRepository,
   private val calculateFirstVote: CalculateFirstVote,
   private val startSecondVote: StartSecondVote,
-  private val exitLoungeUseCase: ExitLoungeUseCase,
+  private val exitLounge: ExitLounge,
   private val savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<FirstVoteState, FirstVoteEvent, FirstVoteReduce, FirstVoteSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): FirstVoteState =
@@ -238,7 +238,7 @@ class FirstVoteViewModel @Inject constructor(
     loungeStatusFlow.cancel()
     memberListFlow.cancel()
 
-    exitLoungeUseCase(me.asDomain())
+    exitLounge(me.asDomain())
 
     sendSideEffect(FirstVoteSideEffect.PopBackStack)
   }

@@ -8,7 +8,7 @@ import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.MemberRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
-import com.jwd.lunchvote.domain.usecase.ExileMemberUseCase
+import com.jwd.lunchvote.domain.usecase.ExileMember
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kr.co.inbody.config.error.LoungeError
 import kr.co.inbody.config.error.MemberError
 import kr.co.inbody.config.error.UserError
 import javax.inject.Inject
@@ -31,7 +30,7 @@ import javax.inject.Inject
 class LoungeMemberViewModel @Inject constructor(
   private val userRepository: UserRepository,
   private val memberRepository: MemberRepository,
-  private val exileMemberUseCase: ExileMemberUseCase,
+  private val exileMember: ExileMember,
   private val savedStateHandle: SavedStateHandle,
 ) : BaseStateViewModel<LoungeMemberState, LoungeMemberEvent, LoungeMemberReduce, LoungeMemberSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): LoungeMemberState {
@@ -92,7 +91,7 @@ class LoungeMemberViewModel @Inject constructor(
   private suspend fun exileMember() {
     sendSideEffect(LoungeMemberSideEffect.CloseDialog)
 
-    exileMemberUseCase(currentState.member.asDomain())
+    exileMember(currentState.member.asDomain())
 
     sendSideEffect(LoungeMemberSideEffect.PopBackStack)
   }

@@ -10,7 +10,7 @@ import java.time.Instant
 import java.util.UUID
 import javax.inject.Inject
 
-class CreateLoungeUseCase @Inject constructor(
+class CreateLounge @Inject constructor(
   private val loungeRepository: LoungeRepository,
   private val memberRepository: MemberRepository,
   private val chatRepository: ChatRepository
