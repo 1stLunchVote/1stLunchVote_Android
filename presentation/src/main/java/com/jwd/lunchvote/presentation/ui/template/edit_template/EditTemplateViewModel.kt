@@ -115,15 +115,14 @@ class EditTemplateViewModel @Inject constructor(
   private suspend fun save() {
     sendSideEffect(EditTemplateSideEffect.CloseDialog)
 
-    templateRepository.updateTemplate(
-      TemplateUIModel(
-        id = currentState.template.id,
-        userId = currentState.template.userId,
-        name = currentState.template.name,
-        likedFoodIds = currentState.likedFoods.map { it.name },
-        dislikedFoodIds = currentState.dislikedFoods.map { it.name }
-      ).asDomain()
+    val updatedTemplate = TemplateUIModel(
+      id = currentState.template.id,
+      userId = currentState.template.userId,
+      name = currentState.template.name,
+      likedFoodIds = currentState.likedFoods.map { it.name },
+      dislikedFoodIds = currentState.dislikedFoods.map { it.name }
     )
+    templateRepository.updateTemplate(updatedTemplate.asDomain())
 
     sendSideEffect(EditTemplateSideEffect.ShowSnackBar(UiText.StringResource(R.string.edit_template_save_snackbar)))
     sendSideEffect(EditTemplateSideEffect.PopBackStack)
