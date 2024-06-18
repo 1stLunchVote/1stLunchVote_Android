@@ -9,7 +9,6 @@ import com.jwd.lunchvote.remote.mapper.asRemote
 import com.jwd.lunchvote.remote.model.FirstVoteResultRemote
 import com.jwd.lunchvote.remote.model.SecondVoteResultRemote
 import kotlinx.coroutines.tasks.await
-import kr.co.inbody.config.error.VoteError
 import javax.inject.Inject
 
 class VoteResultDataSourceImpl @Inject constructor(

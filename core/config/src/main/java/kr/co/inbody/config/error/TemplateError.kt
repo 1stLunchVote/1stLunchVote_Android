@@ -9,6 +9,6 @@ interface TemplateError {
 
   data object DeletedTemplate : Throwable() {
     private fun readResolve(): Any = DeletedTemplate
-    override val message: String = "템플릿이 삭제되었습니다."
+    override val message: String = "삭제된 템플릿입니다."
   }
 }

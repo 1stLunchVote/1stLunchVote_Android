@@ -40,6 +40,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kr.co.inbody.config.error.LoungeError
+import kr.co.inbody.config.error.MemberError
 import kr.co.inbody.config.error.UserError
 import javax.inject.Inject
 
@@ -73,7 +74,7 @@ class FirstVoteViewModel @Inject constructor(
   private val owner: MemberUIModel
     get() = currentState.memberList.find { it.type == MemberUIModel.Type.OWNER } ?: throw LoungeError.NoOwner
   private val me: MemberUIModel
-    get() = currentState.memberList.find { it.userId == currentState.user.id } ?: throw LoungeError.InvalidMember
+    get() = currentState.memberList.find { it.userId == currentState.user.id } ?: throw MemberError.InvalidMember
 
   override fun handleEvents(event: FirstVoteEvent) {
     when(event) {

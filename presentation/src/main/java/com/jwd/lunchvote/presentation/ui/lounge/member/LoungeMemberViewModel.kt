@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.co.inbody.config.error.LoungeError
+import kr.co.inbody.config.error.MemberError
 import kr.co.inbody.config.error.UserError
 import javax.inject.Inject
 
@@ -68,7 +69,7 @@ class LoungeMemberViewModel @Inject constructor(
   override fun handleErrors(error: Throwable) {
     sendSideEffect(LoungeMemberSideEffect.ShowSnackBar(UiText.ErrorString(error)))
     when (error) {
-      is LoungeError.InvalidMember -> sendSideEffect(LoungeMemberSideEffect.PopBackStack)
+      is MemberError.InvalidMember -> sendSideEffect(LoungeMemberSideEffect.PopBackStack)
     }
   }
 

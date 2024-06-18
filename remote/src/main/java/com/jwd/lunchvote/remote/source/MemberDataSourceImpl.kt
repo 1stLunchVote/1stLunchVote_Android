@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.tasks.await
 import kr.co.inbody.config.error.LoungeError
+import kr.co.inbody.config.error.MemberError
 import javax.inject.Inject
 
 class MemberDataSourceImpl @Inject constructor(
@@ -81,7 +82,7 @@ class MemberDataSourceImpl @Inject constructor(
       .get()
       .await()
       .getValue(MemberRemote::class.java)
-      ?.asData(userId) ?: throw LoungeError.InvalidMember
+      ?.asData(userId) ?: throw MemberError.InvalidMember
 
   override suspend fun updateMemberReadyType(
     member: MemberData

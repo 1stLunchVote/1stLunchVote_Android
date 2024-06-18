@@ -3,6 +3,7 @@ package com.jwd.lunchvote.remote.mapper
 import com.jwd.lunchvote.core.common.mapper.BiMapper
 import com.jwd.lunchvote.data.model.ChatData
 import com.jwd.lunchvote.remote.model.ChatRemote
+import kr.co.inbody.config.error.ChatError
 import kr.co.inbody.config.error.LoungeError
 
 private object ChatRemoteMapper : BiMapper<ChatRemote, ChatData> {
@@ -34,7 +35,7 @@ private object ChatRemoteTypeMapper : BiMapper<String, ChatData.Type> {
     when (from) {
       ChatRemote.TYPE_DEFAULT -> ChatData.Type.DEFAULT
       ChatRemote.TYPE_SYSTEM -> ChatData.Type.SYSTEM
-      else -> throw LoungeError.InvalidChatType
+      else -> throw ChatError.InvalidChatType
     }
 
   override fun mapToLeft(from: ChatData.Type): String =

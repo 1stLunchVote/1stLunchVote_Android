@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import kr.co.inbody.config.error.LoungeError
+import kr.co.inbody.config.error.MemberError
 import kr.co.inbody.config.error.UserError
 import java.time.ZonedDateTime
 import java.util.UUID
@@ -74,7 +75,7 @@ class LoungeViewModel @Inject constructor(
   private val owner: MemberUIModel
     get() = currentState.memberList.find { it.type == MemberUIModel.Type.OWNER } ?: throw LoungeError.NoOwner
   private val me: MemberUIModel
-    get() = currentState.memberList.find { it.userId == currentState.user.id } ?: throw LoungeError.InvalidMember
+    get() = currentState.memberList.find { it.userId == currentState.user.id } ?: throw MemberError.InvalidMember
 
   init {
     launch {
@@ -122,8 +123,7 @@ class LoungeViewModel @Inject constructor(
       is LoungeError.FullMember -> sendSideEffect(LoungeSideEffect.PopBackStack)
       is LoungeError.NoLounge -> sendSideEffect(LoungeSideEffect.PopBackStack)
       is LoungeError.JoinLoungeFailed -> sendSideEffect(LoungeSideEffect.PopBackStack)
-      is LoungeError.InvalidMember -> sendSideEffect(LoungeSideEffect.PopBackStack)
-      is LoungeError.InvalidLounge -> sendSideEffect(LoungeSideEffect.PopBackStack)
+      is MemberError.InvalidMember -> sendSideEffect(LoungeSideEffect.PopBackStack)
       else -> Unit
     }
   }
