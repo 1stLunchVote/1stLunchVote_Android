@@ -1,6 +1,6 @@
-package com.jwd.lunchvote.core.common.error
+package kr.co.inbody.config.error
 
-interface VoteError {
+interface VoteResultError {
 
   data object NoVoteResult : Throwable() {
     private fun readResolve(): Any = NoVoteResult

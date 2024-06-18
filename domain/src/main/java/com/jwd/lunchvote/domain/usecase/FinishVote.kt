@@ -4,7 +4,7 @@ import com.jwd.lunchvote.domain.entity.Lounge
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import javax.inject.Inject
 
-class FinishVoteUseCase @Inject constructor(
+class FinishVote @Inject constructor(
   private val loungeRepository: LoungeRepository
 ) {
 

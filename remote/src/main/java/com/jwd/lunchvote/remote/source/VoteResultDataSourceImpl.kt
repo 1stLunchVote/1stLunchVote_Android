@@ -1,7 +1,6 @@
 package com.jwd.lunchvote.remote.source
 
 import com.google.firebase.database.FirebaseDatabase
-import com.jwd.lunchvote.core.common.error.VoteError
 import com.jwd.lunchvote.data.model.FirstVoteResultData
 import com.jwd.lunchvote.data.model.SecondVoteResultData
 import com.jwd.lunchvote.data.source.remote.VoteResultDataSource
@@ -14,7 +13,7 @@ import javax.inject.Inject
 
 class VoteResultDataSourceImpl @Inject constructor(
   private val database: FirebaseDatabase
-): VoteResultDataSource {
+) : VoteResultDataSource {
 
   companion object {
     private const val REFERENCE_VOTE_RESULT = "VoteResult"
@@ -74,7 +73,8 @@ class VoteResultDataSourceImpl @Inject constructor(
       .await()
       .children
       .mapNotNull {
-        it.getValue(SecondVoteResultRemote::class.java)
+        it.child(CHILD_SECOND_VOTE_RESULT)
+          .getValue(SecondVoteResultRemote::class.java)
           ?.asData(it.key!!)
       }
 }

@@ -14,28 +14,28 @@ import javax.inject.Inject
 
 class ChatDataSourceImpl @Inject constructor(
   private val database: FirebaseDatabase
-): ChatDataSource {
+) : ChatDataSource {
 
   companion object {
-    const val CHAT_PATH = "Chat"
+    private const val REFERENCE_CHAT = "Chat"
 
-    const val CHAT_LOUNGE_ID = "loungeId"
-    const val CHAT_USER_ID = "userId"
-    const val CHAT_USER_PROFILE = "userProfile"
-    const val CHAT_MESSAGE = "message"
-    const val CHAT_TYPE = "type"
-    const val CHAT_CREATED_AT = "createdAt"
+    private const val COLUMN_USER_ID = "userId"
+    private const val COLUMN_USER_NAME = "userName"
+    private const val COLUMN_USER_PROFILE = "userProfile"
+    private const val COLUMN_MESSAGE = "message"
+    private const val COLUMN_TYPE = "type"
+    private const val COLUMN_CREATED_AT = "createdAt"
   }
 
   override fun getChatListFlow(
     loungeId: String
   ): Flow<List<ChatData>> =
     database
-      .getReference(CHAT_PATH)
+      .getReference(REFERENCE_CHAT)
       .child(loungeId)
       .getValueEventFlow<ChatRemote>()
       .map {
-        it.mapNotNull { (key, value) -> value?.asData(key) }
+        it.mapNotNull { (id, chat) -> chat?.asData(loungeId, id) }
           .sortedByDescending { chat -> chat.createdAt }
       }
 
@@ -43,7 +43,7 @@ class ChatDataSourceImpl @Inject constructor(
     chat: ChatData
   ) {
     database
-      .getReference(CHAT_PATH)
+      .getReference(REFERENCE_CHAT)
       .child(chat.loungeId)
       .child(chat.id)
       .setValue(chat.asRemote())

@@ -2,7 +2,6 @@ package com.jwd.lunchvote.presentation.ui.vote.result
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.repository.VoteResultRepository
@@ -41,7 +40,7 @@ class VoteResultViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(VoteResultSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+    sendSideEffect(VoteResultSideEffect.ShowSnackBar(UiText.ErrorString(error)))
   }
 
   private suspend fun initialize() {

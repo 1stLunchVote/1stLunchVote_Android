@@ -2,7 +2,6 @@ package com.jwd.lunchvote.presentation.ui.tips
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.presentation.ui.tips.TipsContract.TipsEvent
 import com.jwd.lunchvote.presentation.ui.tips.TipsContract.TipsReduce
@@ -34,6 +33,6 @@ class TipsViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(TipsSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+    sendSideEffect(TipsSideEffect.ShowSnackBar(UiText.ErrorString(error)))
   }
 }

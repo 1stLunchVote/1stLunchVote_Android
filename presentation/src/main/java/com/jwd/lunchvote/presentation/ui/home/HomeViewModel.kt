@@ -3,11 +3,10 @@ package com.jwd.lunchvote.presentation.ui.home
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.jwd.lunchvote.core.common.error.LoungeError
-import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
+import com.jwd.lunchvote.domain.usecase.GetFoodTrend
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeEvent
@@ -16,16 +15,19 @@ import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeSideEffect
 import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kr.co.inbody.config.error.LoungeError
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
   private val foodRepository: FoodRepository,
   private val loungeRepository: LoungeRepository,
+  private val getFoodTrend: GetFoodTrend,
   savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<HomeState, HomeEvent, HomeReduce, HomeSideEffect>(savedStateHandle){
   override fun createInitialState(savedState: Parcelable?): HomeState {
@@ -42,7 +44,8 @@ class HomeViewModel @Inject constructor(
 
   override fun handleEvents(event: HomeEvent) {
     when(event) {
-      is HomeEvent.ScreenInitialize -> launch { getFoodTrend() }
+      is HomeEvent.ScreenInitialize -> launch { initialize() }
+
       is HomeEvent.OnClickLoungeButton -> sendSideEffect(HomeSideEffect.NavigateToLounge(currentState.loungeId))
       is HomeEvent.OnClickJoinLoungeButton -> sendSideEffect(HomeSideEffect.OpenJoinDialog)
       is HomeEvent.OnClickTemplateButton -> sendSideEffect(HomeSideEffect.NavigateToTemplateList)
@@ -68,14 +71,14 @@ class HomeViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(HomeSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+    sendSideEffect(HomeSideEffect.ShowSnackBar(UiText.ErrorString(error)))
   }
 
-  private suspend fun getFoodTrend() {
-    val foodTrend = foodRepository.getFoodTrend()
+  private suspend fun initialize() {
+    val (foodTrend, foodTrendRatio) = getFoodTrend()
 
-    updateState(HomeReduce.UpdateFoodTrend(foodTrend.first.asUI()))
-    updateState(HomeReduce.UpdateFoodTrendRatio(foodTrend.second))
+    updateState(HomeReduce.UpdateFoodTrend(foodTrend.asUI()))
+    updateState(HomeReduce.UpdateFoodTrendRatio(foodTrendRatio))
   }
 
   private suspend fun checkLoungeExist() {

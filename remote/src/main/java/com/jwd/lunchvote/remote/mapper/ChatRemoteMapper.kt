@@ -1,14 +1,15 @@
 package com.jwd.lunchvote.remote.mapper
 
-import com.jwd.lunchvote.core.common.error.LoungeError
 import com.jwd.lunchvote.core.common.mapper.BiMapper
 import com.jwd.lunchvote.data.model.ChatData
 import com.jwd.lunchvote.remote.model.ChatRemote
+import kr.co.inbody.config.error.ChatError
+import kr.co.inbody.config.error.LoungeError
 
 private object ChatRemoteMapper : BiMapper<ChatRemote, ChatData> {
   override fun mapToRight(from: ChatRemote): ChatData =
     ChatData(
-      loungeId = from.loungeId,
+      loungeId = "",
       id = "",
       userId = from.userId,
       userName = from.userName,
@@ -20,7 +21,6 @@ private object ChatRemoteMapper : BiMapper<ChatRemote, ChatData> {
 
   override fun mapToLeft(from: ChatData): ChatRemote =
     ChatRemote(
-      loungeId = from.loungeId,
       userId = from.userId,
       userName = from.userName,
       userProfile = from.userProfile,
@@ -35,7 +35,7 @@ private object ChatRemoteTypeMapper : BiMapper<String, ChatData.Type> {
     when (from) {
       ChatRemote.TYPE_DEFAULT -> ChatData.Type.DEFAULT
       ChatRemote.TYPE_SYSTEM -> ChatData.Type.SYSTEM
-      else -> throw LoungeError.InvalidChatType
+      else -> throw ChatError.InvalidChatType
     }
 
   override fun mapToLeft(from: ChatData.Type): String =
@@ -45,8 +45,8 @@ private object ChatRemoteTypeMapper : BiMapper<String, ChatData.Type> {
     }
 }
 
-internal fun ChatRemote.asData(id: String): ChatData =
-  ChatRemoteMapper.mapToRight(this).copy(id = id)
+internal fun ChatRemote.asData(loungeId: String, id: String): ChatData =
+  ChatRemoteMapper.mapToRight(this).copy(loungeId = loungeId, id = id)
 
 internal fun ChatData.asRemote(): ChatRemote =
   ChatRemoteMapper.mapToLeft(this)

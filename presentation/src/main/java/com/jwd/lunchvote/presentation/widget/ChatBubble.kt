@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -17,10 +19,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.core.ui.theme.colorNeutral90
+import com.jwd.lunchvote.domain.entity.Chat
 import com.jwd.lunchvote.presentation.model.ChatUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import java.time.format.DateTimeFormatter
@@ -135,16 +139,25 @@ fun ChatBubble(
       modifier = modifier.fillMaxWidth(),
       contentAlignment = Alignment.Center
     ) {
-      Box(
+      ReversedRow(
         modifier = Modifier
-          .size(256.dp, 24.dp)
+          .width(256.dp)
           .clip(RoundedCornerShape(100))
-          .background(color = colorNeutral90),
-        contentAlignment = Alignment.Center
+          .background(color = colorNeutral90)
+          .padding(horizontal = 12.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
       ) {
         Text(
           text = chat.message,
           color = MaterialTheme.colorScheme.background,
+          style = MaterialTheme.typography.titleSmall
+        )
+        Text(
+          text = chat.userName,
+          color = MaterialTheme.colorScheme.background,
+          overflow = TextOverflow.Ellipsis,
+          maxLines = 1,
           style = MaterialTheme.typography.titleSmall
         )
       }
@@ -159,12 +172,12 @@ private fun ChatBubblePreview() {
     Column(
       modifier = Modifier
         .fillMaxWidth()
-        .padding(horizontal = 24.dp),
+        .padding(24.dp),
       verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
       ChatBubble(
         chat = ChatUIModel(
-          message = "투표 방이 생성되었습니다.",
+          message = Chat.CREATE_SYSTEM_MESSAGE,
           type = ChatUIModel.Type.SYSTEM
         ),
         member = MemberUIModel(),
@@ -172,7 +185,8 @@ private fun ChatBubblePreview() {
       )
       ChatBubble(
         chat = ChatUIModel(
-          message = "김철수님이 입장하였습니다.",
+          userName = "김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수",
+          message = Chat.JOIN_SYSTEM_MESSAGE,
           type = ChatUIModel.Type.SYSTEM
         ),
         member = MemberUIModel(),
@@ -220,8 +234,8 @@ private fun ChatBubblePreview() {
       )
       ChatBubble(
         chat = ChatUIModel(
-          userName = "김철수",
-          message = "김철수님이 추방되었습니다.",
+          userName = "김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수",
+          message = Chat.EXILE_SYSTEM_MESSAGE,
           type = ChatUIModel.Type.SYSTEM
         ),
         member = MemberUIModel(),

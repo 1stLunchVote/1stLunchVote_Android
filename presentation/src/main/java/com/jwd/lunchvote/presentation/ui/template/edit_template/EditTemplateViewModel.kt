@@ -3,7 +3,6 @@ package com.jwd.lunchvote.presentation.ui.template.edit_template
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.repository.TemplateRepository
@@ -88,7 +87,7 @@ class EditTemplateViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(EditTemplateSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+    sendSideEffect(EditTemplateSideEffect.ShowSnackBar(UiText.ErrorString(error)))
   }
 
   private suspend fun initialize() {
@@ -116,15 +115,14 @@ class EditTemplateViewModel @Inject constructor(
   private suspend fun save() {
     sendSideEffect(EditTemplateSideEffect.CloseDialog)
 
-    templateRepository.updateTemplate(
-      TemplateUIModel(
-        id = currentState.template.id,
-        userId = currentState.template.userId,
-        name = currentState.template.name,
-        likedFoodIds = currentState.likedFoods.map { it.name },
-        dislikedFoodIds = currentState.dislikedFoods.map { it.name }
-      ).asDomain()
+    val updatedTemplate = TemplateUIModel(
+      id = currentState.template.id,
+      userId = currentState.template.userId,
+      name = currentState.template.name,
+      likedFoodIds = currentState.likedFoods.map { it.name },
+      dislikedFoodIds = currentState.dislikedFoods.map { it.name }
     )
+    templateRepository.updateTemplate(updatedTemplate.asDomain())
 
     sendSideEffect(EditTemplateSideEffect.ShowSnackBar(UiText.StringResource(R.string.edit_template_save_snackbar)))
     sendSideEffect(EditTemplateSideEffect.PopBackStack)

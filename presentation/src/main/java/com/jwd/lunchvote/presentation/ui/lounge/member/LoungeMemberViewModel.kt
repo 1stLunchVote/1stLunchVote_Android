@@ -5,13 +5,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.jwd.lunchvote.core.common.error.LoungeError
-import com.jwd.lunchvote.core.common.error.UnknownError
-import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.MemberRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
-import com.jwd.lunchvote.domain.usecase.ExileMemberUseCase
+import com.jwd.lunchvote.domain.usecase.ExileMember
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
@@ -25,13 +22,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kr.co.inbody.config.error.MemberError
+import kr.co.inbody.config.error.UserError
 import javax.inject.Inject
 
 @HiltViewModel
 class LoungeMemberViewModel @Inject constructor(
   private val userRepository: UserRepository,
   private val memberRepository: MemberRepository,
-  private val exileMemberUseCase: ExileMemberUseCase,
+  private val exileMember: ExileMember,
   private val savedStateHandle: SavedStateHandle,
 ) : BaseStateViewModel<LoungeMemberState, LoungeMemberEvent, LoungeMemberReduce, LoungeMemberSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): LoungeMemberState {
@@ -67,9 +66,9 @@ class LoungeMemberViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(LoungeMemberSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+    sendSideEffect(LoungeMemberSideEffect.ShowSnackBar(UiText.ErrorString(error)))
     when (error) {
-      is LoungeError.InvalidMember -> sendSideEffect(LoungeMemberSideEffect.PopBackStack)
+      is MemberError.InvalidMember -> sendSideEffect(LoungeMemberSideEffect.PopBackStack)
     }
   }
 
@@ -92,7 +91,7 @@ class LoungeMemberViewModel @Inject constructor(
   private suspend fun exileMember() {
     sendSideEffect(LoungeMemberSideEffect.CloseDialog)
 
-    exileMemberUseCase(currentState.member.asDomain())
+    exileMember(currentState.member.asDomain())
 
     sendSideEffect(LoungeMemberSideEffect.PopBackStack)
   }

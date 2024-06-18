@@ -9,8 +9,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.jwd.lunchvote.core.common.error.UnknownError
-import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.StorageRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
@@ -29,6 +27,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kr.co.inbody.config.error.UserError
 import java.io.File
 import java.util.UUID
 import javax.inject.Inject
@@ -82,7 +81,7 @@ class ProfileViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(ProfileSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+    sendSideEffect(ProfileSideEffect.ShowSnackBar(UiText.ErrorString(error)))
   }
 
   private suspend fun initialize() {

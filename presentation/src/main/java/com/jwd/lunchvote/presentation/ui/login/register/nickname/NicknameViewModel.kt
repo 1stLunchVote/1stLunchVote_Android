@@ -3,7 +3,6 @@ package com.jwd.lunchvote.presentation.ui.login.register.nickname
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
-import com.jwd.lunchvote.core.common.error.UnknownError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.usecase.CreateUserWithEmailAndPassword
@@ -47,7 +46,7 @@ class NicknameViewModel @Inject constructor(
   override fun handleErrors(error: Throwable) {
     when (error) {
       is FirebaseAuthUserCollisionException -> sendSideEffect(NicknameSideEffect.ShowSnackBar(UiText.StringResource(R.string.nickname_user_collision_error_snackbar)))
-      else -> sendSideEffect(NicknameSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+      else -> sendSideEffect(NicknameSideEffect.ShowSnackBar(UiText.ErrorString(error)))
     }
   }
 

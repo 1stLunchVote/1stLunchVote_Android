@@ -5,9 +5,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.jwd.lunchvote.core.common.error.LoungeError
-import com.jwd.lunchvote.core.common.error.UnknownError
-import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.entity.Lounge
 import com.jwd.lunchvote.domain.entity.Member
@@ -18,8 +15,8 @@ import com.jwd.lunchvote.domain.repository.MemberRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.repository.VoteResultRepository
 import com.jwd.lunchvote.domain.usecase.CalculateSecondVote
-import com.jwd.lunchvote.domain.usecase.ExitLoungeUseCase
-import com.jwd.lunchvote.domain.usecase.FinishVoteUseCase
+import com.jwd.lunchvote.domain.usecase.ExitLounge
+import com.jwd.lunchvote.domain.usecase.FinishVote
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
@@ -33,11 +30,15 @@ import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVo
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVoteState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kr.co.inbody.config.error.LoungeError
+import kr.co.inbody.config.error.MemberError
+import kr.co.inbody.config.error.UserError
 import javax.inject.Inject
 
 @HiltViewModel
@@ -49,8 +50,8 @@ class SecondVoteViewModel @Inject constructor(
   private val foodRepository: FoodRepository,
   private val ballotRepository: BallotRepository,
   private val calculateSecondVote: CalculateSecondVote,
-  private val finishVoteUseCase: FinishVoteUseCase,
-  private val exitLoungeUseCase: ExitLoungeUseCase,
+  private val finishVote: FinishVote,
+  private val exitLounge: ExitLounge,
   private val savedStateHandle: SavedStateHandle
 ) : BaseStateViewModel<SecondVoteState, SecondVoteEvent, SecondVoteReduce, SecondVoteSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): SecondVoteState =
@@ -64,10 +65,13 @@ class SecondVoteViewModel @Inject constructor(
     }
   }
 
+  private lateinit var loungeStatusFlow: Job
+  private lateinit var memberListFlow: Job
+
   private val owner: MemberUIModel
     get() = currentState.memberList.find { it.type == MemberUIModel.Type.OWNER } ?: throw LoungeError.NoOwner
   private val me: MemberUIModel
-    get() = currentState.memberList.find { it.userId == currentState.user.id } ?: throw LoungeError.InvalidMember
+    get() = currentState.memberList.find { it.userId == currentState.user.id } ?: throw MemberError.InvalidMember
 
   override fun handleEvents(event: SecondVoteEvent) {
     when (event) {
@@ -105,7 +109,7 @@ class SecondVoteViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(SecondVoteSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+    sendSideEffect(SecondVoteSideEffect.ShowSnackBar(UiText.ErrorString(error)))
   }
 
   private suspend fun initialize() {
@@ -118,8 +122,8 @@ class SecondVoteViewModel @Inject constructor(
     val lounge = loungeRepository.getLoungeById(loungeId).asUI()
     updateState(SecondVoteReduce.UpdateLounge(lounge))
 
-    launch(false) { collectMemberList(loungeId) }
-    launch(false) { collectLoungeStatus(loungeId) }
+    loungeStatusFlow = launch { collectLoungeStatus(lounge.id) }
+    memberListFlow = launch { collectMemberList(lounge.id) }
 
     val firstVoteResult = voteResultRepository.getFirstVoteResultByLoungeId(loungeId)
     val foodList = firstVoteResult.foodIds.map { id -> foodRepository.getFoodById(id).asUI() }
@@ -176,13 +180,16 @@ class SecondVoteViewModel @Inject constructor(
 
       if (me.userId == owner.userId) {
         calculateSecondVote(currentState.lounge.id)
-        finishVoteUseCase(currentState.lounge.id)
+        finishVote(currentState.lounge.id)
       }
     }
   }
 
   private suspend fun exitVote() {
-    exitLoungeUseCase(me.asDomain())
+    loungeStatusFlow.cancel()
+    memberListFlow.cancel()
+
+    exitLounge(me.asDomain())
 
     sendSideEffect(SecondVoteSideEffect.PopBackStack)
   }

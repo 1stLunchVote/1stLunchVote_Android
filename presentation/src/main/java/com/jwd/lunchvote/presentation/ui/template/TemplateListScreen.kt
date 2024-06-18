@@ -172,7 +172,7 @@ private fun TemplateListItem(
       )
       LikeDislike(
         like = template.likedFoodIds.size,
-        dislike = template.likedFoodIds.size
+        dislike = template.dislikedFoodIds.size
       )
     }
     Image(

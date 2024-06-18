@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.domain.config
+package kr.co.inbody.config.config
 
 object EmailConfig {
   val REGEX = Regex("^([0-9a-zA-Z_\\.-]+)@([0-9a-zA-Z_-]+)(\\.[0-9a-zA-Z_-]+){1,2}$")

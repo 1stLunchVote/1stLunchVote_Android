@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jwd.lunchvote.domain.config.EmailConfig
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.ui.login.register.email_verification.EmailVerificationContract.EmailVerificationEvent
 import com.jwd.lunchvote.presentation.ui.login.register.email_verification.EmailVerificationContract.EmailVerificationSideEffect
@@ -31,6 +30,7 @@ import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import kotlinx.coroutines.flow.collectLatest
+import kr.co.inbody.config.config.EmailConfig
 
 @Composable
 fun EmailVerificationRoute(

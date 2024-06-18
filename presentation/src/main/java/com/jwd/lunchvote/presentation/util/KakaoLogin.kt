@@ -1,12 +1,12 @@
 package com.jwd.lunchvote.presentation.util
 
 import android.content.Context
-import com.jwd.lunchvote.core.common.error.LoginError
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
 import com.kakao.sdk.user.model.AccessTokenInfo
+import kr.co.inbody.config.error.LoginError
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException

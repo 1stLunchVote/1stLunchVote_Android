@@ -9,7 +9,7 @@ import java.time.Instant
 import java.util.UUID
 import javax.inject.Inject
 
-class ExitLoungeUseCase @Inject constructor(
+class ExitLounge @Inject constructor(
   private val loungeRepository: LoungeRepository,
   private val memberRepository: MemberRepository,
   private val chatRepository: ChatRepository
@@ -27,7 +27,7 @@ class ExitLoungeUseCase @Inject constructor(
       userId = member.userId,
       userName = member.userName,
       userProfile = member.userProfile,
-      message = "${member.userName}님이 퇴장하였습니다.",
+      message = Chat.EXIT_SYSTEM_MESSAGE,
       type = Chat.Type.SYSTEM,
       createdAt = Instant.now().epochSecond
     )

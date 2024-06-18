@@ -5,9 +5,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.jwd.lunchvote.core.common.error.LoungeError
-import com.jwd.lunchvote.core.common.error.UnknownError
-import com.jwd.lunchvote.core.common.error.UserError
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.entity.Lounge
 import com.jwd.lunchvote.domain.entity.Member
@@ -18,13 +15,12 @@ import com.jwd.lunchvote.domain.repository.MemberRepository
 import com.jwd.lunchvote.domain.repository.TemplateRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.usecase.CalculateFirstVote
-import com.jwd.lunchvote.domain.usecase.ExitLoungeUseCase
+import com.jwd.lunchvote.domain.usecase.ExitLounge
 import com.jwd.lunchvote.domain.usecase.StartSecondVote
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.FirstBallotUIModel
-import com.jwd.lunchvote.presentation.model.FoodStatus
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.model.updateFoodMap
@@ -36,11 +32,15 @@ import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteS
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kr.co.inbody.config.error.LoungeError
+import kr.co.inbody.config.error.MemberError
+import kr.co.inbody.config.error.UserError
 import javax.inject.Inject
 
 @HiltViewModel
@@ -53,7 +53,7 @@ class FirstVoteViewModel @Inject constructor(
   private val ballotRepository: BallotRepository,
   private val calculateFirstVote: CalculateFirstVote,
   private val startSecondVote: StartSecondVote,
-  private val exitLoungeUseCase: ExitLoungeUseCase,
+  private val exitLounge: ExitLounge,
   private val savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<FirstVoteState, FirstVoteEvent, FirstVoteReduce, FirstVoteSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): FirstVoteState =
@@ -67,10 +67,13 @@ class FirstVoteViewModel @Inject constructor(
     }
   }
 
+  private lateinit var loungeStatusFlow: Job
+  private lateinit var memberListFlow: Job
+
   private val owner: MemberUIModel
     get() = currentState.memberList.find { it.type == MemberUIModel.Type.OWNER } ?: throw LoungeError.NoOwner
   private val me: MemberUIModel
-    get() = currentState.memberList.find { it.userId == currentState.user.id } ?: throw LoungeError.InvalidMember
+    get() = currentState.memberList.find { it.userId == currentState.user.id } ?: throw MemberError.InvalidMember
 
   override fun handleEvents(event: FirstVoteEvent) {
     when(event) {
@@ -124,7 +127,7 @@ class FirstVoteViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(FirstVoteSideEffect.ShowSnackBar(UiText.DynamicString(error.message ?: UnknownError.UNKNOWN)))
+    sendSideEffect(FirstVoteSideEffect.ShowSnackBar(UiText.ErrorString(error)))
   }
 
   private suspend fun initialize() {
@@ -137,8 +140,8 @@ class FirstVoteViewModel @Inject constructor(
     val lounge = loungeRepository.getLoungeById(loungeId).asUI()
     updateState(FirstVoteReduce.UpdateLounge(lounge))
 
-    launch(false) { collectMemberList(loungeId) }
-    launch(false) { collectLoungeStatus(loungeId) }
+    loungeStatusFlow = launch { collectLoungeStatus(lounge.id) }
+    memberListFlow = launch { collectMemberList(lounge.id) }
 
     val foodList = foodRepository.getAllFood().map { it.asUI() }
     val foodMap = foodList.associateWith { FoodStatus.DEFAULT }
@@ -147,18 +150,6 @@ class FirstVoteViewModel @Inject constructor(
     val templateList = templateRepository.getTemplateList(userId).map { it.asUI() }
 
     setDialogState(FirstVoteDialog.SelectTemplateDialog(templateList))
-  }
-
-  private suspend fun collectMemberList(loungeId: String) {
-    memberRepository.getMemberListFlow(loungeId).collectLatest { memberList ->
-      updateState(FirstVoteReduce.UpdateMemberList(memberList.map { it.asUI() }))
-
-      if (memberList.size <= 1) {
-        sendSideEffect(FirstVoteSideEffect.ShowSnackBar(UiText.StringResource(R.string.first_vote_only_owner_snackbar)))
-        sendSideEffect(FirstVoteSideEffect.PopBackStack)
-      }
-      if (memberList.all { it.status == Member.Status.VOTED }) launch { submitVote() }
-    }
   }
 
   private suspend fun collectLoungeStatus(loungeId: String) {
@@ -171,6 +162,18 @@ class FirstVoteViewModel @Inject constructor(
         Lounge.Status.SECOND_VOTE -> sendSideEffect(FirstVoteSideEffect.NavigateToSecondVote(currentState.lounge.id))
         else -> Unit
       }
+    }
+  }
+
+  private suspend fun collectMemberList(loungeId: String) {
+    memberRepository.getMemberListFlow(loungeId).collectLatest { memberList ->
+      updateState(FirstVoteReduce.UpdateMemberList(memberList.map { it.asUI() }))
+
+      if (memberList.size <= 1) {
+        sendSideEffect(FirstVoteSideEffect.ShowSnackBar(UiText.StringResource(R.string.first_vote_only_owner_snackbar)))
+        sendSideEffect(FirstVoteSideEffect.PopBackStack)
+      }
+      if (memberList.all { it.status == Member.Status.VOTED }) launch { submitVote() }
     }
   }
 
@@ -231,7 +234,10 @@ class FirstVoteViewModel @Inject constructor(
   }
 
   private suspend fun exitVote() {
-    exitLoungeUseCase(me.asDomain())
+    loungeStatusFlow.cancel()
+    memberListFlow.cancel()
+
+    exitLounge(me.asDomain())
 
     sendSideEffect(FirstVoteSideEffect.PopBackStack)
   }

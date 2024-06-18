@@ -10,6 +10,8 @@ java {
 }
 
 dependencies {
+  implementation(project(":core:config"))
+
   implementation(libs.coroutines)
   implementation(libs.inject)
 }

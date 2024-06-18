@@ -1,9 +1,10 @@
 package com.jwd.lunchvote.remote.mapper
 
-import com.jwd.lunchvote.core.common.error.LoungeError
 import com.jwd.lunchvote.core.common.mapper.BiMapper
 import com.jwd.lunchvote.data.model.MemberData
 import com.jwd.lunchvote.remote.model.MemberRemote
+import kr.co.inbody.config.error.LoungeError
+import kr.co.inbody.config.error.MemberError
 
 private object MemberRemoteMapper : BiMapper<MemberRemote, MemberData> {
   override fun mapToRight(from: MemberRemote): MemberData =
@@ -37,7 +38,7 @@ private object MemberRemoteTypeMapper : BiMapper<String, MemberData.Type> {
       MemberRemote.TYPE_OWNER -> MemberData.Type.OWNER
       MemberRemote.TYPE_READY -> MemberData.Type.READY
       MemberRemote.TYPE_EXILED -> MemberData.Type.EXILED
-      else -> throw LoungeError.InvalidMemberType
+      else -> throw MemberError.InvalidMemberType
     }
 
   override fun mapToLeft(from: MemberData.Type): String =
@@ -55,7 +56,7 @@ private object MemberRemoteStatusMapper : BiMapper<String, MemberData.Status> {
       MemberRemote.STATUS_STANDBY -> MemberData.Status.STANDBY
       MemberRemote.STATUS_VOTING -> MemberData.Status.VOTING
       MemberRemote.STATUS_VOTED -> MemberData.Status.VOTED
-      else -> throw LoungeError.InvalidMemberStatus
+      else -> throw MemberError.InvalidMemberStatus
     }
 
   override fun mapToLeft(from: MemberData.Status): String =

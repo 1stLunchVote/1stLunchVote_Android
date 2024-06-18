@@ -9,7 +9,7 @@ import kotlinx.parcelize.Parcelize
 class HomeContract {
   @Parcelize
   data class HomeState(
-    val foodTrend: FoodUIModel = FoodUIModel(),
+    val foodTrend: FoodUIModel? = null,
     val foodTrendRatio: Float = 0f,
     val loungeId: String? = null
   ) : ViewModelContract.State, Parcelable

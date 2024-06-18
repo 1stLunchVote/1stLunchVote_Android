@@ -7,10 +7,10 @@ import javax.inject.Inject
 
 class StorageDataSourceImpl @Inject constructor(
   private val storage: FirebaseStorage
-): StorageDataSource {
+) : StorageDataSource {
 
   companion object {
-    const val PROFILE_IMAGE_PATH = "Profile"
+    const val STORAGE_REFERENCE_PROFILE = "Profile"
   }
 
   override suspend fun uploadProfileImage(
@@ -19,7 +19,7 @@ class StorageDataSourceImpl @Inject constructor(
   ): String =
     storage
       .reference
-      .child(PROFILE_IMAGE_PATH)
+      .child(STORAGE_REFERENCE_PROFILE)
       .child(userId)
       .putBytes(image)
       .await()

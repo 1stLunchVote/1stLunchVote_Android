@@ -1,7 +1,6 @@
 package com.jwd.lunchvote.domain.usecase
 
 import com.jwd.lunchvote.domain.entity.Chat
-import com.jwd.lunchvote.domain.entity.Lounge
 import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.entity.User
 import com.jwd.lunchvote.domain.repository.ChatRepository
@@ -11,13 +10,14 @@ import java.time.Instant
 import java.util.UUID
 import javax.inject.Inject
 
-class JoinLoungeUseCase @Inject constructor(
+class CreateLounge @Inject constructor(
   private val loungeRepository: LoungeRepository,
   private val memberRepository: MemberRepository,
   private val chatRepository: ChatRepository
 ) {
 
-  suspend operator fun invoke(user: User, loungeId: String): Lounge {
+  suspend operator fun invoke(user: User): String {
+    val loungeId = loungeRepository.createLounge()
     loungeRepository.joinLoungeById(loungeId)
 
     val member = Member(
@@ -25,7 +25,7 @@ class JoinLoungeUseCase @Inject constructor(
       userId = user.id,
       userName = user.name,
       userProfile = user.profileImage,
-      type = Member.Type.DEFAULT,
+      type = Member.Type.OWNER,
       status = Member.Status.STANDBY,
       createdAt = Instant.now().epochSecond,
       deletedAt = null
@@ -36,14 +36,14 @@ class JoinLoungeUseCase @Inject constructor(
       id = UUID.randomUUID().toString(),
       loungeId = loungeId,
       userId = user.id,
-      userName = user.name,
+      userName = "",
       userProfile = user.profileImage,
-      message = "${user.name}님이 입장하였습니다.",
+      message = Chat.CREATE_SYSTEM_MESSAGE,
       type = Chat.Type.SYSTEM,
       createdAt = Instant.now().epochSecond
     )
     chatRepository.sendChat(chat)
 
-    return loungeRepository.getLoungeById(loungeId)
+    return loungeId
   }
 }

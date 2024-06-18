@@ -1,11 +1,11 @@
 package com.jwd.lunchvote.domain.usecase
 
-import com.jwd.lunchvote.domain.config.VoteConfig
 import com.jwd.lunchvote.domain.entity.FirstVoteResult
 import com.jwd.lunchvote.domain.repository.BallotRepository
 import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.repository.VoteResultRepository
 import kotlinx.coroutines.delay
+import kr.co.inbody.config.config.VoteConfig
 import javax.inject.Inject
 
 class CalculateFirstVote @Inject constructor(
