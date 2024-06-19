@@ -9,7 +9,6 @@ import com.jwd.lunchvote.remote.mapper.asRemote
 import com.jwd.lunchvote.remote.model.FirstVoteResultRemote
 import com.jwd.lunchvote.remote.model.SecondVoteResultRemote
 import kotlinx.coroutines.tasks.await
-import kr.co.inbody.config.error.VoteResultError
 import javax.inject.Inject
 
 class VoteResultDataSourceImpl @Inject constructor(
@@ -43,7 +42,7 @@ class VoteResultDataSourceImpl @Inject constructor(
       .get()
       .await()
       .getValue(FirstVoteResultRemote::class.java)
-      ?.asData(loungeId) ?: throw VoteResultError.NoVoteResult
+      ?.asData(loungeId) ?: throw VoteError.NoVoteResult
 
   override suspend fun saveSecondVoteResult(
     secondVoteResult: SecondVoteResultData
@@ -65,7 +64,7 @@ class VoteResultDataSourceImpl @Inject constructor(
       .get()
       .await()
       .getValue(SecondVoteResultRemote::class.java)
-      ?.asData(loungeId) ?: throw VoteResultError.NoVoteResult
+      ?.asData(loungeId) ?: throw VoteError.NoVoteResult
 
   override suspend fun getAllVoteResults(): List<SecondVoteResultData> =
     database
