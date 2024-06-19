@@ -69,7 +69,6 @@ fun HomeRoute(
   context: Context = LocalContext.current
 ){
   val state by viewModel.viewState.collectAsStateWithLifecycle()
-  val loading by viewModel.isLoading.collectAsStateWithLifecycle()
   val dialog by viewModel.dialogState.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect){
