@@ -44,6 +44,7 @@ import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVo
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVoteEvent
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVoteSideEffect
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVoteState
+import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.widget.HorizontalProgressBar
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
@@ -53,15 +54,16 @@ import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun SecondVoteRoute(
   popBackStack: () -> Unit,
   navigateToVoteResult: (String) -> Unit,
-  showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: SecondVoteViewModel = hiltViewModel(),
+  snackbarChannel: Channel<String> = LocalSnackbarChannel.current,
   context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
@@ -72,7 +74,7 @@ fun SecondVoteRoute(
       when(it) {
         is SecondVoteSideEffect.PopBackStack -> popBackStack()
         is SecondVoteSideEffect.NavigateToVoteResult -> navigateToVoteResult(it.loungeId)
-        is SecondVoteSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
+        is SecondVoteSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

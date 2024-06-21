@@ -38,6 +38,7 @@ import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.ui.login.LoginContract.LoginEvent
 import com.jwd.lunchvote.presentation.ui.login.LoginContract.LoginSideEffect
 import com.jwd.lunchvote.presentation.ui.login.LoginContract.LoginState
+import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.util.login
 import com.jwd.lunchvote.presentation.widget.Gap
@@ -50,6 +51,7 @@ import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kr.co.inbody.config.config.EmailConfig
 import kr.co.inbody.config.error.LoginError
@@ -58,10 +60,10 @@ import kr.co.inbody.config.error.LoginError
 fun LoginRoute(
   navigateToHome: () -> Unit,
   navigateToEmailVerification: () -> Unit,
-  showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: LoginViewModel = hiltViewModel(),
-  context: Context = LocalContext.current,
+  snackbarChannel: Channel<String> = LocalSnackbarChannel.current,
+  context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
   val loading by viewModel.isLoading.collectAsStateWithLifecycle()
@@ -105,8 +107,8 @@ fun LoginRoute(
             }
           }
         }
-        is LoginSideEffect.LaunchGoogleLogin -> { googleLauncher.launch(googleSignInClient.signInIntent) }
-        is LoginSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
+        is LoginSideEffect.LaunchGoogleLogin -> googleLauncher.launch(googleSignInClient.signInIntent)
+        is LoginSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

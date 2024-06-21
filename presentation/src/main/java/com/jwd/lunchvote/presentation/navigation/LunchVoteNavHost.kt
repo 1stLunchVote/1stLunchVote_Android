@@ -28,7 +28,6 @@ import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteRoute
 @Composable
 fun LunchVoteNavHost(
   startDestination: String,
-  showSnackBar: suspend (String) -> Unit,
   navController: NavHostController,
   modifier: Modifier = Modifier
 ) {
@@ -62,14 +61,12 @@ fun LunchVoteNavHost(
     composable(LunchVoteNavRoute.Login) {
       LoginRoute(
         navigateToHome = { navController.navigateWithPop(LunchVoteNavRoute.Home) },
-        navigateToEmailVerification = { navController.navigate(LunchVoteNavRoute.EmailVerification) },
-        showSnackBar = showSnackBar
+        navigateToEmailVerification = { navController.navigate(LunchVoteNavRoute.EmailVerification) }
       )
     }
     composable(LunchVoteNavRoute.EmailVerification) {
       EmailVerificationRoute(
-        navigateToPassword = { navController.navigate(LunchVoteNavRoute.Password) },
-        showSnackBar = showSnackBar
+        navigateToPassword = { navController.navigate(LunchVoteNavRoute.Password) }
       )
     }
     composable(LunchVoteNavRoute.Password) {
@@ -77,14 +74,12 @@ fun LunchVoteNavHost(
         navigateToLogin = { navController.navigateWithPop(LunchVoteNavRoute.Login) },
         navigateToNickname = { email, password ->
           navController.navigateWithPop(LunchVoteNavRoute.Nickname, email, password)
-        },
-        showSnackBar = showSnackBar
+        }
       )
     }
     composable(LunchVoteNavRoute.Nickname) {
       NicknameRoute(
-        navigateToHome = { navController.navigateWithPop(LunchVoteNavRoute.Home) },
-        showSnackBar = showSnackBar
+        navigateToHome = { navController.navigateWithPop(LunchVoteNavRoute.Home) }
       )
     }
     composable(LunchVoteNavRoute.Home) {
@@ -100,8 +95,7 @@ fun LunchVoteNavHost(
         },
         navigateToTips = {
           navController.navigate(LunchVoteNavRoute.Tips)
-        },
-        showSnackBar = showSnackBar
+        }
       )
     }
     composable(LunchVoteNavRoute.Lounge) {
@@ -112,14 +106,12 @@ fun LunchVoteNavHost(
         },
         navigateToFirstVote = { loungeId ->
           navController.navigateWithPop(LunchVoteNavRoute.FirstVote, loungeId)
-        },
-        showSnackBar = showSnackBar
+        }
       )
     }
     composable(LunchVoteNavRoute.LoungeMember) {
       LoungeMemberRoute(
-        popBackStack = { navController.popBackStack() },
-        showSnackBar = showSnackBar
+        popBackStack = { navController.popBackStack() }
       )
     }
     composable(LunchVoteNavRoute.FirstVote) {
@@ -127,8 +119,7 @@ fun LunchVoteNavHost(
         popBackStack = { navController.popBackStack(LunchVoteNavRoute.Home) },
         navigateToSecondVote = { loungeId ->
           navController.navigate(LunchVoteNavRoute.SecondVote, loungeId)
-        },
-        showSnackBar = showSnackBar
+        }
       )
     }
     composable(LunchVoteNavRoute.SecondVote) {
@@ -136,14 +127,12 @@ fun LunchVoteNavHost(
         popBackStack = { navController.popBackStack(LunchVoteNavRoute.Home) },
         navigateToVoteResult = { loungeId ->
           navController.navigate(LunchVoteNavRoute.VoteResult, loungeId)
-        },
-        showSnackBar = showSnackBar
+        }
       )
     }
     composable(LunchVoteNavRoute.VoteResult) {
       VoteResultRoute(
-        navigateToHome = { navController.navigateWithPop(LunchVoteNavRoute.Home) },
-        showSnackBar = showSnackBar
+        navigateToHome = { navController.navigateWithPop(LunchVoteNavRoute.Home) }
       )
     }
     composable(LunchVoteNavRoute.TemplateList) {
@@ -154,41 +143,35 @@ fun LunchVoteNavHost(
         navigateToEditTemplate = { templateId ->
           navController.navigate(LunchVoteNavRoute.EditTemplate, templateId)
         },
-        popBackStack = { navController.popBackStack() },
-        showSnackBar = showSnackBar
+        popBackStack = { navController.popBackStack() }
       )
     }
     composable(LunchVoteNavRoute.EditTemplate) {
       EditTemplateRoute(
-        popBackStack = { navController.popBackStack() },
-        showSnackBar = showSnackBar
+        popBackStack = { navController.popBackStack() }
       )
     }
     composable(LunchVoteNavRoute.AddTemplate) {
       AddTemplateRoute(
-        popBackStack = { navController.popBackStack() },
-        showSnackBar = showSnackBar
+        popBackStack = { navController.popBackStack() }
       )
     }
     composable(LunchVoteNavRoute.Setting) {
       SettingRoute(
         popBackStack = { navController.popBackStack() },
         navigateToProfile = { navController.navigate(LunchVoteNavRoute.Profile) },
-        navigateToLogin = { navController.navigateWithPop(LunchVoteNavRoute.Login) },
-        showSnackBar = showSnackBar
+        navigateToLogin = { navController.navigateWithPop(LunchVoteNavRoute.Login) }
       )
     }
     composable(LunchVoteNavRoute.Profile) {
       ProfileRoute(
         popBackStack = { navController.popBackStack() },
-        navigateToLogin = { navController.navigateWithPop(LunchVoteNavRoute.Login) },
-        showSnackBar = showSnackBar
+        navigateToLogin = { navController.navigateWithPop(LunchVoteNavRoute.Login) }
       )
     }
     composable(LunchVoteNavRoute.Tips) {
       TipsRoute(
-        popBackStack = { navController.popBackStack() },
-        showSnackBar = showSnackBar
+        popBackStack = { navController.popBackStack() }
       )
     }
   }

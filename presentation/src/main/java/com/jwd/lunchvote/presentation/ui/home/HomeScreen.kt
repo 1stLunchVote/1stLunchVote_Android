@@ -49,12 +49,14 @@ import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeEvent
 import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeSideEffect
 import com.jwd.lunchvote.presentation.ui.home.HomeContract.HomeState
+import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.skydoves.landscapist.coil.CoilImage
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -63,9 +65,9 @@ fun HomeRoute(
   navigateToTemplateList: () -> Unit,
   navigateToSetting: () -> Unit,
   navigateToTips: () -> Unit,
-  showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: HomeViewModel = hiltViewModel(),
+  snackbarChannel: Channel<String> = LocalSnackbarChannel.current,
   context: Context = LocalContext.current
 ){
   val state by viewModel.viewState.collectAsStateWithLifecycle()
@@ -80,7 +82,7 @@ fun HomeRoute(
         is HomeSideEffect.NavigateToTips -> navigateToTips()
         is HomeSideEffect.OpenJoinDialog -> viewModel.setDialogState(HomeContract.JOIN_DIALOG)
         is HomeSideEffect.CloseDialog -> viewModel.setDialogState("")
-        is HomeSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
+        is HomeSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

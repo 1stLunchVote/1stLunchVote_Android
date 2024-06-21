@@ -35,6 +35,7 @@ import com.jwd.lunchvote.presentation.model.UserUIModel
 import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberContract.LoungeMemberEvent
 import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberContract.LoungeMemberSideEffect
 import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberContract.LoungeMemberState
+import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
@@ -43,14 +44,15 @@ import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun LoungeMemberRoute(
   popBackStack: () -> Unit,
-  showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: LoungeMemberViewModel = hiltViewModel(),
+  snackbarChannel: Channel<String> = LocalSnackbarChannel.current,
   context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
@@ -63,7 +65,7 @@ fun LoungeMemberRoute(
         is LoungeMemberSideEffect.PopBackStack -> popBackStack()
         is LoungeMemberSideEffect.OpenExileConfirmDialog -> viewModel.openDialog(LoungeMemberContract.EXILE_CONFIRM_DIALOG)
         is LoungeMemberSideEffect.CloseDialog -> viewModel.openDialog("")
-        is LoungeMemberSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
+        is LoungeMemberSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

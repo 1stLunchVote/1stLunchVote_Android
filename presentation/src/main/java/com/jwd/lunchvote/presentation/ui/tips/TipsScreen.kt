@@ -30,17 +30,19 @@ import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.ui.tips.TipsContract.TipsEvent
 import com.jwd.lunchvote.presentation.ui.tips.TipsContract.TipsSideEffect
 import com.jwd.lunchvote.presentation.ui.tips.TipsContract.TipsState
+import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun TipsRoute(
   popBackStack: () -> Unit,
-  showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: TipsViewModel = hiltViewModel(),
+  snackbarChannel: Channel<String> = LocalSnackbarChannel.current,
   context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
@@ -49,7 +51,7 @@ fun TipsRoute(
     viewModel.sideEffect.collectLatest {
       when(it) {
         is TipsSideEffect.PopBackStack -> popBackStack()
-        is TipsSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
+        is TipsSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

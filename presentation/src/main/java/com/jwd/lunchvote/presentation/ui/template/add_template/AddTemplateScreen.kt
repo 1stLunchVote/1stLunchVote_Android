@@ -33,6 +33,7 @@ import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateEvent
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateSideEffect
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateState
+import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.FoodItem
 import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
@@ -41,14 +42,15 @@ import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.TextFieldType
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun AddTemplateRoute(
   popBackStack: () -> Unit,
-  showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: AddTemplateViewModel = hiltViewModel(),
+  snackbarChannel: Channel<String> = LocalSnackbarChannel.current,
   context: Context = LocalContext.current
 ){
   val state by viewModel.viewState.collectAsStateWithLifecycle()
@@ -58,7 +60,7 @@ fun AddTemplateRoute(
     viewModel.sideEffect.collectLatest {
       when(it){
         is AddTemplateSideEffect.PopBackStack -> popBackStack()
-        is AddTemplateSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
+        is AddTemplateSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

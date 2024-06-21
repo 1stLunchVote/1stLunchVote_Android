@@ -46,6 +46,7 @@ import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteD
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteEvent
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteSideEffect
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteState
+import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.FoodItem
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.HorizontalProgressBar
@@ -58,15 +59,16 @@ import com.jwd.lunchvote.presentation.widget.MemberProgress
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.TextFieldType
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun FirstVoteRoute(
   popBackStack: () -> Unit,
   navigateToSecondVote: (String) -> Unit,
-  showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: FirstVoteViewModel = hiltViewModel(),
+  snackbarChannel: Channel<String> = LocalSnackbarChannel.current,
   context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
@@ -77,7 +79,7 @@ fun FirstVoteRoute(
       when(it) {
         is FirstVoteSideEffect.PopBackStack -> popBackStack()
         is FirstVoteSideEffect.NavigateToSecondVote -> navigateToSecondVote(it.loungeId)
-        is FirstVoteSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
+        is FirstVoteSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

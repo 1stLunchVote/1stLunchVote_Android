@@ -9,6 +9,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -20,6 +21,7 @@ import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavHost
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
 import com.jwd.lunchvote.presentation.navigation.route
+import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
@@ -56,12 +58,15 @@ class MainActivity : ComponentActivity() {
                   snackbarHostState.showSnackbar(message)
                 }
             }
-            LunchVoteNavHost(
-              startDestination = startDestination,
-              showSnackBar = { snackbarChannel.send(it) },
-              navController = navController,
-              modifier = Modifier.padding(padding)
-            )
+            CompositionLocalProvider(
+              value = LocalSnackbarChannel provides snackbarChannel
+            ) {
+              LunchVoteNavHost(
+                startDestination = startDestination,
+                navController = navController,
+                modifier = Modifier.padding(padding)
+              )
+            }
           }
         }
       }

@@ -30,6 +30,7 @@ import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.ui.vote.result.VoteResultContract.VoteResultEvent
 import com.jwd.lunchvote.presentation.ui.vote.result.VoteResultContract.VoteResultSideEffect
 import com.jwd.lunchvote.presentation.ui.vote.result.VoteResultContract.VoteResultState
+import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
@@ -37,14 +38,15 @@ import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun VoteResultRoute(
   navigateToHome: () -> Unit,
-  showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: VoteResultViewModel = hiltViewModel(),
+  snackbarChannel: Channel<String> = LocalSnackbarChannel.current,
   context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
@@ -54,7 +56,7 @@ fun VoteResultRoute(
     viewModel.sideEffect.collectLatest {
        when (it) {
         is VoteResultSideEffect.NavigateToHome -> navigateToHome()
-        is VoteResultSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
+        is VoteResultSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

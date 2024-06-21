@@ -37,6 +37,7 @@ import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.ui.template.TemplateListContract.TemplateListEvent
 import com.jwd.lunchvote.presentation.ui.template.TemplateListContract.TemplateListSideEffect
 import com.jwd.lunchvote.presentation.ui.template.TemplateListContract.TemplateListState
+import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
@@ -44,6 +45,7 @@ import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -51,9 +53,9 @@ fun TemplateListRoute(
   popBackStack: () -> Unit,
   navigateToAddTemplate: (String) -> Unit,
   navigateToEditTemplate: (String?) -> Unit,
-  showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: TemplateListViewModel = hiltViewModel(),
+  snackbarChannel: Channel<String> = LocalSnackbarChannel.current,
   context: Context = LocalContext.current
 ){
   val state by viewModel.viewState.collectAsStateWithLifecycle()
@@ -68,7 +70,7 @@ fun TemplateListRoute(
         is TemplateListSideEffect.NavigateToEditTemplate -> navigateToEditTemplate(it.templateId)
         is TemplateListSideEffect.OpenAddDialog -> viewModel.setDialogState(TemplateListContract.ADD_DIALOG)
         is TemplateListSideEffect.CloseDialog -> viewModel.setDialogState("")
-        is TemplateListSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
+        is TemplateListSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

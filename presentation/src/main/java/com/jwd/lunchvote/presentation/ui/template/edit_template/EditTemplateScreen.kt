@@ -42,6 +42,7 @@ import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateEvent
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateSideEffect
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateState
+import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.FoodItem
 import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
@@ -51,14 +52,15 @@ import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.TextFieldType
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun EditTemplateRoute(
   popBackStack: () -> Unit,
-  showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: EditTemplateViewModel = hiltViewModel(),
+  snackbarChannel: Channel<String> = LocalSnackbarChannel.current,
   context: Context = LocalContext.current
 ){
   val state by viewModel.viewState.collectAsStateWithLifecycle()
@@ -72,7 +74,7 @@ fun EditTemplateRoute(
         is EditTemplateSideEffect.OpenDeleteDialog -> viewModel.setDialogState(EditTemplateContract.DELETE_DIALOG)
         is EditTemplateSideEffect.OpenConfirmDialog -> viewModel.setDialogState(EditTemplateContract.CONFIRM_DIALOG)
         is EditTemplateSideEffect.CloseDialog -> viewModel.setDialogState("")
-        is EditTemplateSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
+        is EditTemplateSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }
