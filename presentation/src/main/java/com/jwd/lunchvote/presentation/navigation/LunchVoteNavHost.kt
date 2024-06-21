@@ -65,9 +65,7 @@ fun LunchVoteNavHost(
       )
     }
     composable(LunchVoteNavRoute.EmailVerification) {
-      EmailVerificationRoute(
-        navigateToPassword = { navController.navigate(LunchVoteNavRoute.Password) }
-      )
+      EmailVerificationRoute()
     }
     composable(LunchVoteNavRoute.Password) {
       PasswordRoute(
@@ -118,7 +116,7 @@ fun LunchVoteNavHost(
       FirstVoteRoute(
         popBackStack = { navController.popBackStack(LunchVoteNavRoute.Home) },
         navigateToSecondVote = { loungeId ->
-          navController.navigate(LunchVoteNavRoute.SecondVote, loungeId)
+          navController.navigateWithPop(LunchVoteNavRoute.SecondVote, loungeId)
         }
       )
     }
@@ -126,7 +124,7 @@ fun LunchVoteNavHost(
       SecondVoteRoute(
         popBackStack = { navController.popBackStack(LunchVoteNavRoute.Home) },
         navigateToVoteResult = { loungeId ->
-          navController.navigate(LunchVoteNavRoute.VoteResult, loungeId)
+          navController.navigateWithPop(LunchVoteNavRoute.VoteResult, loungeId)
         }
       )
     }

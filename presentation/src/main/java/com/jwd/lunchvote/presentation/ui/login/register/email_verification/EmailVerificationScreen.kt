@@ -36,7 +36,6 @@ import kr.co.inbody.config.config.EmailConfig
 
 @Composable
 fun EmailVerificationRoute(
-  navigateToPassword: () -> Unit,
   modifier: Modifier = Modifier,
   viewModel: EmailVerificationViewModel = hiltViewModel(),
   snackbarChannel: Channel<String> = LocalSnackbarChannel.current,
@@ -47,7 +46,6 @@ fun EmailVerificationRoute(
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
       when (it) {
-        is EmailVerificationSideEffect.NavigateToPassword -> navigateToPassword()
         is EmailVerificationSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
