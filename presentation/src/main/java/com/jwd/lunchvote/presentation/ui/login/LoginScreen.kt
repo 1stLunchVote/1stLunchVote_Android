@@ -64,11 +64,11 @@ fun LoginRoute(
   context: Context = LocalContext.current,
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
-  val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+  val loading by viewModel.isLoading.collectAsStateWithLifecycle()
 
   val googleSignInClient by lazy {
     val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-      .requestIdToken(BuildConfig.WEB_CLIENT_ID)
+      .requestIdToken(BuildConfig.FIREBASE_WEB_CLIENT_ID)
       .requestEmail()
       .build()
     GoogleSignIn.getClient(context, googleSignInOptions)
@@ -114,7 +114,7 @@ fun LoginRoute(
   LoginScreen(
     state = state,
     modifier = modifier,
-    isLoading = isLoading,
+    loading = loading,
     onEvent = viewModel::sendEvent
   )
 }
@@ -123,7 +123,7 @@ fun LoginRoute(
 private fun LoginScreen(
   state: LoginState,
   modifier: Modifier = Modifier,
-  isLoading: Boolean = false,
+  loading: Boolean = false,
   onEvent: (LoginEvent) -> Unit = {}
 ) {
   Screen(
@@ -149,20 +149,20 @@ private fun LoginScreen(
         onEmailChange = { onEvent(LoginEvent.OnEmailChange(it)) },
         onPasswordChange = { onEvent(LoginEvent.OnPasswordChange(it)) },
         onClickEmailLoginButton = { onEvent(LoginEvent.OnClickEmailLoginButton) },
-        isLoading = isLoading,
+        loading = loading,
         modifier = Modifier.fillMaxWidth()
       )
       Gap(height = 8.dp)
       RegisterRow(
         onClickRegisterButton = { onEvent(LoginEvent.OnClickRegisterButton) },
-        isLoading = isLoading,
+        loading = loading,
         modifier = Modifier.fillMaxWidth()
       )
       Gap(minHeight = 32.dp)
       SocialLoginButtons(
         onClickKakaoLoginButton = { onEvent(LoginEvent.OnClickKakaoLoginButton) },
         onClickGoogleLoginButton = { onEvent(LoginEvent.OnClickGoogleLoginButton) },
-        isLoading = isLoading,
+        loading = loading,
         modifier = Modifier.fillMaxWidth()
       )
     }
@@ -176,7 +176,7 @@ private fun LoginFields(
   onEmailChange: (String) -> Unit,
   onPasswordChange: (String) -> Unit,
   onClickEmailLoginButton: () -> Unit,
-  isLoading: Boolean,
+  loading: Boolean,
   modifier: Modifier = Modifier,
 ) {
   Column(
@@ -190,7 +190,7 @@ private fun LoginFields(
       onTextChange = onEmailChange,
       hintText = stringResource(R.string.login_email_hint),
       modifier = Modifier.fillMaxWidth(),
-      enabled = isLoading.not(),
+      enabled = loading.not(),
       keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
     )
     LunchVoteTextField(
@@ -198,7 +198,7 @@ private fun LoginFields(
       onTextChange = onPasswordChange,
       hintText = stringResource(R.string.login_password_hint),
       modifier = Modifier.fillMaxWidth(),
-      enabled = isLoading.not(),
+      enabled = loading.not(),
       keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
       visualTransformation = PasswordVisualTransformation()
     )
@@ -213,7 +213,7 @@ private fun LoginFields(
     Button(
       onClick = onClickEmailLoginButton,
       modifier = Modifier.fillMaxWidth(),
-      enabled = isLoading.not() && email.isNotEmpty() && password.isNotEmpty() && isValid
+      enabled = loading.not() && email.isNotEmpty() && password.isNotEmpty() && isValid
     ) {
       Text(text = stringResource(R.string.login_button))
     }
@@ -223,7 +223,7 @@ private fun LoginFields(
 @Composable
 private fun RegisterRow(
   onClickRegisterButton: () -> Unit,
-  isLoading: Boolean,
+  loading: Boolean,
   modifier: Modifier = Modifier
 ) {
   Row(
@@ -239,7 +239,7 @@ private fun RegisterRow(
       text = stringResource(R.string.login_register_button),
       modifier = Modifier
         .clickableWithoutEffect(
-          enabled = isLoading.not(),
+          enabled = loading.not(),
           onClick = onClickRegisterButton
         )
         .padding(start = 8.dp, top = 12.dp, bottom = 12.dp, end = 0.dp),
@@ -255,7 +255,7 @@ private fun RegisterRow(
 private fun SocialLoginButtons(
   onClickKakaoLoginButton: () -> Unit,
   onClickGoogleLoginButton: () -> Unit,
-  isLoading: Boolean,
+  loading: Boolean,
   modifier: Modifier = Modifier
 ) {
   Column(
@@ -265,13 +265,13 @@ private fun SocialLoginButtons(
     KakaoLoginButton(
       onClick = onClickKakaoLoginButton,
       modifier = Modifier.fillMaxWidth(),
-      enabled = isLoading.not(),
+      enabled = loading.not(),
       size = LoginButtonSize.Medium
     )
     GoogleLoginButton(
       onClick = onClickGoogleLoginButton,
       modifier = Modifier.fillMaxWidth(),
-      enabled = isLoading.not(),
+      enabled = loading.not(),
       size = LoginButtonSize.Medium
     )
   }
@@ -321,7 +321,7 @@ private fun Preview4() {
         email = "email@email.com",
         password = "password"
       ),
-      isLoading = true
+      loading = true
     )
   }
 }

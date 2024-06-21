@@ -25,7 +25,7 @@ android {
     consumerProguardFiles("consumer-rules.pro")
 
     // google web client id
-    buildConfigField("String", "WEB_CLIENT_ID", "${localProperties["WEB_CLIENT_ID"]}")
+    buildConfigField("String", "FIREBASE_WEB_CLIENT_ID", "${localProperties["FIREBASE_WEB_CLIENT_ID"]}")
   }
 
   buildTypes {
