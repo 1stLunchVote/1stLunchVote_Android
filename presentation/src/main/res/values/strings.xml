@@ -210,7 +210,4 @@
     <string name="profile_delete_user_confirm_dialog_cancel_button">취소</string>
     <string name="profile_delete_user_confirm_dialog_confirm_button">탈퇴</string>
     <string name="profile_delete_user_success_snackbar">정상적으로 탈퇴되었습니다.</string>
-
-
-    <string name="default_web_client_id">865155786423-dtjpm7cu0ah5vipogspaqqkb30nidacv.apps.googleusercontent.com</string>
 </resources>

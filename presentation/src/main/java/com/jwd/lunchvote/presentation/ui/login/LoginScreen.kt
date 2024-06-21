@@ -33,6 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.jwd.lunchvote.presentation.BuildConfig
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.ui.login.LoginContract.LoginEvent
 import com.jwd.lunchvote.presentation.ui.login.LoginContract.LoginSideEffect
@@ -67,7 +68,7 @@ fun LoginRoute(
 
   val googleSignInClient by lazy {
     val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-      .requestIdToken(context.getString(R.string.default_web_client_id))
+      .requestIdToken(BuildConfig.WEB_CLIENT_ID)
       .requestEmail()
       .build()
     GoogleSignIn.getClient(context, googleSignInOptions)

@@ -1,3 +1,7 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
   alias(libs.plugins.library)
   alias(libs.plugins.kotlin.android)
@@ -6,6 +10,9 @@ plugins {
   alias(libs.plugins.ksp)
   alias(libs.plugins.secrets)
 }
+
+val localProperties = Properties()
+localProperties.load(FileInputStream(rootProject.file("local.properties")))
 
 android {
   namespace = libs.versions.applicationId.get() + ".presentation"
@@ -16,6 +23,9 @@ android {
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     consumerProguardFiles("consumer-rules.pro")
+
+    // google web client id
+    buildConfigField("String", "WEB_CLIENT_ID", "${localProperties["WEB_CLIENT_ID"]}")
   }
 
   buildTypes {
