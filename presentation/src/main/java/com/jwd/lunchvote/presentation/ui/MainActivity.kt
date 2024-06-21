@@ -38,10 +38,11 @@ class MainActivity : ComponentActivity() {
       val snackbarHostState = remember { SnackbarHostState() }
       val navController = rememberNavController()
 
-      val startDestination =
-        if (Firebase.auth.currentUser != null) LunchVoteNavRoute.Home.route
-        else if (Firebase.auth.isSignInWithEmailLink(intent.data.toString())) LunchVoteNavRoute.Password.route
-        else LunchVoteNavRoute.Login.route
+      val startDestination = when {
+        Firebase.auth.currentUser != null -> LunchVoteNavRoute.Home.route
+        Firebase.auth.isSignInWithEmailLink(intent.data.toString()) -> LunchVoteNavRoute.Password.route
+        else -> LunchVoteNavRoute.Login.route
+      }
 
       LunchVoteTheme {
         Surface(
