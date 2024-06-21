@@ -51,7 +51,7 @@ fun TipsRoute(
     viewModel.sideEffect.collectLatest {
       when(it) {
         is TipsSideEffect.PopBackStack -> popBackStack()
-        is TipsSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
+        is TipsSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

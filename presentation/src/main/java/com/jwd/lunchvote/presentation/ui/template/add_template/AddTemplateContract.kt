@@ -37,6 +37,6 @@ class AddTemplateContract {
 
   sealed interface AddTemplateSideEffect : ViewModelContract.SideEffect {
     data object PopBackStack : AddTemplateSideEffect
-    data class ShowSnackBar(val message: UiText) : AddTemplateSideEffect
+    data class ShowSnackbar(val message: UiText) : AddTemplateSideEffect
   }
 }

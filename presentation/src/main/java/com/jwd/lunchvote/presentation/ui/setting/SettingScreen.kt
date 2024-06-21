@@ -58,7 +58,7 @@ fun SettingRoute(
         is SettingSideEffect.PopBackStack -> popBackStack()
         is SettingSideEffect.NavigateToProfile -> navigateToProfile()
         is SettingSideEffect.NavigateToLogin -> navigateToLogin()
-        is SettingSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
+        is SettingSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

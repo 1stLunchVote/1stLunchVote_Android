@@ -60,7 +60,7 @@ fun AddTemplateRoute(
     viewModel.sideEffect.collectLatest {
       when(it){
         is AddTemplateSideEffect.PopBackStack -> popBackStack()
-        is AddTemplateSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
+        is AddTemplateSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

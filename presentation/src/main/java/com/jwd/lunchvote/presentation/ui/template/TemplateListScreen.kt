@@ -70,7 +70,7 @@ fun TemplateListRoute(
         is TemplateListSideEffect.NavigateToEditTemplate -> navigateToEditTemplate(it.templateId)
         is TemplateListSideEffect.OpenAddDialog -> viewModel.setDialogState(TemplateListContract.ADD_DIALOG)
         is TemplateListSideEffect.CloseDialog -> viewModel.setDialogState("")
-        is TemplateListSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
+        is TemplateListSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

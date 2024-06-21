@@ -109,7 +109,7 @@ class SecondVoteViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(SecondVoteSideEffect.ShowSnackBar(UiText.ErrorString(error)))
+    sendSideEffect(SecondVoteSideEffect.ShowSnackbar(UiText.ErrorString(error)))
   }
 
   private suspend fun initialize() {
@@ -135,7 +135,7 @@ class SecondVoteViewModel @Inject constructor(
       updateState(SecondVoteReduce.UpdateMemberList(memberList.map { it.asUI() }))
 
       if (memberList.size <= 1) {
-        sendSideEffect(SecondVoteSideEffect.ShowSnackBar(UiText.StringResource(R.string.first_vote_only_owner_snackbar)))
+        sendSideEffect(SecondVoteSideEffect.ShowSnackbar(UiText.StringResource(R.string.first_vote_only_owner_snackbar)))
         sendSideEffect(SecondVoteSideEffect.PopBackStack)
       }
       if (memberList.all { it.status == Member.Status.VOTED }) launch { submitVote() }
@@ -146,7 +146,7 @@ class SecondVoteViewModel @Inject constructor(
     loungeRepository.getLoungeStatusFlowById(loungeId).collectLatest { status ->
       when(status) {
         Lounge.Status.QUIT -> {
-          sendSideEffect(SecondVoteSideEffect.ShowSnackBar(UiText.StringResource(R.string.first_vote_owner_exited_snackbar)))
+          sendSideEffect(SecondVoteSideEffect.ShowSnackbar(UiText.StringResource(R.string.first_vote_owner_exited_snackbar)))
           sendSideEffect(SecondVoteSideEffect.PopBackStack)
         }
         Lounge.Status.FINISHED -> sendSideEffect(SecondVoteSideEffect.NavigateToVoteResult(currentState.lounge.id))

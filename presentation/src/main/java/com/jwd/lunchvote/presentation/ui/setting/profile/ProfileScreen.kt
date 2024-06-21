@@ -87,7 +87,7 @@ fun ProfileRoute(
         is ProfileSideEffect.OpenDeleteUserConfirmDialog -> viewModel.setDialogState(ProfileContract.DELETE_USER_CONFIRM_DIALOG)
         is ProfileSideEffect.CloseDialog -> viewModel.setDialogState("")
         is ProfileSideEffect.NavigateToLogin -> navigateToLogin()
-        is ProfileSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
+        is ProfileSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

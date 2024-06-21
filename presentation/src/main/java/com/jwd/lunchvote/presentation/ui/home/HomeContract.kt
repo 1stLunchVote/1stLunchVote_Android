@@ -41,7 +41,7 @@ class HomeContract {
     data object NavigateToTips : HomeSideEffect
     data object OpenJoinDialog : HomeSideEffect
     data object CloseDialog : HomeSideEffect
-    data class ShowSnackBar(val message: UiText) : HomeSideEffect
+    data class ShowSnackbar(val message: UiText) : HomeSideEffect
   }
 
   companion object {

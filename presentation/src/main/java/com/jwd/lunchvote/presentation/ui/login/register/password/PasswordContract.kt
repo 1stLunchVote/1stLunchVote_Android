@@ -32,6 +32,6 @@ class PasswordContract {
   sealed interface PasswordSideEffect : ViewModelContract.SideEffect {
     data object NavigateToLogin : PasswordSideEffect
     data class NavigateToNickname(val email: String, val password: String) : PasswordSideEffect
-    data class ShowSnackBar(val message: UiText) : PasswordSideEffect
+    data class ShowSnackbar(val message: UiText) : PasswordSideEffect
   }
 }

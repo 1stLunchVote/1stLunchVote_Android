@@ -68,7 +68,7 @@ class AddTemplateViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(AddTemplateSideEffect.ShowSnackBar(UiText.ErrorString(error)))
+    sendSideEffect(AddTemplateSideEffect.ShowSnackbar(UiText.ErrorString(error)))
   }
 
   private suspend fun initialize() {
@@ -92,7 +92,7 @@ class AddTemplateViewModel @Inject constructor(
 
     templateRepository.addTemplate(template.asDomain())
 
-    sendSideEffect(AddTemplateSideEffect.ShowSnackBar(UiText.StringResource(R.string.add_template_add_snackbar)))
+    sendSideEffect(AddTemplateSideEffect.ShowSnackbar(UiText.StringResource(R.string.add_template_add_snackbar)))
     sendSideEffect(AddTemplateSideEffect.PopBackStack)
   }
 }

@@ -48,7 +48,7 @@ fun EmailVerificationRoute(
     viewModel.sideEffect.collectLatest {
       when (it) {
         is EmailVerificationSideEffect.NavigateToPassword -> navigateToPassword()
-        is EmailVerificationSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
+        is EmailVerificationSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

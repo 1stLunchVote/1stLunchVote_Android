@@ -40,7 +40,7 @@ class VoteResultViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(VoteResultSideEffect.ShowSnackBar(UiText.ErrorString(error)))
+    sendSideEffect(VoteResultSideEffect.ShowSnackbar(UiText.ErrorString(error)))
   }
 
   private suspend fun initialize() {

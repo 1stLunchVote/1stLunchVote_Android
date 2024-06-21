@@ -37,6 +37,6 @@ class LoginContract {
     data object NavigateToEmailVerification : LoginSideEffect
     data object LaunchGoogleLogin : LoginSideEffect
     data object LaunchKakaoLogin : LoginSideEffect
-    data class ShowSnackBar(val message: UiText) : LoginSideEffect
+    data class ShowSnackbar(val message: UiText) : LoginSideEffect
   }
 }

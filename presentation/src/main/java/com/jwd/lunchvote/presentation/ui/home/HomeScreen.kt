@@ -82,7 +82,7 @@ fun HomeRoute(
         is HomeSideEffect.NavigateToTips -> navigateToTips()
         is HomeSideEffect.OpenJoinDialog -> viewModel.setDialogState(HomeContract.JOIN_DIALOG)
         is HomeSideEffect.CloseDialog -> viewModel.setDialogState("")
-        is HomeSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
+        is HomeSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

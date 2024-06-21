@@ -52,7 +52,7 @@ class ProfileContract {
     data object OpenDeleteUserConfirmDialog : ProfileSideEffect
     data object CloseDialog : ProfileSideEffect
     data object NavigateToLogin : ProfileSideEffect
-    data class ShowSnackBar(val message: UiText) : ProfileSideEffect
+    data class ShowSnackbar(val message: UiText) : ProfileSideEffect
   }
 
   companion object {

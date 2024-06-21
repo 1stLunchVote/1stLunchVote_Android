@@ -87,7 +87,7 @@ class EditTemplateViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(EditTemplateSideEffect.ShowSnackBar(UiText.ErrorString(error)))
+    sendSideEffect(EditTemplateSideEffect.ShowSnackbar(UiText.ErrorString(error)))
   }
 
   private suspend fun initialize() {
@@ -124,7 +124,7 @@ class EditTemplateViewModel @Inject constructor(
     )
     templateRepository.updateTemplate(updatedTemplate.asDomain())
 
-    sendSideEffect(EditTemplateSideEffect.ShowSnackBar(UiText.StringResource(R.string.edit_template_save_snackbar)))
+    sendSideEffect(EditTemplateSideEffect.ShowSnackbar(UiText.StringResource(R.string.edit_template_save_snackbar)))
     sendSideEffect(EditTemplateSideEffect.PopBackStack)
   }
 
@@ -133,7 +133,7 @@ class EditTemplateViewModel @Inject constructor(
 
     templateRepository.deleteTemplateById(currentState.template.id)
 
-    sendSideEffect(EditTemplateSideEffect.ShowSnackBar(UiText.StringResource(R.string.edit_template_delete_snackbar)))
+    sendSideEffect(EditTemplateSideEffect.ShowSnackbar(UiText.StringResource(R.string.edit_template_delete_snackbar)))
     sendSideEffect(EditTemplateSideEffect.PopBackStack)
   }
 }

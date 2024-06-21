@@ -61,7 +61,7 @@ class ProfileViewModel @Inject constructor(
 
       // DialogEvent
       is ProfileEvent.OnProfileImageChangeEditProfileImageDialog -> updateState(ProfileReduce.UpdateProfileImage(event.profileImageUri))
-      is ProfileEvent.OnImageLoadErrorEditProfileImageDialog -> sendSideEffect(ProfileSideEffect.ShowSnackBar(UiText.StringResource(R.string.profile_edit_profile_image_dialog_image_load_error)))
+      is ProfileEvent.OnImageLoadErrorEditProfileImageDialog -> sendSideEffect(ProfileSideEffect.ShowSnackbar(UiText.StringResource(R.string.profile_edit_profile_image_dialog_image_load_error)))
       is ProfileEvent.OnClickCancelButtonEditProfileImageDialog -> sendSideEffect(ProfileSideEffect.CloseDialog)
       is ProfileEvent.OnClickSaveButtonEditProfileImageDialog -> launch { saveProfileImage(event.context) }
       is ProfileEvent.OnNameChangeEditNameDialog -> updateState(ProfileReduce.UpdateName(event.name))
@@ -81,7 +81,7 @@ class ProfileViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(ProfileSideEffect.ShowSnackBar(UiText.ErrorString(error)))
+    sendSideEffect(ProfileSideEffect.ShowSnackbar(UiText.ErrorString(error)))
   }
 
   private suspend fun initialize() {
@@ -110,7 +110,7 @@ class ProfileViewModel @Inject constructor(
     val user = currentState.user.copy(profileImage = image)
     userRepository.updateUser(user.asDomain())
     
-    sendSideEffect(ProfileSideEffect.ShowSnackBar(UiText.StringResource(R.string.profile_edit_profile_image_success_snackbar)))
+    sendSideEffect(ProfileSideEffect.ShowSnackbar(UiText.StringResource(R.string.profile_edit_profile_image_success_snackbar)))
     initialize()
   }
 
@@ -120,7 +120,7 @@ class ProfileViewModel @Inject constructor(
     val user = currentState.user.copy(name = currentState.name)
 
     userRepository.updateUser(user.asDomain())
-    sendSideEffect(ProfileSideEffect.ShowSnackBar(UiText.StringResource(R.string.profile_edit_name_success_snackbar)))
+    sendSideEffect(ProfileSideEffect.ShowSnackbar(UiText.StringResource(R.string.profile_edit_name_success_snackbar)))
     initialize()
   }
 
@@ -130,7 +130,7 @@ class ProfileViewModel @Inject constructor(
     val currentUser = Firebase.auth.currentUser ?: throw UserError.NoUser
     currentUser.delete().await()
 
-    sendSideEffect(ProfileSideEffect.ShowSnackBar(UiText.StringResource(R.string.profile_delete_user_success_snackbar)))
+    sendSideEffect(ProfileSideEffect.ShowSnackbar(UiText.StringResource(R.string.profile_delete_user_success_snackbar)))
     sendSideEffect(ProfileSideEffect.NavigateToLogin)
   }
 }

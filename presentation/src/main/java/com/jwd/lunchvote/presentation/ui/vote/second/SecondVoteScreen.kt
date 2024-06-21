@@ -74,7 +74,7 @@ fun SecondVoteRoute(
       when(it) {
         is SecondVoteSideEffect.PopBackStack -> popBackStack()
         is SecondVoteSideEffect.NavigateToVoteResult -> navigateToVoteResult(it.loungeId)
-        is SecondVoteSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
+        is SecondVoteSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

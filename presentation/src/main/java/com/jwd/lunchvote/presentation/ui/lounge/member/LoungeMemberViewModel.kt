@@ -66,7 +66,7 @@ class LoungeMemberViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(LoungeMemberSideEffect.ShowSnackBar(UiText.ErrorString(error)))
+    sendSideEffect(LoungeMemberSideEffect.ShowSnackbar(UiText.ErrorString(error)))
     when (error) {
       is MemberError.InvalidMember -> sendSideEffect(LoungeMemberSideEffect.PopBackStack)
     }

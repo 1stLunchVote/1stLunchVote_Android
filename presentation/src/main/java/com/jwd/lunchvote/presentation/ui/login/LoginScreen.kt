@@ -108,7 +108,7 @@ fun LoginRoute(
           }
         }
         is LoginSideEffect.LaunchGoogleLogin -> googleLauncher.launch(googleSignInClient.signInIntent)
-        is LoginSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
+        is LoginSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

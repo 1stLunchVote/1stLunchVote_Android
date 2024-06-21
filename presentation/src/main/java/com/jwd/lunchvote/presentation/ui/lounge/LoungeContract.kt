@@ -48,7 +48,7 @@ class LoungeContract {
     data class NavigateToVote(val loungeId: String) : LoungeSideEffect
     data object OpenVoteExitDialog : LoungeSideEffect
     data object CloseDialog : LoungeSideEffect
-    data class ShowSnackBar(val message: UiText) : LoungeSideEffect
+    data class ShowSnackbar(val message: UiText) : LoungeSideEffect
     data class CopyToClipboard(val loungeId: String) : LoungeSideEffect
   }
 

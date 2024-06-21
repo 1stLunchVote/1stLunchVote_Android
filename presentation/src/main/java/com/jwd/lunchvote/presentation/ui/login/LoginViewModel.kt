@@ -60,13 +60,13 @@ class LoginViewModel @Inject constructor(
     when (error) {
       is FirebaseAuthException -> {
         when (error.errorCode) {
-          "ERROR_USER_NOT_FOUND" -> sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.StringResource(R.string.login_user_not_found_error_snackbar)))
-          "ERROR_WRONG_PASSWORD" -> sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.StringResource(R.string.login_wrong_password_error_snackbar)))
-          "ERROR_USER_DISABLED" -> sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.StringResource(R.string.login_user_disabled_error_snackbar)))
-          else -> sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.ErrorString(error)))
+          "ERROR_USER_NOT_FOUND" -> sendSideEffect(LoginSideEffect.ShowSnackbar(UiText.StringResource(R.string.login_user_not_found_error_snackbar)))
+          "ERROR_WRONG_PASSWORD" -> sendSideEffect(LoginSideEffect.ShowSnackbar(UiText.StringResource(R.string.login_wrong_password_error_snackbar)))
+          "ERROR_USER_DISABLED" -> sendSideEffect(LoginSideEffect.ShowSnackbar(UiText.StringResource(R.string.login_user_disabled_error_snackbar)))
+          else -> sendSideEffect(LoginSideEffect.ShowSnackbar(UiText.ErrorString(error)))
         }
       }
-      else -> sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.ErrorString(error)))
+      else -> sendSideEffect(LoginSideEffect.ShowSnackbar(UiText.ErrorString(error)))
     }
   }
 
@@ -119,7 +119,7 @@ class LoginViewModel @Inject constructor(
   }
 
   private fun loginSuccess() {
-    sendSideEffect(LoginSideEffect.ShowSnackBar(UiText.StringResource(R.string.login_success_snackbar)))
+    sendSideEffect(LoginSideEffect.ShowSnackbar(UiText.StringResource(R.string.login_success_snackbar)))
     sendSideEffect(LoginSideEffect.NavigateToHome)
   }
 }

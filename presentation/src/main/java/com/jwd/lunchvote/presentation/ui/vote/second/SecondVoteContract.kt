@@ -50,7 +50,7 @@ class SecondVoteContract {
   sealed interface SecondVoteSideEffect : ViewModelContract.SideEffect {
     data object PopBackStack : SecondVoteSideEffect
     data class NavigateToVoteResult(val loungeId: String) : SecondVoteSideEffect
-    data class ShowSnackBar(val message: UiText) : SecondVoteSideEffect
+    data class ShowSnackbar(val message: UiText) : SecondVoteSideEffect
   }
 
   sealed interface SecondVoteDialog {

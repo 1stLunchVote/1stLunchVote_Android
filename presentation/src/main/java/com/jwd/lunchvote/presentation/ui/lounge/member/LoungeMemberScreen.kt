@@ -65,7 +65,7 @@ fun LoungeMemberRoute(
         is LoungeMemberSideEffect.PopBackStack -> popBackStack()
         is LoungeMemberSideEffect.OpenExileConfirmDialog -> viewModel.openDialog(LoungeMemberContract.EXILE_CONFIRM_DIALOG)
         is LoungeMemberSideEffect.CloseDialog -> viewModel.openDialog("")
-        is LoungeMemberSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
+        is LoungeMemberSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

@@ -71,7 +71,7 @@ class HomeViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(HomeSideEffect.ShowSnackBar(UiText.ErrorString(error)))
+    sendSideEffect(HomeSideEffect.ShowSnackbar(UiText.ErrorString(error)))
   }
 
   private suspend fun initialize() {
@@ -85,7 +85,7 @@ class HomeViewModel @Inject constructor(
     val loungeId = currentState.loungeId ?: return
     updateState(HomeReduce.UpdateLoungeId(null))
     sendSideEffect(HomeSideEffect.CloseDialog)
-    sendSideEffect(HomeSideEffect.ShowSnackBar(UiText.StringResource(R.string.home_joining_lounge_snackbar)))
+    sendSideEffect(HomeSideEffect.ShowSnackbar(UiText.StringResource(R.string.home_joining_lounge_snackbar)))
 
     val isAvailable = loungeRepository.checkLoungeExistById(loungeId)
 

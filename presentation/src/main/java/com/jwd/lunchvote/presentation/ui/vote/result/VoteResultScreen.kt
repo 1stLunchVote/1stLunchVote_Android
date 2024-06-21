@@ -56,7 +56,7 @@ fun VoteResultRoute(
     viewModel.sideEffect.collectLatest {
        when (it) {
         is VoteResultSideEffect.NavigateToHome -> navigateToHome()
-        is VoteResultSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
+        is VoteResultSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

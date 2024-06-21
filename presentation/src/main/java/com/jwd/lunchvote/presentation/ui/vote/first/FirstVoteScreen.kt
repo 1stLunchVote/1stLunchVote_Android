@@ -79,7 +79,7 @@ fun FirstVoteRoute(
       when(it) {
         is FirstVoteSideEffect.PopBackStack -> popBackStack()
         is FirstVoteSideEffect.NavigateToSecondVote -> navigateToSecondVote(it.loungeId)
-        is FirstVoteSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
+        is FirstVoteSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

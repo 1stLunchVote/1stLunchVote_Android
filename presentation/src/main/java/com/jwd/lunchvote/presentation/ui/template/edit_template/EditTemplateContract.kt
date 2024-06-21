@@ -53,7 +53,7 @@ class EditTemplateContract {
     data object OpenDeleteDialog : EditTemplateSideEffect
     data object OpenConfirmDialog : EditTemplateSideEffect
     data object CloseDialog : EditTemplateSideEffect
-    data class ShowSnackBar(val message: UiText) : EditTemplateSideEffect
+    data class ShowSnackbar(val message: UiText) : EditTemplateSideEffect
   }
 
   companion object {

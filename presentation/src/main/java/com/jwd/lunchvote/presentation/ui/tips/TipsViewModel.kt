@@ -33,6 +33,6 @@ class TipsViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(TipsSideEffect.ShowSnackBar(UiText.ErrorString(error)))
+    sendSideEffect(TipsSideEffect.ShowSnackbar(UiText.ErrorString(error)))
   }
 }

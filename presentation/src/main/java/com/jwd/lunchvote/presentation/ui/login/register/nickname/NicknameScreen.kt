@@ -45,7 +45,7 @@ fun NicknameRoute(
     viewModel.sideEffect.collectLatest {
       when (it) {
         is NicknameSideEffect.NavigateToHome -> navigateToHome()
-        is NicknameSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
+        is NicknameSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

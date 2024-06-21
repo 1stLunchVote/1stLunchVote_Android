@@ -26,6 +26,6 @@ class VoteResultContract {
 
   sealed interface VoteResultSideEffect : ViewModelContract.SideEffect {
     data object NavigateToHome : VoteResultSideEffect
-    data class ShowSnackBar(val message: UiText) : VoteResultSideEffect
+    data class ShowSnackbar(val message: UiText) : VoteResultSideEffect
   }
 }

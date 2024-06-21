@@ -74,7 +74,7 @@ fun EditTemplateRoute(
         is EditTemplateSideEffect.OpenDeleteDialog -> viewModel.setDialogState(EditTemplateContract.DELETE_DIALOG)
         is EditTemplateSideEffect.OpenConfirmDialog -> viewModel.setDialogState(EditTemplateContract.CONFIRM_DIALOG)
         is EditTemplateSideEffect.CloseDialog -> viewModel.setDialogState("")
-        is EditTemplateSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
+        is EditTemplateSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

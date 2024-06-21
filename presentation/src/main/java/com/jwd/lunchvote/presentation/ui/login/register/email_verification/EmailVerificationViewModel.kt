@@ -43,7 +43,7 @@ class EmailVerificationViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(EmailVerificationSideEffect.ShowSnackBar(UiText.ErrorString(error)))
+    sendSideEffect(EmailVerificationSideEffect.ShowSnackbar(UiText.ErrorString(error)))
   }
 
   private val actionCodeSettings = actionCodeSettings {
@@ -58,7 +58,7 @@ class EmailVerificationViewModel @Inject constructor(
 
   private suspend fun checkEmail() {
     val exists = userRepository.checkUserExists(currentState.email)
-    if (exists) sendSideEffect(EmailVerificationSideEffect.ShowSnackBar(UiText.StringResource(R.string.email_verification_user_collision_error_snackbar)))
+    if (exists) sendSideEffect(EmailVerificationSideEffect.ShowSnackbar(UiText.StringResource(R.string.email_verification_user_collision_error_snackbar)))
     else sendEmail()
   }
 
@@ -68,10 +68,10 @@ class EmailVerificationViewModel @Inject constructor(
         if (task.isSuccessful) {
           setEmail(currentState.email)
 
-          sendSideEffect(EmailVerificationSideEffect.ShowSnackBar(UiText.StringResource(R.string.email_verification_email_send_snackbar)))
+          sendSideEffect(EmailVerificationSideEffect.ShowSnackbar(UiText.StringResource(R.string.email_verification_email_send_snackbar)))
           updateState(EmailVerificationReduce.UpdateEmailSent(true))
         } else {
-          sendSideEffect(EmailVerificationSideEffect.ShowSnackBar(UiText.StringResource(R.string.email_verification_email_send_error_snackbar)))
+          sendSideEffect(EmailVerificationSideEffect.ShowSnackbar(UiText.StringResource(R.string.email_verification_email_send_error_snackbar)))
         }
       }
   }

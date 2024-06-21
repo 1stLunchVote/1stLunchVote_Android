@@ -93,7 +93,7 @@ fun LoungeRoute(
         is LoungeSideEffect.NavigateToVote -> navigateToFirstVote(it.loungeId)
         is LoungeSideEffect.OpenVoteExitDialog -> viewModel.openDialog(LoungeContract.VOTE_EXIT_DIALOG)
         is LoungeSideEffect.CloseDialog -> viewModel.openDialog("")
-        is LoungeSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
+        is LoungeSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
         is LoungeSideEffect.CopyToClipboard -> clipboardManager.setText(AnnotatedString(it.loungeId))
       }
     }

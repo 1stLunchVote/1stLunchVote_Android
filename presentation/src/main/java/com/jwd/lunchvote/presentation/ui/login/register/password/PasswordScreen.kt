@@ -49,7 +49,7 @@ fun PasswordRoute(
       when (it) {
         is PasswordSideEffect.NavigateToLogin -> navigateToLogin()
         is PasswordSideEffect.NavigateToNickname -> navigateToNickname(it.email, it.password)
-        is PasswordSideEffect.ShowSnackBar -> snackbarChannel.send(it.message.asString(context))
+        is PasswordSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

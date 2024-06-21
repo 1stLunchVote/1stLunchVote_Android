@@ -43,7 +43,7 @@ class PasswordViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(PasswordSideEffect.ShowSnackBar(UiText.ErrorString(error)))
+    sendSideEffect(PasswordSideEffect.ShowSnackbar(UiText.ErrorString(error)))
     when (error) {
       is LoginError.NoEmail -> sendSideEffect(PasswordSideEffect.NavigateToLogin)
     }

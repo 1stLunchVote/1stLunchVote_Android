@@ -33,6 +33,6 @@ class SettingContract {
     data object PopBackStack : SettingSideEffect
     data object NavigateToProfile : SettingSideEffect
     data object NavigateToLogin : SettingSideEffect
-    data class ShowSnackBar(val message: UiText) : SettingSideEffect
+    data class ShowSnackbar(val message: UiText) : SettingSideEffect
   }
 }

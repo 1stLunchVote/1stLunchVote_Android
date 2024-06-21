@@ -117,7 +117,7 @@ class LoungeViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.ErrorString(error)))
+    sendSideEffect(LoungeSideEffect.ShowSnackbar(UiText.ErrorString(error)))
     when (error) {
       is LoungeError.LoungeQuit -> sendSideEffect(LoungeSideEffect.PopBackStack)
       is LoungeError.FullMember -> sendSideEffect(LoungeSideEffect.PopBackStack)
@@ -161,7 +161,7 @@ class LoungeViewModel @Inject constructor(
     loungeRepository.getLoungeStatusFlowById(loungeId).collectLatest { status ->
       when (status) {
         Lounge.Status.QUIT -> {
-          sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_owner_exited_snackbar)))
+          sendSideEffect(LoungeSideEffect.ShowSnackbar(UiText.StringResource(R.string.lounge_owner_exited_snackbar)))
           sendSideEffect(LoungeSideEffect.PopBackStack)
         }
         Lounge.Status.FIRST_VOTE -> {
@@ -181,7 +181,7 @@ class LoungeViewModel @Inject constructor(
   private suspend fun collectMemberType(loungeId: String) {
     memberRepository.getMemberTypeFlow(loungeId, currentState.user.id).collectLatest { type ->
       if (type == Member.Type.EXILED) {
-        sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_exiled_snackbar)))
+        sendSideEffect(LoungeSideEffect.ShowSnackbar(UiText.StringResource(R.string.lounge_exiled_snackbar)))
         sendSideEffect(LoungeSideEffect.PopBackStack)
       }
     }
@@ -211,7 +211,7 @@ class LoungeViewModel @Inject constructor(
 
   private suspend fun startVote() {
     if (currentState.memberList.any { it.type == MemberUIModel.Type.DEFAULT }) {
-      sendSideEffect(LoungeSideEffect.ShowSnackBar(UiText.StringResource(R.string.lounge_not_ready_to_start_snackbar)))
+      sendSideEffect(LoungeSideEffect.ShowSnackbar(UiText.StringResource(R.string.lounge_not_ready_to_start_snackbar)))
     } else {
       startFirstVote(currentState.lounge.id)
     }
