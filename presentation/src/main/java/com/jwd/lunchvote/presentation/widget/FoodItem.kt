@@ -26,15 +26,14 @@ import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.core.ui.theme.colorSuccess
 import com.jwd.lunchvote.core.ui.util.circleShadow
 import com.jwd.lunchvote.presentation.R
-import com.jwd.lunchvote.presentation.model.FoodStatus
+import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 
 @Composable
 fun FoodItem(
-  food: FoodUIModel,
-  status: FoodStatus,
+  foodItem: FoodItem,
   modifier: Modifier = Modifier,
   onClick: () -> Unit
 ) {
@@ -48,20 +47,20 @@ fun FoodItem(
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
     Box(
-      modifier = if (status == FoodStatus.DISLIKE) Modifier.alpha(0.5f) else Modifier
+      modifier = if (foodItem.status == FoodItem.Status.DISLIKE) Modifier.alpha(0.5f) else Modifier
     ) {
       CoilImage(
-        imageModel = { food.image },
+        imageModel = { foodItem.food },
         modifier = Modifier
           .size(100.dp)
           .let {
-            when (status) {
-              FoodStatus.DEFAULT -> it
+            when (foodItem.status) {
+              FoodItem.Status.DEFAULT -> it
                 .clip(RoundedCornerShape(16.dp))
                 .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
                 .alpha(0.8f)
 
-              FoodStatus.LIKE -> it
+              FoodItem.Status.LIKE -> it
                 .clip(RoundedCornerShape(16.dp))
                 .border(2.dp, colorSuccess, RoundedCornerShape(16.dp))
                 .circleShadow(colorSuccess, blurRadius = 8.dp)
@@ -74,7 +73,7 @@ fun FoodItem(
         ),
         previewPlaceholder = R.drawable.ic_food_image_temp
       )
-      if (status == FoodStatus.DISLIKE) {
+      if (foodItem.status == FoodItem.Status.DISLIKE) {
         Image(
           painterResource(R.drawable.ic_mask_reversed),
           null,
@@ -88,7 +87,7 @@ fun FoodItem(
       }
     }
     Text(
-      food.name,
+      foodItem.food.name,
       style = MaterialTheme.typography.bodyLarge
     )
   }
@@ -102,30 +101,30 @@ fun FoodItemDefaultPreview() {
       horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
       FoodItem(
-        FoodUIModel(
-          id = "",
-          image = "",
-          name = "햄버거"
+        foodItem = FoodItem(
+          food = FoodUIModel(
+            name = "햄버거"
+          ),
+          status = FoodItem.Status.DEFAULT
         ),
-        status = FoodStatus.DEFAULT,
         onClick = {}
       )
       FoodItem(
-        FoodUIModel(
-          id = "",
-          image = "",
-          name = "햄버거"
+        foodItem = FoodItem(
+          food = FoodUIModel(
+            name = "햄버거"
+          ),
+          status = FoodItem.Status.LIKE
         ),
-        status = FoodStatus.LIKE,
         onClick = {}
       )
       FoodItem(
-        FoodUIModel(
-          id = "",
-          image = "",
-          name = "햄버거"
+        foodItem = FoodItem(
+          food = FoodUIModel(
+            name = "햄버거"
+          ),
+          status = FoodItem.Status.DISLIKE
         ),
-        status = FoodStatus.DISLIKE,
         onClick = {}
       )
     }

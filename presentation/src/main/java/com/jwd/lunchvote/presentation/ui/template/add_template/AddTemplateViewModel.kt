@@ -10,9 +10,8 @@ import com.jwd.lunchvote.domain.repository.TemplateRepository
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
-import com.jwd.lunchvote.presentation.model.FoodStatus
+import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
-import com.jwd.lunchvote.presentation.model.updateFoodMap
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateEvent
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateReduce
@@ -38,7 +37,7 @@ class AddTemplateViewModel @Inject constructor(
       is AddTemplateEvent.ScreenInitialize -> launch { initialize() }
 
       is AddTemplateEvent.OnClickBackButton -> sendSideEffect(AddTemplateSideEffect.PopBackStack)
-      is AddTemplateEvent.OnClickFood -> updateState(AddTemplateReduce.UpdateFoodStatus(event.food))
+      is AddTemplateEvent.OnClickFoodItem -> updateState(AddTemplateReduce.UpdateFoodStatus(event.foodItem))
       is AddTemplateEvent.OnSearchKeywordChange -> updateState(AddTemplateReduce.UpdateSearchKeyword(event.searchKeyword))
       is AddTemplateEvent.OnClickAddButton -> launch { addTemplate() }
     }
@@ -47,22 +46,10 @@ class AddTemplateViewModel @Inject constructor(
   override fun reduceState(state: AddTemplateState, reduce: AddTemplateReduce): AddTemplateState {
     return when (reduce) {
       is AddTemplateReduce.UpdateName -> state.copy(name = reduce.name)
-      is AddTemplateReduce.UpdateFoodMap -> state.copy(foodMap = reduce.foodMap)
-      is AddTemplateReduce.UpdateFoodStatus -> when (reduce.food) {
-        in state.likedFoods -> state.copy(
-          foodMap = state.foodMap.updateFoodMap(reduce.food),
-          likedFoods = state.likedFoods.filter { it.id != reduce.food.id },
-          dislikedFoods = state.dislikedFoods + reduce.food
-        )
-        in state.dislikedFoods -> state.copy(
-          foodMap = state.foodMap.updateFoodMap(reduce.food),
-          dislikedFoods = state.dislikedFoods.filter { it.id != reduce.food.id }
-        )
-        else -> state.copy(
-          foodMap = state.foodMap.updateFoodMap(reduce.food),
-          likedFoods = state.likedFoods + reduce.food
-        )
-      }
+      is AddTemplateReduce.UpdateFoodItemList -> state.copy(foodItemList = reduce.foodItemList)
+      is AddTemplateReduce.UpdateFoodStatus -> state.copy(
+        foodItemList = state.foodItemList.map { if (it == reduce.foodItem) it.nextStatus() else it }
+      )
       is AddTemplateReduce.UpdateSearchKeyword -> state.copy(searchKeyword = reduce.searchKeyword)
     }
   }
@@ -76,18 +63,20 @@ class AddTemplateViewModel @Inject constructor(
     val name = checkNotNull(savedStateHandle.get<String>(nameKey))
     updateState(AddTemplateReduce.UpdateName(name))
 
-    val foodList = foodRepository.getAllFood()
-    val foodMap = foodList.associate { it.asUI() to FoodStatus.DEFAULT }
-    updateState(AddTemplateReduce.UpdateFoodMap(foodMap))
+    val foodList = foodRepository.getAllFood().map { it.asUI() }
+    val foodItemList = foodList.map { FoodItem(food = it, status = FoodItem.Status.DEFAULT) }
+    updateState(AddTemplateReduce.UpdateFoodItemList(foodItemList))
   }
 
   private suspend fun addTemplate() {
     val userId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
+    val likedFoodIds = currentState.foodItemList.filter { it.status == FoodItem.Status.LIKE }.map { it.food.id }
+    val dislikedFoodIds = currentState.foodItemList.filter { it.status == FoodItem.Status.DISLIKE }.map { it.food.id }
     val template = TemplateUIModel(
       userId = userId,
       name = currentState.name,
-      likedFoodIds = currentState.likedFoods.map { it.name },
-      dislikedFoodIds = currentState.dislikedFoods.map { it.name },
+      likedFoodIds = likedFoodIds,
+      dislikedFoodIds = dislikedFoodIds,
     )
 
     templateRepository.addTemplate(template.asDomain())

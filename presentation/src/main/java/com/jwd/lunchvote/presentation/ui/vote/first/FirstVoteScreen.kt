@@ -39,7 +39,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
-import com.jwd.lunchvote.presentation.model.FoodStatus
+import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteDialog
@@ -150,8 +150,8 @@ private fun FirstVotingScreen(
     verticalArrangement = Arrangement.spacedBy(16.dp)
   ) {
     FirstVoteInformationRow(
-      like = state.likedFoods.size,
-      dislike = state.dislikedFoods.size,
+      like = state.foodItemList.count { it.status == FoodItem.Status.LIKE },
+      dislike = state.foodItemList.count { it.status == FoodItem.Status.DISLIKE },
       memberList = state.memberList,
       modifier = Modifier.fillMaxWidth()
     )
@@ -170,20 +170,19 @@ private fun FirstVotingScreen(
       verticalArrangement = Arrangement.spacedBy(8.dp),
       horizontalArrangement = Arrangement.SpaceBetween
     ) {
-      val filteredFoodList = state.foodMap.keys.filter { it.name.contains(state.searchKeyword) }
+      val filteredFoodList = state.foodItemList.filter { it.food.name.contains(state.searchKeyword) }
 
-      items(filteredFoodList) {food ->
+      items(filteredFoodList) { foodItem ->
         FoodItem(
-          food = food,
-          status = state.foodMap[food] ?: FoodStatus.DEFAULT,
-          onClick = { onEvent(FirstVoteEvent.OnClickFood(food)) }
+          foodItem = foodItem,
+          onClick = { onEvent(FirstVoteEvent.OnClickFoodItem(foodItem)) }
         )
       }
     }
     Button(
       onClick = { onEvent(FirstVoteEvent.OnClickFinishButton) },
       modifier = Modifier.align(Alignment.CenterHorizontally),
-      enabled = state.likedFoods.isNotEmpty() || state.dislikedFoods.isNotEmpty()
+      enabled = state.foodItemList.any { it.status != FoodItem.Status.DEFAULT }
     ) {
       Text(text = stringResource(R.string.first_vote_finish_button))
     }
