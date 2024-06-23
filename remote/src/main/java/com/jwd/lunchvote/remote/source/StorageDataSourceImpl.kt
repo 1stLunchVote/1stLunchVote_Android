@@ -2,11 +2,17 @@ package com.jwd.lunchvote.remote.source
 
 import com.google.firebase.storage.FirebaseStorage
 import com.jwd.lunchvote.data.source.remote.StorageDataSource
+import com.jwd.lunchvote.remote.source.StorageDataSourceImpl.Companion.STORAGE_REFERENCE_PROFILE
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import java.io.File
 import javax.inject.Inject
 
 class StorageDataSourceImpl @Inject constructor(
-  private val storage: FirebaseStorage
+  private val storage: FirebaseStorage,
+  private val dispatcher: CoroutineDispatcher
 ) : StorageDataSource {
 
   companion object {
@@ -27,12 +33,15 @@ class StorageDataSourceImpl @Inject constructor(
   }
 
   override suspend fun getFoodImage(foodName: String): ByteArray =
-    storage
-      .reference
-      .child(STORAGE_REFERENCE_FOOD)
-      .child(foodName)
-      .getBytes(1024 * 1024)
-      .await()
+    withContext(dispatcher) {
+      storage
+        .reference
+        .child(STORAGE_REFERENCE_FOOD)
+        .child(foodName)
+        .getBytes(2048 * 2048)
+        .await()
+    }
+
 
   override suspend fun uploadProfileImage(
     userId: String,

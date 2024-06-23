@@ -9,6 +9,7 @@ import com.jwd.lunchvote.remote.mapper.asRemote
 import com.jwd.lunchvote.remote.model.FoodRemote
 import kotlinx.coroutines.tasks.await
 import kr.co.inbody.config.error.FoodError
+import java.io.File
 import javax.inject.Inject
 
 class FoodDataSourceImpl @Inject constructor(

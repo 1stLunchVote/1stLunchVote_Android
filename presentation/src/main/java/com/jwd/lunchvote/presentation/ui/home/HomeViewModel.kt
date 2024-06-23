@@ -139,5 +139,8 @@ class HomeViewModel @Inject constructor(
     )
 
     createFood(food.asDomain())
+    
+    updateState(HomeReduce.UpdateFoodName(null))
+    updateState(HomeReduce.UpdateFoodImageUri(null))
   }
 }
