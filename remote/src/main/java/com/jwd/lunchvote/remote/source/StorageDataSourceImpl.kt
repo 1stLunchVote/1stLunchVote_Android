@@ -10,8 +10,29 @@ class StorageDataSourceImpl @Inject constructor(
 ) : StorageDataSource {
 
   companion object {
+    const val STORAGE_REFERENCE_FOOD = "Food"
     const val STORAGE_REFERENCE_PROFILE = "Profile"
   }
+
+  override suspend fun uploadFoodImage(
+    foodName: String,
+    image: ByteArray
+  ) {
+    storage
+      .reference
+      .child(STORAGE_REFERENCE_FOOD)
+      .child(foodName)
+      .putBytes(image)
+      .await()
+  }
+
+  override suspend fun getFoodImage(foodName: String): ByteArray =
+    storage
+      .reference
+      .child(STORAGE_REFERENCE_FOOD)
+      .child(foodName)
+      .getBytes(1024 * 1024)
+      .await()
 
   override suspend fun uploadProfileImage(
     userId: String,
