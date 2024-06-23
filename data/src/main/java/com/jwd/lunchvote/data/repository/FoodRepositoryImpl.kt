@@ -15,7 +15,4 @@ class FoodRepositoryImpl @Inject constructor(
 
   override suspend fun getFoodById(id: String): Food =
     foodDataSource.getFoodById(id).asDomain()
-
-  override suspend fun getFoodTrend(): Pair<Food, Float> =
-    foodDataSource.getFoodTrend().let { (food, trend) -> food.asDomain() to trend }
 }

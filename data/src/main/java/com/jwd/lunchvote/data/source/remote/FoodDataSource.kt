@@ -6,5 +6,4 @@ interface FoodDataSource {
 
   suspend fun getAllFood(): List<FoodData>
   suspend fun getFoodById(id: String): FoodData
-  suspend fun getFoodTrend(): Pair<FoodData, Float>
 }

@@ -41,16 +41,4 @@ class FoodDataSourceImpl @Inject constructor(
       .await()
       .toObject(FoodRemote::class.java)
       ?.asData(id) ?: throw FoodError.NoFood
-
-  // TODO: 임시
-  override suspend fun getFoodTrend(): Pair<FoodData, Float> =
-    fireStore
-      .collection(COLLECTION_FOOD)
-      .get()
-      .await()
-      .documents
-      .firstNotNullOf {
-        it.toObject(FoodRemote::class.java)
-          ?.asData(it.id)
-      } to 36f
 }

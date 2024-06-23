@@ -8,14 +8,12 @@ private object FoodRemoteMapper: BiMapper<FoodRemote, FoodData> {
   override fun mapToRight(from: FoodRemote): FoodData =
     FoodData(
       id = "",
-      name = from.name,
-      image = from.image
+      name = from.name
     )
 
   override fun mapToLeft(from: FoodData): FoodRemote =
     FoodRemote(
-      name = from.name,
-      image = from.image
+      name = from.name
     )
 }
 
