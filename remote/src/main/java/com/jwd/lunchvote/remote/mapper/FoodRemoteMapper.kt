@@ -8,8 +8,7 @@ private object FoodRemoteMapper: BiMapper<FoodRemote, FoodData> {
   override fun mapToRight(from: FoodRemote): FoodData =
     FoodData(
       id = "",
-      name = from.name,
-      image = byteArrayOf()
+      name = from.name
     )
 
   override fun mapToLeft(from: FoodData): FoodRemote =
@@ -21,5 +20,5 @@ private object FoodRemoteMapper: BiMapper<FoodRemote, FoodData> {
 internal fun FoodData.asRemote(): FoodRemote =
   FoodRemoteMapper.mapToLeft(this)
 
-internal fun FoodRemote.asData(id: String, image: ByteArray): FoodData =
-  FoodRemoteMapper.mapToRight(this).copy(id = id, image = image)
+internal fun FoodRemote.asData(id: String): FoodData =
+  FoodRemoteMapper.mapToRight(this).copy(id = id)

@@ -4,10 +4,12 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.os.Environment
 import android.os.Parcelable
+import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.LoungeRepository
+import com.jwd.lunchvote.domain.repository.StorageRepository
 import com.jwd.lunchvote.domain.usecase.CreateFood
 import com.jwd.lunchvote.domain.usecase.GetFoodTrend
 import com.jwd.lunchvote.presentation.R
@@ -32,6 +34,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+  private val storageRepository: StorageRepository,
   private val loungeRepository: LoungeRepository,
   private val getFoodTrend: GetFoodTrend,
   savedStateHandle: SavedStateHandle,
@@ -86,6 +89,7 @@ class HomeViewModel @Inject constructor(
   override fun reduceState(state: HomeState, reduce: HomeReduce): HomeState {
     return when(reduce) {
       is HomeReduce.UpdateFoodTrend -> state.copy(foodTrend = reduce.foodTrend)
+      is HomeReduce.UpdateFoodTrendImageUri -> state.copy(foodTrendImageUri = reduce.foodTrendImageUri)
       is HomeReduce.UpdateFoodTrendRatio -> state.copy(foodTrendRatio = reduce.foodTrendRatio)
       is HomeReduce.UpdateLoungeId -> state.copy(loungeId = reduce.loungeId)
 
@@ -101,8 +105,10 @@ class HomeViewModel @Inject constructor(
 
   private suspend fun initialize() {
     val (foodTrend, foodTrendRatio) = getFoodTrend()
+    val foodTrendImageUri = storageRepository.getFoodImageUri(foodTrend.name).toUri()
 
     updateState(HomeReduce.UpdateFoodTrend(foodTrend.asUI()))
+    updateState(HomeReduce.UpdateFoodTrendImageUri(foodTrendImageUri))
     updateState(HomeReduce.UpdateFoodTrendRatio(foodTrendRatio))
   }
 
@@ -134,11 +140,10 @@ class HomeViewModel @Inject constructor(
     val imageByteArray = file.readBytes()
     val food = FoodUIModel(
       id = UUID.randomUUID().toString(),
-      name = currentState.foodName ?: return,
-      image = imageByteArray
+      name = currentState.foodName ?: return
     )
 
-    createFood(food.asDomain())
+    createFood(food.asDomain(), imageByteArray)
     
     updateState(HomeReduce.UpdateFoodName(null))
     updateState(HomeReduce.UpdateFoodImageUri(null))

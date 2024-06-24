@@ -1,5 +1,6 @@
 package com.jwd.lunchvote.presentation.widget
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -50,7 +51,7 @@ fun FoodItem(
       modifier = if (foodItem.status == FoodItem.Status.DISLIKE) Modifier.alpha(0.5f) else Modifier
     ) {
       CoilImage(
-        imageModel = { foodItem.food.image },
+        imageModel = { foodItem.imageUri },
         modifier = Modifier
           .size(100.dp)
           .let {
@@ -105,6 +106,7 @@ fun FoodItemDefaultPreview() {
           food = FoodUIModel(
             name = "햄버거"
           ),
+          imageUri = Uri.EMPTY,
           status = FoodItem.Status.DEFAULT
         ),
         onClick = {}
@@ -114,6 +116,7 @@ fun FoodItemDefaultPreview() {
           food = FoodUIModel(
             name = "햄버거"
           ),
+          imageUri = Uri.EMPTY,
           status = FoodItem.Status.LIKE
         ),
         onClick = {}
@@ -123,6 +126,7 @@ fun FoodItemDefaultPreview() {
           food = FoodUIModel(
             name = "햄버거"
           ),
+          imageUri = Uri.EMPTY,
           status = FoodItem.Status.DISLIKE
         ),
         onClick = {}

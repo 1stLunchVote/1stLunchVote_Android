@@ -1,5 +1,6 @@
 package com.jwd.lunchvote.remote.source
 
+import android.net.Uri
 import com.google.firebase.storage.FirebaseStorage
 import com.jwd.lunchvote.data.source.remote.StorageDataSource
 import com.jwd.lunchvote.remote.source.StorageDataSourceImpl.Companion.STORAGE_REFERENCE_PROFILE
@@ -24,22 +25,27 @@ class StorageDataSourceImpl @Inject constructor(
     foodName: String,
     image: ByteArray
   ) {
-    storage
-      .reference
-      .child(STORAGE_REFERENCE_FOOD)
-      .child(foodName)
-      .putBytes(image)
-      .await()
-  }
-
-  override suspend fun getFoodImage(foodName: String): ByteArray =
     withContext(dispatcher) {
       storage
         .reference
         .child(STORAGE_REFERENCE_FOOD)
         .child(foodName)
-        .getBytes(2048 * 2048)
+        .putBytes(image)
         .await()
+    }
+  }
+
+  override suspend fun getFoodImageUri(
+    foodName: String
+  ): String =
+    withContext(dispatcher) {
+      storage
+        .reference
+        .child(STORAGE_REFERENCE_FOOD)
+        .child(foodName)
+        .downloadUrl
+        .await()
+        .toString()
     }
 
 
@@ -47,14 +53,16 @@ class StorageDataSourceImpl @Inject constructor(
     userId: String,
     image: ByteArray
   ): String =
-    storage
-      .reference
-      .child(STORAGE_REFERENCE_PROFILE)
-      .child(userId)
-      .putBytes(image)
-      .await()
-      .storage
-      .downloadUrl
-      .await()
-      .toString()
+    withContext(dispatcher) {
+      storage
+        .reference
+        .child(STORAGE_REFERENCE_PROFILE)
+        .child(userId)
+        .putBytes(image)
+        .await()
+        .storage
+        .downloadUrl
+        .await()
+        .toString()
+    }
 }

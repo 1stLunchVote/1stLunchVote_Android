@@ -1,6 +1,7 @@
 package com.jwd.lunchvote.presentation.ui.template.edit_template
 
 import android.content.Context
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -270,6 +271,7 @@ private fun Preview() {
         foodItemList = List(10) {
           FoodItem(
             food = FoodUIModel(name = "${it}번째 음식"),
+            imageUri = Uri.EMPTY,
             status = FoodItem.Status.DEFAULT
           )
         },

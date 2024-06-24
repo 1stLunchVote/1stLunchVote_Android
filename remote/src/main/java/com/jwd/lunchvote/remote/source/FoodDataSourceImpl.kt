@@ -3,18 +3,15 @@ package com.jwd.lunchvote.remote.source
 import com.google.firebase.firestore.FirebaseFirestore
 import com.jwd.lunchvote.data.model.FoodData
 import com.jwd.lunchvote.data.source.remote.FoodDataSource
-import com.jwd.lunchvote.data.source.remote.StorageDataSource
 import com.jwd.lunchvote.remote.mapper.asData
 import com.jwd.lunchvote.remote.mapper.asRemote
 import com.jwd.lunchvote.remote.model.FoodRemote
 import kotlinx.coroutines.tasks.await
 import kr.co.inbody.config.error.FoodError
-import java.io.File
 import javax.inject.Inject
 
 class FoodDataSourceImpl @Inject constructor(
-  private val fireStore: FirebaseFirestore,
-  private val storageDataSource: StorageDataSource
+  private val fireStore: FirebaseFirestore
 ) : FoodDataSource {
 
   companion object {
@@ -37,11 +34,7 @@ class FoodDataSourceImpl @Inject constructor(
       .await()
       .documents
       .mapNotNull {
-        it.toObject(FoodRemote::class.java)
-          ?.let { food ->
-            val image = storageDataSource.getFoodImage(food.name)
-            food.asData(it.id, image)
-          } ?: throw FoodError.NoFood
+        it.toObject(FoodRemote::class.java)?.asData(it.id)
       }
 
   override suspend fun getFoodById(
@@ -53,8 +46,5 @@ class FoodDataSourceImpl @Inject constructor(
       .get()
       .await()
       .toObject(FoodRemote::class.java)
-      ?.let {
-        val image = storageDataSource.getFoodImage(it.name)
-        it.asData(id, image)
-      } ?: throw FoodError.NoFood
+      ?.asData(id) ?: throw FoodError.NoFood
 }

@@ -1,6 +1,7 @@
 package com.jwd.lunchvote.presentation.ui.vote.result
 
 import android.content.Context
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -100,6 +101,7 @@ private fun VoteResultScreen(
       Gap(height = 8.dp)
       VoteResultImage(
         food = state.food,
+        foodImageUri = state.foodImageUri,
         voteRatio = state.voteRatio,
         modifier = Modifier.size(156.dp)
       )
@@ -123,6 +125,7 @@ private fun VoteResultScreen(
 @Composable
 private fun VoteResultImage(
   food: FoodUIModel,
+  foodImageUri: Uri,
   voteRatio: Float,
   modifier: Modifier = Modifier
 ) {
@@ -131,7 +134,7 @@ private fun VoteResultImage(
     contentAlignment = Alignment.Center
   ) {
     CoilImage(
-      imageModel = { food.image },
+      imageModel = { foodImageUri },
       modifier = Modifier.size(156.dp),
       imageOptions = ImageOptions(
         contentScale = ContentScale.Crop

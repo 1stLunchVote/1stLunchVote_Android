@@ -1,11 +1,13 @@
 package com.jwd.lunchvote.presentation.ui.template.add_template
 
 import android.os.Parcelable
+import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.FoodRepository
+import com.jwd.lunchvote.domain.repository.StorageRepository
 import com.jwd.lunchvote.domain.repository.TemplateRepository
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
@@ -25,6 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AddTemplateViewModel @Inject constructor(
   private val foodRepository: FoodRepository,
+  private val storageRepository: StorageRepository,
   private val templateRepository: TemplateRepository,
   private val savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<AddTemplateState, AddTemplateEvent, AddTemplateReduce, AddTemplateSideEffect>(savedStateHandle){
@@ -61,10 +64,18 @@ class AddTemplateViewModel @Inject constructor(
   private suspend fun initialize() {
     val nameKey = LunchVoteNavRoute.AddTemplate.arguments.first().name
     val name = checkNotNull(savedStateHandle.get<String>(nameKey))
+
     updateState(AddTemplateReduce.UpdateName(name))
 
-    val foodList = foodRepository.getAllFood().map { it.asUI() }
-    val foodItemList = foodList.map { FoodItem(food = it, status = FoodItem.Status.DEFAULT) }
+    val foodItemList = foodRepository.getAllFood().map { food ->
+      val imageUri = storageRepository.getFoodImageUri(food.id).toUri()
+      FoodItem(
+        food = food.asUI(),
+        imageUri = imageUri,
+        status = FoodItem.Status.DEFAULT
+      )
+    }
+
     updateState(AddTemplateReduce.UpdateFoodItemList(foodItemList))
   }
 

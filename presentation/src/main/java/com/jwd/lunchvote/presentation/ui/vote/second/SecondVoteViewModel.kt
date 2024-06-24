@@ -1,6 +1,7 @@
 package com.jwd.lunchvote.presentation.ui.vote.second
 
 import android.os.Parcelable
+import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
@@ -12,6 +13,7 @@ import com.jwd.lunchvote.domain.repository.BallotRepository
 import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
+import com.jwd.lunchvote.domain.repository.StorageRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.repository.VoteResultRepository
 import com.jwd.lunchvote.domain.usecase.CalculateSecondVote
@@ -20,6 +22,7 @@ import com.jwd.lunchvote.domain.usecase.FinishVote
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
+import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.SecondBallotUIModel
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
@@ -48,6 +51,7 @@ class SecondVoteViewModel @Inject constructor(
   private val memberRepository: MemberRepository,
   private val voteResultRepository: VoteResultRepository,
   private val foodRepository: FoodRepository,
+  private val storageRepository: StorageRepository,
   private val ballotRepository: BallotRepository,
   private val calculateSecondVote: CalculateSecondVote,
   private val finishVote: FinishVote,
@@ -78,11 +82,11 @@ class SecondVoteViewModel @Inject constructor(
       is SecondVoteEvent.ScreenInitialize -> launch { initialize() }
 
       is SecondVoteEvent.OnClickBackButton -> setDialogState(SecondVoteDialog.ExitDialog)
-      is SecondVoteEvent.OnClickFood -> {
-        if (currentState.selectedFood == event.food) {
-          updateState(SecondVoteReduce.UpdateSelectedFood(null))
+      is SecondVoteEvent.OnClickFoodItem -> {
+        if (currentState.selectedFoodItem == event.foodItem) {
+          updateState(SecondVoteReduce.UpdateSelectedFoodItem(null))
         } else {
-          updateState(SecondVoteReduce.UpdateSelectedFood(event.food))
+          updateState(SecondVoteReduce.UpdateSelectedFoodItem(event.foodItem))
         }
       }
       is SecondVoteEvent.OnClickFinishButton -> launch(false) { finishVote() }
@@ -101,8 +105,8 @@ class SecondVoteViewModel @Inject constructor(
       is SecondVoteReduce.UpdateUser -> state.copy(user = reduce.user)
       is SecondVoteReduce.UpdateLounge -> state.copy(lounge = reduce.lounge)
       is SecondVoteReduce.UpdateMemberList -> state.copy(memberList = reduce.memberList)
-      is SecondVoteReduce.UpdateFoodList -> state.copy(foodList = reduce.foodList)
-      is SecondVoteReduce.UpdateSelectedFood -> state.copy(selectedFood = reduce.food)
+      is SecondVoteReduce.UpdateFoodItemList -> state.copy(foodItemList = reduce.foodItemList)
+      is SecondVoteReduce.UpdateSelectedFoodItem -> state.copy(selectedFoodItem = reduce.foodItem)
       is SecondVoteReduce.UpdateFinished -> state.copy(finished = reduce.finished)
       is SecondVoteReduce.UpdateCalculating -> state.copy(calculating = reduce.calculating)
     }
@@ -126,8 +130,16 @@ class SecondVoteViewModel @Inject constructor(
     memberListFlow = launch { collectMemberList(lounge.id) }
 
     val firstVoteResult = voteResultRepository.getFirstVoteResultByLoungeId(loungeId)
-    val foodList = firstVoteResult.foodIds.map { id -> foodRepository.getFoodById(id).asUI() }
-    updateState(SecondVoteReduce.UpdateFoodList(foodList))
+    val foodItemList = firstVoteResult.foodIds.map { id ->
+      val food = foodRepository.getFoodById(id).asUI()
+      val imageUri = storageRepository.getFoodImageUri(food.name).toUri()
+      FoodItem(
+        food = food,
+        imageUri = imageUri,
+        status = FoodItem.Status.DEFAULT
+      )
+    }
+    updateState(SecondVoteReduce.UpdateFoodItemList(foodItemList))
   }
 
   private suspend fun collectMemberList(loungeId: String) {
@@ -168,13 +180,13 @@ class SecondVoteViewModel @Inject constructor(
   }
 
   private suspend fun submitVote() {
-    if (currentState.selectedFood != null) {
+    if (currentState.selectedFoodItem != null) {
       updateState(SecondVoteReduce.UpdateCalculating(true))
 
       val ballot = SecondBallotUIModel(
         loungeId = currentState.lounge.id,
         userId = currentState.user.id,
-        foodId = currentState.selectedFood!!.id
+        foodId = currentState.selectedFoodItem!!.food.id
       )
       ballotRepository.submitSecondBallot(ballot.asDomain())
 

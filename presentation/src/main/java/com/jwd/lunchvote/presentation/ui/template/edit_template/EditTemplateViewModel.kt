@@ -1,10 +1,12 @@
 package com.jwd.lunchvote.presentation.ui.template.edit_template
 
 import android.os.Parcelable
+import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.FoodRepository
+import com.jwd.lunchvote.domain.repository.StorageRepository
 import com.jwd.lunchvote.domain.repository.TemplateRepository
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
@@ -27,6 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class EditTemplateViewModel @Inject constructor(
   private val foodRepository: FoodRepository,
+  private val storageRepository: StorageRepository,
   private val templateRepository: TemplateRepository,
   private val savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<EditTemplateState, EditTemplateEvent, EditTemplateReduce, EditTemplateSideEffect>(savedStateHandle){
@@ -80,18 +83,19 @@ class EditTemplateViewModel @Inject constructor(
     val templateId = checkNotNull(savedStateHandle.get<String>(templateIdKey))
     val template = templateRepository.getTemplateById(templateId).asUI()
 
-    val foodList = foodRepository.getAllFood().map { it.asUI() }
-    val foodItemList = foodList.map {
+    val foodItemList = foodRepository.getAllFood().map { food ->
+      val imageUri = storageRepository.getFoodImageUri(food.name).toUri()
       FoodItem(
-        food = it,
-        status = when(it.id) {
+        food = food.asUI(),
+        imageUri = imageUri,
+        status = when(food.id) {
           in template.likedFoodIds -> FoodItem.Status.LIKE
           in template.dislikedFoodIds -> FoodItem.Status.DISLIKE
           else -> FoodItem.Status.DEFAULT
         }
       )
     }
-    
+
     updateState(EditTemplateReduce.UpdateTemplate(template))
     updateState(EditTemplateReduce.UpdateFoodItemList(foodItemList))
   }

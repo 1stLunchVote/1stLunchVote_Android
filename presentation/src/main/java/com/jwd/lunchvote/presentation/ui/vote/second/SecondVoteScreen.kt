@@ -1,6 +1,7 @@
 package com.jwd.lunchvote.presentation.ui.vote.second
 
 import android.content.Context
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -37,6 +38,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.UserUIModel
@@ -140,11 +142,11 @@ private fun SecondVotingScreen(
       memberList = state.memberList,
       modifier = Modifier.fillMaxWidth()
     )
-    SecondVotePaper(
+    SecondVoteBallot(
       userName = state.user.name,
-      foodList = state.foodList,
-      selectedFood = state.selectedFood ?: FoodUIModel(),
-      onClickFood = { onEvent(SecondVoteEvent.OnClickFood(it)) },
+      foodItemList = state.foodItemList,
+      selectedFoodItem = state.selectedFoodItem,
+      onClickFoodItem = { onEvent(SecondVoteEvent.OnClickFoodItem(it)) },
       modifier = Modifier
         .weight(1f)
         .fillMaxWidth()
@@ -152,7 +154,7 @@ private fun SecondVotingScreen(
     Button(
       onClick = { onEvent(SecondVoteEvent.OnClickFinishButton) },
       modifier = Modifier.align(Alignment.CenterHorizontally),
-      enabled = state.selectedFood != null
+      enabled = state.selectedFoodItem != null
     ) {
       Text(text = stringResource(R.string.second_vote_finish_button))
     }
@@ -173,12 +175,12 @@ private fun SecondVoteInformationRow(
 }
 
 @Composable
-private fun SecondVotePaper(
+private fun SecondVoteBallot(
   userName: String,
-  foodList: List<FoodUIModel>,
-  selectedFood: FoodUIModel,
+  foodItemList: List<FoodItem>,
+  selectedFoodItem: FoodItem?,
   modifier: Modifier = Modifier,
-  onClickFood: (FoodUIModel) -> Unit = {}
+  onClickFoodItem: (FoodItem) -> Unit = {}
 ) {
   Column(
     modifier = modifier
@@ -196,12 +198,12 @@ private fun SecondVotePaper(
       modifier = Modifier.fillMaxWidth(),
       verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-      foodList.forEach { food ->
+      foodItemList.forEach { foodItem ->
         SecondVoteTile(
-          food = food,
-          selected = selectedFood == food,
+          foodItem = foodItem,
+          selected = selectedFoodItem == foodItem,
           modifier = Modifier.fillMaxWidth(),
-          onClick = { onClickFood(food) }
+          onClick = { onClickFoodItem(foodItem) }
         )
       }
     }
@@ -210,7 +212,7 @@ private fun SecondVotePaper(
 
 @Composable
 private fun SecondVoteTile(
-  food: FoodUIModel,
+  foodItem: FoodItem,
   selected: Boolean,
   modifier: Modifier = Modifier,
   onClick: () -> Unit = {}
@@ -223,7 +225,7 @@ private fun SecondVoteTile(
     verticalAlignment = Alignment.CenterVertically
   ) {
     CoilImage(
-      imageModel = { food.image },
+      imageModel = { foodItem.imageUri },
       modifier = Modifier.size(80.dp),
       imageOptions = ImageOptions(
         contentScale = ContentScale.Crop
@@ -234,7 +236,7 @@ private fun SecondVoteTile(
       color = MaterialTheme.colorScheme.outline
     )
     Text(
-      text = food.name,
+      text = foodItem.food.name,
       style = MaterialTheme.typography.titleMedium,
       modifier = Modifier
         .weight(1f)
@@ -335,12 +337,18 @@ private fun Preview() {
           MemberUIModel(status = MemberUIModel.Status.VOTED),
           MemberUIModel(status = MemberUIModel.Status.VOTING)
         ),
-        foodList = List(5) { FoodUIModel(
-          name = "음식 $it",
-        ) },
-        selectedFood = FoodUIModel(
-          name = "음식 2"
-        ),
+        foodItemList = List(5) {
+          FoodItem(
+            food = FoodUIModel(name = "음식 $it"),
+            imageUri = Uri.EMPTY,
+            status = FoodItem.Status.DEFAULT
+          )
+        },
+        selectedFoodItem = FoodItem(
+          food = FoodUIModel(name = "음식 2"),
+          imageUri = Uri.EMPTY,
+          status = FoodItem.Status.DEFAULT
+        )
       )
     )
   }

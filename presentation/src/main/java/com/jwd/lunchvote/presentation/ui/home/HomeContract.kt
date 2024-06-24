@@ -13,6 +13,7 @@ class HomeContract {
   @Parcelize
   data class HomeState(
     val foodTrend: FoodUIModel? = null,
+    val foodTrendImageUri: Uri? = null,
     val foodTrendRatio: Float = 0f,
     val loungeId: String? = null,
 
@@ -45,6 +46,7 @@ class HomeContract {
 
   sealed interface HomeReduce : ViewModelContract.Reduce {
     data class UpdateFoodTrend(val foodTrend: FoodUIModel) : HomeReduce
+    data class UpdateFoodTrendImageUri(val foodTrendImageUri: Uri) : HomeReduce
     data class UpdateFoodTrendRatio(val foodTrendRatio: Float) : HomeReduce
     data class UpdateLoungeId(val loungeId: String?) : HomeReduce
 

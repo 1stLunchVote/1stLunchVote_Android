@@ -12,8 +12,8 @@ class StorageRepositoryImpl @Inject constructor(
     storageDataSource.uploadFoodImage(foodName, image)
   }
 
-  override suspend fun getFoodImage(foodName: String): ByteArray =
-    storageDataSource.getFoodImage(foodName)
+  override suspend fun getFoodImageUri(foodName: String): String =
+    storageDataSource.getFoodImageUri(foodName)
 
   override suspend fun uploadProfileImage(userId: String, image: ByteArray): String =
     storageDataSource.uploadProfileImage(userId, image)
