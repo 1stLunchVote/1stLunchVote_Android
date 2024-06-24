@@ -57,7 +57,6 @@ import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeEvent
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeSideEffect
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
-import com.jwd.lunchvote.presentation.util.UiText
 import com.jwd.lunchvote.presentation.widget.ChatBubble
 import com.jwd.lunchvote.presentation.widget.EmptyProfile
 import com.jwd.lunchvote.presentation.widget.InviteProfile

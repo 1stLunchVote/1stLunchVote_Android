@@ -1,6 +1,5 @@
 package com.jwd.lunchvote.presentation.widget
 
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -106,7 +105,6 @@ fun FoodItemDefaultPreview() {
           food = FoodUIModel(
             name = "햄버거"
           ),
-          imageUri = Uri.EMPTY,
           status = FoodItem.Status.DEFAULT
         ),
         onClick = {}
@@ -116,7 +114,6 @@ fun FoodItemDefaultPreview() {
           food = FoodUIModel(
             name = "햄버거"
           ),
-          imageUri = Uri.EMPTY,
           status = FoodItem.Status.LIKE
         ),
         onClick = {}
@@ -126,7 +123,6 @@ fun FoodItemDefaultPreview() {
           food = FoodUIModel(
             name = "햄버거"
           ),
-          imageUri = Uri.EMPTY,
           status = FoodItem.Status.DISLIKE
         ),
         onClick = {}

@@ -1,7 +1,6 @@
 package com.jwd.lunchvote.presentation.ui.template.add_template
 
 import android.content.Context
-import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -175,9 +174,7 @@ private fun Preview() {
         name = "학생회 회식 대표 메뉴",
         foodItemList = List(10) {
           FoodItem(
-            food = FoodUIModel(name = "${it}번째 음식"),
-            imageUri = Uri.EMPTY,
-            status = FoodItem.Status.DEFAULT
+            food = FoodUIModel(name = "${it}번째 음식")
           )
         }
       )

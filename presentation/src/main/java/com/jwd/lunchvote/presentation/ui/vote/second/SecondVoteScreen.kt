@@ -1,7 +1,6 @@
 package com.jwd.lunchvote.presentation.ui.vote.second
 
 import android.content.Context
-import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -339,15 +338,11 @@ private fun Preview() {
         ),
         foodItemList = List(5) {
           FoodItem(
-            food = FoodUIModel(name = "음식 $it"),
-            imageUri = Uri.EMPTY,
-            status = FoodItem.Status.DEFAULT
+            food = FoodUIModel(name = "음식 $it")
           )
         },
         selectedFoodItem = FoodItem(
-          food = FoodUIModel(name = "음식 2"),
-          imageUri = Uri.EMPTY,
-          status = FoodItem.Status.DEFAULT
+          food = FoodUIModel(name = "음식 2")
         )
       )
     )

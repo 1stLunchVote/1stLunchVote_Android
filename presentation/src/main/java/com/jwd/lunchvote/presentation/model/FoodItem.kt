@@ -6,9 +6,9 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class FoodItem(
-  val food: FoodUIModel,
-  val imageUri: Uri,
-  val status: Status
+  val food: FoodUIModel = FoodUIModel(),
+  val imageUri: Uri = Uri.EMPTY,
+  val status: Status = Status.DEFAULT
 ) : Parcelable {
 
   enum class Status {
