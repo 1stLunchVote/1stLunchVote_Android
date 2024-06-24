@@ -136,8 +136,7 @@ class FirstVoteViewModel @Inject constructor(
       val imageUri = storageRepository.getFoodImageUri(food.name).toUri()
       FoodItem(
         food = food.asUI(),
-        imageUri = imageUri,
-        status = FoodItem.Status.DEFAULT
+        imageUri = imageUri
       )
     }
     updateState(FirstVoteReduce.UpdateFoodItemList(foodItemList))

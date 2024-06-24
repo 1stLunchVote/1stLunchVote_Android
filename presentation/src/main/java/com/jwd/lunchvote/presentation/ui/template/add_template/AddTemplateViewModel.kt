@@ -71,8 +71,7 @@ class AddTemplateViewModel @Inject constructor(
       val imageUri = storageRepository.getFoodImageUri(food.id).toUri()
       FoodItem(
         food = food.asUI(),
-        imageUri = imageUri,
-        status = FoodItem.Status.DEFAULT
+        imageUri = imageUri
       )
     }
 

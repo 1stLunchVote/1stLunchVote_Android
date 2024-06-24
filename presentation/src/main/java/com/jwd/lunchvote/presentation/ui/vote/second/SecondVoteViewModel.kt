@@ -135,8 +135,7 @@ class SecondVoteViewModel @Inject constructor(
       val imageUri = storageRepository.getFoodImageUri(food.name).toUri()
       FoodItem(
         food = food,
-        imageUri = imageUri,
-        status = FoodItem.Status.DEFAULT
+        imageUri = imageUri
       )
     }
     updateState(SecondVoteReduce.UpdateFoodItemList(foodItemList))
