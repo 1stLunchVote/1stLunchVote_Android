@@ -28,11 +28,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
-import com.jwd.lunchvote.presentation.model.FoodStatus
+import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateEvent
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateSideEffect
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateState
+import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.FoodItem
 import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
@@ -41,14 +42,15 @@ import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.TextFieldType
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun AddTemplateRoute(
   popBackStack: () -> Unit,
-  showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: AddTemplateViewModel = hiltViewModel(),
+  snackbarChannel: Channel<String> = LocalSnackbarChannel.current,
   context: Context = LocalContext.current
 ){
   val state by viewModel.viewState.collectAsStateWithLifecycle()
@@ -58,7 +60,7 @@ fun AddTemplateRoute(
     viewModel.sideEffect.collectLatest {
       when(it){
         is AddTemplateSideEffect.PopBackStack -> popBackStack()
-        is AddTemplateSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
+        is AddTemplateSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }
@@ -98,8 +100,8 @@ private fun AddTemplateScreen(
     ) {
       TemplateTitle(
         name = state.name,
-        like = state.likedFoods.size,
-        dislike = state.dislikedFoods.size,
+        like = state.foodItemList.count { it.status == FoodItem.Status.LIKE },
+        dislike = state.foodItemList.count { it.status == FoodItem.Status.DISLIKE },
         modifier = Modifier.fillMaxWidth()
       )
       LunchVoteTextField(
@@ -117,20 +119,19 @@ private fun AddTemplateScreen(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
       ) {
-        val filteredFoodList = state.foodMap.keys.filter { it.name.contains(state.searchKeyword) }
+        val filteredFoodList = state.foodItemList.filter { it.food.name.contains(state.searchKeyword) }
 
-        items(filteredFoodList) {food ->
+        items(filteredFoodList) { foodItem ->
           FoodItem(
-            food = food,
-            status = state.foodMap[food] ?: FoodStatus.DEFAULT,
-            onClick = { onEvent(AddTemplateEvent.OnClickFood(food)) }
+            foodItem = foodItem,
+            onClick = { onEvent(AddTemplateEvent.OnClickFoodItem(foodItem)) }
           )
         }
       }
       Button(
         onClick = { onEvent(AddTemplateEvent.OnClickAddButton) },
         modifier = Modifier.align(CenterHorizontally),
-        enabled = state.likedFoods.isNotEmpty() || state.dislikedFoods.isNotEmpty()
+        enabled = state.foodItemList.any { it.status != FoodItem.Status.DEFAULT }
       ) {
         Text(text = stringResource(R.string.add_template_add_button))
       }
@@ -171,11 +172,11 @@ private fun Preview() {
     AddTemplateScreen(
       AddTemplateState(
         name = "학생회 회식 대표 메뉴",
-        foodMap = mapOf(
-          FoodUIModel(name = "음식명") to FoodStatus.DEFAULT,
-          FoodUIModel(name = "음식명") to FoodStatus.DEFAULT,
-          FoodUIModel(name = "음식명") to FoodStatus.DEFAULT,
-        )
+        foodItemList = List(10) {
+          FoodItem(
+            food = FoodUIModel(name = "${it}번째 음식")
+          )
+        }
       )
     )
   }

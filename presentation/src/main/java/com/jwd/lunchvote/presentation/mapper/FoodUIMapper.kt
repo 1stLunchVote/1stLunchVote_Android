@@ -8,15 +8,13 @@ private object FoodUIMapper : BiMapper<FoodUIModel, Food> {
   override fun mapToRight(from: FoodUIModel): Food =
     Food(
       id = from.id,
-      name = from.name,
-      image = from.image
+      name = from.name
     )
 
   override fun mapToLeft(from: Food): FoodUIModel =
     FoodUIModel(
       id = from.id,
-      name = from.name,
-      image = from.image
+      name = from.name
     )
 }
 

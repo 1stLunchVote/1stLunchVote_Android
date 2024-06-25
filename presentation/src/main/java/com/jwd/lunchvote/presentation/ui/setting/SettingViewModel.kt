@@ -29,10 +29,10 @@ class SettingViewModel @Inject constructor(
 
       is SettingEvent.OnClickBackButton -> sendSideEffect(SettingSideEffect.PopBackStack)
       is SettingEvent.OnClickProfileButton -> sendSideEffect(SettingSideEffect.NavigateToProfile)
-      is SettingEvent.OnClickAlertSettingButton -> sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.DynamicString("알림 설정")))
-      is SettingEvent.OnClickContactButton -> sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.DynamicString("1:1 문의")))
-      is SettingEvent.OnClickNoticeButton -> sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.DynamicString("공지사항 및 이용약관")))
-      is SettingEvent.OnClickSuggestButton -> sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.DynamicString("개선 제안하기")))
+      is SettingEvent.OnClickAlertSettingButton -> sendSideEffect(SettingSideEffect.ShowSnackbar(UiText.DynamicString("알림 설정")))
+      is SettingEvent.OnClickContactButton -> sendSideEffect(SettingSideEffect.ShowSnackbar(UiText.DynamicString("1:1 문의")))
+      is SettingEvent.OnClickNoticeButton -> sendSideEffect(SettingSideEffect.ShowSnackbar(UiText.DynamicString("공지사항 및 이용약관")))
+      is SettingEvent.OnClickSuggestButton -> sendSideEffect(SettingSideEffect.ShowSnackbar(UiText.DynamicString("개선 제안하기")))
       is SettingEvent.OnClickLogoutButton -> launch { logout() }
     }
   }
@@ -44,7 +44,7 @@ class SettingViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.ErrorString(error)))
+    sendSideEffect(SettingSideEffect.ShowSnackbar(UiText.ErrorString(error)))
     when (error) {
       is UserError.NoUser -> Firebase.auth.signOut()
     }
@@ -53,7 +53,7 @@ class SettingViewModel @Inject constructor(
   private fun logout() {
     Firebase.auth.signOut()
 
-    sendSideEffect(SettingSideEffect.ShowSnackBar(UiText.StringResource(R.string.setting_logout_success_snackbar)))
+    sendSideEffect(SettingSideEffect.ShowSnackbar(UiText.StringResource(R.string.setting_logout_success_snackbar)))
     sendSideEffect(SettingSideEffect.NavigateToLogin)
   }
 }

@@ -1,17 +1,18 @@
 package com.jwd.lunchvote.presentation.ui.template.edit_template
 
 import android.os.Parcelable
+import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.FoodRepository
+import com.jwd.lunchvote.domain.repository.StorageRepository
 import com.jwd.lunchvote.domain.repository.TemplateRepository
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
-import com.jwd.lunchvote.presentation.model.FoodStatus
+import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
-import com.jwd.lunchvote.presentation.model.updateFoodMap
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateEvent
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateReduce
@@ -28,6 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class EditTemplateViewModel @Inject constructor(
   private val foodRepository: FoodRepository,
+  private val storageRepository: StorageRepository,
   private val templateRepository: TemplateRepository,
   private val savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<EditTemplateState, EditTemplateEvent, EditTemplateReduce, EditTemplateSideEffect>(savedStateHandle){
@@ -49,7 +51,7 @@ class EditTemplateViewModel @Inject constructor(
 
       is EditTemplateEvent.OnClickBackButton -> sendSideEffect(EditTemplateSideEffect.PopBackStack)
       is EditTemplateEvent.OnSearchKeywordChange -> updateState(EditTemplateReduce.UpdateSearchKeyword(event.searchKeyword))
-      is EditTemplateEvent.OnClickFood -> updateState(EditTemplateReduce.UpdateFoodStatus(event.food))
+      is EditTemplateEvent.OnClickFoodItem -> updateState(EditTemplateReduce.UpdateFoodStatus(event.foodItem))
       is EditTemplateEvent.OnClickSaveButton -> sendSideEffect(EditTemplateSideEffect.OpenConfirmDialog)
       is EditTemplateEvent.OnClickDeleteButton -> sendSideEffect(EditTemplateSideEffect.OpenDeleteDialog)
 
@@ -64,30 +66,16 @@ class EditTemplateViewModel @Inject constructor(
   override fun reduceState(state: EditTemplateState, reduce: EditTemplateReduce): EditTemplateState {
     return when (reduce) {
       is EditTemplateReduce.UpdateTemplate -> state.copy(template = reduce.template)
-      is EditTemplateReduce.UpdateFoodMap -> state.copy(foodMap = reduce.foodMap)
-      is EditTemplateReduce.UpdateLikedFoods -> state.copy(likedFoods = reduce.likedFoods)
-      is EditTemplateReduce.UpdateDislikedFoods -> state.copy(dislikedFoods = reduce.dislikedFoods)
+      is EditTemplateReduce.UpdateFoodItemList -> state.copy(foodItemList = reduce.foodItemList)
       is EditTemplateReduce.UpdateSearchKeyword -> state.copy(searchKeyword = reduce.searchKeyword)
-      is EditTemplateReduce.UpdateFoodStatus -> when (reduce.food) {
-        in state.likedFoods -> state.copy(
-          foodMap = state.foodMap.updateFoodMap(reduce.food),
-          likedFoods = state.likedFoods.filter { it.id != reduce.food.id },
-          dislikedFoods = state.dislikedFoods + reduce.food
-        )
-        in state.dislikedFoods -> state.copy(
-          foodMap = state.foodMap.updateFoodMap(reduce.food),
-          dislikedFoods = state.dislikedFoods.filter { it.id != reduce.food.id }
-        )
-        else -> state.copy(
-          foodMap = state.foodMap.updateFoodMap(reduce.food),
-          likedFoods = state.likedFoods + reduce.food
-        )
-      }
+      is EditTemplateReduce.UpdateFoodStatus -> state.copy(
+        foodItemList = state.foodItemList.map { if (it == reduce.foodItem) it.nextStatus() else it }
+      )
     }
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(EditTemplateSideEffect.ShowSnackBar(UiText.ErrorString(error)))
+    sendSideEffect(EditTemplateSideEffect.ShowSnackbar(UiText.ErrorString(error)))
   }
 
   private suspend fun initialize() {
@@ -95,36 +83,38 @@ class EditTemplateViewModel @Inject constructor(
     val templateId = checkNotNull(savedStateHandle.get<String>(templateIdKey))
     val template = templateRepository.getTemplateById(templateId).asUI()
 
-    val foodList = foodRepository.getAllFood().map { it.asUI() }
-    val foodMap = foodList.associateWith {
-      when (it.name) {
-        in template.likedFoodIds -> FoodStatus.LIKE
-        in template.dislikedFoodIds -> FoodStatus.DISLIKE
-        else -> FoodStatus.DEFAULT
-      }
+    val foodItemList = foodRepository.getAllFood().map { food ->
+      val imageUri = storageRepository.getFoodImageUri(food.name).toUri()
+      FoodItem(
+        food = food.asUI(),
+        imageUri = imageUri,
+        status = when(food.id) {
+          in template.likedFoodIds -> FoodItem.Status.LIKE
+          in template.dislikedFoodIds -> FoodItem.Status.DISLIKE
+          else -> FoodItem.Status.DEFAULT
+        }
+      )
     }
-    val likeList = foodList.filter { template.likedFoodIds.contains(it.name) }
-    val dislikeList = foodList.filter { template.dislikedFoodIds.contains(it.name) }
-    
+
     updateState(EditTemplateReduce.UpdateTemplate(template))
-    updateState(EditTemplateReduce.UpdateFoodMap(foodMap))
-    updateState(EditTemplateReduce.UpdateLikedFoods(likeList))
-    updateState(EditTemplateReduce.UpdateDislikedFoods(dislikeList))
+    updateState(EditTemplateReduce.UpdateFoodItemList(foodItemList))
   }
 
   private suspend fun save() {
     sendSideEffect(EditTemplateSideEffect.CloseDialog)
 
+    val likedFoodsId = currentState.foodItemList.filter { it.status == FoodItem.Status.LIKE }.map { it.food.id }
+    val dislikedFoodsId = currentState.foodItemList.filter { it.status == FoodItem.Status.DISLIKE }.map { it.food.id }
     val updatedTemplate = TemplateUIModel(
       id = currentState.template.id,
       userId = currentState.template.userId,
       name = currentState.template.name,
-      likedFoodIds = currentState.likedFoods.map { it.name },
-      dislikedFoodIds = currentState.dislikedFoods.map { it.name }
+      likedFoodIds = likedFoodsId,
+      dislikedFoodIds = dislikedFoodsId
     )
     templateRepository.updateTemplate(updatedTemplate.asDomain())
 
-    sendSideEffect(EditTemplateSideEffect.ShowSnackBar(UiText.StringResource(R.string.edit_template_save_snackbar)))
+    sendSideEffect(EditTemplateSideEffect.ShowSnackbar(UiText.StringResource(R.string.edit_template_save_snackbar)))
     sendSideEffect(EditTemplateSideEffect.PopBackStack)
   }
 
@@ -133,7 +123,7 @@ class EditTemplateViewModel @Inject constructor(
 
     templateRepository.deleteTemplateById(currentState.template.id)
 
-    sendSideEffect(EditTemplateSideEffect.ShowSnackBar(UiText.StringResource(R.string.edit_template_delete_snackbar)))
+    sendSideEffect(EditTemplateSideEffect.ShowSnackbar(UiText.StringResource(R.string.edit_template_delete_snackbar)))
     sendSideEffect(EditTemplateSideEffect.PopBackStack)
   }
 }

@@ -32,11 +32,13 @@ import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingEvent
 import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingSideEffect
 import com.jwd.lunchvote.presentation.ui.setting.SettingContract.SettingState
+import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.UiText
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -44,8 +46,8 @@ fun SettingRoute(
   popBackStack: () -> Unit,
   navigateToProfile: () -> Unit,
   navigateToLogin: () -> Unit,
-  showSnackBar: suspend (String) -> Unit,
   viewModel: SettingViewModel = hiltViewModel(),
+  snackbarChannel: Channel<String> = LocalSnackbarChannel.current,
   context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
@@ -56,7 +58,7 @@ fun SettingRoute(
         is SettingSideEffect.PopBackStack -> popBackStack()
         is SettingSideEffect.NavigateToProfile -> navigateToProfile()
         is SettingSideEffect.NavigateToLogin -> navigateToLogin()
-        is SettingSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
+        is SettingSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

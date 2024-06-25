@@ -1,6 +1,7 @@
 package com.jwd.lunchvote.presentation.ui.vote.first
 
 import android.os.Parcelable
+import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
@@ -12,6 +13,7 @@ import com.jwd.lunchvote.domain.repository.BallotRepository
 import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
+import com.jwd.lunchvote.domain.repository.StorageRepository
 import com.jwd.lunchvote.domain.repository.TemplateRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.usecase.CalculateFirstVote
@@ -21,10 +23,9 @@ import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.FirstBallotUIModel
-import com.jwd.lunchvote.presentation.model.FoodStatus
+import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
-import com.jwd.lunchvote.presentation.model.updateFoodMap
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteDialog
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteEvent
@@ -50,6 +51,7 @@ class FirstVoteViewModel @Inject constructor(
   private val loungeRepository: LoungeRepository,
   private val memberRepository: MemberRepository,
   private val foodRepository: FoodRepository,
+  private val storageRepository: StorageRepository,
   private val templateRepository: TemplateRepository,
   private val ballotRepository: BallotRepository,
   private val calculateFirstVote: CalculateFirstVote,
@@ -82,7 +84,7 @@ class FirstVoteViewModel @Inject constructor(
 
       is FirstVoteEvent.OnClickBackButton -> setDialogState(FirstVoteDialog.ExitDialog)
       is FirstVoteEvent.OnSearchKeywordChange -> updateState(FirstVoteReduce.UpdateSearchKeyword(event.searchKeyword))
-      is FirstVoteEvent.OnClickFood -> updateState(FirstVoteReduce.UpdateFoodStatus(event.food))
+      is FirstVoteEvent.OnClickFoodItem -> updateState(FirstVoteReduce.UpdateFoodStatus(event.foodItem))
       is FirstVoteEvent.OnClickFinishButton -> launch(false) { finishVote() }
       is FirstVoteEvent.OnClickReVoteButton -> launch(false) { reVote() }
       is FirstVoteEvent.OnVoteFinish -> launch { submitVote() }
@@ -101,25 +103,11 @@ class FirstVoteViewModel @Inject constructor(
       is FirstVoteReduce.UpdateLounge -> state.copy(lounge = reduce.lounge)
       is FirstVoteReduce.UpdateUser -> state.copy(user = reduce.user)
       is FirstVoteReduce.UpdateMemberList -> state.copy(memberList = reduce.memberList)
-      is FirstVoteReduce.UpdateFoodMap -> state.copy(foodMap = reduce.foodMap)
-      is FirstVoteReduce.UpdateLikedFoods -> state.copy(likedFoods = reduce.likedFoods)
-      is FirstVoteReduce.UpdateDislikedFoods -> state.copy(dislikedFoods = reduce.dislikedFoods)
+      is FirstVoteReduce.UpdateFoodItemList -> state.copy(foodItemList = reduce.foodItemList)
       is FirstVoteReduce.UpdateSearchKeyword -> state.copy(searchKeyword = reduce.searchKeyword)
-      is FirstVoteReduce.UpdateFoodStatus -> when (reduce.food) {
-        in state.likedFoods -> state.copy(
-          foodMap = state.foodMap.updateFoodMap(reduce.food),
-          likedFoods = state.likedFoods.filter { it.id != reduce.food.id },
-          dislikedFoods = state.dislikedFoods + reduce.food
-        )
-        in state.dislikedFoods -> state.copy(
-          foodMap = state.foodMap.updateFoodMap(reduce.food),
-          dislikedFoods = state.dislikedFoods.filter { it.id != reduce.food.id }
-        )
-        else -> state.copy(
-          foodMap = state.foodMap.updateFoodMap(reduce.food),
-          likedFoods = state.likedFoods + reduce.food
-        )
-      }
+      is FirstVoteReduce.UpdateFoodStatus -> state.copy(
+        foodItemList = state.foodItemList.map { if (it == reduce.foodItem) it.nextStatus() else it }
+      )
       is FirstVoteReduce.UpdateFinished -> state.copy(finished = reduce.finished)
       is FirstVoteReduce.UpdateCalculating -> state.copy(calculating = reduce.calculating)
 
@@ -128,7 +116,7 @@ class FirstVoteViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(FirstVoteSideEffect.ShowSnackBar(UiText.ErrorString(error)))
+    sendSideEffect(FirstVoteSideEffect.ShowSnackbar(UiText.ErrorString(error)))
   }
 
   private suspend fun initialize() {
@@ -144,9 +132,14 @@ class FirstVoteViewModel @Inject constructor(
     loungeStatusFlow = launch { collectLoungeStatus(lounge.id) }
     memberListFlow = launch { collectMemberList(lounge.id) }
 
-    val foodList = foodRepository.getAllFood().map { it.asUI() }
-    val foodMap = foodList.associateWith { FoodStatus.DEFAULT }
-    updateState(FirstVoteReduce.UpdateFoodMap(foodMap))
+    val foodItemList = foodRepository.getAllFood().map { food ->
+      val imageUri = storageRepository.getFoodImageUri(food.name).toUri()
+      FoodItem(
+        food = food.asUI(),
+        imageUri = imageUri
+      )
+    }
+    updateState(FirstVoteReduce.UpdateFoodItemList(foodItemList))
 
     val templateList = templateRepository.getTemplateList(userId).map { it.asUI() }
 
@@ -157,7 +150,7 @@ class FirstVoteViewModel @Inject constructor(
     loungeRepository.getLoungeStatusFlowById(loungeId).collectLatest { status ->
       when(status) {
         Lounge.Status.QUIT -> {
-          sendSideEffect(FirstVoteSideEffect.ShowSnackBar(UiText.StringResource(R.string.first_vote_owner_exited_snackbar)))
+          sendSideEffect(FirstVoteSideEffect.ShowSnackbar(UiText.StringResource(R.string.first_vote_owner_exited_snackbar)))
           sendSideEffect(FirstVoteSideEffect.PopBackStack)
         }
         Lounge.Status.SECOND_VOTE -> sendSideEffect(FirstVoteSideEffect.NavigateToSecondVote(currentState.lounge.id))
@@ -171,7 +164,7 @@ class FirstVoteViewModel @Inject constructor(
       updateState(FirstVoteReduce.UpdateMemberList(memberList.map { it.asUI() }))
 
       if (memberList.size <= 1) {
-        sendSideEffect(FirstVoteSideEffect.ShowSnackBar(UiText.StringResource(R.string.first_vote_only_owner_snackbar)))
+        sendSideEffect(FirstVoteSideEffect.ShowSnackbar(UiText.StringResource(R.string.first_vote_only_owner_snackbar)))
         sendSideEffect(FirstVoteSideEffect.PopBackStack)
       }
       if (memberList.all { it.status == Member.Status.VOTED }) launch { submitVote() }
@@ -179,27 +172,21 @@ class FirstVoteViewModel @Inject constructor(
   }
 
   private suspend fun selectTemplate(template: TemplateUIModel?) {
-    val foodList = foodRepository.getAllFood().map { it.asUI() }
-
-    if (template == null) {
-      val foodMap = foodList.associateWith { FoodStatus.DEFAULT }
-
-      updateState(FirstVoteReduce.UpdateFoodMap(foodMap))
-    } else {
-      val foodMap = foodList.associateWith {
-        when (it.name) {
-          in template.likedFoodIds -> FoodStatus.LIKE
-          in template.dislikedFoodIds -> FoodStatus.DISLIKE
-          else -> FoodStatus.DEFAULT
-        }
+    if (template != null) {
+      val foodItemList = foodRepository.getAllFood().map { food ->
+        val imageUri = storageRepository.getFoodImageUri(food.name).toUri()
+        FoodItem(
+          food = food.asUI(),
+          imageUri = imageUri,
+          status = when(food.id) {
+            in template.likedFoodIds -> FoodItem.Status.LIKE
+            in template.dislikedFoodIds -> FoodItem.Status.DISLIKE
+            else -> FoodItem.Status.DEFAULT
+          }
+        )
       }
 
-      val likeList = foodList.filter { template.likedFoodIds.contains(it.name) }
-      val dislikeList = foodList.filter { template.dislikedFoodIds.contains(it.name) }
-
-      updateState(FirstVoteReduce.UpdateFoodMap(foodMap))
-      updateState(FirstVoteReduce.UpdateLikedFoods(likeList))
-      updateState(FirstVoteReduce.UpdateDislikedFoods(dislikeList))
+      updateState(FirstVoteReduce.UpdateFoodItemList(foodItemList))
 
       setDialogState(null)
     }
@@ -220,11 +207,13 @@ class FirstVoteViewModel @Inject constructor(
   private suspend fun submitVote() {
     updateState(FirstVoteReduce.UpdateCalculating(true))
 
+    val likedFoodsId = currentState.foodItemList.filter { it.status == FoodItem.Status.LIKE }.map { it.food.id }
+    val dislikedFoodsId = currentState.foodItemList.filter { it.status == FoodItem.Status.DISLIKE }.map { it.food.id }
     val ballot = FirstBallotUIModel(
       loungeId = currentState.lounge.id,
       userId = me.userId,
-      likedFoodIds = currentState.likedFoods.map { it.id },
-      dislikedFoodIds = currentState.dislikedFoods.map { it.id }
+      likedFoodIds = likedFoodsId,
+      dislikedFoodIds = dislikedFoodsId
     )
     ballotRepository.submitFirstBallot(ballot.asDomain())
 

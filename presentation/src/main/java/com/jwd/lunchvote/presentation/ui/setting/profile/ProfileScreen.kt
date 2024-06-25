@@ -52,6 +52,7 @@ import com.jwd.lunchvote.presentation.ui.setting.profile.ProfileContract.Profile
 import com.jwd.lunchvote.presentation.ui.setting.profile.ProfileContract.ProfileSideEffect
 import com.jwd.lunchvote.presentation.ui.setting.profile.ProfileContract.ProfileState
 import com.jwd.lunchvote.presentation.util.ImageBitmapFactory
+import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
@@ -61,6 +62,7 @@ import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import java.io.File
 
@@ -68,8 +70,8 @@ import java.io.File
 fun ProfileRoute(
   popBackStack: () -> Unit,
   navigateToLogin: () -> Unit,
-  showSnackBar: suspend (String) -> Unit,
   viewModel: ProfileViewModel = hiltViewModel(),
+  snackbarChannel: Channel<String> = LocalSnackbarChannel.current,
   context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
@@ -85,7 +87,7 @@ fun ProfileRoute(
         is ProfileSideEffect.OpenDeleteUserConfirmDialog -> viewModel.setDialogState(ProfileContract.DELETE_USER_CONFIRM_DIALOG)
         is ProfileSideEffect.CloseDialog -> viewModel.setDialogState("")
         is ProfileSideEffect.NavigateToLogin -> navigateToLogin()
-        is ProfileSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
+        is ProfileSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

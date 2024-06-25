@@ -1,9 +1,11 @@
 package com.jwd.lunchvote.presentation.ui.vote.result
 
 import android.os.Parcelable
+import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.FoodRepository
+import com.jwd.lunchvote.domain.repository.StorageRepository
 import com.jwd.lunchvote.domain.repository.VoteResultRepository
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
@@ -19,6 +21,7 @@ import javax.inject.Inject
 class VoteResultViewModel @Inject constructor(
   private val voteResultRepository: VoteResultRepository,
   private val foodRepository: FoodRepository,
+  private val storageRepository: StorageRepository,
   private val savedStateHandle: SavedStateHandle
 ) : BaseStateViewModel<VoteResultState, VoteResultEvent, VoteResultReduce, VoteResultSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): VoteResultState {
@@ -35,12 +38,13 @@ class VoteResultViewModel @Inject constructor(
   override fun reduceState(state: VoteResultState, reduce: VoteResultReduce): VoteResultState {
     return when (reduce) {
       is VoteResultReduce.UpdateFood -> state.copy(food = reduce.food)
+      is VoteResultReduce.UpdateFoodImageUri -> state.copy(foodImageUri = reduce.foodImageUri)
       is VoteResultReduce.UpdateVoteRatio -> state.copy(voteRatio = reduce.voteRatio)
     }
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(VoteResultSideEffect.ShowSnackBar(UiText.ErrorString(error)))
+    sendSideEffect(VoteResultSideEffect.ShowSnackbar(UiText.ErrorString(error)))
   }
 
   private suspend fun initialize() {
@@ -48,8 +52,10 @@ class VoteResultViewModel @Inject constructor(
     val loungeId = checkNotNull(savedStateHandle.get<String>(loungeIdKey))
     val voteResult = voteResultRepository.getSecondVoteResultByLoungeId(loungeId)
     val food = foodRepository.getFoodById(voteResult.foodId).asUI()
+    val foodImageUri = storageRepository.getFoodImageUri(food.id).toUri()
 
     updateState(VoteResultReduce.UpdateFood(food))
+    updateState(VoteResultReduce.UpdateFoodImageUri(foodImageUri))
     updateState(VoteResultReduce.UpdateVoteRatio(voteResult.voteRatio))
   }
 }

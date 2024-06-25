@@ -37,7 +37,7 @@ class LoungeMemberContract {
     data object PopBackStack : LoungeMemberSideEffect
     data object OpenExileConfirmDialog : LoungeMemberSideEffect
     data object CloseDialog : LoungeMemberSideEffect
-    data class ShowSnackBar(val message: UiText) : LoungeMemberSideEffect
+    data class ShowSnackbar(val message: UiText) : LoungeMemberSideEffect
   }
 
   companion object {

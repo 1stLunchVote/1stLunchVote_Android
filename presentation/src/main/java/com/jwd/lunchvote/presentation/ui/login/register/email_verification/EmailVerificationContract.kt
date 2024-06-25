@@ -26,7 +26,6 @@ class EmailVerificationContract {
   }
 
   sealed interface EmailVerificationSideEffect : ViewModelContract.SideEffect {
-    data object NavigateToPassword : EmailVerificationSideEffect
-    data class ShowSnackBar(val message: UiText) : EmailVerificationSideEffect
+    data class ShowSnackbar(val message: UiText) : EmailVerificationSideEffect
   }
 }

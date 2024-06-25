@@ -42,7 +42,7 @@ class TemplateListContract {
     data class NavigateToEditTemplate(val templateId: String) : TemplateListSideEffect
     data object OpenAddDialog : TemplateListSideEffect
     data object CloseDialog : TemplateListSideEffect
-    data class ShowSnackBar(val message: UiText) : TemplateListSideEffect
+    data class ShowSnackbar(val message: UiText) : TemplateListSideEffect
   }
 
   companion object {

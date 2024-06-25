@@ -22,18 +22,20 @@ import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.ui.login.register.nickname.NicknameContract.NicknameEvent
 import com.jwd.lunchvote.presentation.ui.login.register.nickname.NicknameContract.NicknameSideEffect
 import com.jwd.lunchvote.presentation.ui.login.register.nickname.NicknameContract.NicknameState
+import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun NicknameRoute(
   navigateToHome: () -> Unit,
-  showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: NicknameViewModel = hiltViewModel(),
+  snackbarChannel: Channel<String> = LocalSnackbarChannel.current,
   context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
@@ -43,7 +45,7 @@ fun NicknameRoute(
     viewModel.sideEffect.collectLatest {
       when (it) {
         is NicknameSideEffect.NavigateToHome -> navigateToHome()
-        is NicknameSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
+        is NicknameSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

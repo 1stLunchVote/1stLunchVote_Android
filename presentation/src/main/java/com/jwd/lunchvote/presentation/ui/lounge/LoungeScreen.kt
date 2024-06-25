@@ -56,7 +56,7 @@ import com.jwd.lunchvote.presentation.model.UserUIModel
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeEvent
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeSideEffect
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeState
-import com.jwd.lunchvote.presentation.util.UiText
+import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.ChatBubble
 import com.jwd.lunchvote.presentation.widget.EmptyProfile
 import com.jwd.lunchvote.presentation.widget.InviteProfile
@@ -66,6 +66,7 @@ import com.jwd.lunchvote.presentation.widget.MemberProfile
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.VoteExitDialog
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -73,10 +74,10 @@ fun LoungeRoute(
   popBackStack: () -> Unit,
   navigateToMember: (String, String) -> Unit,
   navigateToFirstVote: (String) -> Unit,
-  showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: LoungeViewModel = hiltViewModel(),
   clipboardManager: ClipboardManager = LocalClipboardManager.current,
+  snackbarChannel: Channel<String> = LocalSnackbarChannel.current,
   context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
@@ -91,11 +92,8 @@ fun LoungeRoute(
         is LoungeSideEffect.NavigateToVote -> navigateToFirstVote(it.loungeId)
         is LoungeSideEffect.OpenVoteExitDialog -> viewModel.openDialog(LoungeContract.VOTE_EXIT_DIALOG)
         is LoungeSideEffect.CloseDialog -> viewModel.openDialog("")
-        is LoungeSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
-        is LoungeSideEffect.CopyToClipboard -> {
-          clipboardManager.setText(AnnotatedString(it.loungeId))
-          showSnackBar(UiText.StringResource(R.string.lounge_copy_invite_code_snackbar).asString(context))
-        }
+        is LoungeSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
+        is LoungeSideEffect.CopyToClipboard -> clipboardManager.setText(AnnotatedString(it.loungeId))
       }
     }
   }

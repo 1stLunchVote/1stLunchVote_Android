@@ -66,7 +66,7 @@ class TemplateListViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
-    sendSideEffect(TemplateListSideEffect.ShowSnackBar(UiText.ErrorString(error)))
+    sendSideEffect(TemplateListSideEffect.ShowSnackbar(UiText.ErrorString(error)))
   }
 
   private suspend fun initialize() {

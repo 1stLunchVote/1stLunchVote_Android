@@ -26,18 +26,20 @@ import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.ui.login.register.password.PasswordContract.PasswordEvent
 import com.jwd.lunchvote.presentation.ui.login.register.password.PasswordContract.PasswordSideEffect
 import com.jwd.lunchvote.presentation.ui.login.register.password.PasswordContract.PasswordState
+import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun PasswordRoute(
   navigateToLogin: () -> Unit,
   navigateToNickname: (String, String) -> Unit,
-  showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: PasswordViewModel = hiltViewModel(),
+  snackbarChannel: Channel<String> = LocalSnackbarChannel.current,
   context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
@@ -47,7 +49,7 @@ fun PasswordRoute(
       when (it) {
         is PasswordSideEffect.NavigateToLogin -> navigateToLogin()
         is PasswordSideEffect.NavigateToNickname -> navigateToNickname(it.email, it.password)
-        is PasswordSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
+        is PasswordSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }

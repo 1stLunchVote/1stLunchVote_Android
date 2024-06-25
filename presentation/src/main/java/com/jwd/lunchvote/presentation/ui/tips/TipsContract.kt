@@ -24,6 +24,6 @@ class TipsContract {
 
   sealed interface TipsSideEffect: ViewModelContract.SideEffect {
     data object PopBackStack : TipsSideEffect
-    data class ShowSnackBar(val message: UiText) : TipsSideEffect
+    data class ShowSnackbar(val message: UiText) : TipsSideEffect
   }
 }

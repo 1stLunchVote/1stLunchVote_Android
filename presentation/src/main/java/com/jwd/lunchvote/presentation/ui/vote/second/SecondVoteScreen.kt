@@ -37,6 +37,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.UserUIModel
@@ -44,6 +45,7 @@ import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVo
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVoteEvent
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVoteSideEffect
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVoteState
+import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.widget.HorizontalProgressBar
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
@@ -53,15 +55,16 @@ import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun SecondVoteRoute(
   popBackStack: () -> Unit,
   navigateToVoteResult: (String) -> Unit,
-  showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: SecondVoteViewModel = hiltViewModel(),
+  snackbarChannel: Channel<String> = LocalSnackbarChannel.current,
   context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
@@ -72,7 +75,7 @@ fun SecondVoteRoute(
       when(it) {
         is SecondVoteSideEffect.PopBackStack -> popBackStack()
         is SecondVoteSideEffect.NavigateToVoteResult -> navigateToVoteResult(it.loungeId)
-        is SecondVoteSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
+        is SecondVoteSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }
@@ -138,11 +141,11 @@ private fun SecondVotingScreen(
       memberList = state.memberList,
       modifier = Modifier.fillMaxWidth()
     )
-    SecondVotePaper(
+    SecondVoteBallot(
       userName = state.user.name,
-      foodList = state.foodList,
-      selectedFood = state.selectedFood ?: FoodUIModel(),
-      onClickFood = { onEvent(SecondVoteEvent.OnClickFood(it)) },
+      foodItemList = state.foodItemList,
+      selectedFoodItem = state.selectedFoodItem,
+      onClickFoodItem = { onEvent(SecondVoteEvent.OnClickFoodItem(it)) },
       modifier = Modifier
         .weight(1f)
         .fillMaxWidth()
@@ -150,7 +153,7 @@ private fun SecondVotingScreen(
     Button(
       onClick = { onEvent(SecondVoteEvent.OnClickFinishButton) },
       modifier = Modifier.align(Alignment.CenterHorizontally),
-      enabled = state.selectedFood != null
+      enabled = state.selectedFoodItem != null
     ) {
       Text(text = stringResource(R.string.second_vote_finish_button))
     }
@@ -171,12 +174,12 @@ private fun SecondVoteInformationRow(
 }
 
 @Composable
-private fun SecondVotePaper(
+private fun SecondVoteBallot(
   userName: String,
-  foodList: List<FoodUIModel>,
-  selectedFood: FoodUIModel,
+  foodItemList: List<FoodItem>,
+  selectedFoodItem: FoodItem?,
   modifier: Modifier = Modifier,
-  onClickFood: (FoodUIModel) -> Unit = {}
+  onClickFoodItem: (FoodItem) -> Unit = {}
 ) {
   Column(
     modifier = modifier
@@ -194,12 +197,12 @@ private fun SecondVotePaper(
       modifier = Modifier.fillMaxWidth(),
       verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-      foodList.forEach { food ->
+      foodItemList.forEach { foodItem ->
         SecondVoteTile(
-          food = food,
-          selected = selectedFood == food,
+          foodItem = foodItem,
+          selected = selectedFoodItem == foodItem,
           modifier = Modifier.fillMaxWidth(),
-          onClick = { onClickFood(food) }
+          onClick = { onClickFoodItem(foodItem) }
         )
       }
     }
@@ -208,7 +211,7 @@ private fun SecondVotePaper(
 
 @Composable
 private fun SecondVoteTile(
-  food: FoodUIModel,
+  foodItem: FoodItem,
   selected: Boolean,
   modifier: Modifier = Modifier,
   onClick: () -> Unit = {}
@@ -221,7 +224,7 @@ private fun SecondVoteTile(
     verticalAlignment = Alignment.CenterVertically
   ) {
     CoilImage(
-      imageModel = { food.image },
+      imageModel = { foodItem.imageUri },
       modifier = Modifier.size(80.dp),
       imageOptions = ImageOptions(
         contentScale = ContentScale.Crop
@@ -232,7 +235,7 @@ private fun SecondVoteTile(
       color = MaterialTheme.colorScheme.outline
     )
     Text(
-      text = food.name,
+      text = foodItem.food.name,
       style = MaterialTheme.typography.titleMedium,
       modifier = Modifier
         .weight(1f)
@@ -333,12 +336,14 @@ private fun Preview() {
           MemberUIModel(status = MemberUIModel.Status.VOTED),
           MemberUIModel(status = MemberUIModel.Status.VOTING)
         ),
-        foodList = List(5) { FoodUIModel(
-          name = "음식 $it",
-        ) },
-        selectedFood = FoodUIModel(
-          name = "음식 2"
-        ),
+        foodItemList = List(5) {
+          FoodItem(
+            food = FoodUIModel(name = "음식 $it")
+          )
+        },
+        selectedFoodItem = FoodItem(
+          food = FoodUIModel(name = "음식 2")
+        )
       )
     )
   }

@@ -24,6 +24,6 @@ class NicknameContract {
 
   sealed interface NicknameSideEffect : ViewModelContract.SideEffect {
     data object NavigateToHome : NicknameSideEffect
-    data class ShowSnackBar(val message: UiText) : NicknameSideEffect
+    data class ShowSnackbar(val message: UiText) : NicknameSideEffect
   }
 }

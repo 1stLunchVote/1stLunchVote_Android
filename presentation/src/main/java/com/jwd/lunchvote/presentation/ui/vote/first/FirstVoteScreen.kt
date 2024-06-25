@@ -39,13 +39,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
-import com.jwd.lunchvote.presentation.model.FoodStatus
+import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteDialog
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteEvent
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteSideEffect
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteState
+import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.FoodItem
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.HorizontalProgressBar
@@ -58,15 +59,16 @@ import com.jwd.lunchvote.presentation.widget.MemberProgress
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.TextFieldType
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun FirstVoteRoute(
   popBackStack: () -> Unit,
   navigateToSecondVote: (String) -> Unit,
-  showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: FirstVoteViewModel = hiltViewModel(),
+  snackbarChannel: Channel<String> = LocalSnackbarChannel.current,
   context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
@@ -77,7 +79,7 @@ fun FirstVoteRoute(
       when(it) {
         is FirstVoteSideEffect.PopBackStack -> popBackStack()
         is FirstVoteSideEffect.NavigateToSecondVote -> navigateToSecondVote(it.loungeId)
-        is FirstVoteSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
+        is FirstVoteSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }
@@ -148,8 +150,8 @@ private fun FirstVotingScreen(
     verticalArrangement = Arrangement.spacedBy(16.dp)
   ) {
     FirstVoteInformationRow(
-      like = state.likedFoods.size,
-      dislike = state.dislikedFoods.size,
+      like = state.foodItemList.count { it.status == FoodItem.Status.LIKE },
+      dislike = state.foodItemList.count { it.status == FoodItem.Status.DISLIKE },
       memberList = state.memberList,
       modifier = Modifier.fillMaxWidth()
     )
@@ -168,20 +170,19 @@ private fun FirstVotingScreen(
       verticalArrangement = Arrangement.spacedBy(8.dp),
       horizontalArrangement = Arrangement.SpaceBetween
     ) {
-      val filteredFoodList = state.foodMap.keys.filter { it.name.contains(state.searchKeyword) }
+      val filteredFoodList = state.foodItemList.filter { it.food.name.contains(state.searchKeyword) }
 
-      items(filteredFoodList) {food ->
+      items(filteredFoodList) { foodItem ->
         FoodItem(
-          food = food,
-          status = state.foodMap[food] ?: FoodStatus.DEFAULT,
-          onClick = { onEvent(FirstVoteEvent.OnClickFood(food)) }
+          foodItem = foodItem,
+          onClick = { onEvent(FirstVoteEvent.OnClickFoodItem(foodItem)) }
         )
       }
     }
     Button(
       onClick = { onEvent(FirstVoteEvent.OnClickFinishButton) },
       modifier = Modifier.align(Alignment.CenterHorizontally),
-      enabled = state.likedFoods.isNotEmpty() || state.dislikedFoods.isNotEmpty()
+      enabled = state.foodItemList.any { it.status != FoodItem.Status.DEFAULT }
     ) {
       Text(text = stringResource(R.string.first_vote_finish_button))
     }

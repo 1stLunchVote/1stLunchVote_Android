@@ -45,8 +45,8 @@ class NicknameViewModel @Inject constructor(
 
   override fun handleErrors(error: Throwable) {
     when (error) {
-      is FirebaseAuthUserCollisionException -> sendSideEffect(NicknameSideEffect.ShowSnackBar(UiText.StringResource(R.string.nickname_user_collision_error_snackbar)))
-      else -> sendSideEffect(NicknameSideEffect.ShowSnackBar(UiText.ErrorString(error)))
+      is FirebaseAuthUserCollisionException -> sendSideEffect(NicknameSideEffect.ShowSnackbar(UiText.StringResource(R.string.nickname_user_collision_error_snackbar)))
+      else -> sendSideEffect(NicknameSideEffect.ShowSnackbar(UiText.ErrorString(error)))
     }
   }
 
@@ -65,7 +65,7 @@ class NicknameViewModel @Inject constructor(
     )
     userRepository.createUser(user.asDomain())
 
-    sendSideEffect(NicknameSideEffect.ShowSnackBar(UiText.StringResource(R.string.nickname_success_snackbar)))
+    sendSideEffect(NicknameSideEffect.ShowSnackbar(UiText.StringResource(R.string.nickname_success_snackbar)))
     sendSideEffect(NicknameSideEffect.NavigateToHome)
   }
 }

@@ -36,12 +36,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
-import com.jwd.lunchvote.presentation.model.FoodStatus
+import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateEvent
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateSideEffect
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateState
+import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.FoodItem
 import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
@@ -51,14 +52,15 @@ import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.TextFieldType
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun EditTemplateRoute(
   popBackStack: () -> Unit,
-  showSnackBar: suspend (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: EditTemplateViewModel = hiltViewModel(),
+  snackbarChannel: Channel<String> = LocalSnackbarChannel.current,
   context: Context = LocalContext.current
 ){
   val state by viewModel.viewState.collectAsStateWithLifecycle()
@@ -72,7 +74,7 @@ fun EditTemplateRoute(
         is EditTemplateSideEffect.OpenDeleteDialog -> viewModel.setDialogState(EditTemplateContract.DELETE_DIALOG)
         is EditTemplateSideEffect.OpenConfirmDialog -> viewModel.setDialogState(EditTemplateContract.CONFIRM_DIALOG)
         is EditTemplateSideEffect.CloseDialog -> viewModel.setDialogState("")
-        is EditTemplateSideEffect.ShowSnackBar -> showSnackBar(it.message.asString(context))
+        is EditTemplateSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }
@@ -134,8 +136,8 @@ private fun EditTemplateScreen(
     ) {
       TemplateTitle(
         name = state.template.name,
-        like = state.likedFoods.size,
-        dislike = state.dislikedFoods.size,
+        like = state.foodItemList.count { it.status == FoodItem.Status.LIKE },
+        dislike = state.foodItemList.count { it.status == FoodItem.Status.DISLIKE },
         modifier = Modifier.fillMaxWidth()
       )
       LunchVoteTextField(
@@ -153,20 +155,19 @@ private fun EditTemplateScreen(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
       ) {
-        val filteredFoodList = state.foodMap.keys.filter { it.name.contains(state.searchKeyword) }
+        val filteredFoodItemList = state.foodItemList.filter { it.food.name.contains(state.searchKeyword) }
 
-        items(filteredFoodList) {food ->
+        items(filteredFoodItemList) { foodItem ->
           FoodItem(
-            food = food,
-            status = state.foodMap[food] ?: FoodStatus.DEFAULT,
-            onClick = { onEvent(EditTemplateEvent.OnClickFood(food)) }
+            foodItem = foodItem,
+            onClick = { onEvent(EditTemplateEvent.OnClickFoodItem(foodItem)) }
           )
         }
       }
       Button(
         onClick = { onEvent(EditTemplateEvent.OnClickSaveButton) },
         modifier = Modifier.align(CenterHorizontally),
-        enabled = state.likedFoods.isNotEmpty() || state.dislikedFoods.isNotEmpty()
+        enabled = state.foodItemList.any { it.status != FoodItem.Status.DEFAULT }
       ) {
         Text(text = stringResource(R.string.edit_template_save_button))
       }
@@ -266,20 +267,11 @@ private fun Preview() {
   ScreenPreview {
     EditTemplateScreen(
       state = EditTemplateState(
-        foodMap = mapOf(
-          FoodUIModel(
-            id = "1",
-            name = "음식명"
-          ) to FoodStatus.DEFAULT,
-          FoodUIModel(
-            id = "2",
-            name = "음식명"
-          ) to FoodStatus.DEFAULT,
-          FoodUIModel(
-            id = "3",
-            name = "음식명"
-          ) to FoodStatus.DEFAULT,
-        ),
+        foodItemList = List(10) {
+          FoodItem(
+            food = FoodUIModel(name = "${it}번째 음식")
+          )
+        },
         template = TemplateUIModel(
           name = "스트레스 받을 때(매운 음식)"
         )

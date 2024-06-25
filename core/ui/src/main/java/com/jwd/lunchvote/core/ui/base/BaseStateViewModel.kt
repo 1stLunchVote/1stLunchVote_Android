@@ -91,6 +91,7 @@ abstract class BaseStateViewModel<S : State, E : Event, R : Reduce, SE : SideEff
    * @param error 발생한 에러
    */
   fun throwError(error: Throwable) {
+    error.printStackTrace()
     viewModelScope.launch {
       _error.send(error)
     }
@@ -128,7 +129,6 @@ abstract class BaseStateViewModel<S : State, E : Event, R : Reduce, SE : SideEff
   }
 
   val ceh = CoroutineExceptionHandler { _, throwable ->
-    throwable.printStackTrace()
     throwError(throwable)
     setLoading(false)
   }

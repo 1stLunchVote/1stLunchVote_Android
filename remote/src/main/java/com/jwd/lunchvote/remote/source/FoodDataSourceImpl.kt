@@ -4,6 +4,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.jwd.lunchvote.data.model.FoodData
 import com.jwd.lunchvote.data.source.remote.FoodDataSource
 import com.jwd.lunchvote.remote.mapper.asData
+import com.jwd.lunchvote.remote.mapper.asRemote
 import com.jwd.lunchvote.remote.model.FoodRemote
 import kotlinx.coroutines.tasks.await
 import kr.co.inbody.config.error.FoodError
@@ -16,8 +17,14 @@ class FoodDataSourceImpl @Inject constructor(
   companion object {
     private const val COLLECTION_FOOD = "Food"
 
-    private const val COLUMN_IMAGE = "image"
     private const val COLUMN_NAME = "name"
+  }
+
+  override suspend fun createFood(food: FoodData) {
+    fireStore
+      .collection(COLLECTION_FOOD)
+      .add(food.asRemote())
+      .await()
   }
 
   override suspend fun getAllFood(): List<FoodData> =
@@ -27,8 +34,7 @@ class FoodDataSourceImpl @Inject constructor(
       .await()
       .documents
       .mapNotNull {
-        it.toObject(FoodRemote::class.java)
-          ?.asData(it.id)
+        it.toObject(FoodRemote::class.java)?.asData(it.id)
       }
 
   override suspend fun getFoodById(
@@ -41,16 +47,4 @@ class FoodDataSourceImpl @Inject constructor(
       .await()
       .toObject(FoodRemote::class.java)
       ?.asData(id) ?: throw FoodError.NoFood
-
-  // TODO: 임시
-  override suspend fun getFoodTrend(): Pair<FoodData, Float> =
-    fireStore
-      .collection(COLLECTION_FOOD)
-      .get()
-      .await()
-      .documents
-      .firstNotNullOf {
-        it.toObject(FoodRemote::class.java)
-          ?.asData(it.id)
-      } to 36f
 }
