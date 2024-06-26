@@ -18,6 +18,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -26,9 +29,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -46,11 +52,14 @@ import com.jwd.lunchvote.presentation.widget.GoogleLoginButton
 import com.jwd.lunchvote.presentation.widget.KakaoLoginButton
 import com.jwd.lunchvote.presentation.widget.LoginButtonSize
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
+import com.jwd.lunchvote.presentation.widget.PasswordInvisibleIcon
+import com.jwd.lunchvote.presentation.widget.PasswordVisibleIcon
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
+import com.skydoves.landscapist.constraints.constraint
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kr.co.inbody.config.config.EmailConfig
@@ -128,6 +137,35 @@ private fun LoginScreen(
   loading: Boolean = false,
   onEvent: (LoginEvent) -> Unit = {}
 ) {
+//  ConstraintLayout(
+//    modifier = modifier
+//  ) {
+//    val (appBar, loginFields, registerRow, socialLoginButtons) = createRefs()
+//
+//    Image(
+//      painter = painterResource(R.drawable.bg_login_title),
+//      contentDescription = "Login Title",
+//      modifier = Modifier
+//        .constrainAs(appBar) {
+//          top.linkTo(parent.top)
+//          start.linkTo(parent.start)
+//          end.linkTo(parent.end)
+//          width = Dimension.fillToConstraints
+//        }
+//    )
+//    LoginFields(
+//      email = state.email,
+//      password = state.password,
+//      onEmailChange = { onEvent(LoginEvent.OnEmailChange(it)) },
+//      onPasswordChange = { onEvent(LoginEvent.OnPasswordChange(it)) },
+//      onClickEmailLoginButton = { onEvent(LoginEvent.OnClickEmailLoginButton) },
+//      loading = loading,
+//      modifier = Modifier
+//        .constrainAs(loginFields) {
+//          top
+//        }
+//    )
+//  }
   Screen(
     modifier = modifier,
     topAppBar = {
@@ -186,6 +224,7 @@ private fun LoginFields(
     verticalArrangement = Arrangement.spacedBy(8.dp)
   ) {
     val isValid = EmailConfig.REGEX.matches(email)
+    var isVisible by remember { mutableStateOf(false) }
 
     LunchVoteTextField(
       text = email,
@@ -201,8 +240,18 @@ private fun LoginFields(
       hintText = stringResource(R.string.login_password_hint),
       modifier = Modifier.fillMaxWidth(),
       enabled = loading.not(),
+      trailingIcon = {
+        if (password.isNotEmpty()) {
+          if (isVisible) PasswordInvisibleIcon(
+            onClick = { isVisible = false }
+          ) else PasswordVisibleIcon(
+            onClick = { isVisible = true }
+          )
+        }
+      },
       keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-      visualTransformation = PasswordVisualTransformation()
+      visualTransformation = if (isVisible) VisualTransformation.None
+      else PasswordVisualTransformation()
     )
     Text(
       text = stringResource(R.string.login_email_format_error),
@@ -241,8 +290,7 @@ private fun RegisterRow(
       text = stringResource(R.string.login_register_button),
       modifier = Modifier
         .clickableWithoutEffect(
-          enabled = loading.not(),
-          onClick = onClickRegisterButton
+          enabled = loading.not(), onClick = onClickRegisterButton
         )
         .padding(start = 8.dp, top = 12.dp, bottom = 12.dp, end = 0.dp),
       color = MaterialTheme.colorScheme.primary,
