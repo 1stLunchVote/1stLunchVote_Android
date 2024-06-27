@@ -6,10 +6,13 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -24,6 +27,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.focus.FocusRequester.Companion.createRefs
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -34,6 +39,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -137,35 +143,6 @@ private fun LoginScreen(
   loading: Boolean = false,
   onEvent: (LoginEvent) -> Unit = {}
 ) {
-//  ConstraintLayout(
-//    modifier = modifier
-//  ) {
-//    val (appBar, loginFields, registerRow, socialLoginButtons) = createRefs()
-//
-//    Image(
-//      painter = painterResource(R.drawable.bg_login_title),
-//      contentDescription = "Login Title",
-//      modifier = Modifier
-//        .constrainAs(appBar) {
-//          top.linkTo(parent.top)
-//          start.linkTo(parent.start)
-//          end.linkTo(parent.end)
-//          width = Dimension.fillToConstraints
-//        }
-//    )
-//    LoginFields(
-//      email = state.email,
-//      password = state.password,
-//      onEmailChange = { onEvent(LoginEvent.OnEmailChange(it)) },
-//      onPasswordChange = { onEvent(LoginEvent.OnPasswordChange(it)) },
-//      onClickEmailLoginButton = { onEvent(LoginEvent.OnClickEmailLoginButton) },
-//      loading = loading,
-//      modifier = Modifier
-//        .constrainAs(loginFields) {
-//          top
-//        }
-//    )
-//  }
   Screen(
     modifier = modifier,
     topAppBar = {
@@ -203,7 +180,9 @@ private fun LoginScreen(
         onClickKakaoLoginButton = { onEvent(LoginEvent.OnClickKakaoLoginButton) },
         onClickGoogleLoginButton = { onEvent(LoginEvent.OnClickGoogleLoginButton) },
         loading = loading,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+          .height(IntrinsicSize.Max)
+          .fillMaxWidth()
       )
     }
   }
@@ -217,58 +196,160 @@ private fun LoginFields(
   onPasswordChange: (String) -> Unit,
   onClickEmailLoginButton: () -> Unit,
   loading: Boolean,
-  modifier: Modifier = Modifier,
+  modifier: Modifier = Modifier
 ) {
-  Column(
-    modifier = modifier,
-    verticalArrangement = Arrangement.spacedBy(8.dp)
+  BoxWithConstraints(
+    modifier = modifier
   ) {
-    val isValid = EmailConfig.REGEX.matches(email)
-    var isVisible by remember { mutableStateOf(false) }
+    val minimumHeight = 176.dp
+    val maxHeight = maxHeight
 
-    LunchVoteTextField(
-      text = email,
-      onTextChange = onEmailChange,
-      hintText = stringResource(R.string.login_email_hint),
-      modifier = Modifier.fillMaxWidth(),
-      enabled = loading.not(),
-      keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
-    )
-    LunchVoteTextField(
-      text = password,
-      onTextChange = onPasswordChange,
-      hintText = stringResource(R.string.login_password_hint),
-      modifier = Modifier.fillMaxWidth(),
-      enabled = loading.not(),
-      trailingIcon = {
-        if (password.isNotEmpty()) {
-          if (isVisible) PasswordInvisibleIcon(
-            onClick = { isVisible = false }
-          ) else PasswordVisibleIcon(
-            onClick = { isVisible = true }
-          )
+    val constraintSet = ConstraintSet {
+      val emailField = createRefFor("emailField")
+      val passwordField = createRefFor("passwordField")
+      val errorText = createRefFor("errorText")
+      val loginButton = createRefFor("loginButton")
+
+      constrain(emailField) {
+        if (maxHeight >= minimumHeight) {
+          top.linkTo(parent.top)
+          start.linkTo(parent.start)
+          end.linkTo(parent.end)
+        } else {
+          top.linkTo(parent.top)
+          start.linkTo(parent.start)
+          end.linkTo(passwordField.start, 8.dp)
         }
-      },
-      keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-      visualTransformation = if (isVisible) VisualTransformation.None
-      else PasswordVisualTransformation()
-    )
-    Text(
-      text = stringResource(R.string.login_email_format_error),
-      modifier = Modifier
-        .padding(horizontal = 8.dp)
-        .alpha(if (email.isNotEmpty() && isValid.not()) 1f else 0f),
-      color = MaterialTheme.colorScheme.error,
-      style = MaterialTheme.typography.labelMedium
-    )
-    Button(
-      onClick = onClickEmailLoginButton,
-      modifier = Modifier.fillMaxWidth(),
-      enabled = loading.not() && email.isNotEmpty() && password.isNotEmpty() && isValid
+        width = Dimension.fillToConstraints
+      }
+      constrain(passwordField) {
+        if (maxHeight >= minimumHeight) {
+          top.linkTo(emailField.bottom, 8.dp)
+          start.linkTo(parent.start)
+          end.linkTo(parent.end)
+        } else {
+          top.linkTo(parent.top)
+          start.linkTo(emailField.end)
+          end.linkTo(parent.end)
+        }
+        width = Dimension.fillToConstraints
+      }
+      constrain(errorText) {
+        top.linkTo(passwordField.bottom, 8.dp)
+        start.linkTo(parent.start, 8.dp)
+        end.linkTo(parent.end, 8.dp)
+        width = Dimension.fillToConstraints
+      }
+      constrain(loginButton) {
+        top.linkTo(errorText.bottom, 8.dp)
+        start.linkTo(parent.start)
+        end.linkTo(parent.end)
+        width = Dimension.fillToConstraints
+      }
+    }
+
+    ConstraintLayout(
+      constraintSet = constraintSet,
+      modifier = modifier
     ) {
-      Text(text = stringResource(R.string.login_button))
+      val isValid = EmailConfig.REGEX.matches(email)
+      var isVisible by remember { mutableStateOf(false) }
+
+      LunchVoteTextField(
+        text = email,
+        onTextChange = onEmailChange,
+        hintText = stringResource(R.string.login_email_hint),
+        modifier = Modifier.layoutId("emailField"),
+        enabled = loading.not(),
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+      )
+      LunchVoteTextField(
+        text = password,
+        onTextChange = onPasswordChange,
+        hintText = stringResource(R.string.login_password_hint),
+        modifier = Modifier.layoutId("passwordField"),
+        enabled = loading.not(),
+        trailingIcon = {
+          if (password.isNotEmpty()) {
+            if (isVisible) PasswordInvisibleIcon(
+              onClick = { isVisible = false }
+            ) else PasswordVisibleIcon(
+              onClick = { isVisible = true }
+            )
+          }
+        },
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+        visualTransformation = if (isVisible) VisualTransformation.None
+        else PasswordVisualTransformation()
+      )
+      Text(
+        text = stringResource(R.string.login_email_format_error),
+        modifier = Modifier
+          .layoutId("errorText")
+          .alpha(if (email.isNotEmpty() && isValid.not()) 1f else 0f),
+        color = MaterialTheme.colorScheme.error,
+        style = MaterialTheme.typography.labelMedium
+      )
+      Button(
+        onClick = onClickEmailLoginButton,
+        modifier = Modifier.layoutId("loginButton"),
+        enabled = loading.not() && email.isNotEmpty() && password.isNotEmpty() && isValid
+      ) {
+        Text(text = stringResource(R.string.login_button))
+      }
     }
   }
+
+//  Column(
+//    modifier = modifier,
+//    verticalArrangement = Arrangement.spacedBy(8.dp)
+//  ) {
+//    val isValid = EmailConfig.REGEX.matches(email)
+//    var isVisible by remember { mutableStateOf(false) }
+//
+//    LunchVoteTextField(
+//      text = email,
+//      onTextChange = onEmailChange,
+//      hintText = stringResource(R.string.login_email_hint),
+//      modifier = Modifier.fillMaxWidth(),
+//      enabled = loading.not(),
+//      keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+//    )
+//    LunchVoteTextField(
+//      text = password,
+//      onTextChange = onPasswordChange,
+//      hintText = stringResource(R.string.login_password_hint),
+//      modifier = Modifier.fillMaxWidth(),
+//      enabled = loading.not(),
+//      trailingIcon = {
+//        if (password.isNotEmpty()) {
+//          if (isVisible) PasswordInvisibleIcon(
+//            onClick = { isVisible = false }
+//          ) else PasswordVisibleIcon(
+//            onClick = { isVisible = true }
+//          )
+//        }
+//      },
+//      keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+//      visualTransformation = if (isVisible) VisualTransformation.None
+//      else PasswordVisualTransformation()
+//    )
+//    Text(
+//      text = stringResource(R.string.login_email_format_error),
+//      modifier = Modifier
+//        .padding(horizontal = 8.dp)
+//        .alpha(if (email.isNotEmpty() && isValid.not()) 1f else 0f),
+//      color = MaterialTheme.colorScheme.error,
+//      style = MaterialTheme.typography.labelMedium
+//    )
+//    Button(
+//      onClick = onClickEmailLoginButton,
+//      modifier = Modifier.fillMaxWidth(),
+//      enabled = loading.not() && email.isNotEmpty() && password.isNotEmpty() && isValid
+//    ) {
+//      Text(text = stringResource(R.string.login_button))
+//    }
+//  }
 }
 
 @Composable
