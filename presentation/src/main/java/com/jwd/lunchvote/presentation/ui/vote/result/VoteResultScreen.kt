@@ -86,8 +86,7 @@ private fun VoteResultScreen(
         title = stringResource(R.string.vote_result_title),
         navIconVisible = false
       )
-    },
-    scrollable = false
+    }
   ) {
     Column(
       modifier = Modifier.fillMaxSize(),
@@ -100,7 +99,6 @@ private fun VoteResultScreen(
       )
       Gap(height = 8.dp)
       VoteResultImage(
-        food = state.food,
         foodImageUri = state.foodImageUri,
         voteRatio = state.voteRatio,
         modifier = Modifier.size(156.dp)
@@ -124,7 +122,6 @@ private fun VoteResultScreen(
 
 @Composable
 private fun VoteResultImage(
-  food: FoodUIModel,
   foodImageUri: Uri,
   voteRatio: Float,
   modifier: Modifier = Modifier

@@ -2,7 +2,9 @@ package com.jwd.lunchvote.presentation.widget
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -20,7 +22,9 @@ fun Screen(
     modifier = Modifier
       .fillMaxSize()
       .let {
-        if (scrollable) it.verticalScroll(rememberScrollState())
+        if (scrollable) it
+          .verticalScroll(rememberScrollState())
+          .height(IntrinsicSize.Max)
         else it
       }
       .then(modifier),

@@ -41,7 +41,7 @@ import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
-import com.jwd.lunchvote.presentation.widget.TextFieldType
+import com.jwd.lunchvote.presentation.widget.SearchIcon
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -109,7 +109,7 @@ private fun AddTemplateScreen(
         onTextChange = { onEvent(AddTemplateEvent.OnSearchKeywordChange(it)) },
         hintText = stringResource(R.string.add_template_hint_text),
         modifier = Modifier.fillMaxWidth(),
-        textFieldType = TextFieldType.Search
+        leadingIcon = { SearchIcon() }
       )
       LazyVerticalGrid(
         columns = GridCells.Fixed(3),

@@ -7,9 +7,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -18,6 +21,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -26,6 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -46,6 +53,8 @@ import com.jwd.lunchvote.presentation.widget.GoogleLoginButton
 import com.jwd.lunchvote.presentation.widget.KakaoLoginButton
 import com.jwd.lunchvote.presentation.widget.LoginButtonSize
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
+import com.jwd.lunchvote.presentation.widget.PasswordInvisibleIcon
+import com.jwd.lunchvote.presentation.widget.PasswordVisibleIcon
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.kakao.sdk.common.model.ClientError
@@ -134,10 +143,11 @@ private fun LoginScreen(
       Image(
         painterResource(R.drawable.bg_login_title),
         contentDescription = "Login Title",
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+          .fillMaxWidth()
+          .heightIn(max = 320.dp)
       )
-    },
-    scrollable = false
+    }
   ) {
     Column(
       modifier = Modifier
@@ -160,12 +170,14 @@ private fun LoginScreen(
         loading = loading,
         modifier = Modifier.fillMaxWidth()
       )
-      Gap(minHeight = 32.dp)
+      Gap(minHeight = 64.dp)
       SocialLoginButtons(
         onClickKakaoLoginButton = { onEvent(LoginEvent.OnClickKakaoLoginButton) },
         onClickGoogleLoginButton = { onEvent(LoginEvent.OnClickGoogleLoginButton) },
         loading = loading,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+          .height(IntrinsicSize.Max)
+          .fillMaxWidth()
       )
     }
   }
@@ -179,13 +191,14 @@ private fun LoginFields(
   onPasswordChange: (String) -> Unit,
   onClickEmailLoginButton: () -> Unit,
   loading: Boolean,
-  modifier: Modifier = Modifier,
+  modifier: Modifier = Modifier
 ) {
   Column(
     modifier = modifier,
     verticalArrangement = Arrangement.spacedBy(8.dp)
   ) {
     val isValid = EmailConfig.REGEX.matches(email)
+    var isVisible by remember { mutableStateOf(false) }
 
     LunchVoteTextField(
       text = email,
@@ -201,8 +214,18 @@ private fun LoginFields(
       hintText = stringResource(R.string.login_password_hint),
       modifier = Modifier.fillMaxWidth(),
       enabled = loading.not(),
+      trailingIcon = {
+        if (password.isNotEmpty()) {
+          if (isVisible) PasswordInvisibleIcon(
+            onClick = { isVisible = false }
+          ) else PasswordVisibleIcon(
+            onClick = { isVisible = true }
+          )
+        }
+      },
       keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-      visualTransformation = PasswordVisualTransformation()
+      visualTransformation = if (isVisible) VisualTransformation.None
+      else PasswordVisualTransformation()
     )
     Text(
       text = stringResource(R.string.login_email_format_error),
@@ -241,8 +264,7 @@ private fun RegisterRow(
       text = stringResource(R.string.login_register_button),
       modifier = Modifier
         .clickableWithoutEffect(
-          enabled = loading.not(),
-          onClick = onClickRegisterButton
+          enabled = loading.not(), onClick = onClickRegisterButton
         )
         .padding(start = 8.dp, top = 12.dp, bottom = 12.dp, end = 0.dp),
       color = MaterialTheme.colorScheme.primary,
