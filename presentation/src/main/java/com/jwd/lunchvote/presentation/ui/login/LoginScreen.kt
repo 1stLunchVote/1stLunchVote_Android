@@ -155,7 +155,7 @@ private fun LoginScreen(
           .heightIn(max = 320.dp)
       )
     },
-    scrollable = false
+    scrollable = true
   ) {
     Column(
       modifier = Modifier
@@ -178,7 +178,7 @@ private fun LoginScreen(
         loading = loading,
         modifier = Modifier.fillMaxWidth()
       )
-      Gap(minHeight = 32.dp)
+      Gap(minHeight = 64.dp)
       SocialLoginButtons(
         onClickKakaoLoginButton = { onEvent(LoginEvent.OnClickKakaoLoginButton) },
         onClickGoogleLoginButton = { onEvent(LoginEvent.OnClickGoogleLoginButton) },
@@ -201,158 +201,56 @@ private fun LoginFields(
   loading: Boolean,
   modifier: Modifier = Modifier
 ) {
-  BoxWithConstraints(
-    modifier = modifier
+  Column(
+    modifier = modifier,
+    verticalArrangement = Arrangement.spacedBy(8.dp)
   ) {
-    val minimumHeight = 176.dp
-    val maxHeight = maxHeight
+    val isValid = EmailConfig.REGEX.matches(email)
+    var isVisible by remember { mutableStateOf(false) }
 
-    val constraintSet = ConstraintSet {
-      val emailField = createRefFor("emailField")
-      val passwordField = createRefFor("passwordField")
-      val errorText = createRefFor("errorText")
-      val loginButton = createRefFor("loginButton")
-
-      constrain(emailField) {
-        if (maxHeight >= minimumHeight) {
-          top.linkTo(parent.top)
-          start.linkTo(parent.start)
-          end.linkTo(parent.end)
-        } else {
-          top.linkTo(parent.top)
-          start.linkTo(parent.start)
-          end.linkTo(passwordField.start, 8.dp)
+    LunchVoteTextField(
+      text = email,
+      onTextChange = onEmailChange,
+      hintText = stringResource(R.string.login_email_hint),
+      modifier = Modifier.fillMaxWidth(),
+      enabled = loading.not(),
+      keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+    )
+    LunchVoteTextField(
+      text = password,
+      onTextChange = onPasswordChange,
+      hintText = stringResource(R.string.login_password_hint),
+      modifier = Modifier.fillMaxWidth(),
+      enabled = loading.not(),
+      trailingIcon = {
+        if (password.isNotEmpty()) {
+          if (isVisible) PasswordInvisibleIcon(
+            onClick = { isVisible = false }
+          ) else PasswordVisibleIcon(
+            onClick = { isVisible = true }
+          )
         }
-        width = Dimension.fillToConstraints
-      }
-      constrain(passwordField) {
-        if (maxHeight >= minimumHeight) {
-          top.linkTo(emailField.bottom, 8.dp)
-          start.linkTo(parent.start)
-          end.linkTo(parent.end)
-        } else {
-          top.linkTo(parent.top)
-          start.linkTo(emailField.end)
-          end.linkTo(parent.end)
-        }
-        width = Dimension.fillToConstraints
-      }
-      constrain(errorText) {
-        top.linkTo(passwordField.bottom, 8.dp)
-        start.linkTo(parent.start, 8.dp)
-        end.linkTo(parent.end, 8.dp)
-        width = Dimension.fillToConstraints
-      }
-      constrain(loginButton) {
-        top.linkTo(errorText.bottom, 8.dp)
-        start.linkTo(parent.start)
-        end.linkTo(parent.end)
-        width = Dimension.fillToConstraints
-      }
-    }
-
-    ConstraintLayout(
-      constraintSet = constraintSet,
-      modifier = modifier
+      },
+      keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+      visualTransformation = if (isVisible) VisualTransformation.None
+      else PasswordVisualTransformation()
+    )
+    Text(
+      text = stringResource(R.string.login_email_format_error),
+      modifier = Modifier
+        .padding(horizontal = 8.dp)
+        .alpha(if (email.isNotEmpty() && isValid.not()) 1f else 0f),
+      color = MaterialTheme.colorScheme.error,
+      style = MaterialTheme.typography.labelMedium
+    )
+    Button(
+      onClick = onClickEmailLoginButton,
+      modifier = Modifier.fillMaxWidth(),
+      enabled = loading.not() && email.isNotEmpty() && password.isNotEmpty() && isValid
     ) {
-      val isValid = EmailConfig.REGEX.matches(email)
-      var isVisible by remember { mutableStateOf(false) }
-
-      LunchVoteTextField(
-        text = email,
-        onTextChange = onEmailChange,
-        hintText = stringResource(R.string.login_email_hint),
-        modifier = Modifier.layoutId("emailField"),
-        enabled = loading.not(),
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
-      )
-      LunchVoteTextField(
-        text = password,
-        onTextChange = onPasswordChange,
-        hintText = stringResource(R.string.login_password_hint),
-        modifier = Modifier.layoutId("passwordField"),
-        enabled = loading.not(),
-        trailingIcon = {
-          if (password.isNotEmpty()) {
-            if (isVisible) PasswordInvisibleIcon(
-              onClick = { isVisible = false }
-            ) else PasswordVisibleIcon(
-              onClick = { isVisible = true }
-            )
-          }
-        },
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-        visualTransformation = if (isVisible) VisualTransformation.None
-        else PasswordVisualTransformation()
-      )
-      Text(
-        text = stringResource(R.string.login_email_format_error),
-        modifier = Modifier
-          .layoutId("errorText")
-          .alpha(if (email.isNotEmpty() && isValid.not()) 1f else 0f),
-        color = MaterialTheme.colorScheme.error,
-        style = MaterialTheme.typography.labelMedium
-      )
-      Button(
-        onClick = onClickEmailLoginButton,
-        modifier = Modifier.layoutId("loginButton"),
-        enabled = loading.not() && email.isNotEmpty() && password.isNotEmpty() && isValid
-      ) {
-        Text(text = stringResource(R.string.login_button))
-      }
+      Text(text = stringResource(R.string.login_button))
     }
   }
-
-//  Column(
-//    modifier = modifier,
-//    verticalArrangement = Arrangement.spacedBy(8.dp)
-//  ) {
-//    val isValid = EmailConfig.REGEX.matches(email)
-//    var isVisible by remember { mutableStateOf(false) }
-//
-//    LunchVoteTextField(
-//      text = email,
-//      onTextChange = onEmailChange,
-//      hintText = stringResource(R.string.login_email_hint),
-//      modifier = Modifier.fillMaxWidth(),
-//      enabled = loading.not(),
-//      keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
-//    )
-//    LunchVoteTextField(
-//      text = password,
-//      onTextChange = onPasswordChange,
-//      hintText = stringResource(R.string.login_password_hint),
-//      modifier = Modifier.fillMaxWidth(),
-//      enabled = loading.not(),
-//      trailingIcon = {
-//        if (password.isNotEmpty()) {
-//          if (isVisible) PasswordInvisibleIcon(
-//            onClick = { isVisible = false }
-//          ) else PasswordVisibleIcon(
-//            onClick = { isVisible = true }
-//          )
-//        }
-//      },
-//      keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-//      visualTransformation = if (isVisible) VisualTransformation.None
-//      else PasswordVisualTransformation()
-//    )
-//    Text(
-//      text = stringResource(R.string.login_email_format_error),
-//      modifier = Modifier
-//        .padding(horizontal = 8.dp)
-//        .alpha(if (email.isNotEmpty() && isValid.not()) 1f else 0f),
-//      color = MaterialTheme.colorScheme.error,
-//      style = MaterialTheme.typography.labelMedium
-//    )
-//    Button(
-//      onClick = onClickEmailLoginButton,
-//      modifier = Modifier.fillMaxWidth(),
-//      enabled = loading.not() && email.isNotEmpty() && password.isNotEmpty() && isValid
-//    ) {
-//      Text(text = stringResource(R.string.login_button))
-//    }
-//  }
 }
 
 @Composable
