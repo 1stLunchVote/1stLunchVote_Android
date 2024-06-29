@@ -1,11 +1,9 @@
 package com.jwd.lunchvote.presentation.ui.vote.result
 
 import android.os.Parcelable
-import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.FoodRepository
-import com.jwd.lunchvote.domain.repository.StorageRepository
 import com.jwd.lunchvote.domain.repository.VoteResultRepository
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute

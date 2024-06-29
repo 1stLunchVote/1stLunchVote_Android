@@ -2,7 +2,6 @@ package com.jwd.lunchvote.data.repository
 
 import com.jwd.lunchvote.data.mapper.asData
 import com.jwd.lunchvote.data.mapper.asDomain
-import com.jwd.lunchvote.data.model.MemberData
 import com.jwd.lunchvote.data.source.remote.MemberDataSource
 import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.repository.MemberRepository

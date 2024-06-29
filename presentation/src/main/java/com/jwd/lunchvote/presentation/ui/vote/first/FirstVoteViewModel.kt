@@ -1,7 +1,6 @@
 package com.jwd.lunchvote.presentation.ui.vote.first
 
 import android.os.Parcelable
-import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
@@ -13,7 +12,6 @@ import com.jwd.lunchvote.domain.repository.BallotRepository
 import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
-import com.jwd.lunchvote.domain.repository.StorageRepository
 import com.jwd.lunchvote.domain.repository.TemplateRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.usecase.CalculateFirstVote

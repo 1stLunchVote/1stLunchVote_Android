@@ -1,13 +1,11 @@
 package com.jwd.lunchvote.presentation.ui.template.add_template
 
 import android.os.Parcelable
-import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.FoodRepository
-import com.jwd.lunchvote.domain.repository.StorageRepository
 import com.jwd.lunchvote.domain.repository.TemplateRepository
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain

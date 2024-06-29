@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.tasks.await
-import kr.co.inbody.config.error.LoungeError
 import kr.co.inbody.config.error.MemberError
 import javax.inject.Inject
 

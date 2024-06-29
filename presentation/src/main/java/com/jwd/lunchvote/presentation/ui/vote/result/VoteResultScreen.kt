@@ -1,7 +1,6 @@
 package com.jwd.lunchvote.presentation.ui.vote.result
 
 import android.content.Context
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

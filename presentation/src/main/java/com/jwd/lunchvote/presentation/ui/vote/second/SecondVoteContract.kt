@@ -2,7 +2,6 @@ package com.jwd.lunchvote.presentation.ui.vote.second
 
 import android.os.Parcelable
 import com.jwd.lunchvote.core.ui.base.ViewModelContract
-import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.LoungeUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel

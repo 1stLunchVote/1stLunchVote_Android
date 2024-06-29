@@ -1,7 +1,5 @@
 package com.jwd.lunchvote.data.source.remote
 
-import android.net.Uri
-
 interface StorageDataSource {
 
   suspend fun uploadFoodImage(foodName: String, image: ByteArray): String

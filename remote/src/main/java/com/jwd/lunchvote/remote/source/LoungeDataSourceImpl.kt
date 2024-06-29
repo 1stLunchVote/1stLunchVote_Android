@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.tasks.await
 import kr.co.inbody.config.error.LoungeError
-import timber.log.Timber
 import java.util.UUID
 import javax.inject.Inject
 

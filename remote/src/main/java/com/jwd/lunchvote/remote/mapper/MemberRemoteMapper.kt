@@ -3,7 +3,6 @@ package com.jwd.lunchvote.remote.mapper
 import com.jwd.lunchvote.core.common.mapper.BiMapper
 import com.jwd.lunchvote.data.model.MemberData
 import com.jwd.lunchvote.remote.model.MemberRemote
-import kr.co.inbody.config.error.LoungeError
 import kr.co.inbody.config.error.MemberError
 
 private object MemberRemoteMapper : BiMapper<MemberRemote, MemberData> {

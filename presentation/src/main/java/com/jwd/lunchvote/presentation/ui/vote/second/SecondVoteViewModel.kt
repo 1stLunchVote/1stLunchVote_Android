@@ -1,7 +1,6 @@
 package com.jwd.lunchvote.presentation.ui.vote.second
 
 import android.os.Parcelable
-import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
@@ -13,7 +12,6 @@ import com.jwd.lunchvote.domain.repository.BallotRepository
 import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
-import com.jwd.lunchvote.domain.repository.StorageRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.repository.VoteResultRepository
 import com.jwd.lunchvote.domain.usecase.CalculateSecondVote
@@ -22,7 +20,6 @@ import com.jwd.lunchvote.domain.usecase.FinishVote
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
-import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.SecondBallotUIModel
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
