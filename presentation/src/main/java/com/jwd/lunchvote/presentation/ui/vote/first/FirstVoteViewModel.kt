@@ -1,7 +1,6 @@
 package com.jwd.lunchvote.presentation.ui.vote.first
 
 import android.os.Parcelable
-import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
@@ -13,7 +12,6 @@ import com.jwd.lunchvote.domain.repository.BallotRepository
 import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
-import com.jwd.lunchvote.domain.repository.StorageRepository
 import com.jwd.lunchvote.domain.repository.TemplateRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.usecase.CalculateFirstVote
@@ -51,7 +49,6 @@ class FirstVoteViewModel @Inject constructor(
   private val loungeRepository: LoungeRepository,
   private val memberRepository: MemberRepository,
   private val foodRepository: FoodRepository,
-  private val storageRepository: StorageRepository,
   private val templateRepository: TemplateRepository,
   private val ballotRepository: BallotRepository,
   private val calculateFirstVote: CalculateFirstVote,
@@ -133,11 +130,7 @@ class FirstVoteViewModel @Inject constructor(
     memberListFlow = launch { collectMemberList(lounge.id) }
 
     val foodItemList = foodRepository.getAllFood().map { food ->
-      val imageUri = storageRepository.getFoodImageUri(food.name).toUri()
-      FoodItem(
-        food = food.asUI(),
-        imageUri = imageUri
-      )
+      FoodItem(food = food.asUI())
     }
     updateState(FirstVoteReduce.UpdateFoodItemList(foodItemList))
 
@@ -174,10 +167,8 @@ class FirstVoteViewModel @Inject constructor(
   private suspend fun selectTemplate(template: TemplateUIModel?) {
     if (template != null) {
       val foodItemList = foodRepository.getAllFood().map { food ->
-        val imageUri = storageRepository.getFoodImageUri(food.name).toUri()
         FoodItem(
           food = food.asUI(),
-          imageUri = imageUri,
           status = when(food.id) {
             in template.likedFoodIds -> FoodItem.Status.LIKE
             in template.dislikedFoodIds -> FoodItem.Status.DISLIKE

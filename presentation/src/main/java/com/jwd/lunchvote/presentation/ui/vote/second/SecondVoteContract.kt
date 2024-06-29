@@ -2,7 +2,7 @@ package com.jwd.lunchvote.presentation.ui.vote.second
 
 import android.os.Parcelable
 import com.jwd.lunchvote.core.ui.base.ViewModelContract
-import com.jwd.lunchvote.presentation.model.FoodItem
+import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.LoungeUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.UserUIModel
@@ -15,8 +15,8 @@ class SecondVoteContract {
     val user: UserUIModel = UserUIModel(),
     val lounge: LoungeUIModel = LoungeUIModel(),
     val memberList: List<MemberUIModel> = emptyList(),
-    val foodItemList: List<FoodItem> = emptyList(),
-    val selectedFoodItem: FoodItem? = null,
+    val foodList: List<FoodUIModel> = emptyList(),
+    val selectedFood: FoodUIModel? = null,
     val finished: Boolean = false,
     val calculating: Boolean = false
   ) : ViewModelContract.State, Parcelable {
@@ -27,7 +27,7 @@ class SecondVoteContract {
     data object ScreenInitialize : SecondVoteEvent
 
     data object OnClickBackButton : SecondVoteEvent
-    data class OnClickFoodItem(val foodItem: FoodItem) : SecondVoteEvent
+    data class OnClickFood(val food: FoodUIModel) : SecondVoteEvent
     data object OnClickFinishButton : SecondVoteEvent
     data object OnClickReVoteButton : SecondVoteEvent
     data object OnVoteFinish : SecondVoteEvent
@@ -41,8 +41,8 @@ class SecondVoteContract {
     data class UpdateUser(val user: UserUIModel) : SecondVoteReduce
     data class UpdateLounge(val lounge: LoungeUIModel) : SecondVoteReduce
     data class UpdateMemberList(val memberList: List<MemberUIModel>) : SecondVoteReduce
-    data class UpdateFoodItemList(val foodItemList: List<FoodItem>) : SecondVoteReduce
-    data class UpdateSelectedFoodItem(val foodItem: FoodItem?) : SecondVoteReduce
+    data class UpdateFoodList(val foodList: List<FoodUIModel>) : SecondVoteReduce
+    data class UpdateSelectedFood(val food: FoodUIModel?) : SecondVoteReduce
     data class UpdateFinished(val finished: Boolean) : SecondVoteReduce
     data class UpdateCalculating(val calculating: Boolean) : SecondVoteReduce
   }

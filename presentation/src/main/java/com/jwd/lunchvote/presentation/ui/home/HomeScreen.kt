@@ -159,7 +159,6 @@ private fun HomeScreen(
     Gap(minHeight = 24.dp)
     FoodTrendChart(
       foodTrend = state.foodTrend,
-      foodTrendImageUri = state.foodTrendImageUri,
       foodTrendRatio = state.foodTrendRatio,
       modifier = Modifier.align(Alignment.CenterHorizontally)
     )
@@ -183,7 +182,6 @@ private fun HomeScreen(
 @Composable
 private fun FoodTrendChart(
   foodTrend: FoodUIModel?,
-  foodTrendImageUri: Uri?,
   foodTrendRatio: Float,
   modifier: Modifier = Modifier
 ) {
@@ -216,7 +214,7 @@ private fun FoodTrendChart(
         }
       } else {
         CoilImage(
-          imageModel = { foodTrendImageUri },
+          imageModel = { foodTrend.imageUrl },
           modifier = Modifier
             .size(160.dp)
             .clip(CircleShape)

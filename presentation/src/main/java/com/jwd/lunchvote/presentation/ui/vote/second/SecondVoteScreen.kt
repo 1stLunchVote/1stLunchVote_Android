@@ -37,7 +37,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
-import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.UserUIModel
@@ -143,9 +142,9 @@ private fun SecondVotingScreen(
     )
     SecondVoteBallot(
       userName = state.user.name,
-      foodItemList = state.foodItemList,
-      selectedFoodItem = state.selectedFoodItem,
-      onClickFoodItem = { onEvent(SecondVoteEvent.OnClickFoodItem(it)) },
+      foodList = state.foodList,
+      selectedFood = state.selectedFood,
+      onClickFood = { onEvent(SecondVoteEvent.OnClickFood(it)) },
       modifier = Modifier
         .weight(1f)
         .fillMaxWidth()
@@ -153,7 +152,7 @@ private fun SecondVotingScreen(
     Button(
       onClick = { onEvent(SecondVoteEvent.OnClickFinishButton) },
       modifier = Modifier.align(Alignment.CenterHorizontally),
-      enabled = state.selectedFoodItem != null
+      enabled = state.selectedFood != null
     ) {
       Text(text = stringResource(R.string.second_vote_finish_button))
     }
@@ -176,10 +175,10 @@ private fun SecondVoteInformationRow(
 @Composable
 private fun SecondVoteBallot(
   userName: String,
-  foodItemList: List<FoodItem>,
-  selectedFoodItem: FoodItem?,
+  foodList: List<FoodUIModel>,
+  selectedFood: FoodUIModel?,
   modifier: Modifier = Modifier,
-  onClickFoodItem: (FoodItem) -> Unit = {}
+  onClickFood: (FoodUIModel) -> Unit = {}
 ) {
   Column(
     modifier = modifier
@@ -197,12 +196,12 @@ private fun SecondVoteBallot(
       modifier = Modifier.fillMaxWidth(),
       verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-      foodItemList.forEach { foodItem ->
+      foodList.forEach { food ->
         SecondVoteTile(
-          foodItem = foodItem,
-          selected = selectedFoodItem == foodItem,
+          food = food,
+          selected = selectedFood == food,
           modifier = Modifier.fillMaxWidth(),
-          onClick = { onClickFoodItem(foodItem) }
+          onClick = { onClickFood(food) }
         )
       }
     }
@@ -211,7 +210,7 @@ private fun SecondVoteBallot(
 
 @Composable
 private fun SecondVoteTile(
-  foodItem: FoodItem,
+  food: FoodUIModel,
   selected: Boolean,
   modifier: Modifier = Modifier,
   onClick: () -> Unit = {}
@@ -224,7 +223,7 @@ private fun SecondVoteTile(
     verticalAlignment = Alignment.CenterVertically
   ) {
     CoilImage(
-      imageModel = { foodItem.imageUri },
+      imageModel = { food.imageUrl },
       modifier = Modifier.size(80.dp),
       imageOptions = ImageOptions(
         contentScale = ContentScale.Crop
@@ -235,7 +234,7 @@ private fun SecondVoteTile(
       color = MaterialTheme.colorScheme.outline
     )
     Text(
-      text = foodItem.food.name,
+      text = food.name,
       style = MaterialTheme.typography.titleMedium,
       modifier = Modifier
         .weight(1f)
@@ -336,14 +335,10 @@ private fun Preview() {
           MemberUIModel(status = MemberUIModel.Status.VOTED),
           MemberUIModel(status = MemberUIModel.Status.VOTING)
         ),
-        foodItemList = List(5) {
-          FoodItem(
-            food = FoodUIModel(name = "음식 $it")
-          )
+        foodList = List(5) {
+          FoodUIModel(name = "음식 $it")
         },
-        selectedFoodItem = FoodItem(
-          food = FoodUIModel(name = "음식 2")
-        )
+        selectedFood = FoodUIModel(name = "음식 2")
       )
     )
   }

@@ -18,6 +18,7 @@ class FoodDataSourceImpl @Inject constructor(
     private const val COLLECTION_FOOD = "Food"
 
     private const val COLUMN_NAME = "name"
+    private const val COLUMN_IMAGE_URL = "imageUrl"
   }
 
   override suspend fun createFood(food: FoodData) {

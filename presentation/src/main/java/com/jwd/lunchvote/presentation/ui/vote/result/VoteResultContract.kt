@@ -1,6 +1,5 @@
 package com.jwd.lunchvote.presentation.ui.vote.result
 
-import android.net.Uri
 import android.os.Parcelable
 import com.jwd.lunchvote.core.ui.base.ViewModelContract
 import com.jwd.lunchvote.presentation.model.FoodUIModel
@@ -11,7 +10,6 @@ class VoteResultContract {
   @Parcelize
   data class VoteResultState(
     val food: FoodUIModel = FoodUIModel(),
-    val foodImageUri: Uri = Uri.EMPTY,
     val voteRatio: Float = 0f
   ) : ViewModelContract.State, Parcelable
 
@@ -23,7 +21,6 @@ class VoteResultContract {
 
   sealed interface VoteResultReduce : ViewModelContract.Reduce {
     data class UpdateFood(val food: FoodUIModel) : VoteResultReduce
-    data class UpdateFoodImageUri(val foodImageUri: Uri) : VoteResultReduce
     data class UpdateVoteRatio(val voteRatio: Float) : VoteResultReduce
   }
 
