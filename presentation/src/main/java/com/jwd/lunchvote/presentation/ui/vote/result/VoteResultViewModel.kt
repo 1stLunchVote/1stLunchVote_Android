@@ -52,7 +52,7 @@ class VoteResultViewModel @Inject constructor(
     val loungeId = checkNotNull(savedStateHandle.get<String>(loungeIdKey))
     val voteResult = voteResultRepository.getSecondVoteResultByLoungeId(loungeId)
     val food = foodRepository.getFoodById(voteResult.foodId).asUI()
-    val foodImageUri = storageRepository.getFoodImageUri(food.id).toUri()
+    val foodImageUri = storageRepository.getFoodImageUri(food.name).toUri()
 
     updateState(VoteResultReduce.UpdateFood(food))
     updateState(VoteResultReduce.UpdateFoodImageUri(foodImageUri))

@@ -154,8 +154,7 @@ private fun LoginScreen(
           .fillMaxWidth()
           .heightIn(max = 320.dp)
       )
-    },
-    scrollable = true
+    }
   ) {
     Column(
       modifier = Modifier

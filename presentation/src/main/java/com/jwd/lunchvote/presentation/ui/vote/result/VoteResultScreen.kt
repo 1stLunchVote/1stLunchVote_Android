@@ -6,7 +6,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
@@ -86,8 +88,7 @@ private fun VoteResultScreen(
         title = stringResource(R.string.vote_result_title),
         navIconVisible = false
       )
-    },
-    scrollable = false
+    }
   ) {
     Column(
       modifier = Modifier.fillMaxSize(),
@@ -100,7 +101,6 @@ private fun VoteResultScreen(
       )
       Gap(height = 8.dp)
       VoteResultImage(
-        food = state.food,
         foodImageUri = state.foodImageUri,
         voteRatio = state.voteRatio,
         modifier = Modifier.size(156.dp)
@@ -124,7 +124,6 @@ private fun VoteResultScreen(
 
 @Composable
 private fun VoteResultImage(
-  food: FoodUIModel,
   foodImageUri: Uri,
   voteRatio: Float,
   modifier: Modifier = Modifier
