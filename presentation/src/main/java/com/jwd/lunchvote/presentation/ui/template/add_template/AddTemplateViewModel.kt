@@ -27,7 +27,6 @@ import javax.inject.Inject
 @HiltViewModel
 class AddTemplateViewModel @Inject constructor(
   private val foodRepository: FoodRepository,
-  private val storageRepository: StorageRepository,
   private val templateRepository: TemplateRepository,
   private val savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<AddTemplateState, AddTemplateEvent, AddTemplateReduce, AddTemplateSideEffect>(savedStateHandle){
@@ -68,11 +67,7 @@ class AddTemplateViewModel @Inject constructor(
     updateState(AddTemplateReduce.UpdateName(name))
 
     val foodItemList = foodRepository.getAllFood().map { food ->
-      val imageUri = storageRepository.getFoodImageUri(food.id).toUri()
-      FoodItem(
-        food = food.asUI(),
-        imageUri = imageUri
-      )
+      FoodItem(food = food.asUI())
     }
 
     updateState(AddTemplateReduce.UpdateFoodItemList(foodItemList))

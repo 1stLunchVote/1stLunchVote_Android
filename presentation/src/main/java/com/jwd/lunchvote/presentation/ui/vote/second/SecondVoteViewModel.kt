@@ -51,7 +51,6 @@ class SecondVoteViewModel @Inject constructor(
   private val memberRepository: MemberRepository,
   private val voteResultRepository: VoteResultRepository,
   private val foodRepository: FoodRepository,
-  private val storageRepository: StorageRepository,
   private val ballotRepository: BallotRepository,
   private val calculateSecondVote: CalculateSecondVote,
   private val finishVote: FinishVote,
@@ -82,11 +81,11 @@ class SecondVoteViewModel @Inject constructor(
       is SecondVoteEvent.ScreenInitialize -> launch { initialize() }
 
       is SecondVoteEvent.OnClickBackButton -> setDialogState(SecondVoteDialog.ExitDialog)
-      is SecondVoteEvent.OnClickFoodItem -> {
-        if (currentState.selectedFoodItem == event.foodItem) {
-          updateState(SecondVoteReduce.UpdateSelectedFoodItem(null))
+      is SecondVoteEvent.OnClickFood -> {
+        if (currentState.selectedFood == event.food) {
+          updateState(SecondVoteReduce.UpdateSelectedFood(null))
         } else {
-          updateState(SecondVoteReduce.UpdateSelectedFoodItem(event.foodItem))
+          updateState(SecondVoteReduce.UpdateSelectedFood(event.food))
         }
       }
       is SecondVoteEvent.OnClickFinishButton -> launch(false) { finishVote() }
@@ -105,8 +104,8 @@ class SecondVoteViewModel @Inject constructor(
       is SecondVoteReduce.UpdateUser -> state.copy(user = reduce.user)
       is SecondVoteReduce.UpdateLounge -> state.copy(lounge = reduce.lounge)
       is SecondVoteReduce.UpdateMemberList -> state.copy(memberList = reduce.memberList)
-      is SecondVoteReduce.UpdateFoodItemList -> state.copy(foodItemList = reduce.foodItemList)
-      is SecondVoteReduce.UpdateSelectedFoodItem -> state.copy(selectedFoodItem = reduce.foodItem)
+      is SecondVoteReduce.UpdateFoodList -> state.copy(foodList = reduce.foodList)
+      is SecondVoteReduce.UpdateSelectedFood -> state.copy(selectedFood = reduce.food)
       is SecondVoteReduce.UpdateFinished -> state.copy(finished = reduce.finished)
       is SecondVoteReduce.UpdateCalculating -> state.copy(calculating = reduce.calculating)
     }
@@ -130,15 +129,8 @@ class SecondVoteViewModel @Inject constructor(
     memberListFlow = launch { collectMemberList(lounge.id) }
 
     val firstVoteResult = voteResultRepository.getFirstVoteResultByLoungeId(loungeId)
-    val foodItemList = firstVoteResult.foodIds.map { id ->
-      val food = foodRepository.getFoodById(id).asUI()
-      val imageUri = storageRepository.getFoodImageUri(food.name).toUri()
-      FoodItem(
-        food = food,
-        imageUri = imageUri
-      )
-    }
-    updateState(SecondVoteReduce.UpdateFoodItemList(foodItemList))
+    val foodList = firstVoteResult.foodIds.map { id -> foodRepository.getFoodById(id).asUI() }
+    updateState(SecondVoteReduce.UpdateFoodList(foodList))
   }
 
   private suspend fun collectMemberList(loungeId: String) {
@@ -179,13 +171,13 @@ class SecondVoteViewModel @Inject constructor(
   }
 
   private suspend fun submitVote() {
-    if (currentState.selectedFoodItem != null) {
+    if (currentState.selectedFood != null) {
       updateState(SecondVoteReduce.UpdateCalculating(true))
 
       val ballot = SecondBallotUIModel(
         loungeId = currentState.lounge.id,
         userId = currentState.user.id,
-        foodId = currentState.selectedFoodItem!!.food.id
+        foodId = currentState.selectedFood!!.id
       )
       ballotRepository.submitSecondBallot(ballot.asDomain())
 

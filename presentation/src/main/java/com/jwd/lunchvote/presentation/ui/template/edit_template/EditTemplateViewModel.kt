@@ -29,7 +29,6 @@ import javax.inject.Inject
 @HiltViewModel
 class EditTemplateViewModel @Inject constructor(
   private val foodRepository: FoodRepository,
-  private val storageRepository: StorageRepository,
   private val templateRepository: TemplateRepository,
   private val savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<EditTemplateState, EditTemplateEvent, EditTemplateReduce, EditTemplateSideEffect>(savedStateHandle){
@@ -84,10 +83,8 @@ class EditTemplateViewModel @Inject constructor(
     val template = templateRepository.getTemplateById(templateId).asUI()
 
     val foodItemList = foodRepository.getAllFood().map { food ->
-      val imageUri = storageRepository.getFoodImageUri(food.name).toUri()
       FoodItem(
         food = food.asUI(),
-        imageUri = imageUri,
         status = when(food.id) {
           in template.likedFoodIds -> FoodItem.Status.LIKE
           in template.dislikedFoodIds -> FoodItem.Status.DISLIKE

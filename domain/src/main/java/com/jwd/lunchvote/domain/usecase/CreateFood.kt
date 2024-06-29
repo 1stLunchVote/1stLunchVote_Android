@@ -11,7 +11,8 @@ class CreateFood @Inject constructor(
 ) {
 
   suspend operator fun invoke(food: Food, image: ByteArray) {
-    foodRepository.createFood(food)
-    storageRepository.uploadFoodImage(food.name, image)
+    val imageUrl = storageRepository.uploadFoodImage(food.name, image)
+
+    foodRepository.createFood(food.copy(imageUrl = imageUrl))
   }
 }

@@ -1,14 +1,10 @@
 package com.jwd.lunchvote.remote.source
 
-import android.net.Uri
 import com.google.firebase.storage.FirebaseStorage
 import com.jwd.lunchvote.data.source.remote.StorageDataSource
-import com.jwd.lunchvote.remote.source.StorageDataSourceImpl.Companion.STORAGE_REFERENCE_PROFILE
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import java.io.File
 import javax.inject.Inject
 
 class StorageDataSourceImpl @Inject constructor(
@@ -24,30 +20,30 @@ class StorageDataSourceImpl @Inject constructor(
   override suspend fun uploadFoodImage(
     foodName: String,
     image: ByteArray
-  ) {
-    withContext(dispatcher) {
-      storage
-        .reference
-        .child(STORAGE_REFERENCE_FOOD)
-        .child(foodName)
-        .putBytes(image)
-        .await()
-    }
+  ): String = withContext(dispatcher) {
+    storage
+      .reference
+      .child(STORAGE_REFERENCE_FOOD)
+      .child(foodName)
+      .putBytes(image)
+      .await()
+      .storage
+      .downloadUrl
+      .await()
+      .toString()
   }
 
   override suspend fun getFoodImageUri(
     foodName: String
-  ): String =
-    withContext(dispatcher) {
-      storage
-        .reference
-        .child(STORAGE_REFERENCE_FOOD)
-        .child(foodName)
-        .downloadUrl
-        .await()
-        .toString()
-    }
-
+  ): String = withContext(dispatcher) {
+    storage
+      .reference
+      .child(STORAGE_REFERENCE_FOOD)
+      .child(foodName)
+      .downloadUrl
+      .await()
+      .toString()
+  }
 
   override suspend fun uploadProfileImage(
     userId: String,

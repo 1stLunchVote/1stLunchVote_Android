@@ -99,7 +99,7 @@ private fun VoteResultScreen(
       )
       Gap(height = 8.dp)
       VoteResultImage(
-        foodImageUri = state.foodImageUri,
+        foodImageUri = state.food.imageUrl,
         voteRatio = state.voteRatio,
         modifier = Modifier.size(156.dp)
       )
@@ -122,7 +122,7 @@ private fun VoteResultScreen(
 
 @Composable
 private fun VoteResultImage(
-  foodImageUri: Uri,
+  foodImageUri: String,
   voteRatio: Float,
   modifier: Modifier = Modifier
 ) {

@@ -21,7 +21,6 @@ import javax.inject.Inject
 class VoteResultViewModel @Inject constructor(
   private val voteResultRepository: VoteResultRepository,
   private val foodRepository: FoodRepository,
-  private val storageRepository: StorageRepository,
   private val savedStateHandle: SavedStateHandle
 ) : BaseStateViewModel<VoteResultState, VoteResultEvent, VoteResultReduce, VoteResultSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): VoteResultState {
@@ -38,7 +37,6 @@ class VoteResultViewModel @Inject constructor(
   override fun reduceState(state: VoteResultState, reduce: VoteResultReduce): VoteResultState {
     return when (reduce) {
       is VoteResultReduce.UpdateFood -> state.copy(food = reduce.food)
-      is VoteResultReduce.UpdateFoodImageUri -> state.copy(foodImageUri = reduce.foodImageUri)
       is VoteResultReduce.UpdateVoteRatio -> state.copy(voteRatio = reduce.voteRatio)
     }
   }
@@ -52,10 +50,8 @@ class VoteResultViewModel @Inject constructor(
     val loungeId = checkNotNull(savedStateHandle.get<String>(loungeIdKey))
     val voteResult = voteResultRepository.getSecondVoteResultByLoungeId(loungeId)
     val food = foodRepository.getFoodById(voteResult.foodId).asUI()
-    val foodImageUri = storageRepository.getFoodImageUri(food.name).toUri()
 
     updateState(VoteResultReduce.UpdateFood(food))
-    updateState(VoteResultReduce.UpdateFoodImageUri(foodImageUri))
     updateState(VoteResultReduce.UpdateVoteRatio(voteResult.voteRatio))
   }
 }

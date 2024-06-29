@@ -50,7 +50,7 @@ fun FoodItem(
       modifier = if (foodItem.status == FoodItem.Status.DISLIKE) Modifier.alpha(0.5f) else Modifier
     ) {
       CoilImage(
-        imageModel = { foodItem.imageUri },
+        imageModel = { foodItem.food.imageUrl },
         modifier = Modifier
           .size(100.dp)
           .let {
