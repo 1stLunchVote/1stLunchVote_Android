@@ -8,5 +8,6 @@ data class FriendUIModel(
   val userId: String = "",
   val friendId: String = "",
   val createdAt: ZonedDateTime = getInitialDateTime(),
+  val matchedAt: ZonedDateTime? = null,
   val deletedAt: ZonedDateTime? = null
 )

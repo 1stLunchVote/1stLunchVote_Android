@@ -11,6 +11,7 @@ private object FriendDataMapper : BiMapper<FriendData, Friend> {
       userId = from.userId,
       friendId = from.friendId,
       createdAt = from.createdAt,
+      matchedAt = from.matchedAt,
       deletedAt = from.deletedAt
     )
 
@@ -20,6 +21,7 @@ private object FriendDataMapper : BiMapper<FriendData, Friend> {
       userId = from.userId,
       friendId = from.friendId,
       createdAt = from.createdAt,
+      matchedAt = from.matchedAt,
       deletedAt = from.deletedAt
     )
 }

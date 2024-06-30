@@ -13,6 +13,7 @@ private object FriendRemoteMapper : BiMapper<FriendRemote, FriendData> {
       userId = from.userId,
       friendId = from.friendId,
       createdAt = from.createdAt.toLong(),
+      matchedAt = from.matchedAt?.toLong(),
       deletedAt = from.deletedAt?.toLong()
     )
 
@@ -22,6 +23,7 @@ private object FriendRemoteMapper : BiMapper<FriendRemote, FriendData> {
       userId = from.userId,
       friendId = from.friendId,
       createdAt = from.createdAt.toTimestamp(),
+      matchedAt = from.matchedAt?.toTimestamp(),
       deletedAt = from.deletedAt?.toTimestamp()
     )
 }

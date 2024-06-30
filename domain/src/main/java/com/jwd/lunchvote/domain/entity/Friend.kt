@@ -5,5 +5,6 @@ data class Friend(
   val userId: String,
   val friendId: String,
   val createdAt: Long,
+  val matchedAt: Long?,
   val deletedAt: Long?
 )

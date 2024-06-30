@@ -13,6 +13,7 @@ private object FriendUiMapper : BiMapper<FriendUIModel, Friend> {
       userId = from.userId,
       friendId = from.friendId,
       createdAt = from.createdAt.toLong(),
+      matchedAt = from.matchedAt?.toLong(),
       deletedAt = from.deletedAt?.toLong()
     )
 
@@ -22,6 +23,7 @@ private object FriendUiMapper : BiMapper<FriendUIModel, Friend> {
       userId = from.userId,
       friendId = from.friendId,
       createdAt = from.createdAt.toZonedDateTime(),
+      matchedAt = from.matchedAt?.toZonedDateTime(),
       deletedAt = from.deletedAt?.toZonedDateTime()
     )
 }
