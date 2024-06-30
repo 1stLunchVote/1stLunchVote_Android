@@ -1,6 +1,6 @@
 package com.jwd.lunchvote.di
 
-import com.jwd.lunchvote.data.source.FriendDataSource
+import com.jwd.lunchvote.data.source.remote.FriendDataSource
 import com.jwd.lunchvote.data.source.local.PreferenceDataSource
 import com.jwd.lunchvote.data.source.remote.BallotDataSource
 import com.jwd.lunchvote.data.source.remote.ChatDataSource
