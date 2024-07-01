@@ -31,7 +31,7 @@ class FriendListContract {
 
   sealed interface FriendListSideEffect : ViewModelContract.SideEffect {
     data object PopBackStack : FriendListSideEffect
-    data object NavigateToFriendRequestList : FriendListSideEffect
+    data object NavigateToFriendRequest : FriendListSideEffect
     data object OpenRequestDialog : FriendListSideEffect
     data object CloseDialog : FriendListSideEffect
     data class ShowSnackbar(val message: UiText) : FriendListSideEffect

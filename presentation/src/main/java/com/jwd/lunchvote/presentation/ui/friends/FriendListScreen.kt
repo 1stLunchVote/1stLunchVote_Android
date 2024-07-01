@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun FriendListRoute(
   popBackStack: () -> Unit,
-  navigateToFriendRequestList: () -> Unit,
+  navigateToFriendRequest: () -> Unit,
   modifier: Modifier = Modifier,
   viewModel: FriendListViewModel = hiltViewModel(),
   snackbarChannel: Channel<String> = LocalSnackbarChannel.current,
@@ -39,7 +39,7 @@ fun FriendListRoute(
     viewModel.sideEffect.collectLatest {
       when(it){
         is FriendListSideEffect.PopBackStack -> popBackStack()
-        is FriendListSideEffect.NavigateToFriendRequestList -> navigateToFriendRequestList()
+        is FriendListSideEffect.NavigateToFriendRequest -> navigateToFriendRequest()
         is FriendListSideEffect.OpenRequestDialog -> viewModel.setDialogState(FriendListContract.REQUEST_DIALOG)
         is FriendListSideEffect.CloseDialog -> viewModel.setDialogState("")
         is FriendListSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))

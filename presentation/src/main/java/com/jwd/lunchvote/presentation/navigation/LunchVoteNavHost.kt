@@ -8,6 +8,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.jwd.lunchvote.presentation.ui.friends.FriendListRoute
 import com.jwd.lunchvote.presentation.ui.home.HomeRoute
 import com.jwd.lunchvote.presentation.ui.login.LoginRoute
 import com.jwd.lunchvote.presentation.ui.login.register.email_verification.EmailVerificationRoute
@@ -85,18 +86,10 @@ fun LunchVoteNavHost(
         navigateToLounge = { loungeId ->
           navController.navigate(LunchVoteNavRoute.Lounge, loungeId)
         },
-        navigateToTemplateList = {
-          navController.navigate(LunchVoteNavRoute.TemplateList)
-        },
-        navigateToFriendList = {
-          navController.navigate(LunchVoteNavRoute.FriendList)
-        },
-        navigateToSetting = {
-          navController.navigate(LunchVoteNavRoute.Setting)
-        },
-        navigateToTips = {
-          navController.navigate(LunchVoteNavRoute.Tips)
-        }
+        navigateToTemplateList = { navController.navigate(LunchVoteNavRoute.TemplateList) },
+        navigateToFriendList = { navController.navigate(LunchVoteNavRoute.FriendList) },
+        navigateToSetting = { navController.navigate(LunchVoteNavRoute.Setting) },
+        navigateToTips = { navController.navigate(LunchVoteNavRoute.Tips) }
       )
     }
     composable(LunchVoteNavRoute.Lounge) {
@@ -156,6 +149,15 @@ fun LunchVoteNavHost(
       AddTemplateRoute(
         popBackStack = { navController.popBackStack() }
       )
+    }
+    composable(LunchVoteNavRoute.FriendList) {
+       FriendListRoute(
+         popBackStack = { navController.popBackStack() },
+         navigateToFriendRequest = { navController.navigate(LunchVoteNavRoute.FriendRequest) }
+       )
+    }
+    composable(LunchVoteNavRoute.FriendRequest) {
+      // FriendRequestRoute
     }
     composable(LunchVoteNavRoute.Setting) {
       SettingRoute(
