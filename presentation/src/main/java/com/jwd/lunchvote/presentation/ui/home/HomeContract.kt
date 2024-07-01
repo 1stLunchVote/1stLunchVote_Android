@@ -25,6 +25,7 @@ class HomeContract {
     data object OnClickLoungeButton : HomeEvent
     data object OnClickJoinLoungeButton : HomeEvent
     data object OnClickTemplateButton : HomeEvent
+    data object OnClickFriendButton : HomeEvent
     data object OnClickSettingButton : HomeEvent
     data object OnClickTipsButton : HomeEvent
 
@@ -55,6 +56,7 @@ class HomeContract {
   sealed interface HomeSideEffect : ViewModelContract.SideEffect {
     data class NavigateToLounge(val loungeId: String?) : HomeSideEffect
     data object NavigateToTemplateList : HomeSideEffect
+    data object NavigateToFriendList : HomeSideEffect
     data object NavigateToSetting : HomeSideEffect
     data object NavigateToTips : HomeSideEffect
     data object OpenJoinDialog : HomeSideEffect

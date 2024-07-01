@@ -88,6 +88,9 @@ fun LunchVoteNavHost(
         navigateToTemplateList = {
           navController.navigate(LunchVoteNavRoute.TemplateList)
         },
+        navigateToFriendList = {
+          navController.navigate(LunchVoteNavRoute.FriendList)
+        },
         navigateToSetting = {
           navController.navigate(LunchVoteNavRoute.Setting)
         },
