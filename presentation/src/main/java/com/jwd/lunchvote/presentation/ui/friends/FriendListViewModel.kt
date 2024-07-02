@@ -34,6 +34,7 @@ class FriendListViewModel @Inject constructor(
       is FriendListEvent.ScreenInitialize -> launch { initialize() }
 
       is FriendListEvent.OnClickBackButton -> sendSideEffect(FriendListSideEffect.PopBackStack)
+      is FriendListEvent.OnClickFriendRequestButton -> sendSideEffect(FriendListSideEffect.NavigateToFriendRequest)
 
       // DialogEvents
       is FriendListEvent.OnFriendNameChange -> updateState(FriendListReduce.UpdateFriendName(event.friendName))

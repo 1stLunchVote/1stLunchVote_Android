@@ -1,6 +1,11 @@
 package com.jwd.lunchvote.presentation.ui.friends
 
 import android.content.Context
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.rounded.Notifications
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -14,6 +19,7 @@ import com.jwd.lunchvote.presentation.model.UserUIModel
 import com.jwd.lunchvote.presentation.ui.friends.FriendListContract.FriendListEvent
 import com.jwd.lunchvote.presentation.ui.friends.FriendListContract.FriendListSideEffect
 import com.jwd.lunchvote.presentation.ui.friends.FriendListContract.FriendListState
+import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateEvent
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
@@ -80,7 +86,14 @@ private fun FriendListScreen(
         title = "친구 목록",
         popBackStack = { onEvent(FriendListEvent.OnClickBackButton) },
         actions = {
-
+          IconButton(
+            onClick = { onEvent(FriendListEvent.OnClickFriendRequestButton) }
+          ) {
+            Icon(
+              Icons.Rounded.Notifications,
+              contentDescription = "friend request"
+            )
+          }
         }
       )
     }
