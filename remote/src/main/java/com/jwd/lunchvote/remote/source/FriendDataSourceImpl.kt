@@ -65,8 +65,10 @@ class FriendDataSourceImpl @Inject constructor(
       .whereEqualTo(COLUMN_USER_ID, userId)
       .get()
       .await()
-      .toObjects(FriendRemote::class.java)
-      .map { it.asData() }
+      .mapNotNull {
+        it.toObject(FriendRemote::class.java)
+          .asData(it.id)
+      }
 
   override suspend fun getReceivedFriendRequests(
     userId: String
@@ -78,8 +80,10 @@ class FriendDataSourceImpl @Inject constructor(
       .whereEqualTo(COLUMN_FRIEND_ID, userId)
       .get()
       .await()
-      .toObjects(FriendRemote::class.java)
-      .map { it.asData() }
+      .mapNotNull {
+        it.toObject(FriendRemote::class.java)
+          .asData(it.id)
+      }
 
   override suspend fun getFriends(
     userId: String
