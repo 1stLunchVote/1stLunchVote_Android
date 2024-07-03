@@ -1,29 +1,52 @@
 package com.jwd.lunchvote.presentation.ui.friends
 
 import android.content.Context
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.rounded.Notifications
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
+import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.UserUIModel
 import com.jwd.lunchvote.presentation.ui.friends.FriendListContract.FriendListEvent
 import com.jwd.lunchvote.presentation.ui.friends.FriendListContract.FriendListSideEffect
 import com.jwd.lunchvote.presentation.ui.friends.FriendListContract.FriendListState
 import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateEvent
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
+import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
+import com.jwd.lunchvote.presentation.widget.MemberProfile
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import kotlinx.coroutines.channels.Channel
@@ -96,9 +119,105 @@ private fun FriendListScreen(
           }
         }
       )
-    }
+    },
+    scrollable = false
   ) {
+    Box(
+      modifier = Modifier.fillMaxSize()
+    ) {
+      LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+      ) {
+        FriendItemGroup(
+          title = "투표 진행 중",
+          friendList = state.friendList
+        ) { friend ->
+          FriendItem(
+            friend = friend,
+            online = true,
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(horizontal = 24.dp)
+          )
+        }
+        FriendItemGroup(
+          title = "미접속",
+          friendList = state.friendList
+        ) { friend ->
+          FriendItem(
+            friend = friend,
+            online = false,
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(horizontal = 24.dp)
+          )
+        }
+      }
+      FloatingActionButton(
+        onClick = { onEvent(FriendListEvent.OnClickRequestButton) },
+        modifier = Modifier
+          .align(Alignment.BottomEnd)
+          .padding(end = 32.dp, bottom = 48.dp),
+        containerColor = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary,
+      ) {
+        Icon(
+          imageVector = Icons.Outlined.Add,
+          contentDescription = "add friend"
+        )
+      }
+    }
+  }
+}
 
+private fun LazyListScope.FriendItemGroup(
+  title: String,
+  friendList: List<UserUIModel>,
+  content: @Composable LazyItemScope.(UserUIModel) -> Unit
+) {
+  item {
+    HorizontalDivider(thickness = 2.dp)
+  }
+  item {
+    Text(
+      text = title,
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 24.dp, vertical = 4.dp),
+      color = MaterialTheme.colorScheme.outlineVariant,
+      style = MaterialTheme.typography.labelMedium
+    )
+  }
+  items(friendList) { friend ->
+    content(friend)
+  }
+}
+
+@Composable
+private fun FriendItem(
+  friend: UserUIModel,
+  modifier: Modifier,
+  online: Boolean = true
+) {
+  Row(
+    modifier = modifier
+      .fillMaxWidth()
+      .padding(horizontal = 12.dp, vertical = 8.dp),
+    horizontalArrangement = Arrangement.spacedBy(24.dp),
+    verticalAlignment = Alignment.CenterVertically
+  ) {
+    MemberProfile(
+      member = MemberUIModel(
+        userProfile = friend.profileImage,
+        type = if (online) MemberUIModel.Type.READY else MemberUIModel.Type.DEFAULT
+      ),
+      onClick = {}
+    )
+    Text(
+      text = friend.name,
+      style = MaterialTheme.typography.titleSmall
+    )
   }
 }
 

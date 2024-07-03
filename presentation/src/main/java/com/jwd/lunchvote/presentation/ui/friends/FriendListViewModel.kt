@@ -3,7 +3,12 @@ package com.jwd.lunchvote.presentation.ui.friends
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.domain.repository.FriendRepository
+import com.jwd.lunchvote.domain.repository.UserRepository
+import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.ui.friends.FriendListContract.*
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -11,10 +16,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kr.co.inbody.config.error.UserError
 import javax.inject.Inject
 
 @HiltViewModel
 class FriendListViewModel @Inject constructor(
+  private val userRepository: UserRepository,
+  private val friendRepository: FriendRepository,
   savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<FriendListState, FriendListEvent, FriendListReduce, FriendListSideEffect>(savedStateHandle){
   override fun createInitialState(savedState: Parcelable?): FriendListState {
@@ -35,6 +43,7 @@ class FriendListViewModel @Inject constructor(
 
       is FriendListEvent.OnClickBackButton -> sendSideEffect(FriendListSideEffect.PopBackStack)
       is FriendListEvent.OnClickFriendRequestButton -> sendSideEffect(FriendListSideEffect.NavigateToFriendRequest)
+      is FriendListEvent.OnClickRequestButton -> sendSideEffect(FriendListSideEffect.OpenRequestDialog)
 
       // DialogEvents
       is FriendListEvent.OnFriendNameChange -> updateState(FriendListReduce.UpdateFriendName(event.friendName))
@@ -55,6 +64,11 @@ class FriendListViewModel @Inject constructor(
   }
 
   private suspend fun initialize() {
+    val userId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
+    val friendList = friendRepository.getFriends(userId).map { friendId ->
+      userRepository.getUserById(friendId).asUI()
+    }
 
+    updateState(FriendListReduce.UpdateFriendList(friendList))
   }
 }

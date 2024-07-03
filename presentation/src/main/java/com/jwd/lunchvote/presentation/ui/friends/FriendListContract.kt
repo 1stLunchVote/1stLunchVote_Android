@@ -18,6 +18,7 @@ class FriendListContract {
 
     data object OnClickBackButton : FriendListEvent
     data object OnClickFriendRequestButton : FriendListEvent
+    data object OnClickRequestButton : FriendListEvent
 
     // DialogEvents
     data class OnFriendNameChange(val friendName: String) : FriendListEvent

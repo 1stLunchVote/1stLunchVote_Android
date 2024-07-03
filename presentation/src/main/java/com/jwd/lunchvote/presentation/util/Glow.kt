@@ -20,7 +20,7 @@ internal fun Modifier.glow(
 ): Modifier = this.drawBehind {
   val paint = Paint().apply {
     isAntiAlias = true
-    setShadowLayer(radius.toPx(), 0.dp.toPx(), 0.dp.toPx(), color.toArgb())
+    setShadowLayer((radius / 2).toPx(), 0.dp.toPx(), 0.dp.toPx(), color.toArgb())
   }
 
   drawContext.canvas.nativeCanvas.apply {
