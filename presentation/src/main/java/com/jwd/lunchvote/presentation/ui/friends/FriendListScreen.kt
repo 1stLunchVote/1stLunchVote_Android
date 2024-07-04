@@ -135,7 +135,7 @@ private fun FriendListScreen(
       ) {
         friendItemGroup(
           titleId = R.string.friend_list_online_group_title,
-          friendList = state.friendList
+          friendList = state.onlineFriendList
         ) { friend ->
           FriendItem(
             friend = friend,
@@ -147,7 +147,7 @@ private fun FriendListScreen(
         }
         friendItemGroup(
           titleId = R.string.friend_list_offline_group_title,
-          friendList = state.friendList
+          friendList = state.offlineFriendList
         ) { friend ->
           FriendItem(
             friend = friend,
@@ -294,7 +294,7 @@ private fun Preview() {
   ScreenPreview {
     FriendListScreen(
       FriendListState(
-        friendList = List(5) {
+        onlineFriendList = List(5) {
           UserUIModel(
             name = "친구 $it"
           )
