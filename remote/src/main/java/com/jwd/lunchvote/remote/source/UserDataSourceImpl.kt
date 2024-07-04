@@ -71,9 +71,7 @@ class UserDataSourceImpl @Inject constructor(
       .await()
       .toObject(UserRemote::class.java)
       .let { user ->
-        if (user == null) throw UserError.NoUser
-        else if (user.deletedAt != null) throw UserError.DeletedUser
-        else user.asData(id)
+        user?.asData(id) ?: throw UserError.NoUser
       }
 
 

@@ -9,7 +9,10 @@ import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.FriendRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.presentation.mapper.asUI
-import com.jwd.lunchvote.presentation.ui.friends.FriendListContract.*
+import com.jwd.lunchvote.presentation.ui.friends.FriendListContract.FriendListEvent
+import com.jwd.lunchvote.presentation.ui.friends.FriendListContract.FriendListReduce
+import com.jwd.lunchvote.presentation.ui.friends.FriendListContract.FriendListSideEffect
+import com.jwd.lunchvote.presentation.ui.friends.FriendListContract.FriendListState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.co.inbody.config.error.UserError
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
