@@ -3,6 +3,7 @@ package com.jwd.lunchvote.presentation.ui.friends
 import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,10 +21,14 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -41,6 +46,7 @@ import com.jwd.lunchvote.presentation.ui.friends.FriendListContract.FriendListEv
 import com.jwd.lunchvote.presentation.ui.friends.FriendListContract.FriendListSideEffect
 import com.jwd.lunchvote.presentation.ui.friends.FriendListContract.FriendListState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
+import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
@@ -133,11 +139,10 @@ private fun FriendListScreen(
         ) { friend ->
           FriendItem(
             friend = friend,
-            onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriend(friend.id)) },
+            onClickJoinButton = { onEvent(FriendListEvent.OnClickJoinButton(friend.id)) },
+            onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id)) },
             online = true,
-            modifier = Modifier
-              .fillMaxWidth()
-              .padding(horizontal = 24.dp)
+            modifier = Modifier.fillMaxWidth()
           )
         }
         friendItemGroup(
@@ -146,11 +151,10 @@ private fun FriendListScreen(
         ) { friend ->
           FriendItem(
             friend = friend,
-            onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriend(friend.id)) },
+            onClickJoinButton = { onEvent(FriendListEvent.OnClickJoinButton(friend.id)) },
+            onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id)) },
             online = false,
-            modifier = Modifier
-              .fillMaxWidth()
-              .padding(horizontal = 24.dp)
+            modifier = Modifier.fillMaxWidth()
           )
         }
       }
@@ -198,7 +202,7 @@ private fun LazyListScope.friendItemGroup(
         text = stringResource(R.string.friend_list_no_friend),
         modifier = Modifier
           .fillMaxWidth()
-          .padding(horizontal = 24.dp, vertical = 24.dp),
+          .padding(24.dp),
         color = MaterialTheme.colorScheme.outline,
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.labelMedium
@@ -210,35 +214,51 @@ private fun LazyListScope.friendItemGroup(
 @Composable
 private fun FriendItem(
   friend: UserUIModel,
+  onClickJoinButton: () -> Unit,
   onClickDeleteFriendButton: () -> Unit,
   modifier: Modifier,
   online: Boolean = true
 ) {
-  Row(
+  var extended by remember { mutableStateOf(false) }
+
+  Column(
     modifier = modifier
       .fillMaxWidth()
-      .padding(horizontal = 12.dp, vertical = 8.dp),
-    horizontalArrangement = Arrangement.spacedBy(24.dp),
-    verticalAlignment = Alignment.CenterVertically
+      .padding(horizontal = 24.dp, vertical = 8.dp)
+      .clickableWithoutEffect { extended = !extended },
+    verticalArrangement = Arrangement.spacedBy(8.dp)
   ) {
-    MemberProfile(
-      member = MemberUIModel(
-        userProfile = friend.profileImage,
-        type = if (online) MemberUIModel.Type.READY else MemberUIModel.Type.DEFAULT
-      ),
-      onClick = {}
-    )
-    Text(
-      text = friend.name,
-      modifier = Modifier.weight(1f),
-      style = MaterialTheme.typography.titleSmall
-    )
-    Button(
-      onClick = onClickDeleteFriendButton
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.spacedBy(24.dp),
+      verticalAlignment = Alignment.CenterVertically
     ) {
-      Text(
-        text = stringResource(R.string.friend_delete_button)
+      MemberProfile(
+        member = MemberUIModel(
+          userProfile = friend.profileImage,
+          type = if (online) MemberUIModel.Type.READY else MemberUIModel.Type.DEFAULT
+        ),
+        onClick = { extended = !extended }
       )
+      Text(
+        text = friend.name,
+        modifier = Modifier.weight(1f),
+        style = MaterialTheme.typography.titleSmall
+      )
+    }
+    if (extended) {
+      Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.End),
+        verticalAlignment = Alignment.CenterVertically
+      ) {
+        OutlinedButton(onClickDeleteFriendButton) {
+          Text(text = stringResource(R.string.friend_list_delete_button))
+        }
+        Button(onClickJoinButton) {
+          Text(text = stringResource(R.string.friend_list_join_button))
+        }
+      }
     }
   }
 }

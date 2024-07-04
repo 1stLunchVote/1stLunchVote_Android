@@ -18,7 +18,8 @@ class FriendListContract {
 
     data object OnClickBackButton : FriendListEvent
     data object OnClickFriendRequestButton : FriendListEvent
-    data class OnClickDeleteFriend(val friendId: String) : FriendListEvent
+    data class OnClickJoinButton (val friendId: String) : FriendListEvent
+    data class OnClickDeleteFriendButton(val friendId: String) : FriendListEvent
     data object OnClickRequestButton : FriendListEvent
 
     // DialogEvents

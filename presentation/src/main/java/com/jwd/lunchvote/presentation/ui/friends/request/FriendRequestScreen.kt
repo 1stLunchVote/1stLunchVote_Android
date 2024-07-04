@@ -87,9 +87,7 @@ private fun FriendRequestScreen(
     scrollable = false
   ) {
     LazyColumn(
-      modifier = Modifier
-        .fillMaxSize()
-        .padding(horizontal = 24.dp),
+      modifier = Modifier.fillMaxSize(),
       verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
       val requestList = state.requestSenderMap.entries.toList().sortedByDescending { it.key.createdAt }
@@ -100,7 +98,7 @@ private fun FriendRequestScreen(
             text = stringResource(R.string.friend_request_no_request),
             modifier = Modifier
               .fillMaxWidth()
-              .padding(vertical = 24.dp),
+              .padding(24.dp),
             color = MaterialTheme.colorScheme.outline,
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.labelMedium
@@ -131,7 +129,7 @@ private fun FriendRequestItem(
   Column(
     modifier = modifier
       .fillMaxWidth()
-      .padding(horizontal = 12.dp, vertical = 8.dp),
+      .padding(horizontal = 24.dp, vertical = 8.dp),
     verticalArrangement = Arrangement.spacedBy(8.dp)
   ) {
     val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd a hh:mm", Locale.KOREA)
@@ -165,19 +163,11 @@ private fun FriendRequestItem(
       horizontalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.End),
       verticalAlignment = Alignment.CenterVertically
     ) {
-      OutlinedButton(
-        onClick = onClickRejectButton
-      ) {
-        Text(
-          text = "거절"
-        )
+      OutlinedButton(onClickRejectButton) {
+        Text(text = stringResource(R.string.friend_request_reject_button))
       }
-      Button(
-        onClick = onClickAcceptButton
-      ) {
-        Text(
-          text = "수락"
-        )
+      Button(onClickAcceptButton) {
+        Text(text = stringResource(R.string.friend_request_accept_button))
       }
     }
   }

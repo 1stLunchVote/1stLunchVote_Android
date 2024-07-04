@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.co.inbody.config.error.UserError
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -48,7 +47,8 @@ class FriendListViewModel @Inject constructor(
 
       is FriendListEvent.OnClickBackButton -> sendSideEffect(FriendListSideEffect.PopBackStack)
       is FriendListEvent.OnClickFriendRequestButton -> sendSideEffect(FriendListSideEffect.NavigateToFriendRequest)
-      is FriendListEvent.OnClickDeleteFriend -> launch { deleteFriend(event.friendId) }
+      is FriendListEvent.OnClickJoinButton -> Unit
+      is FriendListEvent.OnClickDeleteFriendButton -> launch { deleteFriend(event.friendId) }
       is FriendListEvent.OnClickRequestButton -> sendSideEffect(FriendListSideEffect.OpenRequestDialog)
 
       // DialogEvents
