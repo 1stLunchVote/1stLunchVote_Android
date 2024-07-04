@@ -98,10 +98,24 @@ class FriendListViewModel @Inject constructor(
     updateState(FriendListReduce.UpdateFriendName(null))
 
     val userId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
+    val user = userRepository.getUserById(userId).asUI()
+    if (friendName == user.name) {
+      sendSideEffect(FriendListSideEffect.ShowSnackbar(UiText.StringResource(R.string.friend_list_self_snackbar)))
+      return
+    }
+
     val friend = userRepository.getUserByName(friendName).asUI()
     if (friend in currentState.friendList) {
       sendSideEffect(FriendListSideEffect.ShowSnackbar(UiText.StringResource(R.string.friend_list_already_friend_snackbar)))
       return
+    }
+
+    val requestList = friendRepository.getSentFriendRequests(userId) + friendRepository.getReceivedFriendRequests(userId)
+    requestList.forEach { request ->
+      if ((userId == request.userId && friend.id == request.friendId) || (userId == request.friendId && friend.id == request.userId)) {
+        sendSideEffect(FriendListSideEffect.ShowSnackbar(UiText.StringResource(R.string.friend_list_already_request_snackbar)))
+        return
+      }
     }
 
     friendRepository.requestFriend(userId, friend.id)
