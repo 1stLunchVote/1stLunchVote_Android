@@ -42,7 +42,8 @@
     <string name="nickname_description">제1회 점심메뉴 총선거에서 사용할\n멋진 닉네임을 정해주세요!</string>
     <string name="nickname_nickname_hint">닉네임 입력</string>
     <string name="nickname_next_button">계정 생성</string>
-    <string name="nickname_user_collision_error_snackbar">해당 이메일로 생성된 계정이 있습니다. 계정을 확인해주세요.</string>
+    <string name="nickname_email_collision_error_snackbar">해당 이메일로 생성된 계정이 있습니다. 계정을 확인해주세요.</string>
+    <string name="nickname_name_collision_error_snackbar">중복된 닉네임입니다.</string>
     <string name="nickname_success_snackbar">계정이 성공적으로 생성되었습니다.</string>
 
     <!-- HomeScreen -->

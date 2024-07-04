@@ -11,8 +11,11 @@ class UserRepositoryImpl @Inject constructor(
   private val userDataSource: UserDataSource
 ): UserRepository {
 
-  override suspend fun checkUserExists(email: String): Boolean =
-    userDataSource.checkUserExists(email)
+  override suspend fun checkEmailExists(email: String): Boolean =
+    userDataSource.checkEmailExists(email)
+
+  override suspend fun checkNameExists(name: String): Boolean =
+    userDataSource.checkNameExists(name)
 
   override suspend fun createUser(user: User): String =
     userDataSource.createUser(user.asData())

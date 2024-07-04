@@ -77,7 +77,7 @@ class LoginViewModel @Inject constructor(
 
   private suspend fun googleLogin(account: GoogleSignInAccount) {
     val userId = signInWithGoogleIdToken(account.idToken!!)
-    val exists = userRepository.checkUserExists(account.email ?: throw LoginError.NoEmail)
+    val exists = userRepository.checkEmailExists(account.email ?: throw LoginError.NoEmail)
     if (exists.not()) {
       val user = UserUIModel(
         id = userId,
@@ -101,7 +101,7 @@ class LoginViewModel @Inject constructor(
           oAuthToken.idToken == null -> throw LoginError.TokenFailed
           else -> {
             val userId = signInWithKakaoIdToken(oAuthToken.idToken!!)
-            val exists = userRepository.checkUserExists(user.kakaoAccount?.email ?: throw LoginError.NoEmail)
+            val exists = userRepository.checkEmailExists(user.kakaoAccount?.email ?: throw LoginError.NoEmail)
             if (exists.not()) {
               val newUser = UserUIModel(
                 id = userId,

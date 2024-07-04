@@ -25,13 +25,25 @@ class UserDataSourceImpl @Inject constructor(
     private const val COLUMN_DELETED_AT = "deletedAt"
   }
 
-  override suspend fun checkUserExists(
+  override suspend fun checkEmailExists(
     email: String
   ): Boolean =
     fireStore
       .collection(COLLECTION_USER)
       .whereNotDeleted()
       .whereEqualTo(COLUMN_EMAIL, email)
+      .get()
+      .await()
+      .isEmpty
+      .not()
+
+  override suspend fun checkNameExists(
+    name: String
+  ): Boolean =
+    fireStore
+      .collection(COLLECTION_USER)
+      .whereNotDeleted()
+      .whereEqualTo(COLUMN_NAME, name)
       .get()
       .await()
       .isEmpty

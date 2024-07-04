@@ -57,7 +57,7 @@ class EmailVerificationViewModel @Inject constructor(
   }
 
   private suspend fun checkEmail() {
-    val exists = userRepository.checkUserExists(currentState.email)
+    val exists = userRepository.checkEmailExists(currentState.email)
     if (exists) sendSideEffect(EmailVerificationSideEffect.ShowSnackbar(UiText.StringResource(R.string.email_verification_user_collision_error_snackbar)))
     else sendEmail()
   }

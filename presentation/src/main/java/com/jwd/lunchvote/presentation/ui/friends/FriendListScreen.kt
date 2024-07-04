@@ -129,7 +129,7 @@ private fun FriendListScreen(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
       ) {
-        FriendItemGroup(
+        friendItemGroup(
           title = "투표 진행 중",
           friendList = state.friendList
         ) { friend ->
@@ -141,7 +141,7 @@ private fun FriendListScreen(
               .padding(horizontal = 24.dp)
           )
         }
-        FriendItemGroup(
+        friendItemGroup(
           title = "미접속",
           friendList = state.friendList
         ) { friend ->
@@ -171,7 +171,7 @@ private fun FriendListScreen(
   }
 }
 
-private fun LazyListScope.FriendItemGroup(
+private fun LazyListScope.friendItemGroup(
   title: String,
   friendList: List<UserUIModel>,
   content: @Composable LazyItemScope.(UserUIModel) -> Unit

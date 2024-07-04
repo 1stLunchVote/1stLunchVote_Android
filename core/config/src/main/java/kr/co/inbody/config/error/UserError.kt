@@ -11,4 +11,9 @@ interface UserError {
     private fun readResolve(): Any = DeletedUser
     override val message: String = "탈퇴한 회원입니다."
   }
+
+  data object DuplicatedName: Throwable() {
+    private fun readResolve(): Any = DuplicatedName
+    override val message: String = "중복된 닉네임입니다."
+  }
 }
