@@ -8,6 +8,7 @@ import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.FriendRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
+import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.ui.friends.FriendListContract.FriendListEvent
 import com.jwd.lunchvote.presentation.ui.friends.FriendListContract.FriendListReduce
@@ -47,12 +48,13 @@ class FriendListViewModel @Inject constructor(
 
       is FriendListEvent.OnClickBackButton -> sendSideEffect(FriendListSideEffect.PopBackStack)
       is FriendListEvent.OnClickFriendRequestButton -> sendSideEffect(FriendListSideEffect.NavigateToFriendRequest)
+      is FriendListEvent.OnClickDeleteFriend -> launch { deleteFriend(event.friendId) }
       is FriendListEvent.OnClickRequestButton -> sendSideEffect(FriendListSideEffect.OpenRequestDialog)
 
       // DialogEvents
       is FriendListEvent.OnFriendNameChange -> updateState(FriendListReduce.UpdateFriendName(event.friendName))
       is FriendListEvent.OnClickCancelButtonRequestDialog -> sendSideEffect(FriendListSideEffect.CloseDialog)
-      is FriendListEvent.OnClickConfirmButtonRequestDialog -> TODO()
+      is FriendListEvent.OnClickConfirmButtonRequestDialog -> launch { sendRequest() }
     }
   }
 
@@ -64,6 +66,10 @@ class FriendListViewModel @Inject constructor(
   }
 
   override fun handleErrors(error: Throwable) {
+    when (error) {
+      is UserError.NoUser -> sendSideEffect(FriendListSideEffect.ShowSnackbar(UiText.StringResource(R.string.friend_list_no_user_error_snackbar)))
+      else -> Timber.e(error)
+    }
     sendSideEffect(FriendListSideEffect.ShowSnackbar(UiText.ErrorString(error)))
   }
 
@@ -74,5 +80,31 @@ class FriendListViewModel @Inject constructor(
     }
 
     updateState(FriendListReduce.UpdateFriendList(friendList))
+  }
+
+  private suspend fun deleteFriend(friendId: String) {
+    val userId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
+
+    friendRepository.deleteFriend(userId, friendId)
+
+    initialize()
+    sendSideEffect(FriendListSideEffect.ShowSnackbar(UiText.StringResource(R.string.friend_list_delete_friend_snackbar)))
+  }
+
+  private suspend fun sendRequest() {
+    val friendName = currentState.friendName ?: return
+
+    sendSideEffect(FriendListSideEffect.CloseDialog)
+
+    val userId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
+    val friend = userRepository.getUserByName(friendName).asUI()
+    if (friend in currentState.friendList) {
+      sendSideEffect(FriendListSideEffect.ShowSnackbar(UiText.StringResource(R.string.friend_list_already_friend_snackbar)))
+      return
+    }
+
+    friendRepository.requestFriend(userId, friend.id)
+
+    sendSideEffect(FriendListSideEffect.ShowSnackbar(UiText.StringResource(R.string.friend_list_send_request_snackbar)))
   }
 }

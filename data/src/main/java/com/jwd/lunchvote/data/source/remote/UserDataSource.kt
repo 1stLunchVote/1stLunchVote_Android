@@ -8,5 +8,6 @@ interface UserDataSource {
   suspend fun checkNameExists(name: String): Boolean
   suspend fun createUser(user: UserData): String
   suspend fun getUserById(id: String): UserData
+  suspend fun getUserByName(name: String): UserData
   suspend fun updateUser(user: UserData)
 }

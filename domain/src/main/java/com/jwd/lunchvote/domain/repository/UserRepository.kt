@@ -8,5 +8,6 @@ interface UserRepository {
   suspend fun checkNameExists(name: String): Boolean
   suspend fun createUser(user: User): String
   suspend fun getUserById(id: String): User
+  suspend fun getUserByName(name: String): User
   suspend fun updateUser(user: User)
 }

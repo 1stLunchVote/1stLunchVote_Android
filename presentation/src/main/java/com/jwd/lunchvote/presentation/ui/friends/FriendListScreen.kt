@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.rounded.Notifications
+import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -135,6 +136,7 @@ private fun FriendListScreen(
         ) { friend ->
           FriendItem(
             friend = friend,
+            onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriend(friend.id)) },
             online = true,
             modifier = Modifier
               .fillMaxWidth()
@@ -147,6 +149,7 @@ private fun FriendListScreen(
         ) { friend ->
           FriendItem(
             friend = friend,
+            onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriend(friend.id)) },
             online = false,
             modifier = Modifier
               .fillMaxWidth()
@@ -197,6 +200,7 @@ private fun LazyListScope.friendItemGroup(
 @Composable
 private fun FriendItem(
   friend: UserUIModel,
+  onClickDeleteFriendButton: () -> Unit,
   modifier: Modifier,
   online: Boolean = true
 ) {
@@ -216,8 +220,16 @@ private fun FriendItem(
     )
     Text(
       text = friend.name,
+      modifier = Modifier.weight(1f),
       style = MaterialTheme.typography.titleSmall
     )
+    Button(
+      onClick = onClickDeleteFriendButton
+    ) {
+      Text(
+        text = "삭제"
+      )
+    }
   }
 }
 

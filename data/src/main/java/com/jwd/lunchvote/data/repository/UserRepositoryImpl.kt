@@ -23,6 +23,9 @@ class UserRepositoryImpl @Inject constructor(
   override suspend fun getUserById(id: String): User =
     userDataSource.getUserById(id).asDomain()
 
+  override suspend fun getUserByName(name: String): User =
+    userDataSource.getUserByName(name).asDomain()
+
   override suspend fun updateUser(user: User) {
     userDataSource.updateUser(user.asData())
   }

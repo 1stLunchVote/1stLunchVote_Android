@@ -74,6 +74,21 @@ class UserDataSourceImpl @Inject constructor(
         user?.asData(id) ?: throw UserError.NoUser
       }
 
+  override suspend fun getUserByName(
+    name: String
+  ): UserData =
+    fireStore
+      .collection(COLLECTION_USER)
+      .whereNotDeleted()
+      .whereEqualTo(COLUMN_NAME, name)
+      .get()
+      .await()
+      .documents
+      .firstOrNull()
+      ?.let {
+        it.toObject(UserRemote::class.java)
+          ?.asData(it.id)
+      } ?: throw UserError.NoUser
 
   override suspend fun updateUser(
     user: UserData

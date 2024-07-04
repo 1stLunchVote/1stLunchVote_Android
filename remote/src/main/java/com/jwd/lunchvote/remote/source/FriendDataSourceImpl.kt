@@ -6,6 +6,7 @@ import com.jwd.lunchvote.data.model.FriendData
 import com.jwd.lunchvote.data.source.remote.FriendDataSource
 import com.jwd.lunchvote.remote.mapper.asData
 import com.jwd.lunchvote.remote.model.FriendRemote
+import com.jwd.lunchvote.remote.util.deleteDocument
 import com.jwd.lunchvote.remote.util.whereNotDeleted
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -114,11 +115,24 @@ class FriendDataSourceImpl @Inject constructor(
   ) {
     fireStore
       .collection(COLLECTION_FRIEND)
-      .whereEqualTo(COLUMN_USER_ID, userId)
-      .whereEqualTo(COLUMN_FRIEND_ID, friendId)
-      .get()
-      .await()
-      .documents
-      .forEach { it.reference.delete() }
+      .whereNotDeleted()
+      .apply {
+        whereEqualTo(COLUMN_USER_ID, userId)
+          .whereEqualTo(COLUMN_FRIEND_ID, friendId)
+          .get()
+          .await()
+          .documents
+          .forEach {
+            it.reference.deleteDocument()
+          }
+        whereEqualTo(COLUMN_USER_ID, friendId)
+          .whereEqualTo(COLUMN_FRIEND_ID, userId)
+          .get()
+          .await()
+          .documents
+          .forEach {
+            it.reference.deleteDocument()
+          }
+      }
   }
 }
