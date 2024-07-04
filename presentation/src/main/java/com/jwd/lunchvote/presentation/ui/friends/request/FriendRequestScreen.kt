@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -90,13 +91,28 @@ private fun FriendRequestScreen(
       verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
       val requestList = state.requestSenderMap.entries.toList().sortedByDescending { it.key.createdAt }
-      items(requestList) { (request, friend) ->
-        FriendRequestItem(
-          request = request,
-          friend = friend,
-          onClickAcceptButton = { onEvent(FriendRequestEvent.OnClickAcceptRequestButton(request)) },
-          onClickRejectButton = { onEvent(FriendRequestEvent.OnClickRejectRequestButton(request)) }
-        )
+
+      if (requestList.isEmpty()) {
+        item {
+          Text(
+            text = "받은 친구 신청이 없습니다.",
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(vertical = 24.dp),
+            color = MaterialTheme.colorScheme.outline,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.labelMedium
+          )
+        }
+      } else {
+        items(requestList) { (request, friend) ->
+          FriendRequestItem(
+            request = request,
+            friend = friend,
+            onClickAcceptButton = { onEvent(FriendRequestEvent.OnClickAcceptRequestButton(request)) },
+            onClickRejectButton = { onEvent(FriendRequestEvent.OnClickRejectRequestButton(request)) }
+          )
+        }
       }
     }
   }
