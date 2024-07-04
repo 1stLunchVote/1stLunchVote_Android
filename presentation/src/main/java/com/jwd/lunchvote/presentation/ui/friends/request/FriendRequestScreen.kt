@@ -35,6 +35,7 @@ import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -88,12 +89,13 @@ private fun FriendRequestScreen(
         .padding(horizontal = 24.dp),
       verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-      items(state.friendRequestList) { friendRequest ->
+      val requestList = state.requestSenderMap.entries.toList().sortedByDescending { it.key.createdAt }
+      items(requestList) { (request, friend) ->
         FriendRequestItem(
-          friendRequest = friendRequest,
-          friend = state.userById[friendRequest.userId]!!,
-          onClickAcceptButton = { onEvent(FriendRequestEvent.OnClickAcceptRequestButton) },
-          onClickRejectButton = { onEvent(FriendRequestEvent.OnClickRejectRequestButton) }
+          request = request,
+          friend = friend,
+          onClickAcceptButton = { onEvent(FriendRequestEvent.OnClickAcceptRequestButton(request)) },
+          onClickRejectButton = { onEvent(FriendRequestEvent.OnClickRejectRequestButton(request)) }
         )
       }
     }
@@ -102,7 +104,7 @@ private fun FriendRequestScreen(
 
 @Composable
 private fun FriendRequestItem(
-  friendRequest: FriendUIModel,
+  request: FriendUIModel,
   friend: UserUIModel,
   onClickAcceptButton: () -> Unit,
   onClickRejectButton: () -> Unit,
@@ -117,7 +119,7 @@ private fun FriendRequestItem(
     val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd a hh:mm", Locale.KOREA)
 
     Text(
-      text = friendRequest.createdAt.format(dateTimeFormatter),
+      text = request.createdAt.format(dateTimeFormatter),
       modifier = Modifier.padding(bottom = 8.dp),
       color = MaterialTheme.colorScheme.outlineVariant,
       style = MaterialTheme.typography.labelLarge
@@ -169,22 +171,21 @@ private fun Preview() {
   ScreenPreview {
     FriendRequestScreen(
       FriendRequestState(
-        friendRequestList = List(3) {
+        requestSenderMap = mapOf(
           FriendUIModel(
-            userId = "$it"
-          )
-        },
-        userById = mapOf(
-          "0" to UserUIModel(
-            name = "친구 1",
+            id = "1",
+            userId = "1"
+          ) to UserUIModel(
+            id = "1",
+            name = "김철수",
             profileImage = ""
           ),
-          "1" to UserUIModel(
-            name = "친구 2",
-            profileImage = ""
-          ),
-          "2" to UserUIModel(
-            name = "친구 3",
+          FriendUIModel(
+            id = "2",
+            userId = "2"
+          ) to UserUIModel(
+            id = "2",
+            name = "이영희",
             profileImage = ""
           )
         )

@@ -10,21 +10,19 @@ import kotlinx.parcelize.Parcelize
 class FriendRequestContract {
   @Parcelize
   data class FriendRequestState(
-    val friendRequestList: List<FriendUIModel> = emptyList(),
-    val userById: Map<String, UserUIModel> = emptyMap()
+    val requestSenderMap: Map<FriendUIModel, UserUIModel> = emptyMap()
   ) : ViewModelContract.State, Parcelable
 
   sealed interface FriendRequestEvent : ViewModelContract.Event {
     data object ScreenInitialize : FriendRequestEvent
 
     data object OnClickBackButton : FriendRequestEvent
-    data object OnClickAcceptRequestButton : FriendRequestEvent
-    data object OnClickRejectRequestButton : FriendRequestEvent
+    data class OnClickAcceptRequestButton(val friend: FriendUIModel) : FriendRequestEvent
+    data class OnClickRejectRequestButton(val friend: FriendUIModel) : FriendRequestEvent
   }
 
   sealed interface FriendRequestReduce : ViewModelContract.Reduce {
-    data class UpdateFriendRequestList(val friendRequestList: List<FriendUIModel>) : FriendRequestReduce
-    data class UpdateUserById(val userById: Map<String, UserUIModel>) : FriendRequestReduce
+    data class UpdateRequestSenderMap(val requestSenderMap: Map<FriendUIModel, UserUIModel>) : FriendRequestReduce
   }
 
   sealed interface FriendRequestSideEffect : ViewModelContract.SideEffect {
