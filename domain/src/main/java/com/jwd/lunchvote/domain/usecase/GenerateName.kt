@@ -10,11 +10,13 @@ class GenerateName @Inject constructor(
 
   suspend operator fun invoke(name: String?): String {
     val userName = name ?: UserConfig.DEFAULT_USER_NAME
-    while (true) {
-      val randomString = (1..5).map { ('a'..'z').random() }.joinToString("")
+    var isNameExists = userRepository.checkNameExists(userName)
 
-      val nameExits = userRepository.checkNameExists(userName + randomString)
-      if (nameExits.not()) return userName + randomString
+    var randomString = ""
+    while (isNameExists) {
+      randomString = (1..5).map { ('a'..'z').random() }.joinToString("")
+      isNameExists = userRepository.checkNameExists(userName + randomString)
     }
+    return userName + randomString
   }
 }

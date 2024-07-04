@@ -104,6 +104,7 @@ fun ProfileRoute(
     }
     ProfileContract.EDIT_NAME_DIALOG -> {
       EditNameDialog(
+        initialName = state.user.name,
         name = state.name,
         onDismissRequest = { viewModel.sendEvent(ProfileEvent.OnClickCancelButtonEditNameDialog) },
         onNameChange = { viewModel.sendEvent(ProfileEvent.OnNameChangeEditNameDialog(it)) },
@@ -382,6 +383,7 @@ private fun EditProfileImageDialog(
 
 @Composable
 private fun EditNameDialog(
+  initialName: String,
   name: String,
   modifier: Modifier = Modifier,
   onDismissRequest: () -> Unit = {},
@@ -395,14 +397,14 @@ private fun EditNameDialog(
     confirmText = stringResource(R.string.profile_edit_name_dialog_save_button),
     onConfirmation = onConfirmation,
     modifier = modifier,
-    confirmEnabled = name.isNotEmpty()
+    confirmEnabled = (name.isEmpty() || name == initialName).not()
   ) {
     LunchVoteTextField(
       text = name,
       onTextChange = onNameChange,
       hintText = stringResource(R.string.profile_edit_name_dialog_hint_text),
       modifier = Modifier.fillMaxWidth(),
-      isError = name.isEmpty()
+      isError = name.isEmpty() || name == initialName
     )
   }
 }
@@ -467,6 +469,7 @@ private fun EditProfileImageDialogPreview() {
 private fun EditNameDialogPreview() {
   LunchVoteTheme {
     EditNameDialog(
+      initialName = "김태우존잘",
       name = ""
     )
   }
