@@ -68,9 +68,8 @@ class FriendListViewModel @Inject constructor(
   override fun handleErrors(error: Throwable) {
     when (error) {
       is UserError.NoUser -> sendSideEffect(FriendListSideEffect.ShowSnackbar(UiText.StringResource(R.string.friend_list_no_user_error_snackbar)))
-      else -> Timber.e(error)
+      else -> sendSideEffect(FriendListSideEffect.ShowSnackbar(UiText.ErrorString(error)))
     }
-    sendSideEffect(FriendListSideEffect.ShowSnackbar(UiText.ErrorString(error)))
   }
 
   private suspend fun initialize() {
@@ -95,6 +94,8 @@ class FriendListViewModel @Inject constructor(
     val friendName = currentState.friendName ?: return
 
     sendSideEffect(FriendListSideEffect.CloseDialog)
+
+    updateState(FriendListReduce.UpdateFriendName(null))
 
     val userId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
     val friend = userRepository.getUserByName(friendName).asUI()
