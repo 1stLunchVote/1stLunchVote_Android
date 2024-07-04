@@ -170,12 +170,24 @@
     <string name="edit_template_delete_confirm_button">삭제</string>
 
     <!-- FriendListScreen -->
+    <string name="friend_list_title">친구 목록</string>
+    <string name="friend_list_online_group_title">투표 진행 중</string>
+    <string name="friend_list_offline_group_title">미접속</string>
+    <string name="friend_list_no_friend">친구가 없습니다.</string>
+    <string name="friend_delete_button">삭제</string>
     <string name="friend_list_already_friend_snackbar">이미 친구입니다.</string>
     <string name="friend_list_no_user_error_snackbar">유저 정보를 찾을 수 없습니다.</string>
     <string name="friend_list_delete_friend_snackbar">친구를 삭제했습니다.</string>
     <string name="friend_list_send_request_snackbar">친구 신청이 전송되었습니다.</string>
-
+    <!-- FriendListRequestDialog -->
+    <string name="friend_list_request_dialog_title">친구 초대하기</string>
+    <string name="friend_list_request_dialog_hint_text">친구의 닉네임을 입력해주세요</string>
+    <string name="friend_list_request_dialog_dismiss_text">취소</string>
+    <string name="friend_list_request_dialog_confirm_text">친구 초대</string>
+    
     <!-- FriendRequestScreen -->
+    <string name="friend_request_title">받은 친구 신청</string>
+    <string name="friend_request_no_request">받은 친구 신청이 없습니다.</string>
     <string name="friend_request_no_user_error_snackbar">유저 정보를 찾을 수 없습니다.</string>
 
     <!-- SettingScreen -->

@@ -19,12 +19,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
+import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FriendUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.UserUIModel
@@ -78,7 +80,7 @@ private fun FriendRequestScreen(
     modifier = modifier,
     topAppBar = {
       LunchVoteTopBar(
-        title = "받은 친구 신청",
+        title = stringResource(R.string.friend_request_title),
         popBackStack = { onEvent(FriendRequestEvent.OnClickBackButton) }
       )
     },
@@ -95,7 +97,7 @@ private fun FriendRequestScreen(
       if (requestList.isEmpty()) {
         item {
           Text(
-            text = "받은 친구 신청이 없습니다.",
+            text = stringResource(R.string.friend_request_no_request),
             modifier = Modifier
               .fillMaxWidth()
               .padding(vertical = 24.dp),

@@ -3,8 +3,6 @@ package com.jwd.lunchvote.presentation.ui.friends
 import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,11 +10,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
@@ -31,20 +27,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
+import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.UserUIModel
 import com.jwd.lunchvote.presentation.ui.friends.FriendListContract.FriendListEvent
 import com.jwd.lunchvote.presentation.ui.friends.FriendListContract.FriendListSideEffect
 import com.jwd.lunchvote.presentation.ui.friends.FriendListContract.FriendListState
-import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateContract.EditTemplateEvent
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
-import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
@@ -108,7 +104,7 @@ private fun FriendListScreen(
     modifier = modifier,
     topAppBar = {
       LunchVoteTopBar(
-        title = "친구 목록",
+        title = stringResource(R.string.friend_list_title),
         popBackStack = { onEvent(FriendListEvent.OnClickBackButton) },
         actions = {
           IconButton(
@@ -132,7 +128,7 @@ private fun FriendListScreen(
         verticalArrangement = Arrangement.spacedBy(8.dp)
       ) {
         friendItemGroup(
-          title = "투표 진행 중",
+          titleId = R.string.friend_list_online_group_title,
           friendList = state.friendList
         ) { friend ->
           FriendItem(
@@ -145,7 +141,7 @@ private fun FriendListScreen(
           )
         }
         friendItemGroup(
-          title = "미접속",
+          titleId = R.string.friend_list_offline_group_title,
           friendList = state.friendList
         ) { friend ->
           FriendItem(
@@ -176,7 +172,7 @@ private fun FriendListScreen(
 }
 
 private fun LazyListScope.friendItemGroup(
-  title: String,
+  titleId: Int,
   friendList: List<UserUIModel>,
   content: @Composable LazyItemScope.(UserUIModel) -> Unit
 ) {
@@ -185,7 +181,7 @@ private fun LazyListScope.friendItemGroup(
   }
   item {
     Text(
-      text = title,
+      text = stringResource(titleId),
       modifier = Modifier
         .fillMaxWidth()
         .padding(horizontal = 24.dp, vertical = 4.dp),
@@ -199,7 +195,7 @@ private fun LazyListScope.friendItemGroup(
   if (friendList.isEmpty()) {
     item {
       Text(
-        text = "친구가 없습니다.",
+        text = stringResource(R.string.friend_list_no_friend),
         modifier = Modifier
           .fillMaxWidth()
           .padding(horizontal = 24.dp, vertical = 24.dp),
@@ -241,7 +237,7 @@ private fun FriendItem(
       onClick = onClickDeleteFriendButton
     ) {
       Text(
-        text = "삭제"
+        text = stringResource(R.string.friend_delete_button)
       )
     }
   }
@@ -256,10 +252,10 @@ private fun RequestDialog(
   onConfirmation: () -> Unit = {},
 ) {
   LunchVoteDialog(
-    title = "친구 초대하기",
-    dismissText = "취소",
+    title = stringResource(R.string.friend_list_request_dialog_title),
+    dismissText = stringResource(R.string.friend_list_request_dialog_dismiss_text),
     onDismissRequest = onDismissRequest,
-    confirmText = "친구 초대",
+    confirmText = stringResource(R.string.friend_list_request_dialog_confirm_text),
     onConfirmation = onConfirmation,
     modifier = modifier,
     confirmEnabled = friendName.isNotBlank()
@@ -267,7 +263,7 @@ private fun RequestDialog(
     LunchVoteTextField(
       text = friendName,
       onTextChange = onFriendNameChange,
-      hintText = "친구의 닉네임을 입력해주세요"
+      hintText = stringResource(R.string.friend_list_request_dialog_hint_text)
     )
   }
 }
