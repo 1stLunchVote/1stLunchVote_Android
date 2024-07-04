@@ -139,10 +139,10 @@ private fun FriendListScreen(
         ) { friend ->
           FriendItem(
             friend = friend,
-            onClickJoinButton = { onEvent(FriendListEvent.OnClickJoinButton(friend.id)) },
-            onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id)) },
+            modifier = Modifier.fillMaxWidth(),
             online = true,
-            modifier = Modifier.fillMaxWidth()
+            onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id)) },
+            onClickJoinButton = { onEvent(FriendListEvent.OnClickJoinButton(friend.id)) }
           )
         }
         friendItemGroup(
@@ -151,10 +151,9 @@ private fun FriendListScreen(
         ) { friend ->
           FriendItem(
             friend = friend,
-            onClickJoinButton = { onEvent(FriendListEvent.OnClickJoinButton(friend.id)) },
-            onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id)) },
+            modifier = Modifier.fillMaxWidth(),
             online = false,
-            modifier = Modifier.fillMaxWidth()
+            onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id)) },
           )
         }
       }
@@ -214,10 +213,10 @@ private fun LazyListScope.friendItemGroup(
 @Composable
 private fun FriendItem(
   friend: UserUIModel,
-  onClickJoinButton: () -> Unit,
-  onClickDeleteFriendButton: () -> Unit,
   modifier: Modifier,
-  online: Boolean = true
+  online: Boolean = true,
+  onClickDeleteFriendButton: () -> Unit = {},
+  onClickJoinButton: () -> Unit = {}
 ) {
   var extended by remember { mutableStateOf(false) }
 
@@ -255,8 +254,10 @@ private fun FriendItem(
         OutlinedButton(onClickDeleteFriendButton) {
           Text(text = stringResource(R.string.friend_list_delete_button))
         }
-        Button(onClickJoinButton) {
-          Text(text = stringResource(R.string.friend_list_join_button))
+        if (online) {
+          Button(onClickJoinButton) {
+            Text(text = stringResource(R.string.friend_list_join_button))
+          }
         }
       }
     }
