@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.jwd.lunchvote.presentation.ui.friends.FriendListRoute
+import com.jwd.lunchvote.presentation.ui.friends.request.FriendRequestRoute
 import com.jwd.lunchvote.presentation.ui.home.HomeRoute
 import com.jwd.lunchvote.presentation.ui.login.LoginRoute
 import com.jwd.lunchvote.presentation.ui.login.register.email_verification.EmailVerificationRoute
@@ -157,7 +158,9 @@ fun LunchVoteNavHost(
        )
     }
     composable(LunchVoteNavRoute.FriendRequest) {
-      // FriendRequestRoute
+      FriendRequestRoute(
+        popBackStack = { navController.popBackStack() }
+      )
     }
     composable(LunchVoteNavRoute.Setting) {
       SettingRoute(
