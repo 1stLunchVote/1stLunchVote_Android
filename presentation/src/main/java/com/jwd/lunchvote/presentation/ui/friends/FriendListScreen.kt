@@ -131,45 +131,31 @@ private fun FriendListScreen(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
       ) {
-        if (state.friendList.isEmpty()) {
-          item {
-            Text(
-              text = "친구가 없습니다.\n아래 [+] 버튼을 눌러 친구 신청을 보내보세요!",
-              modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 24.dp),
-              color = MaterialTheme.colorScheme.outline,
-              textAlign = TextAlign.Center,
-              style = MaterialTheme.typography.labelMedium
-            )
-          }
-        } else {
-          friendItemGroup(
-            title = "투표 진행 중",
-            friendList = state.friendList
-          ) { friend ->
-            FriendItem(
-              friend = friend,
-              onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriend(friend.id)) },
-              online = true,
-              modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-            )
-          }
-          friendItemGroup(
-            title = "미접속",
-            friendList = state.friendList
-          ) { friend ->
-            FriendItem(
-              friend = friend,
-              onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriend(friend.id)) },
-              online = false,
-              modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-            )
-          }
+        friendItemGroup(
+          title = "투표 진행 중",
+          friendList = state.friendList
+        ) { friend ->
+          FriendItem(
+            friend = friend,
+            onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriend(friend.id)) },
+            online = true,
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(horizontal = 24.dp)
+          )
+        }
+        friendItemGroup(
+          title = "미접속",
+          friendList = state.friendList
+        ) { friend ->
+          FriendItem(
+            friend = friend,
+            onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriend(friend.id)) },
+            online = false,
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(horizontal = 24.dp)
+          )
         }
       }
       FloatingActionButton(
@@ -209,6 +195,19 @@ private fun LazyListScope.friendItemGroup(
   }
   items(friendList) { friend ->
     content(friend)
+  }
+  if (friendList.isEmpty()) {
+    item {
+      Text(
+        text = "친구가 없습니다.",
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 24.dp, vertical = 24.dp),
+        color = MaterialTheme.colorScheme.outline,
+        textAlign = TextAlign.Center,
+        style = MaterialTheme.typography.labelMedium
+      )
+    }
   }
 }
 
