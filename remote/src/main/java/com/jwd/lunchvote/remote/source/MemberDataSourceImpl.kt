@@ -73,7 +73,7 @@ class MemberDataSourceImpl @Inject constructor(
   override suspend fun getMemberByUserId(
     userId: String,
     loungeId: String
-  ): MemberData =
+  ): MemberData? =
     database
       .getReference(REFERENCE_MEMBER)
       .child(loungeId)
@@ -81,7 +81,7 @@ class MemberDataSourceImpl @Inject constructor(
       .get()
       .await()
       .getValue(MemberRemote::class.java)
-      ?.asData(userId) ?: throw MemberError.InvalidMember
+      ?.asData(userId)
 
   override suspend fun updateMemberReadyType(
     member: MemberData

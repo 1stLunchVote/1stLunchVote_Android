@@ -27,6 +27,11 @@ interface LoungeError {
     override val message: String = "투표 방 생성에 실패했습니다."
   }
 
+  data object ExiledMember : Throwable() {
+    private fun readResolve(): Any = ExiledMember
+    override val message: String = "추방되어 방 참여가 불가능합니다."
+  }
+
   data object JoinLoungeFailed : Throwable() {
     private fun readResolve(): Any = JoinLoungeFailed
     override val message: String = "투표 방 참가에 실패했습니다."

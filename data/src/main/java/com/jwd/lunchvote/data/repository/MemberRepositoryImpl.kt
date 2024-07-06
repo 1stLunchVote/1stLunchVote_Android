@@ -23,8 +23,8 @@ class MemberRepositoryImpl @Inject constructor(
   override fun getMemberTypeFlow(loungeId: String, userId: String): Flow<Member.Type> =
     memberDataSource.getMemberTypeFlow(loungeId, userId).map { it.asDomain() }
 
-  override suspend fun getMemberByUserId(userId: String, loungeId: String): Member =
-    memberDataSource.getMemberByUserId(userId, loungeId).asDomain()
+  override suspend fun getMemberByUserId(userId: String, loungeId: String): Member? =
+    memberDataSource.getMemberByUserId(userId, loungeId)?.asDomain()
 
   override suspend fun updateMemberReadyType(member: Member) {
     memberDataSource.updateMemberReadyType(member.asData())

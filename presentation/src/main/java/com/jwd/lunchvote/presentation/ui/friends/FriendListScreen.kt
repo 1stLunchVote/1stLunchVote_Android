@@ -242,7 +242,7 @@ private fun FriendItem(
   modifier: Modifier,
   online: Boolean = true,
   onClickDeleteFriendButton: () -> Unit = {},
-  onClickJoinButton: () -> Unit = {}
+  onClickJoinButton: (() -> Unit)? = null
 ) {
   var extended by remember { mutableStateOf(false) }
 
@@ -280,7 +280,7 @@ private fun FriendItem(
         OutlinedButton(onClickDeleteFriendButton) {
           Text(text = stringResource(R.string.friend_list_delete_button))
         }
-        if (online) {
+        if (onClickJoinButton != null) {
           Button(onClickJoinButton) {
             Text(text = stringResource(R.string.friend_list_join_button))
           }

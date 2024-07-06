@@ -125,6 +125,7 @@ class LoungeViewModel @Inject constructor(
       is LoungeError.FullMember -> sendSideEffect(LoungeSideEffect.PopBackStack)
       is LoungeError.NoLounge -> sendSideEffect(LoungeSideEffect.PopBackStack)
       is LoungeError.JoinLoungeFailed -> sendSideEffect(LoungeSideEffect.PopBackStack)
+      is LoungeError.ExiledMember -> sendSideEffect(LoungeSideEffect.PopBackStack)
       is MemberError.InvalidMember -> sendSideEffect(LoungeSideEffect.PopBackStack)
       else -> Unit
     }
@@ -147,7 +148,15 @@ class LoungeViewModel @Inject constructor(
   private suspend fun joinLounge(loungeId: String) {
     withTimeoutOrNull(TIMEOUT) {
       val user = currentState.user
-      val lounge = joinLounge(user.asDomain(), loungeId).asUI()
+
+      val member = memberRepository.getMemberByUserId(user.id, loungeId)
+      val lounge = if (member == null) {
+        joinLounge(user.asDomain(), loungeId).asUI()
+      } else {
+        if (member.type == Member.Type.EXILED) throw LoungeError.ExiledMember
+
+        loungeRepository.getLoungeById(loungeId).asUI()
+      }
 
       updateState(LoungeReduce.UpdateLounge(lounge))
 

@@ -79,8 +79,8 @@ class LoungeMemberViewModel @Inject constructor(
     val loungeId = checkNotNull(savedStateHandle.get<String>(loungeIdKey))
 
     val myUserId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
-    val me = memberRepository.getMemberByUserId(myUserId, loungeId).asUI()
-    val member = memberRepository.getMemberByUserId(userId, loungeId).asUI()
+    val me = memberRepository.getMemberByUserId(myUserId, loungeId)?.asUI() ?: throw MemberError.InvalidMember
+    val member = memberRepository.getMemberByUserId(userId, loungeId)?.asUI() ?: throw MemberError.InvalidMember
     val user = userRepository.getUserById(member.userId).asUI()
 
     updateState(LoungeMemberReduce.UpdateMe(me))
