@@ -14,10 +14,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
+import com.jwd.lunchvote.domain.repository.UserStatusRepository
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavHost
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
 import com.jwd.lunchvote.presentation.navigation.route
@@ -26,9 +28,34 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+  @Inject
+  lateinit var userStatusRepository: UserStatusRepository
+
+  override fun onResume() {
+    super.onResume()
+
+    lifecycleScope.launch {
+      Firebase.auth.currentUser?.uid?.let { userId ->
+        userStatusRepository.setUserOnline(userId)
+      }
+    }
+  }
+
+  override fun onStop() {
+    lifecycleScope.launch {
+      Firebase.auth.currentUser?.uid?.let { userId ->
+        userStatusRepository.setUserOffline(userId)
+      }
+    }
+
+    super.onStop()
+  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)

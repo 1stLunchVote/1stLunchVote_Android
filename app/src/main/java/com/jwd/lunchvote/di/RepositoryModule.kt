@@ -11,6 +11,7 @@ import com.jwd.lunchvote.data.repository.PreferenceRepositoryImpl
 import com.jwd.lunchvote.data.repository.StorageRepositoryImpl
 import com.jwd.lunchvote.data.repository.TemplateRepositoryImpl
 import com.jwd.lunchvote.data.repository.UserRepositoryImpl
+import com.jwd.lunchvote.data.repository.UserStatusRepositoryImpl
 import com.jwd.lunchvote.data.repository.VoteResultRepositoryImpl
 import com.jwd.lunchvote.domain.repository.BallotRepository
 import com.jwd.lunchvote.domain.repository.ChatRepository
@@ -23,6 +24,7 @@ import com.jwd.lunchvote.domain.repository.PreferenceRepository
 import com.jwd.lunchvote.domain.repository.StorageRepository
 import com.jwd.lunchvote.domain.repository.TemplateRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
+import com.jwd.lunchvote.domain.repository.UserStatusRepository
 import com.jwd.lunchvote.domain.repository.VoteResultRepository
 import dagger.Binds
 import dagger.Module
@@ -99,6 +101,12 @@ internal abstract class RepositoryModule {
   abstract fun bindsUserRepository(
     repository: UserRepositoryImpl
   ): UserRepository
+
+  @Binds
+  @Singleton
+  abstract fun bindsUserStatusRepository(
+    repository: UserStatusRepositoryImpl
+  ): UserStatusRepository
 
   @Binds
   @Singleton
