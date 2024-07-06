@@ -134,7 +134,8 @@ private fun FriendListScreen(
     ) {
       LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
       ) {
         friendItemGroup(
           titleId = R.string.friend_list_lounge_group_title,
@@ -169,6 +170,15 @@ private fun FriendListScreen(
             modifier = Modifier.fillMaxWidth(),
             online = false,
             onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id)) },
+          )
+        }
+        item {
+          Text(
+            text = stringResource(R.string.friend_list_tooltip),
+            modifier = Modifier.padding(top = 16.dp),
+            color = MaterialTheme.colorScheme.outlineVariant,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.labelMedium
           )
         }
       }

@@ -175,6 +175,7 @@
     <string name="friend_list_online_group_title">접속중</string>
     <string name="friend_list_offline_group_title">미접속</string>
     <string name="friend_list_no_friend">친구가 없습니다.</string>
+    <string name="friend_list_tooltip">친구에게 접속 상태가 제대로 출력되지 않는 경우,\n앱을 종료 후 다시 실행해주세요.</string>
     <string name="friend_list_join_button">투표방 참여</string>
     <string name="friend_list_delete_button">삭제</string>
     <string name="friend_list_self_snackbar">본인에게 신청할 수 없습니다!</string>

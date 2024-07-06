@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.co.inbody.config.error.UserError
+import java.time.ZonedDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -91,7 +92,7 @@ class FriendListViewModel @Inject constructor(
       userStatusRepository.getUserStatus(friendId)?.asUI()?.let { status ->
         if (status.loungeId != null) {
           joinedFriendList.add(friend)
-        } else if (status.lastOnline != null) {
+        } else if (status.lastOnline != null && status.lastOnline > ZonedDateTime.now().minusHours(1)) {
           onlineFriendList.add(friend)
         } else {
           offlineFriendList.add(friend)
