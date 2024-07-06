@@ -61,6 +61,7 @@ import kotlinx.coroutines.flow.collectLatest
 fun FriendListRoute(
   popBackStack: () -> Unit,
   navigateToFriendRequest: () -> Unit,
+  navigateToLounge: (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: FriendListViewModel = hiltViewModel(),
   snackbarChannel: Channel<String> = LocalSnackbarChannel.current,
@@ -75,6 +76,7 @@ fun FriendListRoute(
       when(it){
         is FriendListSideEffect.PopBackStack -> popBackStack()
         is FriendListSideEffect.NavigateToFriendRequest -> navigateToFriendRequest()
+        is FriendListSideEffect.NavigateToLounge -> navigateToLounge(it.loungeId)
         is FriendListSideEffect.OpenRequestDialog -> viewModel.setDialogState(FriendListContract.REQUEST_DIALOG)
         is FriendListSideEffect.CloseDialog -> viewModel.setDialogState("")
         is FriendListSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
@@ -157,8 +159,7 @@ private fun FriendListScreen(
             friend = friend,
             modifier = Modifier.fillMaxWidth(),
             online = true,
-            onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id)) },
-            onClickJoinButton = { onEvent(FriendListEvent.OnClickJoinButton(friend.id)) }
+            onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id)) }
           )
         }
         friendItemGroup(

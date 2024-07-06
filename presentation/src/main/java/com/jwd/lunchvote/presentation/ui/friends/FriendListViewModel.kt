@@ -53,7 +53,7 @@ class FriendListViewModel @Inject constructor(
 
       is FriendListEvent.OnClickBackButton -> sendSideEffect(FriendListSideEffect.PopBackStack)
       is FriendListEvent.OnClickFriendRequestButton -> sendSideEffect(FriendListSideEffect.NavigateToFriendRequest)
-      is FriendListEvent.OnClickJoinButton -> Unit
+      is FriendListEvent.OnClickJoinButton -> launch { joinLounge(event.friendId) }
       is FriendListEvent.OnClickDeleteFriendButton -> launch { deleteFriend(event.friendId) }
       is FriendListEvent.OnClickRequestButton -> sendSideEffect(FriendListSideEffect.OpenRequestDialog)
 
@@ -103,6 +103,12 @@ class FriendListViewModel @Inject constructor(
     updateState(FriendListReduce.UpdateJoinedFriendList(joinedFriendList))
     updateState(FriendListReduce.UpdateOnlineFriendList(onlineFriendList))
     updateState(FriendListReduce.UpdateOfflineFriendList(offlineFriendList))
+  }
+
+  private suspend fun joinLounge(friendId: String) {
+    val loungeId = userStatusRepository.getUserStatus(friendId)?.loungeId ?: return
+
+    sendSideEffect(FriendListSideEffect.NavigateToLounge(loungeId))
   }
 
   private suspend fun deleteFriend(friendId: String) {

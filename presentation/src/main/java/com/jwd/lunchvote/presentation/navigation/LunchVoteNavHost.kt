@@ -154,7 +154,10 @@ fun LunchVoteNavHost(
     composable(LunchVoteNavRoute.FriendList) {
        FriendListRoute(
          popBackStack = { navController.popBackStack() },
-         navigateToFriendRequest = { navController.navigate(LunchVoteNavRoute.FriendRequest) }
+         navigateToFriendRequest = { navController.navigate(LunchVoteNavRoute.FriendRequest) },
+         navigateToLounge = { friendId ->
+           navController.navigateWithPop(LunchVoteNavRoute.Lounge, friendId)
+         }
        )
     }
     composable(LunchVoteNavRoute.FriendRequest) {
