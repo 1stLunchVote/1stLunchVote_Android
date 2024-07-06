@@ -13,6 +13,7 @@ import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
+import com.jwd.lunchvote.domain.repository.UserStatusRepository
 import com.jwd.lunchvote.domain.repository.VoteResultRepository
 import com.jwd.lunchvote.domain.usecase.CalculateSecondVote
 import com.jwd.lunchvote.domain.usecase.ExitLounge
@@ -45,6 +46,7 @@ import javax.inject.Inject
 class SecondVoteViewModel @Inject constructor(
   private val userRepository: UserRepository,
   private val loungeRepository: LoungeRepository,
+  private val userStatusRepository: UserStatusRepository,
   private val memberRepository: MemberRepository,
   private val voteResultRepository: VoteResultRepository,
   private val foodRepository: FoodRepository,
@@ -146,6 +148,8 @@ class SecondVoteViewModel @Inject constructor(
     loungeRepository.getLoungeStatusFlowById(loungeId).collectLatest { status ->
       when(status) {
         Lounge.Status.QUIT -> {
+          userStatusRepository.setUserLounge(me.userId, null)
+
           sendSideEffect(SecondVoteSideEffect.ShowSnackbar(UiText.StringResource(R.string.first_vote_owner_exited_snackbar)))
           sendSideEffect(SecondVoteSideEffect.PopBackStack)
         }
@@ -180,6 +184,9 @@ class SecondVoteViewModel @Inject constructor(
 
       if (me.userId == owner.userId) {
         calculateSecondVote(currentState.lounge.id)
+        currentState.memberList.forEach {
+          userStatusRepository.setUserLounge(it.userId, null)
+        }
         finishVote(currentState.lounge.id)
       }
     }
@@ -189,6 +196,7 @@ class SecondVoteViewModel @Inject constructor(
     loungeStatusFlow.cancel()
     memberListFlow.cancel()
 
+    userStatusRepository.setUserLounge(me.userId, null)
     exitLounge(me.asDomain())
 
     sendSideEffect(SecondVoteSideEffect.PopBackStack)
