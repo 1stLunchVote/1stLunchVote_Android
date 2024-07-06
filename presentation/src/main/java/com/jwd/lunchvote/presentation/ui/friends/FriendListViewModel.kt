@@ -9,6 +9,7 @@ import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.FriendRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
+import com.jwd.lunchvote.domain.repository.UserStatusRepository
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.UserUIModel
@@ -29,6 +30,7 @@ import javax.inject.Inject
 class FriendListViewModel @Inject constructor(
   private val userRepository: UserRepository,
   private val friendRepository: FriendRepository,
+  private val userStatusRepository: UserStatusRepository,
   private val loungeRepository: LoungeRepository,
   savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<FriendListState, FriendListEvent, FriendListReduce, FriendListSideEffect>(savedStateHandle){
@@ -63,6 +65,7 @@ class FriendListViewModel @Inject constructor(
 
   override fun reduceState(state: FriendListState, reduce: FriendListReduce): FriendListState {
     return when(reduce) {
+      is FriendListReduce.UpdateJoinedFriendList -> state.copy(joinedFriendList = reduce.joinedFriendList)
       is FriendListReduce.UpdateOnlineFriendList -> state.copy(onlineFriendList = reduce.onlineFriendList)
       is FriendListReduce.UpdateOfflineFriendList -> state.copy(offlineFriendList = reduce.offlineFriendList)
       is FriendListReduce.UpdateFriendName -> state.copy(friendName = reduce.friendName)
@@ -78,15 +81,25 @@ class FriendListViewModel @Inject constructor(
 
   private suspend fun initialize() {
     val userId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
-    var onlineFriendList = mutableListOf<UserUIModel>()
-    var offlineFriendList = mutableListOf<UserUIModel>()
+    val joinedFriendList = mutableListOf<UserUIModel>()
+    val onlineFriendList = mutableListOf<UserUIModel>()
+    val offlineFriendList = mutableListOf<UserUIModel>()
 
     friendRepository.getFriends(userId).map { friendId ->
       val friend = userRepository.getUserById(friendId).asUI()
 
-      onlineFriendList.add(friend)
+      userStatusRepository.getUserStatus(friendId)?.asUI()?.let { status ->
+        if (status.loungeId != null) {
+          joinedFriendList.add(friend)
+        } else if (status.lastOnline != null) {
+          onlineFriendList.add(friend)
+        } else {
+          offlineFriendList.add(friend)
+        }
+      } ?: offlineFriendList.add(friend)
     }
 
+    updateState(FriendListReduce.UpdateJoinedFriendList(joinedFriendList))
     updateState(FriendListReduce.UpdateOnlineFriendList(onlineFriendList))
     updateState(FriendListReduce.UpdateOfflineFriendList(offlineFriendList))
   }

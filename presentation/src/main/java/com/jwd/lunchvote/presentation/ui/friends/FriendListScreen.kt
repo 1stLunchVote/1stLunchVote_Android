@@ -47,6 +47,7 @@ import com.jwd.lunchvote.presentation.ui.friends.FriendListContract.FriendListSi
 import com.jwd.lunchvote.presentation.ui.friends.FriendListContract.FriendListState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
+import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
@@ -66,6 +67,7 @@ fun FriendListRoute(
   context: Context = LocalContext.current
 ){
   val state by viewModel.viewState.collectAsStateWithLifecycle()
+  val loading by viewModel.isLoading.collectAsStateWithLifecycle()
   val dialog by viewModel.dialogState.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect){
@@ -93,7 +95,8 @@ fun FriendListRoute(
     }
   }
 
-  FriendListScreen(
+  if (loading) LoadingScreen()
+  else FriendListScreen(
     state = state,
     modifier = modifier,
     onEvent = viewModel::sendEvent
@@ -133,6 +136,18 @@ private fun FriendListScreen(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
       ) {
+        friendItemGroup(
+          titleId = R.string.friend_list_lounge_group_title,
+          friendList = state.joinedFriendList
+        ) { friend ->
+          FriendItem(
+            friend = friend,
+            modifier = Modifier.fillMaxWidth(),
+            online = true,
+            onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id)) },
+            onClickJoinButton = { onEvent(FriendListEvent.OnClickJoinButton(friend.id)) }
+          )
+        }
         friendItemGroup(
           titleId = R.string.friend_list_online_group_title,
           friendList = state.onlineFriendList

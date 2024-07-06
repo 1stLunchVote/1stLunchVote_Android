@@ -37,7 +37,7 @@ fun LoadingScreen(
 
 @Preview
 @Composable
-fun LoadingScreenPreview() {
+private fun LoadingScreenPreview() {
   LunchVoteTheme {
     LoadingScreen()
   }

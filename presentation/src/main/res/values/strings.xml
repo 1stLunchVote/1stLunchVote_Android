@@ -171,6 +171,7 @@
 
     <!-- FriendListScreen -->
     <string name="friend_list_title">친구 목록</string>
+    <string name="friend_list_lounge_group_title">투표 진행 중</string>
     <string name="friend_list_online_group_title">접속중</string>
     <string name="friend_list_offline_group_title">미접속</string>
     <string name="friend_list_no_friend">친구가 없습니다.</string>
