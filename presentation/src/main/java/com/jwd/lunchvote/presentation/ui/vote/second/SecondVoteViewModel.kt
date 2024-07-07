@@ -67,6 +67,9 @@ class SecondVoteViewModel @Inject constructor(
     }
   }
 
+  private val userId: String
+    get() = Firebase.auth.currentUser?.uid ?: throw UserError.NoSession
+
   private lateinit var loungeStatusFlow: Job
   private lateinit var memberListFlow: Job
 
@@ -115,7 +118,6 @@ class SecondVoteViewModel @Inject constructor(
   }
 
   private suspend fun initialize() {
-    val userId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
     val user = userRepository.getUserById(userId).asUI()
     updateState(SecondVoteReduce.UpdateUser(user))
 

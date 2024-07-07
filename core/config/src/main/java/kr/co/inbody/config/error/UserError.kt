@@ -2,9 +2,14 @@ package kr.co.inbody.config.error
 
 interface UserError {
 
+  data object NoSession : Throwable() {
+    private fun readResolve(): Any = NoSession
+    override val message: String = "회원 정보를 확인할 수 없습니다. 다시 로그인해주세요."
+  }
+
   data object NoUser : Throwable() {
     private fun readResolve(): Any = NoUser
-    override val message: String = "회원 정보를 확인할 수 없습니다. 다시 로그인해주세요."
+    override val message: String = "회원 정보를 확인할 수 없습니다."
   }
 
   data object DeletedUser : Throwable() {

@@ -38,6 +38,9 @@ class TemplateListViewModel @Inject constructor(
     }
   }
 
+  private val userId: String
+    get() = Firebase.auth.currentUser?.uid ?: throw UserError.NoSession
+
   override fun handleEvents(event: TemplateListEvent) {
     when(event) {
       is TemplateListEvent.ScreenInitialize -> launch { initialize() }
@@ -70,7 +73,6 @@ class TemplateListViewModel @Inject constructor(
   }
 
   private suspend fun initialize() {
-    val userId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
     val templateList = templateRepository.getTemplateList(userId).map { it.asUI() }
 
     updateState(TemplateListReduce.UpdateTemplateList(templateList))

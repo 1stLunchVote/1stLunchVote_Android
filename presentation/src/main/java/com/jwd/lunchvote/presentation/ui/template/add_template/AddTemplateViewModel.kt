@@ -32,6 +32,9 @@ class AddTemplateViewModel @Inject constructor(
     return savedState as? AddTemplateState ?: AddTemplateState()
   }
 
+  private val userId: String
+    get() = Firebase.auth.currentUser?.uid ?: throw UserError.NoSession
+
   override fun handleEvents(event: AddTemplateEvent) {
     when(event) {
       is AddTemplateEvent.ScreenInitialize -> launch { initialize() }
@@ -72,7 +75,6 @@ class AddTemplateViewModel @Inject constructor(
   }
 
   private suspend fun addTemplate() {
-    val userId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
     val likedFoodIds = currentState.foodItemList.filter { it.status == FoodItem.Status.LIKE }.map { it.food.id }
     val dislikedFoodIds = currentState.foodItemList.filter { it.status == FoodItem.Status.DISLIKE }.map { it.food.id }
     val template = TemplateUIModel(

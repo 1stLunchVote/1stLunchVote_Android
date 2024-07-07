@@ -28,6 +28,9 @@ class FriendRequestViewModel @Inject constructor(
     return savedState as? FriendRequestState ?: FriendRequestState()
   }
 
+  private val userId: String
+    get() = Firebase.auth.currentUser?.uid ?: throw UserError.NoSession
+
   override fun handleEvents(event: FriendRequestEvent) {
     when(event) {
       is FriendRequestEvent.ScreenInitialize -> launch { initialize() }
@@ -52,7 +55,6 @@ class FriendRequestViewModel @Inject constructor(
   }
 
   private suspend fun initialize() {
-    val userId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
     val friendRequestList = friendRepository.getReceivedFriendRequests(userId).map { it.asUI() }
     val requestSenderMap = friendRequestList.associateWith { userRepository.getUserById(it.userId).asUI() }
 

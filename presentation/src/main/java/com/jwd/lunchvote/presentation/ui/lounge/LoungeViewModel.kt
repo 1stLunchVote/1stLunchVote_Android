@@ -69,6 +69,9 @@ class LoungeViewModel @Inject constructor(
     }
   }
 
+  private val userId: String
+    get() = Firebase.auth.currentUser?.uid ?: throw UserError.NoSession
+
   private lateinit var loungeStatusFlow: Job
   private lateinit var memberListFlow: Job
   private lateinit var memberTypeFlow: Job
@@ -81,7 +84,6 @@ class LoungeViewModel @Inject constructor(
 
   init {
     launch {
-      val userId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
       val user = userRepository.getUserById(userId).asUI()
       updateState(LoungeReduce.UpdateUser(user))
 
