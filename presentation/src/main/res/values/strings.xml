@@ -48,7 +48,7 @@
 
     <!-- HomeScreen -->
     <string name="home_banner_title">지금 사람들은 뭘 먹고 싶을까?</string>
-    <string name="home_banner_loading">정보를 받아오고 있습니다</string>
+    <string name="home_banner_no_trend_food">아직 투표 결과가 없습니다</string>
     <string name="home_banner_score">%d%%의 사람들이 선택</string>
     <string name="home_start_button">투표 생성하기</string>
     <string name="home_join_button">투표 참여하기</string>

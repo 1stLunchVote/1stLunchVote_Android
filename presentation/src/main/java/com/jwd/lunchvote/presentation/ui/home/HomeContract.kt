@@ -44,7 +44,7 @@ class HomeContract {
   }
 
   sealed interface HomeReduce : ViewModelContract.Reduce {
-    data class UpdateFoodTrend(val foodTrend: FoodUIModel) : HomeReduce
+    data class UpdateFoodTrend(val foodTrend: FoodUIModel?) : HomeReduce
     data class UpdateFoodTrendRatio(val foodTrendRatio: Float) : HomeReduce
     data class UpdateLoungeId(val loungeId: String?) : HomeReduce
 

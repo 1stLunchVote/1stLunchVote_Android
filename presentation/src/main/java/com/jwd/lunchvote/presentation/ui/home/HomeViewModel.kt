@@ -103,7 +103,7 @@ class HomeViewModel @Inject constructor(
   private suspend fun initialize() {
     val (foodTrend, foodTrendRatio) = getFoodTrend()
 
-    updateState(HomeReduce.UpdateFoodTrend(foodTrend.asUI()))
+    updateState(HomeReduce.UpdateFoodTrend(foodTrend?.asUI()))
     updateState(HomeReduce.UpdateFoodTrendRatio(foodTrendRatio))
   }
 
