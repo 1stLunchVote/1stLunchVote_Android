@@ -120,16 +120,16 @@ fun HomeRoute(
         onConfirmation = { viewModel.sendEvent(HomeEvent.OnClickConfirmButtonJoinDialog) }
       )
     }
-    HomeContract.SECRET_DIALOG -> {
-      SecretDialog(
-        foodName = state.foodName,
-        foodImageUri = state.foodImageUri,
-        onDismissRequest = { viewModel.sendEvent(HomeEvent.OnClickCancelButtonOfSecretDialog) },
-        onFoodNameChange = { viewModel.sendEvent(HomeEvent.OnFoodNameChangeOfSecretDialog(it)) },
-        onFoodImageChange = { viewModel.sendEvent(HomeEvent.OnFoodImageChangeOfSecretDialog(it)) },
-        onImageError = { viewModel.sendEvent(HomeEvent.OnImageLoadErrorOfSecretDialog) },
-        onConfirmation = { viewModel.sendEvent(HomeEvent.OnClickUploadButtonOfSecretDialog(context)) }
-      )
+    HomeContract.SECRET_DIALOG -> { // Only for Debug
+      if (BuildConfig.DEBUG) {
+        SecretDialog(foodName = state.foodName,
+          foodImageUri = state.foodImageUri,
+          onDismissRequest = { viewModel.sendEvent(HomeEvent.OnClickCancelButtonOfSecretDialog) },
+          onFoodNameChange = { viewModel.sendEvent(HomeEvent.OnFoodNameChangeOfSecretDialog(it)) },
+          onFoodImageChange = { viewModel.sendEvent(HomeEvent.OnFoodImageChangeOfSecretDialog(it)) },
+          onImageError = { viewModel.sendEvent(HomeEvent.OnImageLoadErrorOfSecretDialog) },
+          onConfirmation = { viewModel.sendEvent(HomeEvent.OnClickUploadButtonOfSecretDialog(context)) })
+      }
     }
   }
 

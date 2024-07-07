@@ -15,7 +15,7 @@ class HomeContract {
     val foodTrendRatio: Float = 0f,
     val loungeId: String? = null,
 
-    // TODO: Temporary Secret State
+    // Only for Debug
     val foodName: String? = null,
     val foodImageUri: Uri? = null,
   ) : ViewModelContract.State, Parcelable
@@ -34,7 +34,7 @@ class HomeContract {
     data object OnClickCancelButtonJoinDialog : HomeEvent
     data object OnClickConfirmButtonJoinDialog : HomeEvent
 
-    // TODO: Temporary Secret Events
+    // Only for Debug
     data object OnClickSecretButton : HomeEvent
     data class OnFoodNameChangeOfSecretDialog(val foodName: String?) : HomeEvent
     data class OnFoodImageChangeOfSecretDialog(val foodImageUri: Uri?) : HomeEvent
@@ -48,7 +48,7 @@ class HomeContract {
     data class UpdateFoodTrendRatio(val foodTrendRatio: Float) : HomeReduce
     data class UpdateLoungeId(val loungeId: String?) : HomeReduce
 
-    // TODO: Temporary Secret Reduces
+    // Only for Debug
     data class UpdateFoodName(val foodName: String?) : HomeReduce
     data class UpdateFoodImageUri(val foodImageUri: Uri?) : HomeReduce
   }
@@ -63,14 +63,14 @@ class HomeContract {
     data object CloseDialog : HomeSideEffect
     data class ShowSnackbar(val message: UiText) : HomeSideEffect
 
-    // TODO: Temporary Secret SideEffects
+    // Only for Debug
     data object OpenSecretDialog : HomeSideEffect
   }
 
   companion object {
     const val JOIN_DIALOG = "join_dialog"
 
-    // TODO: Temporary Secret Dialog
+    // Only for Debug
     const val SECRET_DIALOG = "secret_dialog"
   }
 }
