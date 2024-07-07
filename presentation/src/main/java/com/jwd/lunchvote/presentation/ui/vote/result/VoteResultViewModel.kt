@@ -13,17 +13,21 @@ import com.jwd.lunchvote.presentation.ui.vote.result.VoteResultContract.VoteResu
 import com.jwd.lunchvote.presentation.ui.vote.result.VoteResultContract.VoteResultState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kr.co.inbody.config.error.RouteError
 import javax.inject.Inject
 
 @HiltViewModel
 class VoteResultViewModel @Inject constructor(
   private val voteResultRepository: VoteResultRepository,
   private val foodRepository: FoodRepository,
-  private val savedStateHandle: SavedStateHandle
+  savedStateHandle: SavedStateHandle
 ) : BaseStateViewModel<VoteResultState, VoteResultEvent, VoteResultReduce, VoteResultSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): VoteResultState {
     return savedState as? VoteResultState ?: VoteResultState()
   }
+
+  private val loungeId: String =
+    savedStateHandle[LunchVoteNavRoute.VoteResult.arguments.first().name] ?: throw RouteError.NoArguments
 
   override fun handleEvents(event: VoteResultEvent) {
     when (event) {
@@ -44,8 +48,6 @@ class VoteResultViewModel @Inject constructor(
   }
 
   private suspend fun initialize() {
-    val loungeIdKey = LunchVoteNavRoute.SecondVote.arguments.first().name
-    val loungeId = checkNotNull(savedStateHandle.get<String>(loungeIdKey))
     val voteResult = voteResultRepository.getSecondVoteResultByLoungeId(loungeId)
     val food = foodRepository.getFoodById(voteResult.foodId).asUI()
 

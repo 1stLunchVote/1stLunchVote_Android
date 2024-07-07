@@ -39,6 +39,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kr.co.inbody.config.error.LoungeError
 import kr.co.inbody.config.error.MemberError
+import kr.co.inbody.config.error.RouteError
 import kr.co.inbody.config.error.UserError
 import javax.inject.Inject
 
@@ -54,10 +55,14 @@ class SecondVoteViewModel @Inject constructor(
   private val calculateSecondVote: CalculateSecondVote,
   private val finishVote: FinishVote,
   private val exitLounge: ExitLounge,
-  private val savedStateHandle: SavedStateHandle
+  savedStateHandle: SavedStateHandle
 ) : BaseStateViewModel<SecondVoteState, SecondVoteEvent, SecondVoteReduce, SecondVoteSideEffect>(savedStateHandle) {
-  override fun createInitialState(savedState: Parcelable?): SecondVoteState =
-    savedState as? SecondVoteState ?: SecondVoteState()
+  override fun createInitialState(savedState: Parcelable?): SecondVoteState {
+    return savedState as? SecondVoteState ?: SecondVoteState()
+  }
+
+  private val loungeId: String =
+    savedStateHandle[LunchVoteNavRoute.SecondVote.arguments.first().name] ?: throw RouteError.NoArguments
 
   private val _dialogState = MutableStateFlow<SecondVoteDialog?>(null)
   val dialogState: StateFlow<SecondVoteDialog?> = _dialogState.asStateFlow()
@@ -121,8 +126,6 @@ class SecondVoteViewModel @Inject constructor(
     val user = userRepository.getUserById(userId).asUI()
     updateState(SecondVoteReduce.UpdateUser(user))
 
-    val loungeIdKey = LunchVoteNavRoute.SecondVote.arguments.first().name
-    val loungeId = checkNotNull(savedStateHandle.get<String>(loungeIdKey))
     val lounge = loungeRepository.getLoungeById(loungeId).asUI()
     updateState(SecondVoteReduce.UpdateLounge(lounge))
 

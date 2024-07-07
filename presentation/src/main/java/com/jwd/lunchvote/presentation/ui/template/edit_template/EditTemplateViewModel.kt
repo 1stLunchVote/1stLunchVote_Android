@@ -22,17 +22,21 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kr.co.inbody.config.error.RouteError
 import javax.inject.Inject
 
 @HiltViewModel
 class EditTemplateViewModel @Inject constructor(
   private val foodRepository: FoodRepository,
   private val templateRepository: TemplateRepository,
-  private val savedStateHandle: SavedStateHandle
+  savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<EditTemplateState, EditTemplateEvent, EditTemplateReduce, EditTemplateSideEffect>(savedStateHandle){
   override fun createInitialState(savedState: Parcelable?): EditTemplateState {
     return savedState as? EditTemplateState ?: EditTemplateState()
   }
+
+  private val templateId: String =
+    savedStateHandle[LunchVoteNavRoute.EditTemplate.arguments.first().name] ?: throw RouteError.NoArguments
 
   private val _dialogState = MutableStateFlow("")
   val dialogState: StateFlow<String> = _dialogState.asStateFlow()
@@ -76,10 +80,7 @@ class EditTemplateViewModel @Inject constructor(
   }
 
   private suspend fun initialize() {
-    val templateIdKey = LunchVoteNavRoute.EditTemplate.arguments.first().name
-    val templateId = checkNotNull(savedStateHandle.get<String>(templateIdKey))
     val template = templateRepository.getTemplateById(templateId).asUI()
-
     val foodItemList = foodRepository.getAllFood().map { food ->
       FoodItem(
         food = food.asUI(),

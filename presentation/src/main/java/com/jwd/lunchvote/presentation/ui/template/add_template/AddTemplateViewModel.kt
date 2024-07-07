@@ -19,6 +19,7 @@ import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContra
 import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateContract.AddTemplateState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kr.co.inbody.config.error.RouteError
 import kr.co.inbody.config.error.UserError
 import javax.inject.Inject
 
@@ -26,11 +27,14 @@ import javax.inject.Inject
 class AddTemplateViewModel @Inject constructor(
   private val foodRepository: FoodRepository,
   private val templateRepository: TemplateRepository,
-  private val savedStateHandle: SavedStateHandle
+  savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<AddTemplateState, AddTemplateEvent, AddTemplateReduce, AddTemplateSideEffect>(savedStateHandle){
   override fun createInitialState(savedState: Parcelable?): AddTemplateState {
     return savedState as? AddTemplateState ?: AddTemplateState()
   }
+
+  private val name: String =
+    savedStateHandle[LunchVoteNavRoute.AddTemplate.arguments.first().name] ?: throw RouteError.NoArguments
 
   private val userId: String
     get() = Firebase.auth.currentUser?.uid ?: throw UserError.NoSession
@@ -62,9 +66,6 @@ class AddTemplateViewModel @Inject constructor(
   }
 
   private suspend fun initialize() {
-    val nameKey = LunchVoteNavRoute.AddTemplate.arguments.first().name
-    val name = checkNotNull(savedStateHandle.get<String>(nameKey))
-
     updateState(AddTemplateReduce.UpdateName(name))
 
     val foodItemList = foodRepository.getAllFood().map { food ->

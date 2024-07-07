@@ -61,6 +61,9 @@ class LoungeViewModel @Inject constructor(
     return savedState as? LoungeState ?: LoungeState()
   }
 
+  private val loungeId: String? =
+    savedStateHandle[LunchVoteNavRoute.Lounge.arguments.first().name]
+
   private val _dialogState = MutableStateFlow("")
   val dialogState: StateFlow<String> = _dialogState.asStateFlow()
   fun openDialog(dialogState: String) {
@@ -87,8 +90,6 @@ class LoungeViewModel @Inject constructor(
       val user = userRepository.getUserById(userId).asUI()
       updateState(LoungeReduce.UpdateUser(user))
 
-      val loungeIdKey = LunchVoteNavRoute.Lounge.arguments.first().name
-      val loungeId = savedStateHandle.get<String?>(loungeIdKey)
       if (loungeId == null) createLounge() else joinLounge(loungeId)
     }
   }
@@ -156,7 +157,6 @@ class LoungeViewModel @Inject constructor(
         joinLounge(user.asDomain(), loungeId).asUI()
       } else {
         if (member.type == Member.Type.EXILED) throw LoungeError.ExiledMember
-
         loungeRepository.getLoungeById(loungeId).asUI()
       }
 

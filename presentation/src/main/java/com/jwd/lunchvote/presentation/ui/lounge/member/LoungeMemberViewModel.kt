@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.co.inbody.config.error.MemberError
+import kr.co.inbody.config.error.RouteError
 import kr.co.inbody.config.error.UserError
 import javax.inject.Inject
 
@@ -31,11 +32,19 @@ class LoungeMemberViewModel @Inject constructor(
   private val userRepository: UserRepository,
   private val memberRepository: MemberRepository,
   private val exileMember: ExileMember,
-  private val savedStateHandle: SavedStateHandle,
+  savedStateHandle: SavedStateHandle,
 ) : BaseStateViewModel<LoungeMemberState, LoungeMemberEvent, LoungeMemberReduce, LoungeMemberSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): LoungeMemberState {
     return savedState as? LoungeMemberState ?: LoungeMemberState()
   }
+
+  private val memberUserId: String =
+    savedStateHandle[LunchVoteNavRoute.LoungeMember.arguments[0].name] ?: throw RouteError.NoArguments
+  private val loungeId: String =
+    savedStateHandle[LunchVoteNavRoute.LoungeMember.arguments[1].name] ?: throw RouteError.NoArguments
+
+  private val userId: String
+    get() = Firebase.auth.currentUser?.uid ?: throw UserError.NoSession
 
   private val _dialogState = MutableStateFlow("")
   val dialogState: StateFlow<String> = _dialogState.asStateFlow()
@@ -73,14 +82,8 @@ class LoungeMemberViewModel @Inject constructor(
   }
 
   private suspend fun initialize() {
-    val userIdKey = LunchVoteNavRoute.LoungeMember.arguments.first().name
-    val userId = checkNotNull(savedStateHandle.get<String>(userIdKey))
-    val loungeIdKey = LunchVoteNavRoute.LoungeMember.arguments.last().name
-    val loungeId = checkNotNull(savedStateHandle.get<String>(loungeIdKey))
-
-    val myUserId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
-    val me = memberRepository.getMemberByUserId(myUserId, loungeId)?.asUI() ?: throw MemberError.InvalidMember
-    val member = memberRepository.getMemberByUserId(userId, loungeId)?.asUI() ?: throw MemberError.InvalidMember
+    val me = memberRepository.getMemberByUserId(userId, loungeId)?.asUI() ?: throw MemberError.InvalidMember
+    val member = memberRepository.getMemberByUserId(memberUserId, loungeId)?.asUI() ?: throw MemberError.InvalidMember
     val user = userRepository.getUserById(member.userId).asUI()
 
     updateState(LoungeMemberReduce.UpdateMe(me))
