@@ -78,6 +78,7 @@ import java.io.File
 fun HomeRoute(
   navigateToLounge: (String?) -> Unit,
   navigateToTemplateList: () -> Unit,
+  navigateToFriendList: () -> Unit,
   navigateToSetting: () -> Unit,
   navigateToTips: () -> Unit,
   modifier: Modifier = Modifier,
@@ -93,6 +94,7 @@ fun HomeRoute(
       when(it){
         is HomeSideEffect.NavigateToLounge -> navigateToLounge(it.loungeId)
         is HomeSideEffect.NavigateToTemplateList -> navigateToTemplateList()
+        is HomeSideEffect.NavigateToFriendList -> navigateToFriendList()
         is HomeSideEffect.NavigateToSetting -> navigateToSetting()
         is HomeSideEffect.NavigateToTips -> navigateToTips()
         is HomeSideEffect.OpenJoinDialog -> viewModel.setDialogState(HomeContract.JOIN_DIALOG)
@@ -172,6 +174,7 @@ private fun HomeScreen(
       onClickLoungeButton = { onEvent(HomeEvent.OnClickLoungeButton) },
       onClickJoinLoungeButton = { onEvent(HomeEvent.OnClickJoinLoungeButton) },
       onClickTemplateButton = { onEvent(HomeEvent.OnClickTemplateButton) },
+      onClickFriendButton = { onEvent(HomeEvent.OnClickFriendButton) },
       onClickSettingButton = { onEvent(HomeEvent.OnClickSettingButton) },
       onClickTipsButton = { onEvent(HomeEvent.OnClickTipsButton) },
     )
@@ -315,8 +318,9 @@ private fun HomeButtonSet(
   onClickLoungeButton: () -> Unit = {},
   onClickJoinLoungeButton: () -> Unit = {},
   onClickTemplateButton: () -> Unit = {},
+  onClickFriendButton: () -> Unit = {},
   onClickSettingButton: () -> Unit = {},
-  onClickTipsButton: () -> Unit = {},
+  onClickTipsButton: () -> Unit = {}
 ) {
   val buttonShape = RoundedCornerShape(16.dp)
 
@@ -359,21 +363,40 @@ private fun HomeButtonSet(
         )
       }
     }
-    Box(
-      modifier = Modifier
-        .fillMaxWidth()
-        .height(64.dp)
-        .clip(buttonShape)
-        .border(2.dp, MaterialTheme.colorScheme.primary, buttonShape)
-        .clickable { onClickTemplateButton() },
-      contentAlignment = Alignment.TopEnd
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-      Text(
-        text = stringResource(R.string.home_template_button),
-        modifier = Modifier.padding(top = 16.dp, end = 24.dp),
-        style = MaterialTheme.typography.titleMedium,
-        color = MaterialTheme.colorScheme.primary
-      )
+      Box(
+        modifier = Modifier
+          .weight(1f)
+          .height(64.dp)
+          .clip(buttonShape)
+          .border(2.dp, MaterialTheme.colorScheme.primary, buttonShape)
+          .clickable { onClickTemplateButton() },
+        contentAlignment = Alignment.TopEnd
+      ) {
+        Text(
+          text = stringResource(R.string.home_template_button),
+          modifier = Modifier.padding(top = 16.dp, end = 24.dp),
+          style = MaterialTheme.typography.titleMedium,
+          color = MaterialTheme.colorScheme.primary
+        )
+      }
+      Box(
+        modifier = Modifier
+          .size(64.dp)
+          .clip(buttonShape)
+          .border(2.dp, MaterialTheme.colorScheme.primary, buttonShape)
+          .clickable { onClickFriendButton() },
+        contentAlignment = Alignment.Center
+      ) {
+        Text(
+          text = "친구\n관리",
+          style = MaterialTheme.typography.titleSmall,
+          color = MaterialTheme.colorScheme.primary
+        )
+      }
     }
     Row(
       modifier = Modifier.fillMaxWidth(),

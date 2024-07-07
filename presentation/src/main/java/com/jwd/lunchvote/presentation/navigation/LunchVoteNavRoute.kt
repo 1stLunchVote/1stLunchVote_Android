@@ -83,6 +83,9 @@ enum class LunchVoteNavRoute(
     )
   ),
 
+  FriendList,
+  FriendRequest,
+
   Setting,
   Profile,
 

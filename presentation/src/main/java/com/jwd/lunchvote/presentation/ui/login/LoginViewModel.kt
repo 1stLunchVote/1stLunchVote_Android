@@ -6,6 +6,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuthException
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.UserRepository
+import com.jwd.lunchvote.domain.usecase.GenerateName
 import com.jwd.lunchvote.domain.usecase.SignInWithEmailAndPassword
 import com.jwd.lunchvote.domain.usecase.SignInWithGoogleIdToken
 import com.jwd.lunchvote.domain.usecase.SignInWithKakaoIdToken
@@ -20,6 +21,7 @@ import com.jwd.lunchvote.presentation.util.UiText
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.user.UserApiClient
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kr.co.inbody.config.config.UserConfig
 import kr.co.inbody.config.error.LoginError
 import kr.co.inbody.config.error.UserError
 import javax.inject.Inject
@@ -27,6 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
   private val userRepository: UserRepository,
+  private val generateName: GenerateName,
   private val signInWithEmailAndPassword: SignInWithEmailAndPassword,
   private val signInWithKakaoIdToken: SignInWithKakaoIdToken,
   private val signInWithGoogleIdToken: SignInWithGoogleIdToken,
@@ -77,13 +80,14 @@ class LoginViewModel @Inject constructor(
 
   private suspend fun googleLogin(account: GoogleSignInAccount) {
     val userId = signInWithGoogleIdToken(account.idToken!!)
-    val exists = userRepository.checkUserExists(account.email ?: throw LoginError.NoEmail)
+    val exists = userRepository.checkEmailExists(account.email ?: throw LoginError.NoEmail)
+    val name = generateName(account.givenName)
     if (exists.not()) {
       val user = UserUIModel(
         id = userId,
-        email = account.email ?: "",
-        name = account.givenName ?: "",
-        profileImage = account.photoUrl?.toString() ?: ""
+        email = account.email ?: UserConfig.DEFAULT_USER_EMAIL,
+        name = name,
+        profileImage = account.photoUrl?.toString() ?: UserConfig.DEFAULT_USER_PROFILE_IMAGE
       )
       userRepository.createUser(user.asDomain())
     }
@@ -101,13 +105,14 @@ class LoginViewModel @Inject constructor(
           oAuthToken.idToken == null -> throw LoginError.TokenFailed
           else -> {
             val userId = signInWithKakaoIdToken(oAuthToken.idToken!!)
-            val exists = userRepository.checkUserExists(user.kakaoAccount?.email ?: throw LoginError.NoEmail)
+            val exists = userRepository.checkEmailExists(user.kakaoAccount?.email ?: throw LoginError.NoEmail)
             if (exists.not()) {
+              val name = generateName(user.kakaoAccount?.profile?.nickname)
               val newUser = UserUIModel(
                 id = userId,
-                email = user.kakaoAccount?.email ?: "",
-                name = user.kakaoAccount?.profile?.nickname ?: "",
-                profileImage = user.kakaoAccount?.profile?.thumbnailImageUrl ?: ""
+                email = user.kakaoAccount?.email ?: UserConfig.DEFAULT_USER_EMAIL,
+                name = name,
+                profileImage = user.kakaoAccount?.profile?.thumbnailImageUrl ?: UserConfig.DEFAULT_USER_PROFILE_IMAGE
               )
               userRepository.createUser(newUser.asDomain())
             }

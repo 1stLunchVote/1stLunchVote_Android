@@ -25,13 +25,25 @@ class UserDataSourceImpl @Inject constructor(
     private const val COLUMN_DELETED_AT = "deletedAt"
   }
 
-  override suspend fun checkUserExists(
+  override suspend fun checkEmailExists(
     email: String
   ): Boolean =
     fireStore
       .collection(COLLECTION_USER)
       .whereNotDeleted()
       .whereEqualTo(COLUMN_EMAIL, email)
+      .get()
+      .await()
+      .isEmpty
+      .not()
+
+  override suspend fun checkNameExists(
+    name: String
+  ): Boolean =
+    fireStore
+      .collection(COLLECTION_USER)
+      .whereNotDeleted()
+      .whereEqualTo(COLUMN_NAME, name)
       .get()
       .await()
       .isEmpty
@@ -59,11 +71,24 @@ class UserDataSourceImpl @Inject constructor(
       .await()
       .toObject(UserRemote::class.java)
       .let { user ->
-        if (user == null) throw UserError.NoUser
-        else if (user.deletedAt != null) throw UserError.DeletedUser
-        else user.asData(id)
+        user?.asData(id) ?: throw UserError.NoUser
       }
 
+  override suspend fun getUserByName(
+    name: String
+  ): UserData =
+    fireStore
+      .collection(COLLECTION_USER)
+      .whereNotDeleted()
+      .whereEqualTo(COLUMN_NAME, name)
+      .get()
+      .await()
+      .documents
+      .firstOrNull()
+      ?.let {
+        it.toObject(UserRemote::class.java)
+          ?.asData(it.id)
+      } ?: throw UserError.NoUser
 
   override suspend fun updateUser(
     user: UserData

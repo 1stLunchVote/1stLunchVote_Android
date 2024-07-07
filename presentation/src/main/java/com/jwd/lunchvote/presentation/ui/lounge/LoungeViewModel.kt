@@ -12,6 +12,7 @@ import com.jwd.lunchvote.domain.repository.ChatRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
+import com.jwd.lunchvote.domain.repository.UserStatusRepository
 import com.jwd.lunchvote.domain.usecase.CreateLounge
 import com.jwd.lunchvote.domain.usecase.ExitLounge
 import com.jwd.lunchvote.domain.usecase.JoinLounge
@@ -47,6 +48,7 @@ import javax.inject.Inject
 class LoungeViewModel @Inject constructor(
   private val userRepository: UserRepository,
   private val loungeRepository: LoungeRepository,
+  private val userStatusRepository: UserStatusRepository,
   private val memberRepository: MemberRepository,
   private val chatRepository: ChatRepository,
   private val createLounge: CreateLounge,
@@ -123,6 +125,7 @@ class LoungeViewModel @Inject constructor(
       is LoungeError.FullMember -> sendSideEffect(LoungeSideEffect.PopBackStack)
       is LoungeError.NoLounge -> sendSideEffect(LoungeSideEffect.PopBackStack)
       is LoungeError.JoinLoungeFailed -> sendSideEffect(LoungeSideEffect.PopBackStack)
+      is LoungeError.ExiledMember -> sendSideEffect(LoungeSideEffect.PopBackStack)
       is MemberError.InvalidMember -> sendSideEffect(LoungeSideEffect.PopBackStack)
       else -> Unit
     }
@@ -137,16 +140,29 @@ class LoungeViewModel @Inject constructor(
       updateState(LoungeReduce.UpdateLounge(lounge))
 
       collectLoungeData(lounge)
+
+      userStatusRepository.setUserLounge(user.id, loungeId)
     } ?: throw LoungeError.CreateLoungeFailed
   }
 
   private suspend fun joinLounge(loungeId: String) {
     withTimeoutOrNull(TIMEOUT) {
       val user = currentState.user
-      val lounge = joinLounge(user.asDomain(), loungeId).asUI()
-      collectLoungeData(lounge)
+
+      val member = memberRepository.getMemberByUserId(user.id, loungeId)
+      val lounge = if (member == null) {
+        joinLounge(user.asDomain(), loungeId).asUI()
+      } else {
+        if (member.type == Member.Type.EXILED) throw LoungeError.ExiledMember
+
+        loungeRepository.getLoungeById(loungeId).asUI()
+      }
 
       updateState(LoungeReduce.UpdateLounge(lounge))
+
+      collectLoungeData(lounge)
+
+      userStatusRepository.setUserLounge(user.id, loungeId)
     } ?: throw LoungeError.JoinLoungeFailed
   }
 
@@ -161,6 +177,8 @@ class LoungeViewModel @Inject constructor(
     loungeRepository.getLoungeStatusFlowById(loungeId).collectLatest { status ->
       when (status) {
         Lounge.Status.QUIT -> {
+          userStatusRepository.setUserLounge(currentState.user.id, null)
+
           sendSideEffect(LoungeSideEffect.ShowSnackbar(UiText.StringResource(R.string.lounge_owner_exited_snackbar)))
           sendSideEffect(LoungeSideEffect.PopBackStack)
         }
@@ -181,6 +199,8 @@ class LoungeViewModel @Inject constructor(
   private suspend fun collectMemberType(loungeId: String) {
     memberRepository.getMemberTypeFlow(loungeId, currentState.user.id).collectLatest { type ->
       if (type == Member.Type.EXILED) {
+        userStatusRepository.setUserLounge(currentState.user.id, null)
+
         sendSideEffect(LoungeSideEffect.ShowSnackbar(UiText.StringResource(R.string.lounge_exiled_snackbar)))
         sendSideEffect(LoungeSideEffect.PopBackStack)
       }
@@ -227,6 +247,7 @@ class LoungeViewModel @Inject constructor(
     memberTypeFlow.cancel()
     chatListFlow.cancel()
 
+    userStatusRepository.setUserLounge(currentState.user.id, null)
     exitLounge(me.asDomain())
 
     sendSideEffect(LoungeSideEffect.CloseDialog)

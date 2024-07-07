@@ -28,7 +28,6 @@ private object UserUIMapper : BiMapper<UserUIModel, User> {
     )
 }
 
-
 internal fun UserUIModel.asDomain(): User =
   UserUIMapper.mapToRight(this)
 

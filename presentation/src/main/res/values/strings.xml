@@ -42,7 +42,8 @@
     <string name="nickname_description">제1회 점심메뉴 총선거에서 사용할\n멋진 닉네임을 정해주세요!</string>
     <string name="nickname_nickname_hint">닉네임 입력</string>
     <string name="nickname_next_button">계정 생성</string>
-    <string name="nickname_user_collision_error_snackbar">해당 이메일로 생성된 계정이 있습니다. 계정을 확인해주세요.</string>
+    <string name="nickname_email_collision_error_snackbar">해당 이메일로 생성된 계정이 있습니다. 계정을 확인해주세요.</string>
+    <string name="nickname_name_collision_error_snackbar">중복된 닉네임입니다.</string>
     <string name="nickname_success_snackbar">계정이 성공적으로 생성되었습니다.</string>
 
     <!-- HomeScreen -->
@@ -167,6 +168,34 @@
     <string name="edit_template_delete_content">템플릿을 삭제하시겠습니까?</string>
     <string name="edit_template_delete_cancel_button">취소</string>
     <string name="edit_template_delete_confirm_button">삭제</string>
+
+    <!-- FriendListScreen -->
+    <string name="friend_list_title">친구 목록</string>
+    <string name="friend_list_lounge_group_title">투표 진행 중</string>
+    <string name="friend_list_online_group_title">접속중</string>
+    <string name="friend_list_offline_group_title">미접속</string>
+    <string name="friend_list_no_friend">친구가 없습니다.</string>
+    <string name="friend_list_tooltip">친구에게 접속 상태가 제대로 출력되지 않는 경우,\n앱을 종료 후 다시 실행해주세요.</string>
+    <string name="friend_list_join_button">투표방 참여</string>
+    <string name="friend_list_delete_button">삭제</string>
+    <string name="friend_list_self_snackbar">본인에게 신청할 수 없습니다!</string>
+    <string name="friend_list_already_friend_snackbar">이미 친구입니다.</string>
+    <string name="friend_list_already_request_snackbar">이미 신청이 있습니다.</string>
+    <string name="friend_list_no_user_error_snackbar">유저 정보를 찾을 수 없습니다.</string>
+    <string name="friend_list_delete_friend_snackbar">친구를 삭제했습니다.</string>
+    <string name="friend_list_send_request_snackbar">친구 신청이 전송되었습니다.</string>
+    <!-- FriendListRequestDialog -->
+    <string name="friend_list_request_dialog_title">친구 초대하기</string>
+    <string name="friend_list_request_dialog_hint_text">친구의 닉네임을 입력해주세요</string>
+    <string name="friend_list_request_dialog_dismiss_text">취소</string>
+    <string name="friend_list_request_dialog_confirm_text">친구 초대</string>
+    
+    <!-- FriendRequestScreen -->
+    <string name="friend_request_title">받은 친구 신청</string>
+    <string name="friend_request_no_request">받은 친구 신청이 없습니다.</string>
+    <string name="friend_request_reject_button">거절</string>
+    <string name="friend_request_accept_button">수락</string>
+    <string name="friend_request_no_user_error_snackbar">유저 정보를 찾을 수 없습니다.</string>
 
     <!-- SettingScreen -->
     <string name="setting_title">설정</string>

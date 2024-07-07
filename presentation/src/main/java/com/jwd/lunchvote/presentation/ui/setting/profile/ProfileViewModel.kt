@@ -115,9 +115,13 @@ class ProfileViewModel @Inject constructor(
   }
 
   private suspend fun saveName() {
+    val name = currentState.name
+    val nameExists = userRepository.checkNameExists(name)
+    if (nameExists) throw UserError.DuplicatedName
+
     sendSideEffect(ProfileSideEffect.CloseDialog)
 
-    val user = currentState.user.copy(name = currentState.name)
+    val user = currentState.user.copy(name = name)
 
     userRepository.updateUser(user.asDomain())
     sendSideEffect(ProfileSideEffect.ShowSnackbar(UiText.StringResource(R.string.profile_edit_name_success_snackbar)))

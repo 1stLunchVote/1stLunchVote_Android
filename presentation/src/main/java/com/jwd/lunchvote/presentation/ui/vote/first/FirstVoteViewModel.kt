@@ -14,6 +14,7 @@ import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
 import com.jwd.lunchvote.domain.repository.TemplateRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
+import com.jwd.lunchvote.domain.repository.UserStatusRepository
 import com.jwd.lunchvote.domain.usecase.CalculateFirstVote
 import com.jwd.lunchvote.domain.usecase.ExitLounge
 import com.jwd.lunchvote.domain.usecase.StartSecondVote
@@ -47,6 +48,7 @@ import javax.inject.Inject
 class FirstVoteViewModel @Inject constructor(
   private val userRepository: UserRepository,
   private val loungeRepository: LoungeRepository,
+  private val userStatusRepository: UserStatusRepository,
   private val memberRepository: MemberRepository,
   private val foodRepository: FoodRepository,
   private val templateRepository: TemplateRepository,
@@ -143,6 +145,8 @@ class FirstVoteViewModel @Inject constructor(
     loungeRepository.getLoungeStatusFlowById(loungeId).collectLatest { status ->
       when(status) {
         Lounge.Status.QUIT -> {
+          userStatusRepository.setUserLounge(me.userId, null)
+
           sendSideEffect(FirstVoteSideEffect.ShowSnackbar(UiText.StringResource(R.string.first_vote_owner_exited_snackbar)))
           sendSideEffect(FirstVoteSideEffect.PopBackStack)
         }
@@ -157,6 +161,8 @@ class FirstVoteViewModel @Inject constructor(
       updateState(FirstVoteReduce.UpdateMemberList(memberList.map { it.asUI() }))
 
       if (memberList.size <= 1) {
+        userStatusRepository.setUserLounge(me.userId, null)
+
         sendSideEffect(FirstVoteSideEffect.ShowSnackbar(UiText.StringResource(R.string.first_vote_only_owner_snackbar)))
         sendSideEffect(FirstVoteSideEffect.PopBackStack)
       }
@@ -218,6 +224,7 @@ class FirstVoteViewModel @Inject constructor(
     loungeStatusFlow.cancel()
     memberListFlow.cancel()
 
+    userStatusRepository.setUserLounge(me.userId, null)
     exitLounge(me.asDomain())
 
     sendSideEffect(FirstVoteSideEffect.PopBackStack)

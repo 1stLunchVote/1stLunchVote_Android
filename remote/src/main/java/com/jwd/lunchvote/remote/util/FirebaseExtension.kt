@@ -1,5 +1,6 @@
 package com.jwd.lunchvote.remote.util
 
+import com.google.firebase.Timestamp
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -29,7 +30,7 @@ internal fun CollectionReference.whereNotDeleted() =
   this.whereEqualTo("deletedAt", null)
 
 internal fun DocumentReference.deleteDocument() =
-  this.update("deletedAt", System.currentTimeMillis())
+  this.update("deletedAt", Timestamp.now())
 
 internal fun DatabaseReference.deleteChild() =
   this.updateChildren(mapOf("deletedAt" to System.currentTimeMillis()))

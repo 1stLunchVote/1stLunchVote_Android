@@ -1,6 +1,7 @@
 package com.jwd.lunchvote.presentation.model
 
 import android.os.Parcelable
+import com.jwd.lunchvote.presentation.util.getInitialDateTime
 import kotlinx.parcelize.Parcelize
 import java.time.Instant
 import java.time.ZoneId
@@ -14,7 +15,7 @@ data class MemberUIModel(
   val userProfile: String = "",
   val type: Type = Type.DEFAULT,
   val status: Status = Status.STANDBY,
-  val createdAt: ZonedDateTime = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("Asia/Seoul")),
+  val createdAt: ZonedDateTime = getInitialDateTime(),
   val deletedAt: ZonedDateTime? = null
 ) : Parcelable {
 

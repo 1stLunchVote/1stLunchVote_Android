@@ -17,6 +17,7 @@ import com.jwd.lunchvote.presentation.ui.login.register.nickname.NicknameContrac
 import com.jwd.lunchvote.presentation.ui.login.register.nickname.NicknameContract.NicknameState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kr.co.inbody.config.error.UserError
 import javax.inject.Inject
 
 @HiltViewModel
@@ -45,14 +46,19 @@ class NicknameViewModel @Inject constructor(
 
   override fun handleErrors(error: Throwable) {
     when (error) {
-      is FirebaseAuthUserCollisionException -> sendSideEffect(NicknameSideEffect.ShowSnackbar(UiText.StringResource(R.string.nickname_user_collision_error_snackbar)))
+      is FirebaseAuthUserCollisionException -> sendSideEffect(NicknameSideEffect.ShowSnackbar(UiText.StringResource(R.string.nickname_email_collision_error_snackbar)))
       else -> sendSideEffect(NicknameSideEffect.ShowSnackbar(UiText.ErrorString(error)))
     }
   }
 
   private suspend fun signUp() {
-    val email = checkNotNull(savedStateHandle.get<String>(LunchVoteNavRoute.Nickname.arguments[0].name))
-    val password = checkNotNull(savedStateHandle.get<String>(LunchVoteNavRoute.Nickname.arguments[1].name))
+    val isNameExist = userRepository.checkNameExists(currentState.nickname)
+    if (isNameExist) throw UserError.DuplicatedName
+
+    val emailKey = LunchVoteNavRoute.Nickname.arguments[0].name
+    val email = checkNotNull(savedStateHandle.get<String>(emailKey))
+    val passwordKey = LunchVoteNavRoute.Nickname.arguments[1].name
+    val password = checkNotNull(savedStateHandle.get<String>(passwordKey))
 
     createUserWithEmailAndPassword(email, password)
     val userId = signInWithEmailAndPassword(email, password)
