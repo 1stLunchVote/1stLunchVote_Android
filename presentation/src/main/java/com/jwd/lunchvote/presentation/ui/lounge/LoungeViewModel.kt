@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
+import kr.co.inbody.config.config.NetworkConfig
 import kr.co.inbody.config.error.LoungeError
 import kr.co.inbody.config.error.MemberError
 import kr.co.inbody.config.error.UserError
@@ -135,7 +136,7 @@ class LoungeViewModel @Inject constructor(
   }
 
   private suspend fun createLounge() {
-    withTimeoutOrNull(TIMEOUT) {
+    withTimeoutOrNull(NetworkConfig.TIMEOUT) {
       val user = currentState.user
       val loungeId = createLounge(user.asDomain())
       val lounge = loungeRepository.getLoungeById(loungeId).asUI()
@@ -149,16 +150,9 @@ class LoungeViewModel @Inject constructor(
   }
 
   private suspend fun joinLounge(loungeId: String) {
-    withTimeoutOrNull(TIMEOUT) {
+    withTimeoutOrNull(NetworkConfig.TIMEOUT) {
       val user = currentState.user
-
-      val member = memberRepository.getMemberByUserId(user.id, loungeId)
-      val lounge = if (member == null) {
-        joinLounge(user.asDomain(), loungeId).asUI()
-      } else {
-        if (member.type == Member.Type.EXILED) throw LoungeError.ExiledMember
-        loungeRepository.getLoungeById(loungeId).asUI()
-      }
+      val lounge = joinLounge(user.asDomain(), loungeId).asUI()
 
       updateState(LoungeReduce.UpdateLounge(lounge))
 
@@ -244,6 +238,8 @@ class LoungeViewModel @Inject constructor(
   }
 
   private suspend fun exitLounge() {
+    sendSideEffect(LoungeSideEffect.CloseDialog)
+
     loungeStatusFlow.cancel()
     memberListFlow.cancel()
     memberTypeFlow.cancel()
@@ -252,11 +248,6 @@ class LoungeViewModel @Inject constructor(
     userStatusRepository.setUserLounge(currentState.user.id, null)
     exitLounge(me.asDomain())
 
-    sendSideEffect(LoungeSideEffect.CloseDialog)
     sendSideEffect(LoungeSideEffect.PopBackStack)
-  }
-
-  companion object {
-    private const val TIMEOUT = 10000L
   }
 }
