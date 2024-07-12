@@ -84,7 +84,7 @@ class LoungeViewModel @Inject constructor(
   private val owner: MemberUIModel
     get() = currentState.memberList.find { it.type == MemberUIModel.Type.OWNER } ?: throw LoungeError.NoOwner
   private val me: MemberUIModel
-    get() = currentState.memberList.find { it.userId == currentState.user.id } ?: throw MemberError.InvalidMember
+    get() = currentState.memberList.find { it.userId == userId } ?: throw MemberError.InvalidMember
 
   init {
     launch {
