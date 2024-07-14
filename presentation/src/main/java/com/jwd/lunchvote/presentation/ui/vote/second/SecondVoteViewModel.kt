@@ -78,10 +78,11 @@ class SecondVoteViewModel @Inject constructor(
   private lateinit var loungeStatusFlow: Job
   private lateinit var memberListFlow: Job
 
-  private val owner: MemberUIModel
-    get() = currentState.memberList.find { it.type == MemberUIModel.Type.OWNER } ?: throw LoungeError.NoOwner
-  private val me: MemberUIModel
-    get() = currentState.memberList.find { it.userId == userId } ?: throw MemberError.InvalidMember
+  private fun getOwner(memberList: List<MemberUIModel> = currentState.memberList): MemberUIModel =
+    memberList.find { it.type == MemberUIModel.Type.OWNER } ?: throw LoungeError.NoOwner
+
+  private fun getMe(memberList: List<MemberUIModel> = currentState.memberList): MemberUIModel =
+    memberList.find { it.userId == userId } ?: throw MemberError.InvalidMember
 
   override fun handleEvents(event: SecondVoteEvent) {
     when (event) {
@@ -153,6 +154,8 @@ class SecondVoteViewModel @Inject constructor(
     loungeRepository.getLoungeStatusFlowById(loungeId).collectLatest { status ->
       when(status) {
         Lounge.Status.QUIT -> {
+          val me = getMe()
+          
           userStatusRepository.setUserLounge(me.userId, null)
 
           sendSideEffect(SecondVoteSideEffect.ShowSnackbar(UiText.StringResource(R.string.first_vote_owner_exited_snackbar)))
@@ -165,12 +168,14 @@ class SecondVoteViewModel @Inject constructor(
   }
 
   private suspend fun finishVote() {
+    val me = getMe()
     memberRepository.updateMemberStatus(me.asDomain(), MemberUIModel.Status.VOTED.asDomain())
 
     updateState(SecondVoteReduce.UpdateFinished(true))
   }
 
   private suspend fun reVote() {
+    val me = getMe()
     memberRepository.updateMemberStatus(me.asDomain(), MemberUIModel.Status.VOTING.asDomain())
 
     updateState(SecondVoteReduce.UpdateFinished(false))
@@ -179,6 +184,9 @@ class SecondVoteViewModel @Inject constructor(
   private suspend fun submitVote() {
     if (currentState.selectedFood != null) {
       updateState(SecondVoteReduce.UpdateCalculating(true))
+
+      val me = getMe()
+      val owner = getOwner()
 
       val ballot = SecondBallotUIModel(
         loungeId = currentState.lounge.id,
@@ -200,6 +208,8 @@ class SecondVoteViewModel @Inject constructor(
   private suspend fun exitVote() {
     loungeStatusFlow.cancel()
     memberListFlow.cancel()
+
+    val me = getMe()
 
     userStatusRepository.setUserLounge(me.userId, null)
     exitLounge(me.asDomain())

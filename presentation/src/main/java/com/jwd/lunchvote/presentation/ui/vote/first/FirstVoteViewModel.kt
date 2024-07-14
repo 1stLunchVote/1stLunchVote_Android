@@ -79,11 +79,6 @@ class FirstVoteViewModel @Inject constructor(
   private lateinit var loungeStatusFlow: Job
   private lateinit var memberListFlow: Job
 
-//  private val owner: MemberUIModel
-//    get() = currentState.memberList.find { it.type == MemberUIModel.Type.OWNER } ?: throw LoungeError.NoOwner
-//  private val me: MemberUIModel
-//    get() = currentState.memberList.find { it.userId == userId } ?: throw MemberError.InvalidMember
-
   private fun getOwner(memberList: List<MemberUIModel> = currentState.memberList): MemberUIModel =
     memberList.find { it.type == MemberUIModel.Type.OWNER } ?: throw LoungeError.NoOwner
 
@@ -156,6 +151,7 @@ class FirstVoteViewModel @Inject constructor(
       when(status) {
         Lounge.Status.QUIT -> {
           val me = getMe()
+
           userStatusRepository.setUserLounge(me.userId, null)
 
           sendSideEffect(FirstVoteSideEffect.ShowSnackbar(UiText.StringResource(R.string.first_vote_owner_exited_snackbar)))
