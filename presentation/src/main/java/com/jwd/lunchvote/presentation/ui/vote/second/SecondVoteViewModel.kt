@@ -155,7 +155,7 @@ class SecondVoteViewModel @Inject constructor(
       when(status) {
         Lounge.Status.QUIT -> {
           val me = getMe()
-          
+
           userStatusRepository.setUserLounge(me.userId, null)
 
           sendSideEffect(SecondVoteSideEffect.ShowSnackbar(UiText.StringResource(R.string.first_vote_owner_exited_snackbar)))

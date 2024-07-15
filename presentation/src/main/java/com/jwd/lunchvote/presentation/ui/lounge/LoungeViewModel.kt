@@ -81,10 +81,11 @@ class LoungeViewModel @Inject constructor(
   private lateinit var memberTypeFlow: Job
   private lateinit var chatListFlow: Job
 
-  private val owner: MemberUIModel
-    get() = currentState.memberList.find { it.type == MemberUIModel.Type.OWNER } ?: throw LoungeError.NoOwner
-  private val me: MemberUIModel
-    get() = currentState.memberList.find { it.userId == userId } ?: throw MemberError.InvalidMember
+  private fun getOwner(memberList: List<MemberUIModel> = currentState.memberList): MemberUIModel =
+    memberList.find { it.type == MemberUIModel.Type.OWNER } ?: throw LoungeError.NoOwner
+
+  private fun getMe(memberList: List<MemberUIModel> = currentState.memberList): MemberUIModel =
+    memberList.find { it.userId == userId } ?: throw MemberError.InvalidMember
 
   init {
     launch {
@@ -103,6 +104,7 @@ class LoungeViewModel @Inject constructor(
       is LoungeEvent.OnTextChange -> updateState(LoungeReduce.UpdateText(event.text))
       is LoungeEvent.OnClickSendChatButton -> launch(false) { sendChat() }
       is LoungeEvent.OnClickActionButton -> launch(false) {
+        val owner = getOwner()
         if (currentState.user.id == owner.userId) startVote() else updateReady()
       }
 
@@ -234,11 +236,14 @@ class LoungeViewModel @Inject constructor(
   }
 
   private suspend fun updateReady() {
+    val me = getMe()
     memberRepository.updateMemberReadyType(me.asDomain())
   }
 
   private suspend fun exitLounge() {
     sendSideEffect(LoungeSideEffect.CloseDialog)
+
+    val me = getMe()
 
     loungeStatusFlow.cancel()
     memberListFlow.cancel()
