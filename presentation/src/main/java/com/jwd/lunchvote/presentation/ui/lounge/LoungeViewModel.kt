@@ -230,6 +230,8 @@ class LoungeViewModel @Inject constructor(
   private suspend fun startVote() {
     if (currentState.memberList.any { it.type == MemberUIModel.Type.DEFAULT }) {
       sendSideEffect(LoungeSideEffect.ShowSnackbar(UiText.StringResource(R.string.lounge_not_ready_to_start_snackbar)))
+    } else if (currentState.memberList.size <= 1) {
+      sendSideEffect(LoungeSideEffect.ShowSnackbar(UiText.StringResource(R.string.lounge_lack_member_snackbar)))
     } else {
       startFirstVote(currentState.lounge.id)
     }
