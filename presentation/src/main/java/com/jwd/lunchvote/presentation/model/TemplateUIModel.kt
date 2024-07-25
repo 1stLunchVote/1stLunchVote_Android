@@ -3,8 +3,6 @@ package com.jwd.lunchvote.presentation.model
 import android.os.Parcelable
 import com.jwd.lunchvote.presentation.util.getInitialDateTime
 import kotlinx.parcelize.Parcelize
-import java.time.Instant
-import java.time.ZoneId
 import java.time.ZonedDateTime
 
 @Parcelize
