@@ -112,7 +112,6 @@ class HomeViewModel @Inject constructor(
     val loungeId = currentState.loungeId ?: return
     updateState(HomeReduce.UpdateLoungeId(null))
     sendSideEffect(HomeSideEffect.CloseDialog)
-    sendSideEffect(HomeSideEffect.ShowSnackbar(UiText.StringResource(R.string.home_joining_lounge_snackbar)))
 
     val isAvailable = loungeRepository.checkLoungeExistById(loungeId)
 
