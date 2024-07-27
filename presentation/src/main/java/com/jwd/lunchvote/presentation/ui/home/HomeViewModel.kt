@@ -109,9 +109,10 @@ class HomeViewModel @Inject constructor(
   }
 
   private suspend fun checkLoungeExist() {
+    sendSideEffect(HomeSideEffect.CloseDialog)
+    
     val loungeId = currentState.loungeId ?: return
     updateState(HomeReduce.UpdateLoungeId(null))
-    sendSideEffect(HomeSideEffect.CloseDialog)
 
     val isAvailable = loungeRepository.checkLoungeExistById(loungeId)
 
