@@ -34,6 +34,13 @@ enum class LunchVoteNavRoute(
       }
     )
   ),
+  LoungeSetting(
+    arguments = listOf(
+      navArgument("loungeId") {
+        type = NavType.StringType
+      }
+    )
+  ),
   LoungeMember(
     arguments = listOf(
       navArgument("memberUserId") {

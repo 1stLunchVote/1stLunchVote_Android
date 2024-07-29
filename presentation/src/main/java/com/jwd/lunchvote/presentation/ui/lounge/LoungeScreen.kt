@@ -24,9 +24,11 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedIconButton
@@ -72,6 +74,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun LoungeRoute(
   popBackStack: () -> Unit,
+  navigateToLoungeSetting: (String) -> Unit,
   navigateToMember: (String, String) -> Unit,
   navigateToFirstVote: (String) -> Unit,
   modifier: Modifier = Modifier,
@@ -88,6 +91,7 @@ fun LoungeRoute(
     viewModel.sideEffect.collectLatest {
       when (it) {
         is LoungeSideEffect.PopBackStack -> popBackStack()
+        is LoungeSideEffect.NavigateToLoungeSetting -> navigateToLoungeSetting(it.loungeId)
         is LoungeSideEffect.NavigateToMember -> navigateToMember(it.userId, it.loungeId)
         is LoungeSideEffect.NavigateToVote -> navigateToFirstVote(it.loungeId)
         is LoungeSideEffect.OpenVoteExitDialog -> viewModel.openDialog(LoungeContract.VOTE_EXIT_DIALOG)
@@ -126,12 +130,27 @@ private fun LoungeScreen(
   modifier: Modifier = Modifier,
   onEvent: (LoungeEvent) -> Unit = {}
 ) {
+  val isOwner =
+    state.user.id == state.memberList.find { it.type == MemberUIModel.Type.OWNER }?.userId
+
   Screen(
     modifier = modifier,
     topAppBar = {
       LunchVoteTopBar(
         title = stringResource(R.string.lounge_topbar_title),
-        popBackStack = { onEvent(LoungeEvent.OnClickBackButton) }
+        popBackStack = { onEvent(LoungeEvent.OnClickBackButton) },
+        actions = {
+          if (isOwner) {
+            IconButton(
+              onClick = { onEvent(LoungeEvent.OnClickSettingButton) }
+            ) {
+              Icon(
+                Icons.Outlined.Settings,
+                contentDescription = "Settings"
+              )
+            }
+          }
+        }
       )
     },
     scrollable = false
