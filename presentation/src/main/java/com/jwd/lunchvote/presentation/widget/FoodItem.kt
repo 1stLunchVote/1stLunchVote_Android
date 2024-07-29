@@ -95,7 +95,7 @@ fun FoodItem(
 
 @Preview(showBackground = true)
 @Composable
-fun FoodItemDefaultPreview() {
+private fun FoodItemDefaultPreview() {
   LunchVoteTheme {
     Row(
       horizontalArrangement = Arrangement.spacedBy(16.dp)

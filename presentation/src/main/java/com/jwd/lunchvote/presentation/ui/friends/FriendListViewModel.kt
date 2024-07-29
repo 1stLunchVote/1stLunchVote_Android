@@ -47,6 +47,9 @@ class FriendListViewModel @Inject constructor(
     }
   }
 
+  private val userId: String
+    get() = Firebase.auth.currentUser?.uid ?: throw UserError.NoSession
+
   override fun handleEvents(event: FriendListEvent) {
     when(event) {
       is FriendListEvent.ScreenInitialize -> launch { initialize() }
@@ -81,7 +84,6 @@ class FriendListViewModel @Inject constructor(
   }
 
   private suspend fun initialize() {
-    val userId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
     val joinedFriendList = mutableListOf<UserUIModel>()
     val onlineFriendList = mutableListOf<UserUIModel>()
     val offlineFriendList = mutableListOf<UserUIModel>()
@@ -112,8 +114,6 @@ class FriendListViewModel @Inject constructor(
   }
 
   private suspend fun deleteFriend(friendId: String) {
-    val userId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
-
     friendRepository.deleteFriend(userId, friendId)
 
     initialize()
@@ -127,7 +127,6 @@ class FriendListViewModel @Inject constructor(
 
     updateState(FriendListReduce.UpdateFriendName(null))
 
-    val userId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
     val user = userRepository.getUserById(userId).asUI()
     if (friendName == user.name) {
       sendSideEffect(FriendListSideEffect.ShowSnackbar(UiText.StringResource(R.string.friend_list_self_snackbar)))

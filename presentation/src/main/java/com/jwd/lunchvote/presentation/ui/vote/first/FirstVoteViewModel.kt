@@ -7,7 +7,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.entity.Lounge
-import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.repository.BallotRepository
 import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
@@ -41,6 +40,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kr.co.inbody.config.error.LoungeError
 import kr.co.inbody.config.error.MemberError
+import kr.co.inbody.config.error.RouteError
 import kr.co.inbody.config.error.UserError
 import javax.inject.Inject
 
@@ -56,10 +56,14 @@ class FirstVoteViewModel @Inject constructor(
   private val calculateFirstVote: CalculateFirstVote,
   private val startSecondVote: StartSecondVote,
   private val exitLounge: ExitLounge,
-  private val savedStateHandle: SavedStateHandle
+  savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<FirstVoteState, FirstVoteEvent, FirstVoteReduce, FirstVoteSideEffect>(savedStateHandle) {
-  override fun createInitialState(savedState: Parcelable?): FirstVoteState =
-    savedState as? FirstVoteState ?: FirstVoteState()
+  override fun createInitialState(savedState: Parcelable?): FirstVoteState {
+    return savedState as? FirstVoteState ?: FirstVoteState()
+  }
+
+  private val loungeId: String =
+    savedStateHandle[LunchVoteNavRoute.FirstVote.arguments.first().name] ?: throw RouteError.NoArguments
 
   private val _dialogState = MutableStateFlow<FirstVoteDialog?>(null)
   val dialogState: StateFlow<FirstVoteDialog?> = _dialogState.asStateFlow()
@@ -69,13 +73,17 @@ class FirstVoteViewModel @Inject constructor(
     }
   }
 
+  private val userId: String
+    get() = Firebase.auth.currentUser?.uid ?: throw UserError.NoSession
+
   private lateinit var loungeStatusFlow: Job
   private lateinit var memberListFlow: Job
 
-  private val owner: MemberUIModel
-    get() = currentState.memberList.find { it.type == MemberUIModel.Type.OWNER } ?: throw LoungeError.NoOwner
-  private val me: MemberUIModel
-    get() = currentState.memberList.find { it.userId == currentState.user.id } ?: throw MemberError.InvalidMember
+  private fun getOwner(memberList: List<MemberUIModel> = currentState.memberList): MemberUIModel =
+    memberList.find { it.type == MemberUIModel.Type.OWNER } ?: throw LoungeError.NoOwner
+
+  private fun getMe(memberList: List<MemberUIModel> = currentState.memberList): MemberUIModel =
+    memberList.find { it.userId == userId } ?: throw MemberError.InvalidMember
 
   override fun handleEvents(event: FirstVoteEvent) {
     when(event) {
@@ -119,12 +127,9 @@ class FirstVoteViewModel @Inject constructor(
   }
 
   private suspend fun initialize() {
-    val userId = Firebase.auth.currentUser?.uid ?: throw UserError.NoUser
     val user = userRepository.getUserById(userId).asUI()
     updateState(FirstVoteReduce.UpdateUser(user))
 
-    val loungeIdKey = LunchVoteNavRoute.FirstVote.arguments.first().name
-    val loungeId = checkNotNull(savedStateHandle.get<String>(loungeIdKey))
     val lounge = loungeRepository.getLoungeById(loungeId).asUI()
     updateState(FirstVoteReduce.UpdateLounge(lounge))
 
@@ -145,6 +150,8 @@ class FirstVoteViewModel @Inject constructor(
     loungeRepository.getLoungeStatusFlowById(loungeId).collectLatest { status ->
       when(status) {
         Lounge.Status.QUIT -> {
+          val me = getMe()
+
           userStatusRepository.setUserLounge(me.userId, null)
 
           sendSideEffect(FirstVoteSideEffect.ShowSnackbar(UiText.StringResource(R.string.first_vote_owner_exited_snackbar)))
@@ -157,16 +164,18 @@ class FirstVoteViewModel @Inject constructor(
   }
 
   private suspend fun collectMemberList(loungeId: String) {
-    memberRepository.getMemberListFlow(loungeId).collectLatest { memberList ->
-      updateState(FirstVoteReduce.UpdateMemberList(memberList.map { it.asUI() }))
+    memberRepository.getMemberListFlow(loungeId).collectLatest { members ->
+      val memberList = members.map { it.asUI() }
+      updateState(FirstVoteReduce.UpdateMemberList(memberList))
 
       if (memberList.size <= 1) {
+        val me = getMe(memberList)
         userStatusRepository.setUserLounge(me.userId, null)
 
         sendSideEffect(FirstVoteSideEffect.ShowSnackbar(UiText.StringResource(R.string.first_vote_only_owner_snackbar)))
         sendSideEffect(FirstVoteSideEffect.PopBackStack)
       }
-      if (memberList.all { it.status == Member.Status.VOTED }) launch { submitVote() }
+      if (memberList.all { it.status == MemberUIModel.Status.VOTED }) launch { submitVote() }
     }
   }
 
@@ -190,12 +199,14 @@ class FirstVoteViewModel @Inject constructor(
   }
 
   private suspend fun finishVote() {
+    val me = getMe()
     memberRepository.updateMemberStatus(me.asDomain(), MemberUIModel.Status.VOTED.asDomain())
 
     updateState(FirstVoteReduce.UpdateFinished(true))
   }
 
   private suspend fun reVote() {
+    val me = getMe()
     memberRepository.updateMemberStatus(me.asDomain(), MemberUIModel.Status.VOTING.asDomain())
 
     updateState(FirstVoteReduce.UpdateFinished(false))
@@ -203,6 +214,9 @@ class FirstVoteViewModel @Inject constructor(
 
   private suspend fun submitVote() {
     updateState(FirstVoteReduce.UpdateCalculating(true))
+
+    val me = getMe()
+    val owner = getOwner()
 
     val likedFoodsId = currentState.foodItemList.filter { it.status == FoodItem.Status.LIKE }.map { it.food.id }
     val dislikedFoodsId = currentState.foodItemList.filter { it.status == FoodItem.Status.DISLIKE }.map { it.food.id }
@@ -223,6 +237,8 @@ class FirstVoteViewModel @Inject constructor(
   private suspend fun exitVote() {
     loungeStatusFlow.cancel()
     memberListFlow.cancel()
+
+    val me = getMe()
 
     userStatusRepository.setUserLounge(me.userId, null)
     exitLounge(me.asDomain())

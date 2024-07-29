@@ -30,7 +30,9 @@ class JoinLounge @Inject constructor(
     }
     if (lounge.members == 6) throw LoungeError.FullMember
 
-    loungeRepository.joinLoungeById(loungeId)
+    memberRepository.getMemberByUserId(user.id, loungeId)?.let { member ->
+      if (member.type == Member.Type.EXILED) throw LoungeError.ExiledMember
+    }
 
     val member = Member(
       loungeId = loungeId,
@@ -42,7 +44,9 @@ class JoinLounge @Inject constructor(
       createdAt = Instant.now().epochSecond,
       deletedAt = null
     )
+
     memberRepository.createMember(member)
+    loungeRepository.joinLoungeById(loungeId)
 
     val chat = Chat(
       id = UUID.randomUUID().toString(),

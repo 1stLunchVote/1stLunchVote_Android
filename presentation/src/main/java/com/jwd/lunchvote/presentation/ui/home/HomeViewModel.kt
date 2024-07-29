@@ -10,6 +10,7 @@ import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.usecase.CreateFood
 import com.jwd.lunchvote.domain.usecase.GetFoodTrend
+import com.jwd.lunchvote.presentation.BuildConfig
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
@@ -70,7 +71,7 @@ class HomeViewModel @Inject constructor(
       }
       is HomeEvent.OnClickConfirmButtonJoinDialog -> launch { checkLoungeExist() }
 
-      // TODO: Temporary Secret Events
+      // Only for Debug
       is HomeEvent.OnClickSecretButton -> sendSideEffect(HomeSideEffect.OpenSecretDialog)
       is HomeEvent.OnFoodNameChangeOfSecretDialog -> updateState(HomeReduce.UpdateFoodName(event.foodName))
       is HomeEvent.OnFoodImageChangeOfSecretDialog -> updateState(HomeReduce.UpdateFoodImageUri(event.foodImageUri))
@@ -90,7 +91,7 @@ class HomeViewModel @Inject constructor(
       is HomeReduce.UpdateFoodTrendRatio -> state.copy(foodTrendRatio = reduce.foodTrendRatio)
       is HomeReduce.UpdateLoungeId -> state.copy(loungeId = reduce.loungeId)
 
-      // TODO: Temporary Secret Reduces
+      // Only for Debug
       is HomeReduce.UpdateFoodName -> state.copy(foodName = reduce.foodName)
       is HomeReduce.UpdateFoodImageUri -> state.copy(foodImageUri = reduce.foodImageUri)
     }
@@ -103,15 +104,15 @@ class HomeViewModel @Inject constructor(
   private suspend fun initialize() {
     val (foodTrend, foodTrendRatio) = getFoodTrend()
 
-    updateState(HomeReduce.UpdateFoodTrend(foodTrend.asUI()))
+    updateState(HomeReduce.UpdateFoodTrend(foodTrend?.asUI()))
     updateState(HomeReduce.UpdateFoodTrendRatio(foodTrendRatio))
   }
 
   private suspend fun checkLoungeExist() {
+    sendSideEffect(HomeSideEffect.CloseDialog)
+
     val loungeId = currentState.loungeId ?: return
     updateState(HomeReduce.UpdateLoungeId(null))
-    sendSideEffect(HomeSideEffect.CloseDialog)
-    sendSideEffect(HomeSideEffect.ShowSnackbar(UiText.StringResource(R.string.home_joining_lounge_snackbar)))
 
     val isAvailable = loungeRepository.checkLoungeExistById(loungeId)
 
@@ -119,28 +120,30 @@ class HomeViewModel @Inject constructor(
     else throw LoungeError.NoLounge
   }
 
-  // TODO: Temporary Secret Functions
+  // Only for Debug
   private suspend fun uploadFood(context: Context) {
-    sendSideEffect(HomeSideEffect.CloseDialog)
+    if (BuildConfig.DEBUG) {
+      sendSideEffect(HomeSideEffect.CloseDialog)
 
-    val imageBitmap = ImageBitmapFactory().createBitmapFromUri(context, currentState.foodImageUri ?: return)
-    val directory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "images")
-      .apply { if (!exists()) mkdirs() }
-    val file = File(directory, "${currentState.foodName}.jpg").apply {
-      outputStream().use { outputStream ->
-        imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+      val imageBitmap = ImageBitmapFactory().createBitmapFromUri(context, currentState.foodImageUri ?: return)
+      val directory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "images")
+        .apply { if (!exists()) mkdirs() }
+      val file = File(directory, "${currentState.foodName}.jpg").apply {
+        outputStream().use { outputStream ->
+          imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+        }
       }
+
+      val imageByteArray = file.readBytes()
+      val food = FoodUIModel(
+        id = UUID.randomUUID().toString(),
+        name = currentState.foodName ?: return
+      )
+
+      createFood(food.asDomain(), imageByteArray)
+
+      updateState(HomeReduce.UpdateFoodName(null))
+      updateState(HomeReduce.UpdateFoodImageUri(null))
     }
-
-    val imageByteArray = file.readBytes()
-    val food = FoodUIModel(
-      id = UUID.randomUUID().toString(),
-      name = currentState.foodName ?: return
-    )
-
-    createFood(food.asDomain(), imageByteArray)
-    
-    updateState(HomeReduce.UpdateFoodName(null))
-    updateState(HomeReduce.UpdateFoodImageUri(null))
   }
 }

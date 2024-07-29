@@ -68,11 +68,3 @@ fun Modifier.clickableSingle(
         interactionSource = remember { MutableInteractionSource() }
     )
 }
-
-
-inline fun Modifier.noRippleClickable(crossinline onClick: ()->Unit): Modifier = composed {
-    clickable(indication = null,
-        interactionSource = remember { MutableInteractionSource() }) {
-        onClick()
-    }
-}

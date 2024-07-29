@@ -154,7 +154,7 @@ class MemberDataSourceImpl @Inject constructor(
       .getReference(REFERENCE_MEMBER)
       .child(member.loungeId)
       .child(member.userId)
-      .removeValue()
+      .deleteChild()
       .await()
   }
 }

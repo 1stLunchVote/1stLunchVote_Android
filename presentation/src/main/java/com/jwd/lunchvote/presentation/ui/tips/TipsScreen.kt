@@ -76,7 +76,8 @@ private fun TipsScreen(
         title = "게임 방법",
         popBackStack = { onEvent(TipsEvent.OnClickBackButton) }
       )
-    }
+    },
+    scrollable = false
   ) {
     TabRow(
       selectedTabIndex = state.tabIndex,

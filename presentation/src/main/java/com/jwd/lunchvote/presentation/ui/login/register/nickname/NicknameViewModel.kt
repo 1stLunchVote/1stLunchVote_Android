@@ -17,6 +17,7 @@ import com.jwd.lunchvote.presentation.ui.login.register.nickname.NicknameContrac
 import com.jwd.lunchvote.presentation.ui.login.register.nickname.NicknameContract.NicknameState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kr.co.inbody.config.error.RouteError
 import kr.co.inbody.config.error.UserError
 import javax.inject.Inject
 
@@ -25,11 +26,16 @@ class NicknameViewModel @Inject constructor(
   private val userRepository: UserRepository,
   private val createUserWithEmailAndPassword: CreateUserWithEmailAndPassword,
   private val signInWithEmailAndPassword: SignInWithEmailAndPassword,
-  private val savedStateHandle: SavedStateHandle
+  savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<NicknameState, NicknameEvent, NicknameReduce, NicknameSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): NicknameState {
     return savedState as? NicknameState ?: NicknameState()
   }
+
+  private val email: String =
+    savedStateHandle[LunchVoteNavRoute.Nickname.arguments[0].name] ?: throw RouteError.NoArguments
+  private val password: String =
+    savedStateHandle[LunchVoteNavRoute.Nickname.arguments[1].name] ?: throw RouteError.NoArguments
 
   override fun handleEvents(event: NicknameEvent) {
     when (event) {
@@ -54,11 +60,6 @@ class NicknameViewModel @Inject constructor(
   private suspend fun signUp() {
     val isNameExist = userRepository.checkNameExists(currentState.nickname)
     if (isNameExist) throw UserError.DuplicatedName
-
-    val emailKey = LunchVoteNavRoute.Nickname.arguments[0].name
-    val email = checkNotNull(savedStateHandle.get<String>(emailKey))
-    val passwordKey = LunchVoteNavRoute.Nickname.arguments[1].name
-    val password = checkNotNull(savedStateHandle.get<String>(passwordKey))
 
     createUserWithEmailAndPassword(email, password)
     val userId = signInWithEmailAndPassword(email, password)

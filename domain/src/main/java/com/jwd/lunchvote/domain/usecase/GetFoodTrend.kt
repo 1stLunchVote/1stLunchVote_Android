@@ -3,7 +3,6 @@ package com.jwd.lunchvote.domain.usecase
 import com.jwd.lunchvote.domain.entity.Food
 import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.repository.VoteResultRepository
-import kr.co.inbody.config.error.VoteResultError
 import javax.inject.Inject
 
 class GetFoodTrend @Inject constructor(
@@ -11,7 +10,7 @@ class GetFoodTrend @Inject constructor(
   private val foodRepository: FoodRepository
 ) {
 
-  suspend operator fun invoke(): Pair<Food, Float> {
+  suspend operator fun invoke(): Pair<Food?, Float> {
     val voteResultList = voteResultRepository.getAllVoteResults()
     val foodIdCounts = voteResultList.groupingBy { it.foodId }.eachCount()
 
@@ -20,6 +19,6 @@ class GetFoodTrend @Inject constructor(
       val ratio = foodIdCounts[foodId]?.toFloat()?.div(voteResultList.size)?.times(100f) ?: 30f
 
       return food to ratio
-    } ?: throw VoteResultError.NoVoteResult
+    } ?: return null to 0f
   }
 }
