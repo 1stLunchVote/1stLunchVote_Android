@@ -13,4 +13,5 @@ interface LoungeRepository {
   suspend fun exitLoungeById(id: String)
   suspend fun quitLoungeById(id: String)
   suspend fun updateLoungeStatusById(id: String, status: Lounge.Status)
+  suspend fun updateLounge(lounge: Lounge)
 }

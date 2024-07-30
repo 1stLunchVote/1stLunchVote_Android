@@ -127,4 +127,14 @@ class LoungeDataSourceImpl @Inject constructor(
       .setValue(status.asRemote())
       .await()
   }
+
+  override suspend fun updateLounge(
+    lounge: LoungeData
+  ) {
+    database
+      .getReference(REFERENCE_LOUNGE)
+      .child(lounge.id)
+      .setValue(lounge.asRemote())
+      .await()
+  }
 }

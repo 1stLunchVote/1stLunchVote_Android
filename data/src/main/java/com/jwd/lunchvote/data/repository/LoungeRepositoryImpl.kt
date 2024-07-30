@@ -40,4 +40,8 @@ class LoungeRepositoryImpl @Inject constructor(
   override suspend fun updateLoungeStatusById(id: String, status: Lounge.Status) {
     loungeDataSource.updateLoungeStatusById(id, status.asData())
   }
+
+  override suspend fun updateLounge(lounge: Lounge) {
+    loungeDataSource.updateLounge(lounge.asData())
+  }
 }

@@ -9,14 +9,24 @@ private object LoungeUIMapper : BiMapper<LoungeUIModel, Lounge> {
     Lounge(
       id = from.id,
       status = from.status.asDomain(),
-      members = from.members
+      members = from.members,
+      timeLimit = from.timeLimit,
+      maxMembers = from.maxMembers,
+      secondVoteCandidates = from.secondVoteCandidates,
+      minLikeFoods = from.minLikeFoods,
+      minDislikeFoods = from.minDislikeFoods
     )
 
   override fun mapToLeft(from: Lounge): LoungeUIModel =
     LoungeUIModel(
       id = from.id,
       status = from.status.asUI(),
-      members = from.members
+      members = from.members,
+      timeLimit = from.timeLimit,
+      maxMembers = from.maxMembers,
+      secondVoteCandidates = from.secondVoteCandidates,
+      minLikeFoods = from.minLikeFoods,
+      minDislikeFoods = from.minDislikeFoods
     )
 }
 
@@ -40,7 +50,7 @@ private object LoungeUIStatusMapper : BiMapper<LoungeUIModel.Status, Lounge.Stat
     }
 }
 
-internal fun LoungeUIModel.asData(): Lounge =
+internal fun LoungeUIModel.asDomain(): Lounge =
   LoungeUIMapper.mapToRight(this)
 
 internal fun Lounge.asUI(): LoungeUIModel =
