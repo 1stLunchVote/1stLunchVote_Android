@@ -4,11 +4,11 @@ data class LoungeRemote(
   val status: String = STATUS_CREATED,
   val members: Int = 0,
 
-  val timeLimit: Int? = 0,
+  val timeLimit: Int? = null,
   val maxMembers: Int = 0,
   val secondVoteCandidates: Int = 0,
-  val minLikeFoods: Int? = 0,
-  val minDislikeFoods: Int? = 0
+  val minLikeFoods: Int? = null,
+  val minDislikeFoods: Int? = null
 ) {
 
   companion object {

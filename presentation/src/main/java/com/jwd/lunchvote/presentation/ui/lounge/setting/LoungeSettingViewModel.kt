@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.co.inbody.config.config.VoteConfig
 import kr.co.inbody.config.error.RouteError
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -81,6 +82,7 @@ class LoungeSettingViewModel @Inject constructor(
 
   private suspend fun initialize() {
     val lounge = loungeRepository.getLoungeById(loungeId).asUI()
+    Timber.w("💛 ===ktw=== ${lounge}")
 
     updateState(LoungeSettingReduce.UpdateLounge(lounge))
   }

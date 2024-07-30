@@ -12,9 +12,9 @@ data class LoungeUIModel(
 
   val timeLimit: Int? = VoteConfig.DEFAULT_TIME_LIMIT,
   val maxMembers: Int = VoteConfig.DEFAULT_MAX_MEMBERS,
-  val secondVoteCandidates: Int = VoteConfig.SECOND_VOTE_FOOD_COUNT,
-  val minLikeFoods: Int? = VoteConfig.DEFAULT_MIN_LIKE_FOODS,
-  val minDislikeFoods: Int? = VoteConfig.DEFAULT_MIN_DISLIKE_FOODS
+  val secondVoteCandidates: Int = VoteConfig.DEFAULT_SECOND_VOTE_CANDIDATES,
+  val minLikeFoods: Int? = null,
+  val minDislikeFoods: Int? = null
 ): Parcelable {
 
   enum class Status {

@@ -11,6 +11,7 @@ import com.jwd.lunchvote.remote.model.LoungeRemote
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.tasks.await
+import kr.co.inbody.config.config.VoteConfig
 import kr.co.inbody.config.error.LoungeError
 import java.util.UUID
 import javax.inject.Inject
@@ -24,6 +25,12 @@ class LoungeDataSourceImpl @Inject constructor(
 
     private const val COLUMN_STATUS = "status"
     private const val COLUMN_MEMBERS = "members"
+
+    private const val COLUMN_TIME_LIMIT = "timeLimit"
+    private const val COLUMN_MAX_MEMBERS = "maxMembers"
+    private const val COLUMN_SECOND_VOTE_CANDIDATES = "secondVoteCandidates"
+    private const val COLUMN_MIN_LIKE_FOODS = "minLikeFoods"
+    private const val COLUMN_MIN_DISLIKE_FOODS = "minDislikeFoods"
   }
 
   override suspend fun checkLoungeExistById(
@@ -42,14 +49,17 @@ class LoungeDataSourceImpl @Inject constructor(
     database
       .getReference(REFERENCE_LOUNGE)
       .child(loungeId)
-      .apply {
-        child(COLUMN_STATUS)
-          .setValue(LoungeRemote.STATUS_CREATED)
-          .await()
-        child(COLUMN_MEMBERS)
-          .setValue(0)
-          .await()
-      }
+      .updateChildren(
+        mapOf(
+          COLUMN_STATUS to LoungeRemote.STATUS_CREATED,
+          COLUMN_MEMBERS to 0,
+          COLUMN_TIME_LIMIT to VoteConfig.DEFAULT_TIME_LIMIT,
+          COLUMN_MAX_MEMBERS to VoteConfig.DEFAULT_MAX_MEMBERS,
+          COLUMN_SECOND_VOTE_CANDIDATES to VoteConfig.DEFAULT_SECOND_VOTE_CANDIDATES,
+          COLUMN_MIN_LIKE_FOODS to null,
+          COLUMN_MIN_DISLIKE_FOODS to null
+        )
+      )
 
     return loungeId
   }
