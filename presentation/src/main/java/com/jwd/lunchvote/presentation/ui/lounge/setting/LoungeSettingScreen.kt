@@ -269,15 +269,17 @@ private fun TimeLimitDialog(
 ) {
   val timePreset = listOf("10초", "20초", "30초", "60초", "90초", "120초", "무제한")
   var value by remember {
-    when (timeLimit) {
-      10 -> mutableIntStateOf(0)
-      20 -> mutableIntStateOf(1)
-      30 -> mutableIntStateOf(2)
-      60 -> mutableIntStateOf(3)
-      90 -> mutableIntStateOf(4)
-      120 -> mutableIntStateOf(5)
-      else -> mutableIntStateOf(6)
-    }
+    mutableIntStateOf(
+      when (timeLimit) {
+        10 -> 0
+        20 -> 1
+        30 -> 2
+        60 -> 3
+        90 -> 4
+        120 -> 5
+        else -> 6
+      }
+    )
   }
 
   LunchVoteDialog(
