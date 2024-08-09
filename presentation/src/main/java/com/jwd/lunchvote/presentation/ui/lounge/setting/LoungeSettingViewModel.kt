@@ -82,7 +82,6 @@ class LoungeSettingViewModel @Inject constructor(
 
   private suspend fun initialize() {
     val lounge = loungeRepository.getLoungeById(loungeId).asUI()
-    Timber.w("💛 ===ktw=== ${lounge}")
 
     updateState(LoungeSettingReduce.UpdateLounge(lounge))
   }
