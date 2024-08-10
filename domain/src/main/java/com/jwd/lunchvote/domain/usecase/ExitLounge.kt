@@ -19,10 +19,9 @@ class ExitLounge @Inject constructor(
 
     memberRepository.deleteMember(member)
 
-    val chat = Chat.builder()
-      .loungeId(member.loungeId)
-      .member(member)
+    val chat = Chat.builder(member.loungeId)
       .type(Chat.SystemMessageType.EXIT)
+      .member(member)
       .build()
     chatRepository.sendChat(chat)
   }

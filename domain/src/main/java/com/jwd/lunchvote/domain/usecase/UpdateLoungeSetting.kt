@@ -6,59 +6,125 @@ import com.jwd.lunchvote.domain.entity.Chat.SystemMessageType.SETTING_MIN_DISLIK
 import com.jwd.lunchvote.domain.entity.Chat.SystemMessageType.SETTING_MIN_LIKE_FOODS
 import com.jwd.lunchvote.domain.entity.Chat.SystemMessageType.SETTING_SECOND_VOTE_CANDIDATES
 import com.jwd.lunchvote.domain.entity.Chat.SystemMessageType.SETTING_TIME_LIMIT
-import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.repository.ChatRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
-import kotlinx.coroutines.flow.first
 import kr.co.inbody.config.config.VoteConfig
 import kr.co.inbody.config.error.LoungeError
 import javax.inject.Inject
 
 class UpdateLoungeSetting @Inject constructor(
   private val loungeRepository: LoungeRepository,
-  private val memberRepository: MemberRepository,
   private val chatRepository: ChatRepository
 ) {
 
   suspend operator fun invoke(
-    loungeId: String,
-    timeLimit: Int? = null,
-    maxMembers: Int? = null,
-    secondVoteCandidates: Int? = null,
-    minLikeFoods: Int? = null,
-    minDislikeFoods: Int? = null
+    loungeId: String, 
+    timeLimit: Int? = NO_VALUE,
+    maxMembers: Int? = NO_VALUE,
+    secondVoteCandidates: Int? = NO_VALUE,
+    minLikeFoods: Int? = NO_VALUE,
+    minDislikeFoods: Int? = NO_VALUE
   ) {
     val lounge = loungeRepository.getLoungeById(loungeId)
-    if (lounge.members > (maxMembers ?: VoteConfig.DEFAULT_MAX_MEMBERS)) {
-      throw LoungeError.LoungeSettingFailed
-    }
-
-    val updatedLounge = lounge.copy(
-      timeLimit = timeLimit ?: lounge.timeLimit,
-      maxMembers = maxMembers ?: lounge.maxMembers,
-      secondVoteCandidates = secondVoteCandidates ?: lounge.secondVoteCandidates,
-      minLikeFoods = minLikeFoods ?: lounge.minLikeFoods,
-      minDislikeFoods = minDislikeFoods ?: lounge.minDislikeFoods
-    )
-
-    loungeRepository.updateLounge(updatedLounge)
-
-    val timeLimitMap = mapOf(10 to "10초", 20 to "20초", 30 to "30초", 60 to "1분", 90 to "1분 30초", 120 to "2분")
-
-    val chat = Chat.builder()
-      .loungeId(loungeId)
-      .let {
-        when {
-          timeLimit != null -> it.type(SETTING_TIME_LIMIT).arg(timeLimitMap[timeLimit] ?: "${timeLimit}초")
-          maxMembers != null -> it.type(SETTING_MAX_MEMBERS).arg("${maxMembers}명")
-          secondVoteCandidates != null -> it.type(SETTING_SECOND_VOTE_CANDIDATES).arg("${secondVoteCandidates}개")
-          minLikeFoods != null -> it.type(SETTING_MIN_LIKE_FOODS).arg("${minLikeFoods}개")
-          minDislikeFoods != null -> it.type(SETTING_MIN_DISLIKE_FOODS).arg("${minDislikeFoods}개")
-          else -> throw LoungeError.LoungeSettingFailed
+    
+    when {
+      timeLimit != NO_VALUE -> {
+        if (timeLimit == null) {
+          loungeRepository.updateLounge(
+            lounge = lounge.copy(
+              timeLimit = null,
+              minLikeFoods = VoteConfig.DEFAULT_MIN_LIKE_FOODS,
+              minDislikeFoods = VoteConfig.DEFAULT_MIN_DISLIKE_FOODS
+            )
+          )
+          chatRepository.sendChat(
+            chat = Chat.builder(loungeId)
+              .type(SETTING_TIME_LIMIT)
+              .timeLimit(null)
+              .build()
+          )
+        } else {
+          loungeRepository.updateLounge(
+            lounge = lounge.copy(
+              timeLimit = timeLimit,
+              minLikeFoods = null,
+              minDislikeFoods = null
+            )
+          )
+          chatRepository.sendChat(
+            chat = Chat.builder(loungeId)
+              .type(SETTING_TIME_LIMIT)
+              .timeLimit(timeLimit)
+              .build()
+          )
         }
       }
-      .build()
-    chatRepository.sendChat(chat)
+      maxMembers != NO_VALUE -> {
+        if (lounge.members > (maxMembers ?: VoteConfig.DEFAULT_MAX_MEMBERS)) {
+          throw LoungeError.LoungeSettingFailed
+        }
+
+        loungeRepository.updateLounge(
+          lounge = lounge.copy(
+            maxMembers = maxMembers ?: VoteConfig.DEFAULT_MAX_MEMBERS
+          )
+        )
+
+        chatRepository.sendChat(
+          chat = Chat.builder(loungeId)
+            .type(SETTING_MAX_MEMBERS)
+            .maxMembers(maxMembers ?: VoteConfig.DEFAULT_MAX_MEMBERS)
+            .build()
+        )
+      }
+      secondVoteCandidates != NO_VALUE -> {
+        loungeRepository.updateLounge(
+          lounge = lounge.copy(
+            secondVoteCandidates = secondVoteCandidates ?: VoteConfig.DEFAULT_SECOND_VOTE_CANDIDATES
+          )
+        )
+
+        chatRepository.sendChat(
+          chat = Chat.builder(loungeId)
+            .type(SETTING_SECOND_VOTE_CANDIDATES)
+            .secondVoteCandidates(secondVoteCandidates ?: VoteConfig.DEFAULT_SECOND_VOTE_CANDIDATES)
+            .build()
+        )
+      }
+      minLikeFoods != NO_VALUE -> {
+        loungeRepository.updateLounge(
+          lounge = lounge.copy(
+            minLikeFoods = minLikeFoods
+          )
+        )
+
+        chatRepository.sendChat(
+          chat = Chat.builder(loungeId)
+            .type(SETTING_MIN_LIKE_FOODS)
+            .minLikeFoods(minLikeFoods)
+            .build()
+        )
+      }
+      minDislikeFoods != NO_VALUE -> {
+        loungeRepository.updateLounge(
+          lounge = lounge.copy(
+            minDislikeFoods = minDislikeFoods
+          )
+        )
+
+        chatRepository.sendChat(
+          chat = Chat.builder(loungeId)
+            .type(SETTING_MIN_DISLIKE_FOODS)
+            .minDislikeFoods(minDislikeFoods)
+            .build()
+        )
+      }
+      else -> throw LoungeError.LoungeSettingFailed
+    }
+  }
+  
+  companion object {
+    const val NO_VALUE = -1
   }
 }

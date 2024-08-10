@@ -90,33 +90,41 @@ class LoungeSettingViewModel @Inject constructor(
 
   private suspend fun changeSetting(dialog: String, value: Int?) {
     when (dialog) {
-      TIME_LIMIT_DIALOG -> if (value == null) updateLoungeSetting(
-        loungeId = currentState.lounge.id,
-        timeLimit = null,
-        minLikeFoods = VoteConfig.DEFAULT_MIN_LIKE_FOODS,
-        minDislikeFoods = VoteConfig.DEFAULT_MIN_DISLIKE_FOODS
-      ) else updateLoungeSetting(
-        loungeId = currentState.lounge.id,
-        timeLimit = value,
-        minLikeFoods = null,
-        minDislikeFoods = null
-      )
-      MAX_MEMBERS_DIALOG -> updateLoungeSetting(
-        loungeId = currentState.lounge.id,
-        maxMembers = value
-      )
-      SECOND_VOTE_CANDIDATES_DIALOG -> updateLoungeSetting(
-        loungeId = currentState.lounge.id,
-        secondVoteCandidates = value
-      )
-      MIN_LIKE_FOODS_DIALOG -> updateLoungeSetting(
-        loungeId = currentState.lounge.id,
-        minLikeFoods = value
-      )
-      MIN_DISLIKE_FOODS_DIALOG -> updateLoungeSetting(
-        loungeId = currentState.lounge.id,
-        minDislikeFoods = value
-      )
+      TIME_LIMIT_DIALOG -> {
+        if (currentState.lounge.timeLimit == value) return
+        updateLoungeSetting(
+          loungeId = currentState.lounge.id,
+          timeLimit = value
+        )
+      }
+      MAX_MEMBERS_DIALOG -> {
+        if (currentState.lounge.maxMembers == value) return
+        updateLoungeSetting(
+          loungeId = currentState.lounge.id,
+          maxMembers = value
+        )
+      }
+      SECOND_VOTE_CANDIDATES_DIALOG -> {
+        if (currentState.lounge.secondVoteCandidates == value) return
+        updateLoungeSetting(
+          loungeId = currentState.lounge.id,
+          secondVoteCandidates = value
+        )
+      }
+      MIN_LIKE_FOODS_DIALOG -> {
+        if (currentState.lounge.minLikeFoods == value) return
+        updateLoungeSetting(
+          loungeId = currentState.lounge.id,
+          minLikeFoods = value
+        )
+      }
+      MIN_DISLIKE_FOODS_DIALOG -> {
+        if (currentState.lounge.minDislikeFoods == value) return
+        updateLoungeSetting(
+          loungeId = currentState.lounge.id,
+          minDislikeFoods = value
+        )
+      }
       else -> return
     }
 

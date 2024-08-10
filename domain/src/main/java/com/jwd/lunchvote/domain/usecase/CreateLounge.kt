@@ -31,8 +31,7 @@ class CreateLounge @Inject constructor(
     )
     memberRepository.createMember(member)
 
-    val chat = Chat.builder()
-      .loungeId(loungeId)
+    val chat = Chat.builder(loungeId)
       .type(Chat.SystemMessageType.CREATE)
       .build()
     chatRepository.sendChat(chat)

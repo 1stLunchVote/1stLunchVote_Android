@@ -47,10 +47,9 @@ class JoinLounge @Inject constructor(
     memberRepository.createMember(member)
     loungeRepository.joinLoungeById(loungeId)
 
-    val chat = Chat.builder()
-      .loungeId(loungeId)
-      .user(user)
+    val chat = Chat.builder(loungeId)
       .type(Chat.SystemMessageType.JOIN)
+      .user(user)
       .build()
     chatRepository.sendChat(chat)
 

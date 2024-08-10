@@ -18,10 +18,9 @@ class ExileMember @Inject constructor(
 
     memberRepository.exileMember(member)
 
-    val chat = Chat.builder()
-      .loungeId(member.loungeId)
-      .member(member)
+    val chat = Chat.builder(member.loungeId)
       .type(Chat.SystemMessageType.EXILE)
+      .member(member)
       .build()
     chatRepository.sendChat(chat)
   }
