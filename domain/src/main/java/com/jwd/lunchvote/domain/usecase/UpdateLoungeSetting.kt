@@ -8,6 +8,7 @@ import com.jwd.lunchvote.domain.entity.Chat.SystemMessageType.SETTING_SECOND_VOT
 import com.jwd.lunchvote.domain.entity.Chat.SystemMessageType.SETTING_TIME_LIMIT
 import com.jwd.lunchvote.domain.repository.ChatRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
+import com.jwd.lunchvote.domain.repository.MemberRepository
 import kr.co.inbody.config.config.VoteConfig
 import kr.co.inbody.config.error.LoungeError
 import javax.inject.Inject

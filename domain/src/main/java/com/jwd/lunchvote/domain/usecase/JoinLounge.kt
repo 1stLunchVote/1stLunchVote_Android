@@ -8,7 +8,6 @@ import com.jwd.lunchvote.domain.repository.ChatRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
 import kr.co.inbody.config.error.LoungeError
-import java.time.Instant
 import javax.inject.Inject
 
 class JoinLounge @Inject constructor(
@@ -45,16 +44,9 @@ class JoinLounge @Inject constructor(
       }
     } ?: run {
       memberRepository.createMember(
-        member = Member(
-          loungeId = loungeId,
-          userId = user.id,
-          userName = user.name,
-          userProfile = user.profileImage,
-          type = Member.Type.DEFAULT,
-          status = Member.Status.STANDBY,
-          createdAt = Instant.now().epochSecond,
-          deletedAt = null
-        )
+        member = Member.builder(loungeId)
+          .user(user)
+          .build()
       )
       chatRepository.sendChat(
         chat = Chat.builder(loungeId)

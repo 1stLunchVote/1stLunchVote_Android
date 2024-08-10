@@ -194,6 +194,9 @@ data class Chat(
      *  .user(user)
      *  .build()
      *  ```
+     *
+     *
+     * @param loungeId 투표 방 ID
      */
     fun builder(loungeId: String): Builder = Builder(loungeId)
   }
