@@ -10,6 +10,7 @@ interface MemberDataSource {
   fun getMemberTypeFlow(loungeId: String, userId: String): Flow<MemberData.Type>
   suspend fun getMemberByUserId(userId: String, loungeId: String): MemberData?
   suspend fun updateMemberReadyType(member: MemberData)
+  suspend fun updateMemberType(member: MemberData, type: MemberData.Type)
   suspend fun updateMemberStatus(member: MemberData, status: MemberData.Status)
   suspend fun updateMembersStatusByLoungeId(loungeId: String, status: MemberData.Status)
   suspend fun exileMember(member: MemberData)

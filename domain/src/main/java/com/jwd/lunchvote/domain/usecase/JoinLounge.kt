@@ -30,28 +30,41 @@ class JoinLounge @Inject constructor(
     if (lounge.members == 6) throw LoungeError.FullMember
 
     memberRepository.getMemberByUserId(user.id, loungeId)?.let { member ->
-      if (member.type == Member.Type.EXILED) throw LoungeError.ExiledMember
+      when (member.type) {
+        Member.Type.LEAVED -> {
+          memberRepository.updateMemberType(member, Member.Type.DEFAULT)
+          chatRepository.sendChat(
+            chat = Chat.builder(loungeId)
+              .type(Chat.SystemMessageType.JOIN)
+              .user(user)
+              .build()
+          )
+        }
+        Member.Type.EXILED -> throw LoungeError.ExiledMember
+        else -> member
+      }
+    } ?: run {
+      memberRepository.createMember(
+        member = Member(
+          loungeId = loungeId,
+          userId = user.id,
+          userName = user.name,
+          userProfile = user.profileImage,
+          type = Member.Type.DEFAULT,
+          status = Member.Status.STANDBY,
+          createdAt = Instant.now().epochSecond,
+          deletedAt = null
+        )
+      )
+      chatRepository.sendChat(
+        chat = Chat.builder(loungeId)
+          .type(Chat.SystemMessageType.JOIN)
+          .user(user)
+          .build()
+      )
     }
 
-    val member = Member(
-      loungeId = loungeId,
-      userId = user.id,
-      userName = user.name,
-      userProfile = user.profileImage,
-      type = Member.Type.DEFAULT,
-      status = Member.Status.STANDBY,
-      createdAt = Instant.now().epochSecond,
-      deletedAt = null
-    )
-
-    memberRepository.createMember(member)
     loungeRepository.joinLoungeById(loungeId)
-
-    val chat = Chat.builder(loungeId)
-      .type(Chat.SystemMessageType.JOIN)
-      .user(user)
-      .build()
-    chatRepository.sendChat(chat)
 
     return loungeRepository.getLoungeById(loungeId)
   }

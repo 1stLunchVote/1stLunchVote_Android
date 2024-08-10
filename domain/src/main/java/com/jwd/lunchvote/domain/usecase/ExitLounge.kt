@@ -17,12 +17,13 @@ class ExitLounge @Inject constructor(
     loungeRepository.exitLoungeById(member.loungeId)
     if (member.type == Member.Type.OWNER) loungeRepository.quitLoungeById(member.loungeId)
 
-    memberRepository.deleteMember(member)
+    memberRepository.updateMemberType(member, Member.Type.LEAVED)
 
-    val chat = Chat.builder(member.loungeId)
-      .type(Chat.SystemMessageType.EXIT)
-      .member(member)
-      .build()
-    chatRepository.sendChat(chat)
+    chatRepository.sendChat(
+      chat = Chat.builder(member.loungeId)
+        .type(Chat.SystemMessageType.EXIT)
+        .member(member)
+        .build()
+    )
   }
 }

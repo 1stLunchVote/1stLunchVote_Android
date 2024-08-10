@@ -36,6 +36,7 @@ private object MemberDataTypeMapper : BiMapper<MemberData.Type, Member.Type> {
       MemberData.Type.DEFAULT -> Member.Type.DEFAULT
       MemberData.Type.OWNER -> Member.Type.OWNER
       MemberData.Type.READY -> Member.Type.READY
+      MemberData.Type.LEAVED -> Member.Type.LEAVED
       MemberData.Type.EXILED -> Member.Type.EXILED
     }
 
@@ -44,6 +45,7 @@ private object MemberDataTypeMapper : BiMapper<MemberData.Type, Member.Type> {
       Member.Type.DEFAULT -> MemberData.Type.DEFAULT
       Member.Type.OWNER -> MemberData.Type.OWNER
       Member.Type.READY -> MemberData.Type.READY
+      Member.Type.LEAVED -> MemberData.Type.LEAVED
       Member.Type.EXILED -> MemberData.Type.EXILED
     }
 }

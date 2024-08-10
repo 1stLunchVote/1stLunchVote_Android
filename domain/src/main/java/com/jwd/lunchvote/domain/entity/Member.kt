@@ -12,7 +12,7 @@ data class Member(
 ) {
 
   enum class Type {
-    DEFAULT, OWNER, READY, EXILED
+    DEFAULT, OWNER, READY, LEAVED, EXILED
   }
 
   enum class Status {

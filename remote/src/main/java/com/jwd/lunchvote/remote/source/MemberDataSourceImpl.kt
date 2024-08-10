@@ -54,7 +54,7 @@ class MemberDataSourceImpl @Inject constructor(
       .getValueEventFlow<MemberRemote>()
       .map {
         it.mapNotNull { (key, value) -> value?.asData(key) }
-          .filter { member -> member.type != MemberData.Type.EXILED }
+          .filter { member -> member.type !in listOf(MemberData.Type.LEAVED, MemberData.Type.EXILED) }
           .sortedBy { member -> member.createdAt }
       }
 
@@ -102,6 +102,19 @@ class MemberDataSourceImpl @Inject constructor(
           )
           .await()
       }
+  }
+
+  override suspend fun updateMemberType(
+    member: MemberData,
+    type: MemberData.Type
+  ) {
+    database
+      .getReference(REFERENCE_MEMBER)
+      .child(member.loungeId)
+      .child(member.userId)
+      .child(MEMBER_TYPE)
+      .setValue(type.asRemote())
+      .await()
   }
 
   override suspend fun updateMemberStatus(

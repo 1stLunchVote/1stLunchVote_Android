@@ -38,6 +38,7 @@ private object MemberUITypeMapper : BiMapper<MemberUIModel.Type, Member.Type> {
       MemberUIModel.Type.DEFAULT -> Member.Type.DEFAULT
       MemberUIModel.Type.OWNER -> Member.Type.OWNER
       MemberUIModel.Type.READY -> Member.Type.READY
+      MemberUIModel.Type.LEAVED -> Member.Type.LEAVED
       MemberUIModel.Type.EXILED -> Member.Type.EXILED
     }
 
@@ -46,6 +47,7 @@ private object MemberUITypeMapper : BiMapper<MemberUIModel.Type, Member.Type> {
       Member.Type.DEFAULT -> MemberUIModel.Type.DEFAULT
       Member.Type.OWNER -> MemberUIModel.Type.OWNER
       Member.Type.READY -> MemberUIModel.Type.READY
+      Member.Type.LEAVED -> MemberUIModel.Type.LEAVED
       Member.Type.EXILED -> MemberUIModel.Type.EXILED
     }
 }
