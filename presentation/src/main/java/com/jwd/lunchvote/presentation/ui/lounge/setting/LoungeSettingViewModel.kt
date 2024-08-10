@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.usecase.UpdateLoungeSetting
-import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
 import com.jwd.lunchvote.presentation.ui.lounge.setting.LoungeSettingContract.Companion.MAX_MEMBERS_DIALOG
@@ -24,9 +23,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kr.co.inbody.config.config.VoteConfig
 import kr.co.inbody.config.error.RouteError
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel

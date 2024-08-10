@@ -10,7 +10,6 @@ import com.jwd.lunchvote.domain.entity.Chat.SystemMessageType.SETTING_MIN_LIKE_F
 import com.jwd.lunchvote.domain.entity.Chat.SystemMessageType.SETTING_SECOND_VOTE_CANDIDATES
 import com.jwd.lunchvote.domain.entity.Chat.SystemMessageType.SETTING_TIME_LIMIT
 import kotlinx.coroutines.delay
-import kr.co.inbody.config.error.ChatError
 import java.time.Instant
 import java.util.UUID
 
