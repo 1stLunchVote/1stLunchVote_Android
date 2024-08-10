@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.LoungeRepository
+import com.jwd.lunchvote.domain.usecase.UpdateLoungeSetting
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
@@ -31,6 +32,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoungeSettingViewModel @Inject constructor(
   private val loungeRepository: LoungeRepository,
+  private val updateLoungeSetting: UpdateLoungeSetting,
   savedStateHandle: SavedStateHandle
 ) : BaseStateViewModel<LoungeSettingState, LoungeSettingEvent, LoungeSettingReduce, LoungeSettingSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): LoungeSettingState {
@@ -87,24 +89,36 @@ class LoungeSettingViewModel @Inject constructor(
   }
 
   private suspend fun changeSetting(dialog: String, value: Int?) {
-    val lounge = when (dialog) {
-      TIME_LIMIT_DIALOG -> if (value == null) currentState.lounge.copy(
+    when (dialog) {
+      TIME_LIMIT_DIALOG -> if (value == null) updateLoungeSetting(
+        loungeId = currentState.lounge.id,
         timeLimit = null,
         minLikeFoods = VoteConfig.DEFAULT_MIN_LIKE_FOODS,
         minDislikeFoods = VoteConfig.DEFAULT_MIN_DISLIKE_FOODS
-      ) else currentState.lounge.copy(
+      ) else updateLoungeSetting(
+        loungeId = currentState.lounge.id,
         timeLimit = value,
         minLikeFoods = null,
         minDislikeFoods = null
       )
-      MAX_MEMBERS_DIALOG -> currentState.lounge.copy(maxMembers = value!!)
-      SECOND_VOTE_CANDIDATES_DIALOG -> currentState.lounge.copy(secondVoteCandidates = value!!)
-      MIN_LIKE_FOODS_DIALOG -> currentState.lounge.copy(minLikeFoods = value)
-      MIN_DISLIKE_FOODS_DIALOG -> currentState.lounge.copy(minDislikeFoods = value)
+      MAX_MEMBERS_DIALOG -> updateLoungeSetting(
+        loungeId = currentState.lounge.id,
+        maxMembers = value
+      )
+      SECOND_VOTE_CANDIDATES_DIALOG -> updateLoungeSetting(
+        loungeId = currentState.lounge.id,
+        secondVoteCandidates = value
+      )
+      MIN_LIKE_FOODS_DIALOG -> updateLoungeSetting(
+        loungeId = currentState.lounge.id,
+        minLikeFoods = value
+      )
+      MIN_DISLIKE_FOODS_DIALOG -> updateLoungeSetting(
+        loungeId = currentState.lounge.id,
+        minDislikeFoods = value
+      )
       else -> return
     }
-
-    loungeRepository.updateLounge(lounge.asDomain())
 
     sendEvent(LoungeSettingEvent.ScreenInitialize)
   }

@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.domain.entity.Chat
+import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.ChatUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import java.time.format.DateTimeFormatter
@@ -202,7 +203,7 @@ private fun ChatBubblePreview() {
     ) {
       ChatBubble(
         chat = ChatUIModel(
-          message = Chat.CREATE_SYSTEM_MESSAGE,
+          message = "투표 방이 생성되었습니다.",
           type = ChatUIModel.Type.SYSTEM
         ),
         member = MemberUIModel(),
@@ -211,7 +212,7 @@ private fun ChatBubblePreview() {
       ChatBubble(
         chat = ChatUIModel(
           userName = "김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수",
-          message = Chat.JOIN_SYSTEM_MESSAGE,
+          message = "님이 입장하였습니다.",
           type = ChatUIModel.Type.SYSTEM
         ),
         member = MemberUIModel(),
@@ -260,7 +261,7 @@ private fun ChatBubblePreview() {
       ChatBubble(
         chat = ChatUIModel(
           userName = "김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수",
-          message = Chat.EXILE_SYSTEM_MESSAGE,
+          message = "님이 추방되었습니다.",
           type = ChatUIModel.Type.SYSTEM
         ),
         member = MemberUIModel(),

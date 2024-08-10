@@ -47,7 +47,7 @@ abstract class BaseStateViewModel<S : State, E : Event, R : Reduce, SE : SideEff
    *
    * viewState를 collect함으로써 상태(State)의 갱신에 따라 UI를 업데이트할 수 있다.
    *
-   * e.g.
+   * example.
    * ```
    * val state: SampleState by viewModel.viewState.collectAsStateWithLifecycle()
    */
@@ -66,7 +66,7 @@ abstract class BaseStateViewModel<S : State, E : Event, R : Reduce, SE : SideEff
    *
    * sideEffect를 collect함으로써 부수 효과(Side Effect)에 따른 동작을 정의할 수 있다.
    *
-   * e.g.
+   * example.
    * ```
    * LaunchedEffect(viewModel.sideEffect) {
    *   viewModel.sideEffect.collectLatest {

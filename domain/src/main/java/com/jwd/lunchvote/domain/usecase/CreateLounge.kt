@@ -7,7 +7,6 @@ import com.jwd.lunchvote.domain.repository.ChatRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
 import java.time.Instant
-import java.util.UUID
 import javax.inject.Inject
 
 class CreateLounge @Inject constructor(
@@ -32,16 +31,10 @@ class CreateLounge @Inject constructor(
     )
     memberRepository.createMember(member)
 
-    val chat = Chat(
-      id = UUID.randomUUID().toString(),
-      loungeId = loungeId,
-      userId = user.id,
-      userName = "",
-      userProfile = user.profileImage,
-      message = Chat.CREATE_SYSTEM_MESSAGE,
-      type = Chat.Type.SYSTEM,
-      createdAt = Instant.now().epochSecond
-    )
+    val chat = Chat.builder()
+      .loungeId(loungeId)
+      .type(Chat.SystemMessageType.CREATE)
+      .build()
     chatRepository.sendChat(chat)
 
     return loungeId

@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.domain.entity.Chat
+import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.ChatUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
@@ -365,7 +366,7 @@ private fun Preview() {
         chatList = listOf(
           ChatUIModel(
             userName = "김영희",
-            message = Chat.EXILE_SYSTEM_MESSAGE,
+            message = "님이 추방되었습니다.",
             type = ChatUIModel.Type.SYSTEM
           ),
           ChatUIModel(
@@ -375,7 +376,7 @@ private fun Preview() {
           ),
           ChatUIModel(
             userName = "김영희",
-            message = Chat.JOIN_SYSTEM_MESSAGE,
+            message = "님이 입장했습니다.",
             type = ChatUIModel.Type.SYSTEM,
           ),
           ChatUIModel(
@@ -398,11 +399,11 @@ private fun Preview() {
           ),
           ChatUIModel(
             userName = "김철수",
-            message = Chat.JOIN_SYSTEM_MESSAGE,
+            message = "님이 입장했습니다.",
             type = ChatUIModel.Type.SYSTEM
           ),
           ChatUIModel(
-            message = Chat.CREATE_SYSTEM_MESSAGE,
+            message = "투표 방이 생성되었습니다.",
             type = ChatUIModel.Type.SYSTEM
           )
         )

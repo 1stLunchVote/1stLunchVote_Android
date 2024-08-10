@@ -56,4 +56,9 @@ interface LoungeError {
     private fun readResolve(): Any = FullMember
     override val message: String = "참가자가 꽉 찼습니다."
   }
+
+  data object LoungeSettingFailed : Throwable() {
+    private fun readResolve(): Any = LoungeSettingFailed
+    override val message: String = "투표 방 설정에 실패했습니다."
+  }
 }

@@ -9,7 +9,6 @@ import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
 import kr.co.inbody.config.error.LoungeError
 import java.time.Instant
-import java.util.UUID
 import javax.inject.Inject
 
 class JoinLounge @Inject constructor(
@@ -48,16 +47,11 @@ class JoinLounge @Inject constructor(
     memberRepository.createMember(member)
     loungeRepository.joinLoungeById(loungeId)
 
-    val chat = Chat(
-      id = UUID.randomUUID().toString(),
-      loungeId = loungeId,
-      userId = user.id,
-      userName = user.name,
-      userProfile = user.profileImage,
-      message = Chat.JOIN_SYSTEM_MESSAGE,
-      type = Chat.Type.SYSTEM,
-      createdAt = Instant.now().epochSecond
-    )
+    val chat = Chat.builder()
+      .loungeId(loungeId)
+      .user(user)
+      .type(Chat.SystemMessageType.JOIN)
+      .build()
     chatRepository.sendChat(chat)
 
     return loungeRepository.getLoungeById(loungeId)
