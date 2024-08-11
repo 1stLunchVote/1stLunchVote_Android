@@ -25,6 +25,7 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -47,6 +48,7 @@ import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteContract.SecondVo
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.widget.HorizontalProgressBar
+import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.MemberProgress
@@ -91,7 +93,8 @@ fun SecondVoteRoute(
     null -> Unit
   }
 
-  SecondVoteScreen(
+  if (state.calculating) LoadingScreen(message = stringResource(R.string.second_vote_calculating_message))
+  else SecondVoteScreen(
     state = state,
     modifier = modifier,
     onEvent = viewModel::sendEvent
@@ -111,11 +114,15 @@ private fun SecondVoteScreen(
         title = stringResource(R.string.second_vote_title),
         navIconVisible = false
       )
-      HorizontalProgressBar(
-        timeLimitSecond = 60,
-        modifier = Modifier.fillMaxWidth(),
-        onProgressComplete = { onEvent(SecondVoteEvent.OnVoteFinish) }
-      )
+      if (state.lounge.timeLimit != null) {
+        key(state.lounge.timeLimit) {
+          HorizontalProgressBar(
+            timeLimitSecond = state.lounge.timeLimit,
+            modifier = Modifier.fillMaxWidth(),
+            onProgressComplete = { onEvent(SecondVoteEvent.OnVoteFinish) }
+          )
+        }
+      }
     },
     scrollable = false
   ) {

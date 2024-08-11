@@ -39,10 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
-import com.jwd.lunchvote.domain.entity.Food
 import com.jwd.lunchvote.presentation.R
-import com.jwd.lunchvote.presentation.model.FoodItem
-import com.jwd.lunchvote.presentation.model.FoodItem.Status.DEFAULT
 import com.jwd.lunchvote.presentation.model.FoodItem.Status.DISLIKE
 import com.jwd.lunchvote.presentation.model.FoodItem.Status.LIKE
 import com.jwd.lunchvote.presentation.model.MemberUIModel
@@ -66,7 +63,6 @@ import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.SearchIcon
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
-import kr.co.inbody.config.config.VoteConfig
 import kr.co.inbody.config.config.VoteConfig.DEFAULT_MIN_DISLIKE_FOODS
 import kr.co.inbody.config.config.VoteConfig.DEFAULT_MIN_LIKE_FOODS
 
@@ -111,7 +107,7 @@ fun FirstVoteRoute(
     null -> Unit
   }
 
-  if (state.calculating) LoadingScreen(message = stringResource(R.string.first_vote_calculating_message),)
+  if (state.calculating) LoadingScreen(message = stringResource(R.string.first_vote_calculating_message))
   else FirstVoteScreen(
     state = state,
     modifier = modifier,

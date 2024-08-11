@@ -354,6 +354,14 @@ private fun TimeLimitDialog(
           )
         }
       }
+      Text(
+        text = "주의: 10초는 매우 짧습니다!\n" +
+          "랜덤성을 높이고 싶을 때만 설정해주세요.",
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.error,
+        textAlign = TextAlign.Center,
+        style = MaterialTheme.typography.labelMedium
+      )
     }
   }
 }

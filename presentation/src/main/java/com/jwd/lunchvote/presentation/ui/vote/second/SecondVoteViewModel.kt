@@ -182,26 +182,24 @@ class SecondVoteViewModel @Inject constructor(
   }
 
   private suspend fun submitVote() {
-    if (currentState.selectedFood != null) {
-      updateState(SecondVoteReduce.UpdateCalculating(true))
+    updateState(SecondVoteReduce.UpdateCalculating(true))
 
-      val me = getMe()
-      val owner = getOwner()
+    val me = getMe()
+    val owner = getOwner()
 
-      val ballot = SecondBallotUIModel(
-        loungeId = currentState.lounge.id,
-        userId = currentState.user.id,
-        foodId = currentState.selectedFood!!.id
-      )
-      ballotRepository.submitSecondBallot(ballot.asDomain())
+    val ballot = SecondBallotUIModel(
+      loungeId = currentState.lounge.id,
+      userId = currentState.user.id,
+      foodId = (currentState.selectedFood ?: currentState.foodList.random()).id
+    )
+    ballotRepository.submitSecondBallot(ballot.asDomain())
 
-      if (me.userId == owner.userId) {
-        calculateSecondVote(currentState.lounge.id)
-        currentState.memberList.forEach {
-          userStatusRepository.setUserLounge(it.userId, null)
-        }
-        finishVote(currentState.lounge.id)
+    if (me.userId == owner.userId) {
+      calculateSecondVote(currentState.lounge.id)
+      currentState.memberList.forEach {
+        userStatusRepository.setUserLounge(it.userId, null)
       }
+      finishVote(currentState.lounge.id)
     }
   }
 
