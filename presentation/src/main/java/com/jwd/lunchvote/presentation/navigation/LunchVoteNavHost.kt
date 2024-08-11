@@ -17,6 +17,7 @@ import com.jwd.lunchvote.presentation.ui.login.register.nickname.NicknameRoute
 import com.jwd.lunchvote.presentation.ui.login.register.password.PasswordRoute
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeRoute
 import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberRoute
+import com.jwd.lunchvote.presentation.ui.lounge.setting.LoungeSettingRoute
 import com.jwd.lunchvote.presentation.ui.setting.SettingRoute
 import com.jwd.lunchvote.presentation.ui.setting.profile.ProfileRoute
 import com.jwd.lunchvote.presentation.ui.template.TemplateListRoute
@@ -96,12 +97,20 @@ fun LunchVoteNavHost(
     composable(LunchVoteNavRoute.Lounge) {
       LoungeRoute(
         popBackStack = { navController.popBackStack(LunchVoteNavRoute.Home) },
+        navigateToLoungeSetting = { loungeId ->
+          navController.navigate(LunchVoteNavRoute.LoungeSetting, loungeId)
+        },
         navigateToMember = { userId, loungeId ->
           navController.navigate(LunchVoteNavRoute.LoungeMember, userId, loungeId)
         },
         navigateToFirstVote = { loungeId ->
           navController.navigateWithPop(LunchVoteNavRoute.FirstVote, loungeId)
         }
+      )
+    }
+    composable(LunchVoteNavRoute.LoungeSetting) {
+      LoungeSettingRoute(
+        popBackStack = { navController.popBackStack() }
       )
     }
     composable(LunchVoteNavRoute.LoungeMember) {

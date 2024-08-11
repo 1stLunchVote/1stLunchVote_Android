@@ -7,10 +7,12 @@ interface LoungeDataSource {
 
   suspend fun checkLoungeExistById(id: String): Boolean
   suspend fun createLounge(): String
-  fun getLoungeStatusFlowById(id: String): Flow<LoungeData.Status>
   suspend fun getLoungeById(id: String): LoungeData
+  fun getLoungeFlowById(id: String): Flow<LoungeData>
+  fun getLoungeStatusFlowById(id: String): Flow<LoungeData.Status>
   suspend fun joinLoungeById(id: String)
   suspend fun exitLoungeById(id: String)
   suspend fun quitLoungeById(id: String)
   suspend fun updateLoungeStatusById(id: String, status: LoungeData.Status)
+  suspend fun updateLounge(lounge: LoungeData)
 }

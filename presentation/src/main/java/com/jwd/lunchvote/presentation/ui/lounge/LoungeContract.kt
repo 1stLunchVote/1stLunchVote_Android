@@ -23,6 +23,7 @@ class LoungeContract {
 
   sealed interface LoungeEvent : ViewModelContract.Event {
     data object OnClickBackButton : LoungeEvent
+    data object OnClickSettingButton : LoungeEvent
     data class OnClickMember(val member: MemberUIModel) : LoungeEvent
     data object OnClickInviteButton : LoungeEvent
     data class OnTextChange(val text: String) : LoungeEvent
@@ -44,6 +45,7 @@ class LoungeContract {
 
   sealed interface LoungeSideEffect : ViewModelContract.SideEffect {
     data object PopBackStack : LoungeSideEffect
+    data class NavigateToLoungeSetting(val loungeId: String) : LoungeSideEffect
     data class NavigateToMember(val userId: String, val loungeId: String) : LoungeSideEffect
     data class NavigateToVote(val loungeId: String) : LoungeSideEffect
     data object OpenVoteExitDialog : LoungeSideEffect

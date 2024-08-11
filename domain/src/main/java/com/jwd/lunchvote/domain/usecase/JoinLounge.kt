@@ -2,14 +2,20 @@ package com.jwd.lunchvote.domain.usecase
 
 import com.jwd.lunchvote.domain.entity.Chat
 import com.jwd.lunchvote.domain.entity.Lounge
+import com.jwd.lunchvote.domain.entity.Lounge.Status.CREATED
+import com.jwd.lunchvote.domain.entity.Lounge.Status.FINISHED
+import com.jwd.lunchvote.domain.entity.Lounge.Status.FIRST_VOTE
+import com.jwd.lunchvote.domain.entity.Lounge.Status.QUIT
+import com.jwd.lunchvote.domain.entity.Lounge.Status.SECOND_VOTE
 import com.jwd.lunchvote.domain.entity.Member
+import com.jwd.lunchvote.domain.entity.Member.Type.DEFAULT
+import com.jwd.lunchvote.domain.entity.Member.Type.EXILED
+import com.jwd.lunchvote.domain.entity.Member.Type.LEAVED
 import com.jwd.lunchvote.domain.entity.User
 import com.jwd.lunchvote.domain.repository.ChatRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
 import kr.co.inbody.config.error.LoungeError
-import java.time.Instant
-import java.util.UUID
 import javax.inject.Inject
 
 class JoinLounge @Inject constructor(
@@ -22,43 +28,42 @@ class JoinLounge @Inject constructor(
     val lounge = loungeRepository.getLoungeById(loungeId)
 
     when (lounge.status) {
-      Lounge.Status.CREATED -> Unit
-      Lounge.Status.QUIT -> throw LoungeError.LoungeQuit
-      Lounge.Status.FIRST_VOTE -> throw LoungeError.LoungeStarted
-      Lounge.Status.SECOND_VOTE -> throw LoungeError.LoungeStarted
-      Lounge.Status.FINISHED -> throw LoungeError.LoungeFinished
+      CREATED -> Unit
+      QUIT -> throw LoungeError.LoungeQuit
+      FIRST_VOTE -> throw LoungeError.LoungeStarted
+      SECOND_VOTE -> throw LoungeError.LoungeStarted
+      FINISHED -> throw LoungeError.LoungeFinished
     }
-    if (lounge.members == 6) throw LoungeError.FullMember
+    if (lounge.members == lounge.maxMembers) throw LoungeError.FullMember
 
     memberRepository.getMemberByUserId(user.id, loungeId)?.let { member ->
-      if (member.type == Member.Type.EXILED) throw LoungeError.ExiledMember
+      when (member.type) {
+        LEAVED -> {
+          memberRepository.updateMemberType(member, DEFAULT)
+          chatRepository.sendChat(
+            chat = Chat.Builder(loungeId)
+              .user(user)
+              .join()
+              .build()
+          )
+        }
+        EXILED -> throw LoungeError.ExiledMember
+        else -> member
+      }
+    } ?: run {
+      memberRepository.createMember(
+        member = Member.Builder(loungeId, user)
+          .build()
+      )
+      chatRepository.sendChat(
+        chat = Chat.Builder(loungeId)
+          .user(user)
+          .join()
+          .build()
+      )
     }
 
-    val member = Member(
-      loungeId = loungeId,
-      userId = user.id,
-      userName = user.name,
-      userProfile = user.profileImage,
-      type = Member.Type.DEFAULT,
-      status = Member.Status.STANDBY,
-      createdAt = Instant.now().epochSecond,
-      deletedAt = null
-    )
-
-    memberRepository.createMember(member)
     loungeRepository.joinLoungeById(loungeId)
-
-    val chat = Chat(
-      id = UUID.randomUUID().toString(),
-      loungeId = loungeId,
-      userId = user.id,
-      userName = user.name,
-      userProfile = user.profileImage,
-      message = Chat.JOIN_SYSTEM_MESSAGE,
-      type = Chat.Type.SYSTEM,
-      createdAt = Instant.now().epochSecond
-    )
-    chatRepository.sendChat(chat)
 
     return loungeRepository.getLoungeById(loungeId)
   }

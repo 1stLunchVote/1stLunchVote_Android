@@ -9,14 +9,24 @@ private object LoungeDataMapper : BiMapper<LoungeData, Lounge> {
     Lounge(
       id = from.id,
       status = from.status.asDomain(),
-      members = from.members
+      members = from.members,
+      timeLimit = from.timeLimit,
+      maxMembers = from.maxMembers,
+      secondVoteCandidates = from.secondVoteCandidates,
+      minLikeFoods = from.minLikeFoods,
+      minDislikeFoods = from.minDislikeFoods
     )
 
   override fun mapToLeft(from: Lounge): LoungeData =
     LoungeData(
       id = from.id,
       status = from.status.asData(),
-      members = from.members
+      members = from.members,
+      timeLimit = from.timeLimit,
+      maxMembers = from.maxMembers,
+      secondVoteCandidates = from.secondVoteCandidates,
+      minLikeFoods = from.minLikeFoods,
+      minDislikeFoods = from.minDislikeFoods
     )
 }
 

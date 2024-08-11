@@ -24,9 +24,11 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedIconButton
@@ -43,16 +45,23 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.ImeAction.Companion.Send
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.domain.entity.Chat
+import com.jwd.lunchvote.domain.entity.Member
+import com.jwd.lunchvote.domain.entity.Member.Type
+import com.jwd.lunchvote.domain.entity.User
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.ChatUIModel
+import com.jwd.lunchvote.presentation.model.ChatUIModel.Type.SYSTEM
 import com.jwd.lunchvote.presentation.model.MemberUIModel
+import com.jwd.lunchvote.presentation.model.MemberUIModel.Type.OWNER
 import com.jwd.lunchvote.presentation.model.UserUIModel
+import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.Companion.VOTE_EXIT_DIALOG
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeEvent
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeSideEffect
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeState
@@ -72,6 +81,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun LoungeRoute(
   popBackStack: () -> Unit,
+  navigateToLoungeSetting: (String) -> Unit,
   navigateToMember: (String, String) -> Unit,
   navigateToFirstVote: (String) -> Unit,
   modifier: Modifier = Modifier,
@@ -88,9 +98,10 @@ fun LoungeRoute(
     viewModel.sideEffect.collectLatest {
       when (it) {
         is LoungeSideEffect.PopBackStack -> popBackStack()
+        is LoungeSideEffect.NavigateToLoungeSetting -> navigateToLoungeSetting(it.loungeId)
         is LoungeSideEffect.NavigateToMember -> navigateToMember(it.userId, it.loungeId)
         is LoungeSideEffect.NavigateToVote -> navigateToFirstVote(it.loungeId)
-        is LoungeSideEffect.OpenVoteExitDialog -> viewModel.openDialog(LoungeContract.VOTE_EXIT_DIALOG)
+        is LoungeSideEffect.OpenVoteExitDialog -> viewModel.openDialog(VOTE_EXIT_DIALOG)
         is LoungeSideEffect.CloseDialog -> viewModel.openDialog("")
         is LoungeSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
         is LoungeSideEffect.CopyToClipboard -> clipboardManager.setText(AnnotatedString(it.loungeId))
@@ -100,10 +111,9 @@ fun LoungeRoute(
 
   BackHandler { viewModel.sendEvent(LoungeEvent.OnClickBackButton) }
 
-  val isOwner =
-    state.user.id == state.memberList.find { it.type == MemberUIModel.Type.OWNER }?.userId
+  val isOwner = state.user.id == state.memberList.find { it.type == OWNER }?.userId
   when (dialog) {
-    LoungeContract.VOTE_EXIT_DIALOG -> VoteExitDialog(
+    VOTE_EXIT_DIALOG -> VoteExitDialog(
       isOwner = isOwner,
       onDismissRequest = { viewModel.sendEvent(LoungeEvent.OnClickCancelButtonVoteExitDialog) },
       onConfirmation = { viewModel.sendEvent(LoungeEvent.OnClickConfirmButtonVoteExitDialog) }
@@ -131,12 +141,23 @@ private fun LoungeScreen(
     topAppBar = {
       LunchVoteTopBar(
         title = stringResource(R.string.lounge_topbar_title),
-        popBackStack = { onEvent(LoungeEvent.OnClickBackButton) }
+        popBackStack = { onEvent(LoungeEvent.OnClickBackButton) },
+        actions = {
+          IconButton(
+            onClick = { onEvent(LoungeEvent.OnClickSettingButton) }
+          ) {
+            Icon(
+              Icons.Outlined.Settings,
+              contentDescription = "Settings"
+            )
+          }
+        }
       )
     },
     scrollable = false
   ) {
     MemberRow(
+      maxMembers = state.lounge.maxMembers,
       memberList = state.memberList,
       onClickMember = { onEvent(LoungeEvent.OnClickMember(it)) },
       onClickInviteButton = { onEvent(LoungeEvent.OnClickInviteButton) },
@@ -153,7 +174,7 @@ private fun LoungeScreen(
     )
     LoungeBottomBar(
       text = state.text,
-      isOwner = state.user.id == state.memberList.find { it.type == MemberUIModel.Type.OWNER }?.userId,
+      isOwner = state.user.id == state.memberList.find { it.type == OWNER }?.userId,
       modifier = Modifier.fillMaxWidth(),
       onTextChange = { onEvent(LoungeEvent.OnTextChange(it)) },
       onClickSendChatButton = { onEvent(LoungeEvent.OnClickSendChatButton) },
@@ -164,6 +185,7 @@ private fun LoungeScreen(
 
 @Composable
 private fun MemberRow(
+  maxMembers: Int,
   memberList: List<MemberUIModel>,
   onClickMember: (MemberUIModel) -> Unit,
   onClickInviteButton: () -> Unit,
@@ -179,12 +201,12 @@ private fun MemberRow(
         onClick = onClickMember
       )
     }
-    if (memberList.size < 6) {
+    if (memberList.size < maxMembers) {
       InviteProfile(
         onClick = onClickInviteButton
       )
     }
-    repeat(6 - memberList.size - 1) {
+    repeat(maxMembers - memberList.size - 1) {
       EmptyProfile()
     }
   }
@@ -204,18 +226,19 @@ private fun ChatList(
     modifier = modifier.padding(24.dp),
     state = lazyListState,
     verticalArrangement = Arrangement.Top,
+    horizontalAlignment = Alignment.CenterHorizontally,
     reverseLayout = true
   ) {
     itemsIndexed(chatList) { index, chat ->
       val isSameUserWithPrevious = index < chatList.size - 1
-        && chatList[index + 1].type != ChatUIModel.Type.SYSTEM
+        && chatList[index + 1].type != SYSTEM
         && chat.userId == chatList[index + 1].userId
 
       ChatBubble(
         chat = chat,
-        member = memberList.find { it.userId == chat.userId } ?: MemberUIModel(),
-        isMine = chat.userId == userId,
         modifier = Modifier.padding(top = if (isSameUserWithPrevious) 4.dp else 16.dp),
+        isMine = chat.userId == userId,
+        member = memberList.find { it.userId == chat.userId },
         previousChat = chatList.getOrNull(index + 1),
         nextChat = chatList.getOrNull(index - 1),
         onClickMember = onClickMember
@@ -236,7 +259,10 @@ private fun LoungeBottomBar(
   Column(
     modifier = modifier
   ) {
-    HorizontalDivider(thickness = 2.dp, color = MaterialTheme.colorScheme.onBackground)
+    HorizontalDivider(
+      thickness = 2.dp,
+      color = MaterialTheme.colorScheme.onBackground
+    )
     Row(
       modifier = Modifier
         .fillMaxWidth()
@@ -282,7 +308,7 @@ private fun ChatTextField(
     modifier = modifier,
     textStyle = MaterialTheme.typography.bodyLarge,
     keyboardOptions = KeyboardOptions(
-      imeAction = ImeAction.Send
+      imeAction = Send
     ),
     keyboardActions = KeyboardActions(
       onSend = { onClickSendChatButton() }
@@ -334,58 +360,60 @@ private fun ChatTextField(
 @Preview
 @Composable
 private fun Preview() {
+  val user1 = User("1", "", "김철수", "", 0L, 0L)
+  val user2 = User("2", "", "김영희", "", 0L, 0L)
+  val user3 = User("3", "", "김영수", "", 0L, 0L)
+  val member1 = Member.Builder("", user1).owner().build()
+  val member2 = Member.Builder("", user2).build().copy(type = Type.READY)
+  val member3 = Member.Builder("", user3).build()
+
+  val chatBuilder = Chat.Builder("")
+
   ScreenPreview {
     LoungeScreen(
       LoungeState(
         user = UserUIModel(id = "1"),
-        memberList = listOf(
-          MemberUIModel(userId = "1", type = MemberUIModel.Type.OWNER),
-          MemberUIModel(userId = "2", type = MemberUIModel.Type.READY),
-          MemberUIModel(userId = "3")
-        ),
+        memberList = listOf(member1.asUI(), member2.asUI(), member3.asUI()),
         chatList = listOf(
-          ChatUIModel(
-            userName = "김영희",
-            message = Chat.EXILE_SYSTEM_MESSAGE,
-            type = ChatUIModel.Type.SYSTEM
-          ),
-          ChatUIModel(
-            message = "안녕하세요",
-            userId = "3",
-            userName = "김영희"
-          ),
-          ChatUIModel(
-            userName = "김영희",
-            message = Chat.JOIN_SYSTEM_MESSAGE,
-            type = ChatUIModel.Type.SYSTEM,
-          ),
-          ChatUIModel(
-            message = "안녕하세요",
-            userId = "2",
-            userName = "김철수"
-          ),
-          ChatUIModel(
-            message = "안녕하세요",
-            userId = "2",
-            userName = "김철수"
-          ),
-          ChatUIModel(
-            message = "안녕하세요",
-            userId = "1"
-          ),
-          ChatUIModel(
-            message = "안녕하세요",
-            userId = "1"
-          ),
-          ChatUIModel(
-            userName = "김철수",
-            message = Chat.JOIN_SYSTEM_MESSAGE,
-            type = ChatUIModel.Type.SYSTEM
-          ),
-          ChatUIModel(
-            message = Chat.CREATE_SYSTEM_MESSAGE,
-            type = ChatUIModel.Type.SYSTEM
-          )
+          chatBuilder
+            .member(member3)
+            .exile()
+            .build()
+            .asUI(),
+          chatBuilder
+            .member(member3)
+            .message("안녕하세요")
+            .build()
+            .asUI(),
+          chatBuilder
+            .member(member3)
+            .join()
+            .build()
+            .asUI(),
+          chatBuilder
+            .member(member1)
+            .message("안녕하세요")
+            .build()
+            .asUI(),
+          chatBuilder
+            .member(member2)
+            .message("반갑습니다")
+            .build()
+            .asUI(),
+          chatBuilder
+            .member(member2)
+            .message("안녕하세요")
+            .build()
+            .asUI(),
+          chatBuilder
+            .member(member2)
+            .join()
+            .build()
+            .asUI(),
+          chatBuilder
+            .create()
+            .build()
+            .asUI()
         )
       )
     )

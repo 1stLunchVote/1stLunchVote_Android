@@ -38,6 +38,7 @@ private object MemberTypeLocalMapper : BiMapper<MemberEntity.Type, MemberData.Ty
       MemberEntity.Type.DEFAULT -> MemberData.Type.DEFAULT
       MemberEntity.Type.OWNER -> MemberData.Type.OWNER
       MemberEntity.Type.READY -> MemberData.Type.READY
+      MemberEntity.Type.LEAVED -> MemberData.Type.LEAVED
       MemberEntity.Type.EXILED -> MemberData.Type.EXILED
     }
   }
@@ -47,6 +48,7 @@ private object MemberTypeLocalMapper : BiMapper<MemberEntity.Type, MemberData.Ty
       MemberData.Type.DEFAULT -> MemberEntity.Type.DEFAULT
       MemberData.Type.OWNER -> MemberEntity.Type.OWNER
       MemberData.Type.READY -> MemberEntity.Type.READY
+      MemberData.Type.LEAVED -> MemberEntity.Type.LEAVED
       MemberData.Type.EXILED -> MemberEntity.Type.EXILED
     }
   }

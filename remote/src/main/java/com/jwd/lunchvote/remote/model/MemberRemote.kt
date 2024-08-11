@@ -17,6 +17,7 @@ data class MemberRemote(
     const val TYPE_DEFAULT = "default"
     const val TYPE_OWNER = "owner"
     const val TYPE_READY = "ready"
+    const val TYPE_LEAVED = "leaved"
     const val TYPE_EXILED = "exiled"
 
     const val STATUS_STANDBY = "standby"

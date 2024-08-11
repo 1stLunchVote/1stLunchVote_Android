@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -39,7 +40,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
-import com.jwd.lunchvote.presentation.model.FoodItem
+import com.jwd.lunchvote.presentation.model.FoodItem.Status.DISLIKE
+import com.jwd.lunchvote.presentation.model.FoodItem.Status.LIKE
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteContract.FirstVoteDialog
@@ -103,7 +105,7 @@ fun FirstVoteRoute(
     null -> Unit
   }
 
-  if (state.calculating) LoadingScreen(message = stringResource(R.string.first_vote_calculating_message),)
+  if (state.calculating) LoadingScreen(message = stringResource(R.string.first_vote_calculating_message))
   else FirstVoteScreen(
     state = state,
     modifier = modifier,
@@ -124,11 +126,15 @@ private fun FirstVoteScreen(
         title = stringResource(R.string.first_vote_title),
         navIconVisible = false
       )
-      HorizontalProgressBar(
-        timeLimitSecond = 60,
-        modifier = Modifier.fillMaxWidth(),
-        onProgressComplete = { onEvent(FirstVoteEvent.OnVoteFinish) }
-      )
+      if (state.lounge.timeLimit != null) {
+        key(state.lounge.timeLimit) {
+          HorizontalProgressBar(
+            timeLimitSecond = state.lounge.timeLimit,
+            modifier = Modifier.fillMaxWidth(),
+            onProgressComplete = { onEvent(FirstVoteEvent.OnVoteFinish) }
+          )
+        }
+      }
     },
     scrollable = false
   ) {
@@ -150,8 +156,8 @@ private fun FirstVotingScreen(
     verticalArrangement = Arrangement.spacedBy(16.dp)
   ) {
     FirstVoteInformationRow(
-      like = state.foodItemList.count { it.status == FoodItem.Status.LIKE },
-      dislike = state.foodItemList.count { it.status == FoodItem.Status.DISLIKE },
+      like = state.foodItemList.count { it.status == LIKE },
+      dislike = state.foodItemList.count { it.status == DISLIKE },
       memberList = state.memberList,
       modifier = Modifier.fillMaxWidth()
     )
@@ -182,7 +188,8 @@ private fun FirstVotingScreen(
     Button(
       onClick = { onEvent(FirstVoteEvent.OnClickFinishButton) },
       modifier = Modifier.align(Alignment.CenterHorizontally),
-      enabled = state.foodItemList.any { it.status != FoodItem.Status.DEFAULT }
+      enabled = state.foodItemList.count { it.status == LIKE } >= (state.lounge.minLikeFoods ?: 0)
+        && state.foodItemList.count { it.status == DISLIKE } >= (state.lounge.minDislikeFoods ?: 0)
     ) {
       Text(text = stringResource(R.string.first_vote_finish_button))
     }

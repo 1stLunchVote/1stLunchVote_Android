@@ -28,7 +28,7 @@ data class MemberEntity(
 ) {
 
   enum class Type {
-    DEFAULT, OWNER, READY, EXILED
+    DEFAULT, OWNER, READY, LEAVED, EXILED
   }
 
   enum class Status {

@@ -36,6 +36,7 @@ private object MemberRemoteTypeMapper : BiMapper<String, MemberData.Type> {
       MemberRemote.TYPE_DEFAULT -> MemberData.Type.DEFAULT
       MemberRemote.TYPE_OWNER -> MemberData.Type.OWNER
       MemberRemote.TYPE_READY -> MemberData.Type.READY
+      MemberRemote.TYPE_LEAVED -> MemberData.Type.LEAVED
       MemberRemote.TYPE_EXILED -> MemberData.Type.EXILED
       else -> throw MemberError.InvalidMemberType
     }
@@ -45,6 +46,7 @@ private object MemberRemoteTypeMapper : BiMapper<String, MemberData.Type> {
       MemberData.Type.DEFAULT -> MemberRemote.TYPE_DEFAULT
       MemberData.Type.OWNER -> MemberRemote.TYPE_OWNER
       MemberData.Type.READY -> MemberRemote.TYPE_READY
+      MemberData.Type.LEAVED -> MemberRemote.TYPE_LEAVED
       MemberData.Type.EXILED -> MemberRemote.TYPE_EXILED
     }
 }
