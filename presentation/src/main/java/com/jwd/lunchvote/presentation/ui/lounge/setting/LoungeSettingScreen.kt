@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
+import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.ui.lounge.setting.LoungeSettingContract.Companion.MAX_MEMBERS_DIALOG
 import com.jwd.lunchvote.presentation.ui.lounge.setting.LoungeSettingContract.Companion.MIN_DISLIKE_FOODS_DIALOG
 import com.jwd.lunchvote.presentation.ui.lounge.setting.LoungeSettingContract.Companion.MIN_LIKE_FOODS_DIALOG
@@ -126,7 +128,7 @@ private fun LoungeSettingScreen(
     modifier = modifier,
     topAppBar = {
       LunchVoteTopBar(
-        title = "투표 설정",
+        title = stringResource(R.string.lounge_setting_title),
         popBackStack = { onEvent(LoungeSettingEvent.OnClickBackButton) }
       )
     },
@@ -135,55 +137,55 @@ private fun LoungeSettingScreen(
     LazyColumn {
       item {
         SettingBlock(
-          name = "시간 설정",
+          name = stringResource(R.string.lounge_setting_time_setting_title),
           modifier = Modifier.fillMaxWidth()
         ) {
           SettingItem(
-            name = "투표 제한 시간",
-            description = "1차, 2차 투표 각각의 제한 시간을 설정합니다.\n *최소 10초, 최대 2분, 무제한 가능*",
-            value = if (state.lounge.timeLimit != null) "${state.lounge.timeLimit}초" else "무제한",
+            name = stringResource(R.string.lounge_setting_time_limit_title),
+            description = stringResource(R.string.lounge_setting_time_limit_description),
+            value = if (state.lounge.timeLimit != null) stringResource(R.string.lounge_setting_time_limit_body, state.lounge.timeLimit) else stringResource(R.string.lounge_setting_time_limit_body_unlimited),
             onClickItem = { if (state.isOwner) onEvent(LoungeSettingEvent.OnClickTimeLimitItem) }
           )
         }
       }
       item {
         SettingBlock(
-          name = "인원 설정",
+          name = stringResource(R.string.lounge_setting_member_setting_title),
           modifier = Modifier.fillMaxWidth()
         ) {
           SettingItem(
-            name = "투표 최대 인원 수",
-            description = "투표에 참여할 최대 인원 수를 설정합니다.\n *최소 1명, 최대 6명*",
-            value = "${state.lounge.maxMembers}명",
+            name = stringResource(R.string.lounge_setting_max_members_title),
+            description = stringResource(R.string.lounge_setting_max_members_description),
+            value = stringResource(R.string.lounge_setting_max_members_body, state.lounge.maxMembers),
             onClickItem = { if (state.isOwner) onEvent(LoungeSettingEvent.OnClickMaxMembersItem) }
           )
         }
       }
       item {
         SettingBlock(
-          name = "상세 설정",
+          name = stringResource(R.string.lounge_setting_detail_setting_title),
           modifier = Modifier.fillMaxWidth()
         ) {
           SettingItem(
-            name = "2차 투표 후보 수",
-            description = "2차 투표에 후보로 등장할 음식의 개수를 설정합니다.\n *최소 2개, 최대 10개*",
-            value = "${state.lounge.secondVoteCandidates}개",
+            name = stringResource(R.string.lounge_setting_second_vote_candidates_title),
+            description = stringResource(R.string.lounge_setting_second_vote_candidates_description),
+            value = stringResource(R.string.lounge_setting_second_vote_candidates_body, state.lounge.secondVoteCandidates),
             onClickItem = { if (state.isOwner) onEvent(LoungeSettingEvent.OnClickSecondVoteCandidatesItem) }
           )
           SettingItem(
-            name = "최소 선호 음식 수",
-            description = "다음 투표로 넘어가기 위해 투표해야하는 선호 음식의 개수를 설정합니다.\n *최소 1개, 최대 5개*",
-            value = if (state.lounge.minLikeFoods != null) "${state.lounge.minLikeFoods}개" else "-",
+            name = stringResource(R.string.lounge_setting_min_like_foods_title),
+            description = stringResource(R.string.lounge_setting_min_like_foods_description),
+            value = if (state.lounge.minLikeFoods != null) stringResource(R.string.lounge_setting_min_like_foods_body, state.lounge.minLikeFoods) else stringResource(R.string.hyphen),
             enabled = state.lounge.minLikeFoods != null,
-            warningText = "투표 제한 시간이 무제한이어야 합니다.",
+            warningText = stringResource(R.string.lounge_setting_min_like_foods_warning),
             onClickItem = { if (state.isOwner) onEvent(LoungeSettingEvent.OnClickMinLikeFoodsItem) }
           )
           SettingItem(
-            name = "최소 비선호 음식 수",
-            description = "다음 투표로 넘어가기 위해 투표해야하는 비선호 음식의 개수를 설정합니다.\n *최소 0개, 최대 5개*",
-            value = if (state.lounge.minDislikeFoods != null) "${state.lounge.minDislikeFoods}개" else "-",
+            name = stringResource(R.string.lounge_setting_min_dislike_foods_title),
+            description = stringResource(R.string.lounge_setting_min_dislike_foods_body),
+            value = if (state.lounge.minDislikeFoods != null) stringResource(R.string.lounge_setting_min_dislike_foods_body, state.lounge.minDislikeFoods) else stringResource(R.string.hyphen),
             enabled = state.lounge.minDislikeFoods != null,
-            warningText = "투표 제한 시간이 무제한이어야 합니다.",
+            warningText = stringResource(R.string.lounge_setting_min_dislike_foods_warning),
             onClickItem = { if (state.isOwner) onEvent(LoungeSettingEvent.OnClickMinDislikeFoodsItem) }
           )
         }
@@ -255,7 +257,7 @@ private fun SettingItem(
         )
       }
       Text(
-        text = if (enabled) value else "-",
+        text = if (enabled) value else stringResource(R.string.hyphen),
         color = MaterialTheme.colorScheme.outline,
         style = MaterialTheme.typography.bodyLarge
       )
@@ -278,7 +280,7 @@ private fun TimeLimitDialog(
   onDismissRequest: () -> Unit = {},
   onConfirmation: (Int?) -> Unit = {},
 ) {
-  val timePreset = listOf("10초", "20초", "30초", "60초", "90초", "120초", "무제한")
+  val timePreset = listOf(R.string.lounge_setting_time_limit_dialog_time_preset_0, R.string.lounge_setting_time_limit_dialog_time_preset_1, R.string.lounge_setting_time_limit_dialog_time_preset_2, R.string.lounge_setting_time_limit_dialog_time_preset_3, R.string.lounge_setting_time_limit_dialog_time_preset_4, R.string.lounge_setting_time_limit_dialog_time_preset_5, R.string.lounge_setting_time_limit_dialog_time_preset_6)
   var value by remember {
     mutableIntStateOf(
       when (timeLimit) {
@@ -294,11 +296,11 @@ private fun TimeLimitDialog(
   }
 
   LunchVoteDialog(
-    title = "투표 제한 시간",
+    title = stringResource(R.string.lounge_setting_time_limit_title),
     modifier = modifier,
-    dismissText = "취소",
+    dismissText = stringResource(R.string.lounge_setting_dialog_dismiss_text),
     onDismissRequest = onDismissRequest,
-    confirmText = "적용",
+    confirmText = stringResource(R.string.lounge_setting_dialog_confirm_text),
     onConfirmation = {
        onConfirmation(
         when (value) {
@@ -317,7 +319,7 @@ private fun TimeLimitDialog(
       verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
       Text(
-        text = "1차, 2차 투표 각각의 제한 시간을 설정합니다.\n *최소 10초, 최대 2분, 무제한 가능*",
+        text = stringResource(R.string.lounge_setting_time_limit_description),
         modifier = Modifier.fillMaxWidth(),
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.bodySmall
@@ -334,12 +336,12 @@ private fun TimeLimitDialog(
           enabled = value > 0
         ) {
           Text(
-            text = "-",
+            text = stringResource(R.string.minus),
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
           )
         }
         Text(
-          text = timePreset[value],
+          text = stringResource(timePreset[value]),
           modifier = Modifier.weight(1f),
           textAlign = TextAlign.Center,
           style = MaterialTheme.typography.bodyLarge
@@ -349,19 +351,20 @@ private fun TimeLimitDialog(
           enabled = value < timePreset.size - 1
         ) {
           Text(
-            text = "+",
+            text = stringResource(R.string.plus),
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
           )
         }
       }
-      Text(
-        text = "주의: 10초는 매우 짧습니다!\n" +
-          "랜덤성을 높이고 싶을 때만 설정해주세요.",
-        modifier = Modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.error,
-        textAlign = TextAlign.Center,
-        style = MaterialTheme.typography.labelMedium
-      )
+      if (value == 0) {
+        Text(
+          text = stringResource(R.string.lounge_setting_time_limit_dialog_warning),
+          modifier = Modifier.fillMaxWidth(),
+          color = MaterialTheme.colorScheme.error,
+          textAlign = TextAlign.Center,
+          style = MaterialTheme.typography.labelMedium
+        )
+      }
     }
   }
 }
@@ -376,11 +379,11 @@ private fun MaxMembersDialog(
   var value by remember { mutableIntStateOf(maxMembers) }
 
   LunchVoteDialog(
-    title = "투표 최대 인원 수",
+    title = stringResource(R.string.lounge_setting_max_members_title),
     modifier = modifier,
-    dismissText = "취소",
+    dismissText = stringResource(R.string.lounge_setting_dialog_dismiss_text),
     onDismissRequest = onDismissRequest,
-    confirmText = "적용",
+    confirmText = stringResource(R.string.lounge_setting_dialog_confirm_text),
     onConfirmation = { onConfirmation(value) }
   ) {
     Column(
@@ -388,7 +391,7 @@ private fun MaxMembersDialog(
       verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
       Text(
-        text = "투표에 참여할 최대 인원 수를 설정합니다.\n *최소 1명, 최대 6명*",
+        text = stringResource(R.string.lounge_setting_max_members_description),
         modifier = Modifier.fillMaxWidth(),
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.bodySmall
@@ -405,12 +408,12 @@ private fun MaxMembersDialog(
           enabled = value > 1
         ) {
           Text(
-            text = "-",
+            text = stringResource(R.string.minus),
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
           )
         }
         Text(
-          text = "${value}명",
+          text = stringResource(R.string.lounge_setting_max_members_body, value),
           modifier = Modifier.weight(1f),
           textAlign = TextAlign.Center,
           style = MaterialTheme.typography.bodyLarge
@@ -420,7 +423,7 @@ private fun MaxMembersDialog(
           enabled = value < 6
         ) {
           Text(
-            text = "+",
+            text = stringResource(R.string.plus),
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
           )
         }
@@ -439,11 +442,11 @@ private fun SecondVoteCandidatesDialog(
   var value by remember { mutableIntStateOf(secondVoteCandidates) }
 
   LunchVoteDialog(
-    title = "2차 투표 후보 수",
+    title = stringResource(R.string.lounge_setting_second_vote_candidates_title),
     modifier = modifier,
-    dismissText = "취소",
+    dismissText = stringResource(R.string.lounge_setting_dialog_dismiss_text),
     onDismissRequest = onDismissRequest,
-    confirmText = "적용",
+    confirmText = stringResource(R.string.lounge_setting_dialog_confirm_text),
     onConfirmation = { onConfirmation(value) }
   ) {
     Column(
@@ -451,7 +454,7 @@ private fun SecondVoteCandidatesDialog(
       verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
       Text(
-        text = "2차 투표에 후보로 등장할 음식의 개수를 설정합니다.\n *최소 2개, 최대 10개*",
+        text = stringResource(R.string.lounge_setting_second_vote_candidates_description),
         modifier = Modifier.fillMaxWidth(),
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.bodySmall
@@ -468,12 +471,12 @@ private fun SecondVoteCandidatesDialog(
           enabled = value > 2
         ) {
           Text(
-            text = "-",
+            text = stringResource(R.string.minus),
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
           )
         }
         Text(
-          text = "${value}개",
+          text = stringResource(R.string.lounge_setting_second_vote_candidates_body, value),
           modifier = Modifier.weight(1f),
           textAlign = TextAlign.Center,
           style = MaterialTheme.typography.bodyLarge
@@ -483,7 +486,7 @@ private fun SecondVoteCandidatesDialog(
           enabled = value < 10
         ) {
           Text(
-            text = "+",
+            text = stringResource(R.string.plus),
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
           )
         }
@@ -502,11 +505,11 @@ private fun MinLikeFoodsDialog(
   var value by remember { mutableIntStateOf(minLikeFoods) }
 
   LunchVoteDialog(
-    title = "최소 선호 음식 수",
+    title = stringResource(R.string.lounge_setting_min_like_foods_title),
     modifier = modifier,
-    dismissText = "취소",
+    dismissText = stringResource(R.string.lounge_setting_dialog_dismiss_text),
     onDismissRequest = onDismissRequest,
-    confirmText = "적용",
+    confirmText = stringResource(R.string.lounge_setting_dialog_confirm_text),
     onConfirmation = { onConfirmation(value) }
   ) {
     Column(
@@ -514,7 +517,7 @@ private fun MinLikeFoodsDialog(
       verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
       Text(
-        text = "다음 투표로 넘어가기 위해 투표해야하는 선호 음식의 개수를 설정합니다.\n *최소 1개, 최대 5개*",
+        text = stringResource(R.string.lounge_setting_min_like_foods_description),
         modifier = Modifier.fillMaxWidth(),
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.bodySmall
@@ -531,12 +534,12 @@ private fun MinLikeFoodsDialog(
           enabled = value > 1
         ) {
           Text(
-            text = "-",
+            text = stringResource(R.string.minus),
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
           )
         }
         Text(
-          text = "${value}개",
+          text = stringResource(R.string.lounge_setting_min_like_foods_body, value),
           modifier = Modifier.weight(1f),
           textAlign = TextAlign.Center,
           style = MaterialTheme.typography.bodyLarge
@@ -546,7 +549,7 @@ private fun MinLikeFoodsDialog(
           enabled = value < 5
         ) {
           Text(
-            text = "+",
+            text = stringResource(R.string.plus),
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
           )
         }
@@ -565,11 +568,11 @@ private fun MinDislikeFoodsDialog(
   var value by remember { mutableIntStateOf(minDislikeFoods) }
 
   LunchVoteDialog(
-    title = "최소 비선호 음식 수",
+    title = stringResource(R.string.lounge_setting_min_dislike_foods_title),
     modifier = modifier,
-    dismissText = "취소",
+    dismissText = stringResource(R.string.lounge_setting_dialog_dismiss_text),
     onDismissRequest = onDismissRequest,
-    confirmText = "적용",
+    confirmText = stringResource(R.string.lounge_setting_dialog_confirm_text),
     onConfirmation = { onConfirmation(value) }
   ) {
     Column(
@@ -577,7 +580,7 @@ private fun MinDislikeFoodsDialog(
       verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
       Text(
-        text = "다음 투표로 넘어가기 위해 투표해야하는 비선호 음식의 개수를 설정합니다.\n *최소 0개, 최대 5개*",
+        text = stringResource(R.string.lounge_setting_min_dislike_foods_description),
         modifier = Modifier.fillMaxWidth(),
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.bodySmall
@@ -594,12 +597,12 @@ private fun MinDislikeFoodsDialog(
           enabled = value > 0
         ) {
           Text(
-            text = "-",
+            text = stringResource(R.string.minus),
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
           )
         }
         Text(
-          text = "${value}개",
+          text = stringResource(R.string.lounge_setting_min_dislike_foods_body, value),
           modifier = Modifier.weight(1f),
           textAlign = TextAlign.Center,
           style = MaterialTheme.typography.bodyLarge
@@ -609,7 +612,7 @@ private fun MinDislikeFoodsDialog(
           enabled = value < 5
         ) {
           Text(
-            text = "+",
+            text = stringResource(R.string.plus),
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
           )
         }
