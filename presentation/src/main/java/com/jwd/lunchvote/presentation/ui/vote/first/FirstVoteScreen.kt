@@ -63,8 +63,6 @@ import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.SearchIcon
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
-import kr.co.inbody.config.config.VoteConfig.DEFAULT_MIN_DISLIKE_FOODS
-import kr.co.inbody.config.config.VoteConfig.DEFAULT_MIN_LIKE_FOODS
 
 @Composable
 fun FirstVoteRoute(
