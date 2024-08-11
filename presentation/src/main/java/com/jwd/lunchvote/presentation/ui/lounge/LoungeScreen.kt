@@ -77,6 +77,7 @@ import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.VoteExitDialog
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
+import timber.log.Timber
 
 @Composable
 fun LoungeRoute(
@@ -120,6 +121,9 @@ fun LoungeRoute(
     )
   }
 
+  LaunchedEffect(loading) {
+    Timber.w("💛 ===ktw=== ${loading}")
+  }
   if (loading) LoadingScreen(
     message = if (isOwner) stringResource(R.string.lounge_create_loading)
     else stringResource(R.string.lounge_join_loading)
@@ -161,6 +165,7 @@ private fun LoungeScreen(
     scrollable = false
   ) {
     MemberRow(
+      maxMembers = state.lounge.maxMembers,
       memberList = state.memberList,
       onClickMember = { onEvent(LoungeEvent.OnClickMember(it)) },
       onClickInviteButton = { onEvent(LoungeEvent.OnClickInviteButton) },
@@ -188,6 +193,7 @@ private fun LoungeScreen(
 
 @Composable
 private fun MemberRow(
+  maxMembers: Int,
   memberList: List<MemberUIModel>,
   onClickMember: (MemberUIModel) -> Unit,
   onClickInviteButton: () -> Unit,
@@ -203,12 +209,12 @@ private fun MemberRow(
         onClick = onClickMember
       )
     }
-    if (memberList.size < 6) {
+    if (memberList.size < maxMembers) {
       InviteProfile(
         onClick = onClickInviteButton
       )
     }
-    repeat(6 - memberList.size - 1) {
+    repeat(maxMembers - memberList.size - 1) {
       EmptyProfile()
     }
   }

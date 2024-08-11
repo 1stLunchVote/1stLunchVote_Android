@@ -3,11 +3,16 @@ package com.jwd.lunchvote.remote.source
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.values
 import com.jwd.lunchvote.data.model.MemberData
+import com.jwd.lunchvote.data.model.MemberData.Type.EXILED
+import com.jwd.lunchvote.data.model.MemberData.Type.LEAVED
 import com.jwd.lunchvote.data.source.remote.MemberDataSource
 import com.jwd.lunchvote.remote.mapper.asData
 import com.jwd.lunchvote.remote.mapper.asMemberDataType
 import com.jwd.lunchvote.remote.mapper.asRemote
 import com.jwd.lunchvote.remote.model.MemberRemote
+import com.jwd.lunchvote.remote.model.MemberRemote.Companion.TYPE_DEFAULT
+import com.jwd.lunchvote.remote.model.MemberRemote.Companion.TYPE_EXILED
+import com.jwd.lunchvote.remote.model.MemberRemote.Companion.TYPE_READY
 import com.jwd.lunchvote.remote.util.deleteChild
 import com.jwd.lunchvote.remote.util.getValueEventFlow
 import kotlinx.coroutines.flow.Flow
@@ -53,7 +58,7 @@ class MemberDataSourceImpl @Inject constructor(
       .getValueEventFlow<MemberRemote>()
       .map {
         it.mapNotNull { (key, value) -> value?.asData(key) }
-          .filter { member -> member.type !in listOf(MemberData.Type.LEAVED, MemberData.Type.EXILED) }
+          .filter { member -> member.type !in listOf(LEAVED, EXILED) }
           .sortedBy { member -> member.createdAt }
       }
 
@@ -94,8 +99,8 @@ class MemberDataSourceImpl @Inject constructor(
         child(MEMBER_TYPE)
           .setValue(
             when (type) {
-              MemberRemote.TYPE_DEFAULT -> MemberRemote.TYPE_READY
-              MemberRemote.TYPE_READY -> MemberRemote.TYPE_DEFAULT
+              TYPE_DEFAULT -> TYPE_READY
+              TYPE_READY -> TYPE_DEFAULT
               else -> type
             }
           )
@@ -153,7 +158,7 @@ class MemberDataSourceImpl @Inject constructor(
       .child(member.userId)
       .apply {
         child(MEMBER_TYPE)
-          .setValue(MemberRemote.TYPE_EXILED)
+          .setValue(TYPE_EXILED)
           .await()
         deleteChild()
       }

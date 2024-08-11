@@ -19,11 +19,14 @@ class LoungeRepositoryImpl @Inject constructor(
   override suspend fun createLounge(): String =
     loungeDataSource.createLounge()
 
-  override fun getLoungeStatusFlowById(id: String): Flow<Lounge.Status> =
-    loungeDataSource.getLoungeStatusFlowById(id).map { it.asDomain() }
-
   override suspend fun getLoungeById(id: String): Lounge =
     loungeDataSource.getLoungeById(id).asDomain()
+
+  override fun getLoungeFlowById(id: String): Flow<Lounge> =
+    loungeDataSource.getLoungeFlowById(id).map { it.asDomain() }
+
+  override fun getLoungeStatusFlowById(id: String): Flow<Lounge.Status> =
+    loungeDataSource.getLoungeStatusFlowById(id).map { it.asDomain() }
 
   override suspend fun joinLoungeById(id: String) {
     loungeDataSource.joinLoungeById(id)

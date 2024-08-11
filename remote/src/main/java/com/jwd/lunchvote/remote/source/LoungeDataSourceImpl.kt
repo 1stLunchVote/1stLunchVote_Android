@@ -64,16 +64,6 @@ class LoungeDataSourceImpl @Inject constructor(
     return loungeId
   }
 
-  override fun getLoungeStatusFlowById(
-    id: String
-  ): Flow<LoungeData.Status> =
-    database
-      .getReference(REFERENCE_LOUNGE)
-      .child(id)
-      .child(COLUMN_STATUS)
-      .values<String>()
-      .mapNotNull { status -> status?.asLoungeDataStatus() }
-
   override suspend fun getLoungeById(
     id: String
   ): LoungeData =
@@ -85,17 +75,36 @@ class LoungeDataSourceImpl @Inject constructor(
       .getValue(LoungeRemote::class.java)
       ?.asData(id) ?: throw LoungeError.NoLounge
 
+  override fun getLoungeFlowById(
+    id: String
+  ): Flow<LoungeData> =
+    database
+      .getReference(REFERENCE_LOUNGE)
+      .child(id)
+      .values<LoungeRemote>()
+      .mapNotNull { lounge -> lounge?.asData(id) }
+
+  override fun getLoungeStatusFlowById(
+    id: String
+  ): Flow<LoungeData.Status> =
+    database
+      .getReference(REFERENCE_LOUNGE)
+      .child(id)
+      .child(COLUMN_STATUS)
+      .values<String>()
+      .mapNotNull { status -> status?.asLoungeDataStatus() }
+
   override suspend fun joinLoungeById(
     id: String
   ) {
     database
       .getReference(REFERENCE_LOUNGE)
       .child(id)
-      .child(COLUMN_MEMBERS)
       .apply {
-        val members = get().await().value as Long
-        if (members >= 6) throw LoungeError.FullMember
-        setValue(members + 1).await()
+        val members = child(COLUMN_MEMBERS).get().await().value as Long
+        val maxMembers = child(COLUMN_MAX_MEMBERS).get().await().value as Long
+        if (members >= maxMembers) throw LoungeError.FullMember
+        child(COLUMN_MEMBERS).setValue(members + 1).await()
       }
   }
 

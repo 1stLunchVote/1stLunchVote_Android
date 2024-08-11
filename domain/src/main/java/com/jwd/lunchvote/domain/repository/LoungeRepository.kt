@@ -7,8 +7,9 @@ interface LoungeRepository {
 
   suspend fun checkLoungeExistById(id: String): Boolean
   suspend fun createLounge(): String
-  fun getLoungeStatusFlowById(id: String): Flow<Lounge.Status>
   suspend fun getLoungeById(id: String): Lounge
+  fun getLoungeFlowById(id: String): Flow<Lounge>
+  fun getLoungeStatusFlowById(id: String): Flow<Lounge.Status>
   suspend fun joinLoungeById(id: String)
   suspend fun exitLoungeById(id: String)
   suspend fun quitLoungeById(id: String)

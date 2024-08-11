@@ -34,7 +34,7 @@ class JoinLounge @Inject constructor(
       SECOND_VOTE -> throw LoungeError.LoungeStarted
       FINISHED -> throw LoungeError.LoungeFinished
     }
-    if (lounge.members == 6) throw LoungeError.FullMember
+    if (lounge.members == lounge.maxMembers) throw LoungeError.FullMember
 
     memberRepository.getMemberByUserId(user.id, loungeId)?.let { member ->
       when (member.type) {

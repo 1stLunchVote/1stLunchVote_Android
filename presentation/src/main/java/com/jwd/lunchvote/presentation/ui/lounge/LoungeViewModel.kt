@@ -22,7 +22,6 @@ import com.jwd.lunchvote.domain.usecase.StartFirstVote
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
-import com.jwd.lunchvote.presentation.model.LoungeUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel.Type.DEFAULT
 import com.jwd.lunchvote.presentation.model.MemberUIModel.Type.OWNER
@@ -77,7 +76,7 @@ class LoungeViewModel @Inject constructor(
   private val userId: String
     get() = Firebase.auth.currentUser?.uid ?: throw UserError.NoSession
 
-  private lateinit var loungeStatusFlow: Job
+  private lateinit var loungeFlow: Job
   private lateinit var memberListFlow: Job
   private lateinit var memberTypeFlow: Job
   private lateinit var chatListFlow: Job
@@ -147,7 +146,7 @@ class LoungeViewModel @Inject constructor(
 
       updateState(LoungeReduce.UpdateLounge(lounge))
 
-      collectLoungeData(lounge)
+      collectLoungeData(loungeId)
 
       userStatusRepository.setUserLounge(user.id, loungeId)
     } ?: throw LoungeError.CreateLoungeFailed
@@ -160,22 +159,24 @@ class LoungeViewModel @Inject constructor(
 
       updateState(LoungeReduce.UpdateLounge(lounge))
 
-      collectLoungeData(lounge)
+      collectLoungeData(lounge.id)
 
       userStatusRepository.setUserLounge(user.id, loungeId)
     } ?: throw LoungeError.JoinLoungeFailed
   }
 
-  private fun collectLoungeData(lounge: LoungeUIModel) {
-    loungeStatusFlow = launch { collectLoungeStatus(lounge.id) }
-    memberListFlow = launch { collectMemberList(lounge.id) }
-    memberTypeFlow = launch { collectMemberType(lounge.id) }
-    chatListFlow = launch { collectChatList(lounge.id) }
+  private fun collectLoungeData(loungeId: String) {
+    loungeFlow = launch { collectLounge(loungeId) }
+    memberListFlow = launch { collectMemberList(loungeId) }
+    memberTypeFlow = launch { collectMemberType(loungeId) }
+    chatListFlow = launch { collectChatList(loungeId) }
   }
 
-  private suspend fun collectLoungeStatus(loungeId: String) {
-    loungeRepository.getLoungeStatusFlowById(loungeId).collectLatest { status ->
-      when (status) {
+  private suspend fun collectLounge(loungeId: String) {
+    loungeRepository.getLoungeFlowById(loungeId).collectLatest { lounge ->
+      updateState(LoungeReduce.UpdateLounge(lounge.asUI()))
+
+      when (lounge.status) {
         QUIT -> {
           userStatusRepository.setUserLounge(currentState.user.id, null)
 
@@ -244,7 +245,7 @@ class LoungeViewModel @Inject constructor(
 
     val me = getMe()
 
-    loungeStatusFlow.cancel()
+    loungeFlow.cancel()
     memberListFlow.cancel()
     memberTypeFlow.cancel()
     chatListFlow.cancel()
