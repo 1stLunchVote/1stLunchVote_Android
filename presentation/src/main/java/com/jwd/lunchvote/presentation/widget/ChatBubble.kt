@@ -169,36 +169,22 @@ private fun SystemMessage(
   chat: ChatUIModel,
   modifier: Modifier = Modifier
 ) {
-  val width = 256.dp
   val shape = RoundedCornerShape(100)
   val color = MaterialTheme.colorScheme.outlineVariant
 
   Box(
-    modifier = modifier.fillMaxWidth(),
+    modifier = modifier
+      .clip(shape)
+      .background(color),
     contentAlignment = Alignment.Center
   ) {
-    ReversedRow(
+    Text(
+      text = chat.message,
       modifier = Modifier
-        .width(width)
-        .clip(shape)
-        .background(color)
         .padding(horizontal = 12.dp, vertical = 4.dp),
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.Center
-    ) {
-      Text(
-        text = chat.message,
-        color = MaterialTheme.colorScheme.background,
-        style = MaterialTheme.typography.titleSmall
-      )
-      Text(
-        text = chat.userName,
-        color = MaterialTheme.colorScheme.background,
-        overflow = TextOverflow.Ellipsis,
-        maxLines = 1,
-        style = MaterialTheme.typography.titleSmall
-      )
-    }
+      color = MaterialTheme.colorScheme.background,
+      style = MaterialTheme.typography.titleSmall
+    )
   }
 }
 
@@ -206,7 +192,7 @@ private fun SystemMessage(
 @Composable
 private fun ChatBubblePreview() {
   val user1 = User("", "", "김철수", "", 0L, 0L)
-  val user2 = User("", "", "김영희", "", 0L, 0L)
+  val user2 = User("", "", "김영희김영희김영희김영희", "", 0L, 0L)
   val user3 = User("", "", "김영수", "", 0L, 0L)
   val member1 = Member.Builder("", user1).owner().build()
   val member2 = Member.Builder("", user2).build().copy(type = READY)
@@ -219,22 +205,21 @@ private fun ChatBubblePreview() {
       modifier = Modifier
         .fillMaxWidth()
         .padding(24.dp),
-      verticalArrangement = Arrangement.spacedBy(16.dp)
+      verticalArrangement = Arrangement.spacedBy(16.dp),
+      horizontalAlignment = Alignment.CenterHorizontally
     ) {
       ChatBubble(
         chat = chatBuilder
           .create()
           .build()
-          .asUI(),
-        isMine = false
+          .asUI()
       )
       ChatBubble(
         chat = chatBuilder
           .member(member2)
           .join()
           .build()
-          .asUI(),
-        isMine = false
+          .asUI()
       )
       ChatBubble(
         chat = chatBuilder
@@ -250,8 +235,7 @@ private fun ChatBubblePreview() {
           .member(member3)
           .join()
           .build()
-          .asUI(),
-        isMine = false
+          .asUI()
       )
       ChatBubble(
         chat = chatBuilder
@@ -277,7 +261,7 @@ private fun ChatBubblePreview() {
           .message("안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요")
           .build()
           .asUI(),
-        member = MemberUIModel(),
+        member = member1.asUI(),
         isMine = true
       )
       ChatBubble(
@@ -285,8 +269,13 @@ private fun ChatBubblePreview() {
           .member(member3)
           .exile()
           .build()
-          .asUI(),
-        isMine = false
+          .asUI()
+      )
+      ChatBubble(
+        chat = chatBuilder
+          .setMinLikeFoods(5)
+          .build()
+          .asUI()
       )
     }
   }

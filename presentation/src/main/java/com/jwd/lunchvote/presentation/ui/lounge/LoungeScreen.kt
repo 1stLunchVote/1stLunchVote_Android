@@ -228,6 +228,7 @@ private fun ChatList(
     modifier = modifier.padding(24.dp),
     state = lazyListState,
     verticalArrangement = Arrangement.Top,
+    horizontalAlignment = Alignment.CenterHorizontally,
     reverseLayout = true
   ) {
     itemsIndexed(chatList) { index, chat ->

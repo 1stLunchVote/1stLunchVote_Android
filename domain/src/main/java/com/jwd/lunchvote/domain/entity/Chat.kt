@@ -108,45 +108,51 @@ data class Chat(
       this.minDislikeFoods = minDislikeFoods
     }
 
-    fun build(): Chat =
-      Chat(
+    fun build(): Chat {
+      val userId = when (type) {
+        DEFAULT -> user?.id ?: member?.userId ?: throw ChatError.NoUser
+        SYSTEM -> ""
+      }
+      val userName = when (type) {
+        DEFAULT -> user?.name ?: member?.userName ?: throw ChatError.NoUser
+        SYSTEM -> when (messageType) {
+          JOIN, EXIT, EXILE -> user?.name ?: member?.userName ?: throw ChatError.NoUser
+          else -> ""
+        }
+      }
+      val userProfile = when (type) {
+        DEFAULT -> user?.profileImage ?: member?.userProfile ?: throw ChatError.NoUser
+        SYSTEM -> ""
+      }
+      val message = when (type) {
+        DEFAULT -> message ?: throw ChatError.NoMessage
+        SYSTEM -> when (messageType) {
+          CREATE -> "투표 방이 생성되었습니다."
+          JOIN -> "${if (userName.length <= 10) userName else "${userName.take(9)}..."}님이 입장하였습니다."
+          EXIT -> "${if (userName.length <= 10) userName else "${userName.take(9)}..."}님이 퇴장하였습니다."
+          EXILE -> "${if (userName.length <= 10) userName else "${userName.take(9)}..."}님이 추방되었습니다."
+          SETTING_TIME_LIMIT -> "투표 시간 제한이 ${if (timeLimit != null) "${timeLimit}초" else "무제한으"}로 변경되었습니다."
+          SETTING_MAX_MEMBERS -> "최대 인원이 ${maxMembers}명으로 변경되었습니다."
+          SETTING_SECOND_VOTE_CANDIDATES -> "2차 투표 후보 수가 ${secondVoteCandidates}개로 변경되었습니다."
+          SETTING_MIN_LIKE_FOODS -> if (minLikeFoods != null) "좋아하는 음식 최소 선택 수가 ${minLikeFoods}개로 변경되었습니다."
+                                    else "좋아하는 음식 최소 선택 제한이 해제되었습니다."
+          SETTING_MIN_DISLIKE_FOODS -> if (minDislikeFoods != null) "싫어하는 음식 최소 선택 수가 ${minDislikeFoods}개로 변경되었습니다."
+                                       else "싫어하는 음식 최소 선택 제한이 해제되었습니다."
+          else -> throw ChatError.InvalidChatType
+        }
+      }
+
+      return Chat(
         loungeId = loungeId,
         id = UUID.randomUUID().toString(),
-        userId = when (type) {
-          DEFAULT -> user?.id ?: member?.userId ?: throw ChatError.NoUser
-          SYSTEM -> ""
-        },
-        userName = when (type) {
-          DEFAULT -> user?.name ?: member?.userName ?: throw ChatError.NoUser
-          SYSTEM -> when (messageType) {
-            JOIN, EXIT, EXILE -> user?.name ?: member?.userName ?: throw ChatError.NoUser
-            else -> ""
-          }
-        },
-        userProfile = when (type) {
-          DEFAULT -> user?.profileImage ?: member?.userProfile ?: throw ChatError.NoUser
-          SYSTEM -> ""
-        },
-        message = when (type) {
-          DEFAULT -> message ?: throw ChatError.NoMessage
-          SYSTEM -> when (messageType) {
-            CREATE -> "투표 방이 생성되었습니다."
-            JOIN -> "님이 입장하였습니다."
-            EXIT -> "님이 퇴장하였습니다."
-            EXILE -> "님이 추방되었습니다."
-            SETTING_TIME_LIMIT -> "투표 시간 제한이 ${if (timeLimit != null) "${timeLimit}초" else "무제한으"}로 변경되었습니다."
-            SETTING_MAX_MEMBERS -> "최대 인원이 ${maxMembers}명으로 변경되었습니다."
-            SETTING_SECOND_VOTE_CANDIDATES -> "2차 투표 후보 수가 ${secondVoteCandidates}개로 변경되었습니다."
-            SETTING_MIN_LIKE_FOODS -> if (minLikeFoods != null) "좋아하는 음식 최소 선택 수가 ${minLikeFoods}개로 변경되었습니다."
-                                      else "좋아하는 음식 최소 선택 제한이 해제되었습니다."
-            SETTING_MIN_DISLIKE_FOODS -> if (minDislikeFoods != null) "싫어하는 음식 최소 선택 수가 ${minDislikeFoods}개로 변경되었습니다."
-                                         else "싫어하는 음식 최소 선택 제한이 해제되었습니다."
-            else -> throw ChatError.InvalidChatType
-          }
-        },
+        userId = userId,
+        userName = userName,
+        userProfile = userProfile,
+        message = message,
         type = type,
         createdAt = Instant.now().epochSecond
       )
+    }
 
     companion object {
       const val CREATE = "CREATE"
