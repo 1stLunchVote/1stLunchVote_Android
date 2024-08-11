@@ -14,6 +14,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Bottom
+import androidx.compose.ui.Alignment.Companion.End
+import androidx.compose.ui.Alignment.Companion.Start
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -28,6 +31,8 @@ import com.jwd.lunchvote.domain.entity.Member.Type.READY
 import com.jwd.lunchvote.domain.entity.User
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.ChatUIModel
+import com.jwd.lunchvote.presentation.model.ChatUIModel.Type.DEFAULT
+import com.jwd.lunchvote.presentation.model.ChatUIModel.Type.SYSTEM
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -36,9 +41,9 @@ import java.util.Locale
  * 말풍선
  *
  * @param chat: 채팅
- * @param member: 채팅을 보낸 멤버
- * @param isMine: 내가 보낸 메시지인지 여부
  * @param modifier: ChatBubble에 적용될 Modifier
+ * @param isMine: 내가 보낸 메시지인지 여부 *시스템 메세지의 경우 null
+ * @param member: 채팅을 보낸 멤버 *시스템 메세지의 경우 null
  * @param previousChat: 이전 채팅(위에 있는 채팅)
  * @param nextChat: 다음 채팅(아래에 있는 채팅)
  * @param onClickMember: 멤버 사진을 클릭했을 때 호출되는 콜백
@@ -46,8 +51,8 @@ import java.util.Locale
 @Composable
 fun ChatBubble(
   chat: ChatUIModel,
-  isMine: Boolean,
   modifier: Modifier = Modifier,
+  isMine: Boolean = false,
   member: MemberUIModel? = null,
   previousChat: ChatUIModel? = null,
   nextChat: ChatUIModel? = null,
@@ -69,67 +74,70 @@ fun ChatBubble(
   val round = 20.dp
 
   when (chat.type) {
-    ChatUIModel.Type.DEFAULT -> if (isMine) {
-      Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(4.dp, alignment = Alignment.End),
-        verticalAlignment = Alignment.Bottom
-      ) {
-        Text(
-          text = chat.createdAt.format(timeFormatter),
-          modifier = Modifier
-            .padding(bottom = 4.dp)
-            .alpha(if (isSameTimeWithNext) 0f else 1f),
-          color = MaterialTheme.colorScheme.outline,
-          style = MaterialTheme.typography.labelMedium
-        )
-        MessageBubble(
-          message = chat.message,
-          shape = if (isSameUserWithPrevious) RoundedCornerShape(round, round, round, round)
-          else RoundedCornerShape(round, 0.dp, round, round)
-        )
-      }
-    } else {
-      Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.Start)
-      ) {
-        MemberProfile(
-          member = member!!,  // TODO: 해결 방법 찾기
-          modifier = Modifier.alpha(if (isSameUserWithPrevious) 0f else 1f),
-          onClick = onClickMember
-        )
-        Column(
-          verticalArrangement = Arrangement.spacedBy(4.dp)
+
+    DEFAULT -> {
+      if (isMine) {
+        Row(
+          modifier = modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.spacedBy(4.dp, alignment = End),
+          verticalAlignment = Bottom
         ) {
-          if (isSameUserWithPrevious.not()) {
-            Text(
-              text = chat.userName,
-              style = MaterialTheme.typography.titleSmall
-            )
-          }
-          ReversedRow(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.Bottom
+          Text(
+            text = chat.createdAt.format(timeFormatter),
+            modifier = Modifier
+              .padding(bottom = 4.dp)
+              .alpha(if (isSameTimeWithNext) 0f else 1f),
+            color = MaterialTheme.colorScheme.outline,
+            style = MaterialTheme.typography.labelMedium
+          )
+          MessageBubble(
+            message = chat.message,
+            shape = if (isSameUserWithPrevious) RoundedCornerShape(round, round, round, round)
+            else RoundedCornerShape(round, 0.dp, round, round)
+          )
+        }
+      } else {
+        Row(
+          modifier = modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.spacedBy(8.dp, alignment = Start)
+        ) {
+          MemberProfile(
+            member = requireNotNull(member),
+            modifier = Modifier.alpha(if (isSameUserWithPrevious) 0f else 1f),
+            onClick = onClickMember
+          )
+          Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp)
           ) {
-            Text(
-              text = chat.createdAt.format(timeFormatter),
-              modifier = Modifier
-                .padding(bottom = 4.dp)
-                .alpha(if (isSameTimeWithNext) 0f else 1f),
-              color = MaterialTheme.colorScheme.outline,
-              style = MaterialTheme.typography.labelMedium
-            )
-            MessageBubble(
-              message = chat.message,
-              shape = if (isSameUserWithPrevious) RoundedCornerShape(round, round, round, round)
-              else RoundedCornerShape(0.dp, round, round, round)
-            )
+            if (isSameUserWithPrevious.not()) {
+              Text(
+                text = chat.userName,
+                style = MaterialTheme.typography.titleSmall
+              )
+            }
+            ReversedRow(
+              horizontalArrangement = Arrangement.spacedBy(4.dp),
+              verticalAlignment = Bottom
+            ) {
+              Text(
+                text = chat.createdAt.format(timeFormatter),
+                modifier = Modifier
+                  .padding(bottom = 4.dp)
+                  .alpha(if (isSameTimeWithNext) 0f else 1f),
+                color = MaterialTheme.colorScheme.outline,
+                style = MaterialTheme.typography.labelMedium
+              )
+              MessageBubble(
+                message = chat.message,
+                shape = if (isSameUserWithPrevious) RoundedCornerShape(round, round, round, round)
+                else RoundedCornerShape(0.dp, round, round, round)
+              )
+            }
           }
         }
       }
     }
-    else -> SystemMessage(
+    SYSTEM -> SystemMessage(
       chat = chat,
       modifier = modifier
     )
@@ -204,6 +212,8 @@ private fun ChatBubblePreview() {
   val member2 = Member.Builder("", user2).build().copy(type = READY)
   val member3 = Member.Builder("", user3).build()
 
+  val chatBuilder = Chat.Builder("")
+
   LunchVoteTheme {
     Column(
       modifier = Modifier
@@ -212,21 +222,22 @@ private fun ChatBubblePreview() {
       verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
       ChatBubble(
-        chat = Chat.Builder("")
+        chat = chatBuilder
           .create()
           .build()
           .asUI(),
         isMine = false
       )
       ChatBubble(
-        chat = Chat.Builder("")
-          .join(member2.userName)
+        chat = chatBuilder
+          .member(member2)
+          .join()
           .build()
           .asUI(),
         isMine = false
       )
       ChatBubble(
-        chat = Chat.Builder("")
+        chat = chatBuilder
           .member(member2)
           .message("안녕하세요")
           .build()
@@ -235,14 +246,15 @@ private fun ChatBubblePreview() {
         isMine = false
       )
       ChatBubble(
-        chat = Chat.Builder("")
-          .join(member3.userName)
+        chat = chatBuilder
+          .member(member3)
+          .join()
           .build()
           .asUI(),
         isMine = false
       )
       ChatBubble(
-        chat = Chat.Builder("")
+        chat = chatBuilder
           .member(member3)
           .message("안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요")
           .build()
@@ -251,7 +263,7 @@ private fun ChatBubblePreview() {
         isMine = false
       )
       ChatBubble(
-        chat = Chat.Builder("")
+        chat = chatBuilder
           .member(member1)
           .message("안녕하세요")
           .build()
@@ -260,7 +272,7 @@ private fun ChatBubblePreview() {
         isMine = true
       )
       ChatBubble(
-        chat = Chat.Builder("")
+        chat = chatBuilder
           .member(member1)
           .message("안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요")
           .build()
@@ -269,8 +281,9 @@ private fun ChatBubblePreview() {
         isMine = true
       )
       ChatBubble(
-        chat = Chat.Builder("")
-          .exile(member3.userName)
+        chat = chatBuilder
+          .member(member3)
+          .exile()
           .build()
           .asUI(),
         isMine = false

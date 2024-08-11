@@ -20,7 +20,8 @@ class ExileMember @Inject constructor(
 
     chatRepository.sendChat(
       chat = Chat.Builder(member.loungeId)
-        .exile(member.userName)
+        .member(member)
+        .exile()
         .build()
     )
   }

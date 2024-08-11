@@ -2,6 +2,7 @@ package com.jwd.lunchvote.domain.entity
 
 import com.jwd.lunchvote.domain.entity.Chat.Type.DEFAULT
 import com.jwd.lunchvote.domain.entity.Chat.Type.SYSTEM
+import kr.co.inbody.config.error.ChatError
 import java.time.Instant
 import java.util.UUID
 
@@ -26,7 +27,8 @@ data class Chat(
    * example:
    * ```
    * val chat = Chat.Builder(loungeId)
-   *  .join(user.name)
+   *  .member(member)
+   *  .join()
    *  .build()
    *  ```
    *
@@ -36,10 +38,10 @@ data class Chat(
 
     private var type: Type = DEFAULT
 
+    private var user: User? = null
     private var member: Member? = null
-    private var message: String? = null
 
-    private var name: String? = null
+    private var message: String? = null
     private var messageType: String? = null
 
     private var timeLimit: Int? = NO_VALUE
@@ -48,10 +50,15 @@ data class Chat(
     private var minLikeFoods: Int? = NO_VALUE
     private var minDislikeFoods: Int? = NO_VALUE
 
+    fun user(user: User) = apply {
+      this.type = DEFAULT
+      this.user = user
+    }
     fun member(member: Member) = apply {
       this.type = DEFAULT
       this.member = member
     }
+
     fun message(message: String) = apply {
       this.type = DEFAULT
       this.message = message
@@ -62,19 +69,16 @@ data class Chat(
       this.messageType = CREATE
     }
 
-    fun join(name: String) = apply {
+    fun join() = apply {
       this.type = SYSTEM
-      this.name = name
       this.messageType = JOIN
     }
-    fun exit(name: String) = apply {
+    fun exit() = apply {
       this.type = SYSTEM
-      this.name = name
       this.messageType = EXIT
     }
-    fun exile(name: String) = apply {
+    fun exile() = apply {
       this.type = SYSTEM
-      this.name = name
       this.messageType = EXILE
     }
 
@@ -109,24 +113,22 @@ data class Chat(
         loungeId = loungeId,
         id = UUID.randomUUID().toString(),
         userId = when (type) {
-          DEFAULT -> requireNotNull(member) { "사용자 정보가 없습니다." }.userId
+          DEFAULT -> user?.id ?: member?.userId ?: throw ChatError.NoUser
           SYSTEM -> ""
         },
         userName = when (type) {
-          DEFAULT -> requireNotNull(member) { "사용자 정보가 없습니다." }.userName
+          DEFAULT -> user?.name ?: member?.userName ?: throw ChatError.NoUser
           SYSTEM -> when (messageType) {
-            JOIN -> requireNotNull(name) { "입장한 사용자 정보가 없습니다." }
-            EXIT -> requireNotNull(name) { "퇴장한 사용자 정보가 없습니다." }
-            EXILE -> requireNotNull(name) { "추방된 사용자 정보가 없습니다." }
+            JOIN, EXIT, EXILE -> user?.name ?: member?.userName ?: throw ChatError.NoUser
             else -> ""
           }
         },
         userProfile = when (type) {
-          DEFAULT -> requireNotNull(member) { "사용자 정보가 없습니다." }.userProfile
+          DEFAULT -> user?.profileImage ?: member?.userProfile ?: throw ChatError.NoUser
           SYSTEM -> ""
         },
         message = when (type) {
-          DEFAULT -> requireNotNull(message) { "메시지가 없습니다." }
+          DEFAULT -> message ?: throw ChatError.NoMessage
           SYSTEM -> when (messageType) {
             CREATE -> "투표 방이 생성되었습니다."
             JOIN -> "님이 입장하였습니다."
@@ -136,10 +138,10 @@ data class Chat(
             SETTING_MAX_MEMBERS -> "최대 인원이 ${maxMembers}명으로 변경되었습니다."
             SETTING_SECOND_VOTE_CANDIDATES -> "2차 투표 후보 수가 ${secondVoteCandidates}개로 변경되었습니다."
             SETTING_MIN_LIKE_FOODS -> if (minLikeFoods != null) "좋아하는 음식 최소 선택 수가 ${minLikeFoods}개로 변경되었습니다."
-            else "좋아하는 음식 최소 선택 제한이 해제되었습니다."
+                                      else "좋아하는 음식 최소 선택 제한이 해제되었습니다."
             SETTING_MIN_DISLIKE_FOODS -> if (minDislikeFoods != null) "싫어하는 음식 최소 선택 수가 ${minDislikeFoods}개로 변경되었습니다."
-            else "싫어하는 음식 최소 선택 제한이 해제되었습니다."
-            else -> throw IllegalArgumentException("지원하지 않는 메세지 타입입니다.")
+                                         else "싫어하는 음식 최소 선택 제한이 해제되었습니다."
+            else -> throw ChatError.InvalidChatType
           }
         },
         type = type,
