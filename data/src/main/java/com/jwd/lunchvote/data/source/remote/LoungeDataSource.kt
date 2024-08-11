@@ -1,7 +1,6 @@
 package com.jwd.lunchvote.data.source.remote
 
 import com.jwd.lunchvote.data.model.LoungeData
-import com.jwd.lunchvote.domain.entity.Lounge
 import kotlinx.coroutines.flow.Flow
 
 interface LoungeDataSource {
