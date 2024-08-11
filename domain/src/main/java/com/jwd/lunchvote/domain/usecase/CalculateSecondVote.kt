@@ -28,7 +28,7 @@ class CalculateSecondVote @Inject constructor(
     val voteResult = SecondVoteResult(
       loungeId = loungeId,
       foodId = electedFoodIds.random(),
-      voteRatio = (maxScore/secondBallotList.size).toFloat()
+      voteRatio = maxScore.toFloat()/secondBallotList.size.toFloat()
     )
     voteResultRepository.saveSecondVoteResult(voteResult)
   }
