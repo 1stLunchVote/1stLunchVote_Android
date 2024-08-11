@@ -6,6 +6,7 @@ import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.repository.VoteResultRepository
 import kotlinx.coroutines.delay
 import kr.co.inbody.config.config.VoteConfig
+import kr.co.inbody.config.config.VoteConfig.SECOND_VOTE_FOOD_COUNT
 import javax.inject.Inject
 
 class CalculateFirstVote @Inject constructor(
@@ -31,7 +32,7 @@ class CalculateFirstVote @Inject constructor(
       }
     }
 
-    val limit = VoteConfig.SECOND_VOTE_FOOD_COUNT
+    val limit = SECOND_VOTE_FOOD_COUNT
     val topFoods = foodScore.entries.sortedByDescending { it.value }.take(limit)
 
     val minScore = topFoods.last().value

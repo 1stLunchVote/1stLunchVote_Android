@@ -1,5 +1,6 @@
 package com.jwd.lunchvote.domain.entity
 
+import com.jwd.lunchvote.domain.entity.Chat.Type.SYSTEM
 import kotlinx.coroutines.delay
 import java.time.Instant
 import java.util.UUID
@@ -116,7 +117,7 @@ data class Chat(
           userName = "",
           userProfile = "",
           message = "투표 방이 생성되었습니다.",
-          type = Type.SYSTEM,
+          type = SYSTEM,
           createdAt = Instant.now().epochSecond
         )
         JOIN -> Chat(
@@ -126,7 +127,7 @@ data class Chat(
           userName = user?.name ?: member?.userName ?: "",
           userProfile = user?.profileImage ?: member?.userProfile ?: "",
           message = "님이 입장하였습니다.",
-          type = Type.SYSTEM,
+          type = SYSTEM,
           createdAt = Instant.now().epochSecond
         )
         EXIT -> Chat(
@@ -136,7 +137,7 @@ data class Chat(
           userName = user?.name ?: member?.userName ?: "",
           userProfile = user?.profileImage ?: member?.userProfile ?: "",
           message = "님이 퇴장하였습니다.",
-          type = Type.SYSTEM,
+          type = SYSTEM,
           createdAt = Instant.now().epochSecond
         )
         EXILE -> Chat(
@@ -146,7 +147,7 @@ data class Chat(
           userName = user?.name ?: member?.userName ?: "",
           userProfile = user?.profileImage ?: member?.userProfile ?: "",
           message = "님이 추방되었습니다.",
-          type = Type.SYSTEM,
+          type = SYSTEM,
           createdAt = Instant.now().epochSecond
         )
         SETTING_TIME_LIMIT -> Chat(
@@ -156,7 +157,7 @@ data class Chat(
           userName = "",
           userProfile = "",
           message = "투표 시간 제한이 ${if (timeLimit != null) "${timeLimit}초" else "무제한으"}로 변경되었습니다.",
-          type = Type.SYSTEM,
+          type = SYSTEM,
           createdAt = Instant.now().epochSecond
         )
         SETTING_MAX_MEMBERS -> Chat(
@@ -166,7 +167,7 @@ data class Chat(
           userName = "",
           userProfile = "",
           message = "최대 인원이 ${maxMembers}명으로 변경되었습니다.",
-          type = Type.SYSTEM,
+          type = SYSTEM,
           createdAt = Instant.now().epochSecond
         )
         SETTING_SECOND_VOTE_CANDIDATES -> Chat(
@@ -176,7 +177,7 @@ data class Chat(
           userName = "",
           userProfile = "",
           message = "2차 투표 후보 수가 ${secondVoteCandidates}개로 변경되었습니다.",
-          type = Type.SYSTEM,
+          type = SYSTEM,
           createdAt = Instant.now().epochSecond
         )
         SETTING_MIN_LIKE_FOODS -> Chat(
@@ -187,7 +188,7 @@ data class Chat(
           userProfile = "",
           message = if (minLikeFoods != null) "좋아하는 음식 최소 선택 수가 ${minLikeFoods}개로 변경되었습니다."
                     else "좋아하는 음식 최소 선택 제한이 해제되었습니다.",
-          type = Type.SYSTEM,
+          type = SYSTEM,
           createdAt = Instant.now().epochSecond
         )
         SETTING_MIN_DISLIKE_FOODS -> Chat(
@@ -198,7 +199,7 @@ data class Chat(
           userProfile = "",
           message = if (minDislikeFoods != null) "싫어하는 음식 최소 선택 수가 ${minDislikeFoods}개로 변경되었습니다."
                     else "싫어하는 음식 최소 선택 제한이 해제되었습니다.",
-          type = Type.SYSTEM,
+          type = SYSTEM,
           createdAt = Instant.now().epochSecond
         )
         else -> throw IllegalArgumentException("지원하지 않는 메세지 타입입니다.")

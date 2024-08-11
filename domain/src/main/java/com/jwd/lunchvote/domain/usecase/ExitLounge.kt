@@ -3,6 +3,7 @@ package com.jwd.lunchvote.domain.usecase
 import com.jwd.lunchvote.domain.entity.Chat
 import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.entity.Member.Type.LEAVED
+import com.jwd.lunchvote.domain.entity.Member.Type.OWNER
 import com.jwd.lunchvote.domain.repository.ChatRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
@@ -16,7 +17,7 @@ class ExitLounge @Inject constructor(
 
   suspend operator fun invoke(member: Member) {
     loungeRepository.exitLoungeById(member.loungeId)
-    if (member.type == Member.Type.OWNER) loungeRepository.quitLoungeById(member.loungeId)
+    if (member.type == OWNER) loungeRepository.quitLoungeById(member.loungeId)
 
     memberRepository.updateMemberType(member, LEAVED)
 

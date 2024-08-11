@@ -1,5 +1,9 @@
 package com.jwd.lunchvote.domain.entity
 
+import com.jwd.lunchvote.domain.entity.Member.Status.STANDBY
+import com.jwd.lunchvote.domain.entity.Member.Type.DEFAULT
+import com.jwd.lunchvote.domain.entity.Member.Type.OWNER
+
 data class Member(
   val loungeId: String,
   val userId: String,
@@ -40,9 +44,9 @@ data class Member(
     private val user: User
   ) {
 
-    private var type: Type = Type.DEFAULT
+    private var type: Type = DEFAULT
 
-    fun owner() = apply { this.type = Type.OWNER }
+    fun owner() = apply { this.type = OWNER }
 
     fun build(): Member {
       return Member(
@@ -51,7 +55,7 @@ data class Member(
         userName = user.name,
         userProfile = user.profileImage,
         type = type,
-        status = Status.STANDBY,
+        status = STANDBY,
         createdAt = System.currentTimeMillis(),
         deletedAt = null
       )

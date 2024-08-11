@@ -3,7 +3,8 @@ package com.jwd.lunchvote.domain.usecase
 import com.jwd.lunchvote.domain.entity.Chat
 import com.jwd.lunchvote.domain.repository.ChatRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
-import kr.co.inbody.config.config.VoteConfig
+import kr.co.inbody.config.config.VoteConfig.DEFAULT_MIN_DISLIKE_FOODS
+import kr.co.inbody.config.config.VoteConfig.DEFAULT_MIN_LIKE_FOODS
 import kr.co.inbody.config.error.LoungeError
 import javax.inject.Inject
 
@@ -28,8 +29,8 @@ class UpdateLoungeSetting @Inject constructor(
           loungeRepository.updateLounge(
             lounge = lounge.copy(
               timeLimit = null,
-              minLikeFoods = VoteConfig.DEFAULT_MIN_LIKE_FOODS,
-              minDislikeFoods = VoteConfig.DEFAULT_MIN_DISLIKE_FOODS
+              minLikeFoods = DEFAULT_MIN_LIKE_FOODS,
+              minDislikeFoods = DEFAULT_MIN_DISLIKE_FOODS
             )
           )
           chatRepository.sendChat(
@@ -52,41 +53,35 @@ class UpdateLoungeSetting @Inject constructor(
           )
         }
       }
-      maxMembers != NO_VALUE -> {
-        if (lounge.members > (maxMembers ?: VoteConfig.DEFAULT_MAX_MEMBERS)) {
+      maxMembers != NO_VALUE && maxMembers != null -> {
+        if (lounge.members > (maxMembers)) {
           throw LoungeError.LoungeSettingFailed
         }
 
         loungeRepository.updateLounge(
-          lounge = lounge.copy(
-            maxMembers = maxMembers ?: VoteConfig.DEFAULT_MAX_MEMBERS
-          )
+          lounge = lounge.copy(maxMembers = maxMembers)
         )
 
         chatRepository.sendChat(
           chat = Chat.Builder(loungeId)
-            .setMaxMembers(maxMembers ?: VoteConfig.DEFAULT_MAX_MEMBERS)
+            .setMaxMembers(maxMembers)
             .build()
         )
       }
-      secondVoteCandidates != NO_VALUE -> {
+      secondVoteCandidates != NO_VALUE && secondVoteCandidates != null-> {
         loungeRepository.updateLounge(
-          lounge = lounge.copy(
-            secondVoteCandidates = secondVoteCandidates ?: VoteConfig.DEFAULT_SECOND_VOTE_CANDIDATES
-          )
+          lounge = lounge.copy(secondVoteCandidates = secondVoteCandidates)
         )
 
         chatRepository.sendChat(
           chat = Chat.Builder(loungeId)
-            .setSecondVoteCandidates(secondVoteCandidates ?: VoteConfig.DEFAULT_SECOND_VOTE_CANDIDATES)
+            .setSecondVoteCandidates(secondVoteCandidates)
             .build()
         )
       }
       minLikeFoods != NO_VALUE -> {
         loungeRepository.updateLounge(
-          lounge = lounge.copy(
-            minLikeFoods = minLikeFoods
-          )
+          lounge = lounge.copy(minLikeFoods = minLikeFoods)
         )
 
         chatRepository.sendChat(
@@ -97,9 +92,7 @@ class UpdateLoungeSetting @Inject constructor(
       }
       minDislikeFoods != NO_VALUE -> {
         loungeRepository.updateLounge(
-          lounge = lounge.copy(
-            minDislikeFoods = minDislikeFoods
-          )
+          lounge = lounge.copy(minDislikeFoods = minDislikeFoods)
         )
 
         chatRepository.sendChat(
