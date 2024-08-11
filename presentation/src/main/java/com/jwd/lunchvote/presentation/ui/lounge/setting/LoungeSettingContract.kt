@@ -9,7 +9,8 @@ import kotlinx.parcelize.Parcelize
 class LoungeSettingContract {
   @Parcelize
   data class LoungeSettingState(
-    val lounge: LoungeUIModel = LoungeUIModel()
+    val lounge: LoungeUIModel = LoungeUIModel(),
+    val isOwner: Boolean = false
   ) : ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this
   }
@@ -31,6 +32,7 @@ class LoungeSettingContract {
 
   sealed interface LoungeSettingReduce : ViewModelContract.Reduce {
     data class UpdateLounge(val lounge: LoungeUIModel) : LoungeSettingReduce
+    data class UpdateIsOwner(val isOwner: Boolean) : LoungeSettingReduce
   }
 
   sealed interface LoungeSettingSideEffect : ViewModelContract.SideEffect {

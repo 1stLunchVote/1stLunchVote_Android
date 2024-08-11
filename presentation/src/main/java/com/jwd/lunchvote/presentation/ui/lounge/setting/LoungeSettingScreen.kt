@@ -29,6 +29,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
+import com.jwd.lunchvote.presentation.ui.lounge.setting.LoungeSettingContract.Companion.MAX_MEMBERS_DIALOG
+import com.jwd.lunchvote.presentation.ui.lounge.setting.LoungeSettingContract.Companion.MIN_DISLIKE_FOODS_DIALOG
+import com.jwd.lunchvote.presentation.ui.lounge.setting.LoungeSettingContract.Companion.MIN_LIKE_FOODS_DIALOG
+import com.jwd.lunchvote.presentation.ui.lounge.setting.LoungeSettingContract.Companion.SECOND_VOTE_CANDIDATES_DIALOG
+import com.jwd.lunchvote.presentation.ui.lounge.setting.LoungeSettingContract.Companion.TIME_LIMIT_DIALOG
 import com.jwd.lunchvote.presentation.ui.lounge.setting.LoungeSettingContract.LoungeSettingEvent
 import com.jwd.lunchvote.presentation.ui.lounge.setting.LoungeSettingContract.LoungeSettingSideEffect
 import com.jwd.lunchvote.presentation.ui.lounge.setting.LoungeSettingContract.LoungeSettingState
@@ -57,11 +62,17 @@ fun LoungeSettingRoute(
     viewModel.sideEffect.collectLatest {
       when (it) {
         is LoungeSettingSideEffect.PopBackStack -> popBackStack()
-        is LoungeSettingSideEffect.OpenTimeLimitDialog -> viewModel.openDialog(LoungeSettingContract.TIME_LIMIT_DIALOG)
-        is LoungeSettingSideEffect.OpenMaxMembersDialog -> viewModel.openDialog(LoungeSettingContract.MAX_MEMBERS_DIALOG)
-        is LoungeSettingSideEffect.OpenSecondVoteCandidatesDialog -> viewModel.openDialog(LoungeSettingContract.SECOND_VOTE_CANDIDATES_DIALOG)
-        is LoungeSettingSideEffect.OpenMinLikeFoodsDialog -> viewModel.openDialog(LoungeSettingContract.MIN_LIKE_FOODS_DIALOG)
-        is LoungeSettingSideEffect.OpenMinDislikeFoodsDialog -> viewModel.openDialog(LoungeSettingContract.MIN_DISLIKE_FOODS_DIALOG)
+        is LoungeSettingSideEffect.OpenTimeLimitDialog -> viewModel.openDialog(TIME_LIMIT_DIALOG)
+        is LoungeSettingSideEffect.OpenMaxMembersDialog -> viewModel.openDialog(MAX_MEMBERS_DIALOG)
+        is LoungeSettingSideEffect.OpenSecondVoteCandidatesDialog -> viewModel.openDialog(
+          SECOND_VOTE_CANDIDATES_DIALOG
+        )
+        is LoungeSettingSideEffect.OpenMinLikeFoodsDialog -> viewModel.openDialog(
+          MIN_LIKE_FOODS_DIALOG
+        )
+        is LoungeSettingSideEffect.OpenMinDislikeFoodsDialog -> viewModel.openDialog(
+          MIN_DISLIKE_FOODS_DIALOG
+        )
         is LoungeSettingSideEffect.CloseDialog -> viewModel.openDialog("")
         is LoungeSettingSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
@@ -69,27 +80,27 @@ fun LoungeSettingRoute(
   }
   
   when (dialog) {
-    LoungeSettingContract.TIME_LIMIT_DIALOG -> TimeLimitDialog(
+    TIME_LIMIT_DIALOG -> TimeLimitDialog(
       timeLimit = state.lounge.timeLimit,
       onDismissRequest = { viewModel.sendEvent(LoungeSettingEvent.OnClickCancelButtonDialog) },
       onConfirmation = { viewModel.sendEvent(LoungeSettingEvent.OnClickConfirmButtonDialog(it)) }
     )
-    LoungeSettingContract.MAX_MEMBERS_DIALOG -> MaxMembersDialog(
+    MAX_MEMBERS_DIALOG -> MaxMembersDialog(
       maxMembers = state.lounge.maxMembers,
       onDismissRequest = { viewModel.sendEvent(LoungeSettingEvent.OnClickCancelButtonDialog) },
       onConfirmation = { viewModel.sendEvent(LoungeSettingEvent.OnClickConfirmButtonDialog(it)) }
     )
-    LoungeSettingContract.SECOND_VOTE_CANDIDATES_DIALOG -> SecondVoteCandidatesDialog(
+    SECOND_VOTE_CANDIDATES_DIALOG -> SecondVoteCandidatesDialog(
       secondVoteCandidates = state.lounge.secondVoteCandidates,
       onDismissRequest = { viewModel.sendEvent(LoungeSettingEvent.OnClickCancelButtonDialog) },
       onConfirmation = { viewModel.sendEvent(LoungeSettingEvent.OnClickConfirmButtonDialog(it)) }
     )
-    LoungeSettingContract.MIN_LIKE_FOODS_DIALOG -> MinLikeFoodsDialog(
+    MIN_LIKE_FOODS_DIALOG -> MinLikeFoodsDialog(
       minLikeFoods = state.lounge.minLikeFoods ?: VoteConfig.DEFAULT_MIN_LIKE_FOODS,
       onDismissRequest = { viewModel.sendEvent(LoungeSettingEvent.OnClickCancelButtonDialog) },
       onConfirmation = { viewModel.sendEvent(LoungeSettingEvent.OnClickConfirmButtonDialog(it)) }
     )
-    LoungeSettingContract.MIN_DISLIKE_FOODS_DIALOG -> MinDislikeFoodsDialog(
+    MIN_DISLIKE_FOODS_DIALOG -> MinDislikeFoodsDialog(
       minDislikeFoods = state.lounge.minDislikeFoods ?: VoteConfig.DEFAULT_MIN_DISLIKE_FOODS,
       onDismissRequest = { viewModel.sendEvent(LoungeSettingEvent.OnClickCancelButtonDialog) },
       onConfirmation = { viewModel.sendEvent(LoungeSettingEvent.OnClickConfirmButtonDialog(it)) }
@@ -131,7 +142,7 @@ private fun LoungeSettingScreen(
             name = "투표 제한 시간",
             description = "1차, 2차 투표 각각의 제한 시간을 설정합니다.\n *최소 10초, 최대 2분, 무제한 가능*",
             value = if (state.lounge.timeLimit != null) "${state.lounge.timeLimit}초" else "무제한",
-            onClickItem = { onEvent(LoungeSettingEvent.OnClickTimeLimitItem) }
+            onClickItem = { if (state.isOwner) onEvent(LoungeSettingEvent.OnClickTimeLimitItem) }
           )
         }
       }
@@ -144,7 +155,7 @@ private fun LoungeSettingScreen(
             name = "투표 최대 인원 수",
             description = "투표에 참여할 최대 인원 수를 설정합니다.\n *최소 1명, 최대 6명*",
             value = "${state.lounge.maxMembers}명",
-            onClickItem = { onEvent(LoungeSettingEvent.OnClickMaxMembersItem) }
+            onClickItem = { if (state.isOwner) onEvent(LoungeSettingEvent.OnClickMaxMembersItem) }
           )
         }
       }
@@ -157,7 +168,7 @@ private fun LoungeSettingScreen(
             name = "2차 투표 후보 수",
             description = "2차 투표에 후보로 등장할 음식의 개수를 설정합니다.\n *최소 2개, 최대 10개*",
             value = "${state.lounge.secondVoteCandidates}개",
-            onClickItem = { onEvent(LoungeSettingEvent.OnClickSecondVoteCandidatesItem) }
+            onClickItem = { if (state.isOwner) onEvent(LoungeSettingEvent.OnClickSecondVoteCandidatesItem) }
           )
           SettingItem(
             name = "최소 선호 음식 수",
@@ -165,7 +176,7 @@ private fun LoungeSettingScreen(
             value = if (state.lounge.minLikeFoods != null) "${state.lounge.minLikeFoods}개" else "-",
             enabled = state.lounge.minLikeFoods != null,
             warningText = "투표 제한 시간이 무제한이어야 합니다.",
-            onClickItem = { onEvent(LoungeSettingEvent.OnClickMinLikeFoodsItem) }
+            onClickItem = { if (state.isOwner) onEvent(LoungeSettingEvent.OnClickMinLikeFoodsItem) }
           )
           SettingItem(
             name = "최소 비선호 음식 수",
@@ -173,7 +184,7 @@ private fun LoungeSettingScreen(
             value = if (state.lounge.minDislikeFoods != null) "${state.lounge.minDislikeFoods}개" else "-",
             enabled = state.lounge.minDislikeFoods != null,
             warningText = "투표 제한 시간이 무제한이어야 합니다.",
-            onClickItem = { onEvent(LoungeSettingEvent.OnClickMinDislikeFoodsItem) }
+            onClickItem = { if (state.isOwner) onEvent(LoungeSettingEvent.OnClickMinDislikeFoodsItem) }
           )
         }
       }

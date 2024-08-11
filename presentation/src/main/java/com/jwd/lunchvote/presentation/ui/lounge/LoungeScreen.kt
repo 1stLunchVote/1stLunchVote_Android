@@ -77,7 +77,6 @@ import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.VoteExitDialog
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
-import timber.log.Timber
 
 @Composable
 fun LoungeRoute(
@@ -121,9 +120,6 @@ fun LoungeRoute(
     )
   }
 
-  LaunchedEffect(loading) {
-    Timber.w("💛 ===ktw=== ${loading}")
-  }
   if (loading) LoadingScreen(
     message = if (isOwner) stringResource(R.string.lounge_create_loading)
     else stringResource(R.string.lounge_join_loading)
@@ -140,8 +136,6 @@ private fun LoungeScreen(
   modifier: Modifier = Modifier,
   onEvent: (LoungeEvent) -> Unit = {}
 ) {
-  val isOwner = state.user.id == state.memberList.find { it.type == OWNER }?.userId
-
   Screen(
     modifier = modifier,
     topAppBar = {
@@ -149,15 +143,13 @@ private fun LoungeScreen(
         title = stringResource(R.string.lounge_topbar_title),
         popBackStack = { onEvent(LoungeEvent.OnClickBackButton) },
         actions = {
-          if (isOwner) {
-            IconButton(
-              onClick = { onEvent(LoungeEvent.OnClickSettingButton) }
-            ) {
-              Icon(
-                Icons.Outlined.Settings,
-                contentDescription = "Settings"
-              )
-            }
+          IconButton(
+            onClick = { onEvent(LoungeEvent.OnClickSettingButton) }
+          ) {
+            Icon(
+              Icons.Outlined.Settings,
+              contentDescription = "Settings"
+            )
           }
         }
       )

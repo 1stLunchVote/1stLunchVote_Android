@@ -3,8 +3,12 @@ package com.jwd.lunchvote.presentation.ui.lounge.setting
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.repository.LoungeRepository
+import com.jwd.lunchvote.domain.repository.MemberRepository
 import com.jwd.lunchvote.domain.usecase.UpdateLoungeSetting
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
@@ -22,13 +26,18 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kr.co.inbody.config.error.MemberError
 import kr.co.inbody.config.error.RouteError
+import kr.co.inbody.config.error.UserError
 import javax.inject.Inject
 
 @HiltViewModel
 class LoungeSettingViewModel @Inject constructor(
   private val loungeRepository: LoungeRepository,
+  private val memberRepository: MemberRepository,
   private val updateLoungeSetting: UpdateLoungeSetting,
   savedStateHandle: SavedStateHandle
 ) : BaseStateViewModel<LoungeSettingState, LoungeSettingEvent, LoungeSettingReduce, LoungeSettingSideEffect>(savedStateHandle) {
@@ -46,6 +55,9 @@ class LoungeSettingViewModel @Inject constructor(
       _dialogState.emit(dialogState)
     }
   }
+
+  private val userId: String
+    get() = Firebase.auth.currentUser?.uid ?: throw UserError.NoSession
 
   override fun handleEvents(event: LoungeSettingEvent) {
     when (event) {
@@ -72,6 +84,7 @@ class LoungeSettingViewModel @Inject constructor(
   override fun reduceState(state: LoungeSettingState, reduce: LoungeSettingReduce): LoungeSettingState {
     return when (reduce) {
       is LoungeSettingReduce.UpdateLounge -> state.copy(lounge = reduce.lounge)
+      is LoungeSettingReduce.UpdateIsOwner -> state.copy(isOwner = reduce.isOwner)
     }
   }
 
@@ -80,9 +93,18 @@ class LoungeSettingViewModel @Inject constructor(
   }
 
   private suspend fun initialize() {
-    val lounge = loungeRepository.getLoungeById(loungeId).asUI()
+    launch { collectLounge(loungeId) }
 
-    updateState(LoungeSettingReduce.UpdateLounge(lounge))
+    val me = memberRepository.getMemberListFlow(loungeId).first().find { it.userId == userId } ?: throw MemberError.InvalidMember
+    val isOwner = me.type == Member.Type.OWNER
+
+    updateState(LoungeSettingReduce.UpdateIsOwner(isOwner))
+  }
+
+  private suspend fun collectLounge(loungeId: String) {
+    loungeRepository.getLoungeFlowById(loungeId).collectLatest { lounge ->
+      updateState(LoungeSettingReduce.UpdateLounge(lounge.asUI()))
+    }
   }
 
   private suspend fun changeSetting(dialog: String, value: Int?) {
