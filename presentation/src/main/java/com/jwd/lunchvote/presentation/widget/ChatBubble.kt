@@ -22,6 +22,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
+import com.jwd.lunchvote.domain.entity.Chat
+import com.jwd.lunchvote.domain.entity.Member
+import com.jwd.lunchvote.domain.entity.Member.Type.READY
+import com.jwd.lunchvote.domain.entity.User
+import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.ChatUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import java.time.format.DateTimeFormatter
@@ -41,9 +46,9 @@ import java.util.Locale
 @Composable
 fun ChatBubble(
   chat: ChatUIModel,
-  member: MemberUIModel,
   isMine: Boolean,
   modifier: Modifier = Modifier,
+  member: MemberUIModel? = null,
   previousChat: ChatUIModel? = null,
   nextChat: ChatUIModel? = null,
   onClickMember: (MemberUIModel) -> Unit = {}
@@ -90,7 +95,7 @@ fun ChatBubble(
         horizontalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.Start)
       ) {
         MemberProfile(
-          member = member,
+          member = member!!,  // TODO: 해결 방법 찾기
           modifier = Modifier.alpha(if (isSameUserWithPrevious) 0f else 1f),
           onClick = onClickMember
         )
@@ -192,6 +197,13 @@ private fun SystemMessage(
 @Preview(showBackground = true)
 @Composable
 private fun ChatBubblePreview() {
+  val user1 = User("", "", "김철수", "", 0L, 0L)
+  val user2 = User("", "", "김영희", "", 0L, 0L)
+  val user3 = User("", "", "김영수", "", 0L, 0L)
+  val member1 = Member.Builder("", user1).owner().build()
+  val member2 = Member.Builder("", user2).build().copy(type = READY)
+  val member3 = Member.Builder("", user3).build()
+
   LunchVoteTheme {
     Column(
       modifier = Modifier
@@ -200,69 +212,67 @@ private fun ChatBubblePreview() {
       verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
       ChatBubble(
-        chat = ChatUIModel(
-          message = "투표 방이 생성되었습니다.",
-          type = ChatUIModel.Type.SYSTEM
-        ),
-        member = MemberUIModel(),
+        chat = Chat.Builder("")
+          .create()
+          .build()
+          .asUI(),
         isMine = false
       )
       ChatBubble(
-        chat = ChatUIModel(
-          userName = "김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수",
-          message = "님이 입장하였습니다.",
-          type = ChatUIModel.Type.SYSTEM
-        ),
-        member = MemberUIModel(),
+        chat = Chat.Builder("")
+          .join(member2.userName)
+          .build()
+          .asUI(),
         isMine = false
       )
       ChatBubble(
-        chat = ChatUIModel(
-          userName = "김철수",
-          message = "안녕하세요",
-          type = ChatUIModel.Type.DEFAULT
-        ),
-        member = MemberUIModel(
-          type = MemberUIModel.Type.OWNER
-        ),
+        chat = Chat.Builder("")
+          .member(member2)
+          .message("안녕하세요")
+          .build()
+          .asUI(),
+        member = member2.asUI(),
         isMine = false
       )
       ChatBubble(
-        chat = ChatUIModel(
-          userName = "김철수",
-          message = "안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요",
-          type = ChatUIModel.Type.DEFAULT
-        ),
-        member = MemberUIModel(
-          type = MemberUIModel.Type.OWNER
-        ),
+        chat = Chat.Builder("")
+          .join(member3.userName)
+          .build()
+          .asUI(),
         isMine = false
       )
       ChatBubble(
-        chat = ChatUIModel(
-          userName = "김철수",
-          message = "안녕하세요",
-          type = ChatUIModel.Type.DEFAULT
-        ),
+        chat = Chat.Builder("")
+          .member(member3)
+          .message("안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요")
+          .build()
+          .asUI(),
+        member = member3.asUI(),
+        isMine = false
+      )
+      ChatBubble(
+        chat = Chat.Builder("")
+          .member(member1)
+          .message("안녕하세요")
+          .build()
+          .asUI(),
+        member = member1.asUI(),
+        isMine = true
+      )
+      ChatBubble(
+        chat = Chat.Builder("")
+          .member(member1)
+          .message("안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요")
+          .build()
+          .asUI(),
         member = MemberUIModel(),
         isMine = true
       )
       ChatBubble(
-        chat = ChatUIModel(
-          userName = "김철수",
-          message = "안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요",
-          type = ChatUIModel.Type.DEFAULT
-        ),
-        member = MemberUIModel(),
-        isMine = true
-      )
-      ChatBubble(
-        chat = ChatUIModel(
-          userName = "김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수김철수",
-          message = "님이 추방되었습니다.",
-          type = ChatUIModel.Type.SYSTEM
-        ),
-        member = MemberUIModel(),
+        chat = Chat.Builder("")
+          .exile(member3.userName)
+          .build()
+          .asUI(),
         isMine = false
       )
     }

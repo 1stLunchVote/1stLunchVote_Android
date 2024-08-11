@@ -48,8 +48,8 @@ data class Member(
 
     fun owner() = apply { this.type = OWNER }
 
-    fun build(): Member {
-      return Member(
+    fun build(): Member =
+      Member(
         loungeId = loungeId,
         userId = user.id,
         userName = user.name,
@@ -59,6 +59,5 @@ data class Member(
         createdAt = System.currentTimeMillis(),
         deletedAt = null
       )
-    }
   }
 }
