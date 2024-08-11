@@ -22,7 +22,6 @@ class CalculateSecondVote @Inject constructor(
       foodScore[ballot.foodId] = foodScore.getOrDefault(ballot.foodId, 0) + 1
     }
 
-    println("=== foodScore: $foodScore")
     val maxScore = foodScore.values.max()
     val electedFoodIds = foodScore.filter { it.value == maxScore }.keys.toList()
 
