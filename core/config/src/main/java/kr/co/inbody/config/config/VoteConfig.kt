@@ -1,8 +1,6 @@
 package kr.co.inbody.config.config
 
 object VoteConfig {
-  const val SECOND_VOTE_FOOD_COUNT = 5
-
   const val DEFAULT_TIME_LIMIT = 60
   const val DEFAULT_MAX_MEMBERS = 6
   const val DEFAULT_SECOND_VOTE_CANDIDATES = 5

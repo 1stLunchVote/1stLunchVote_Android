@@ -3,12 +3,13 @@ package com.jwd.lunchvote.domain.usecase
 import com.jwd.lunchvote.domain.entity.FirstVoteResult
 import com.jwd.lunchvote.domain.repository.BallotRepository
 import com.jwd.lunchvote.domain.repository.FoodRepository
+import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.VoteResultRepository
 import kotlinx.coroutines.delay
-import kr.co.inbody.config.config.VoteConfig.SECOND_VOTE_FOOD_COUNT
 import javax.inject.Inject
 
 class CalculateFirstVote @Inject constructor(
+  private val loungeRepository: LoungeRepository,
   private val ballotRepository: BallotRepository,
   private val foodRepository: FoodRepository,
   private val voteResultRepository: VoteResultRepository
@@ -31,13 +32,13 @@ class CalculateFirstVote @Inject constructor(
       }
     }
 
-    val limit = SECOND_VOTE_FOOD_COUNT
-    val topFoods = foodScore.entries.sortedByDescending { it.value }.take(limit)
+    val lounge = loungeRepository.getLoungeById(loungeId)
+    val topFoods = foodScore.entries.sortedByDescending { it.value }.take(lounge.secondVoteCandidates)
 
     val minScore = topFoods.last().value
     val topFoodsWithoutMinScoreFoods = topFoods.filter { it.value > minScore }
     val minScoreFoods = foodScore.entries.filter { it.value == minScore }.shuffled()
-    val shuffledTopRankingFoods = (topFoodsWithoutMinScoreFoods + minScoreFoods).take(limit).shuffled()
+    val shuffledTopRankingFoods = (topFoodsWithoutMinScoreFoods + minScoreFoods).take(lounge.secondVoteCandidates).shuffled()
 
     val voteResult = FirstVoteResult(
       loungeId = loungeId,
