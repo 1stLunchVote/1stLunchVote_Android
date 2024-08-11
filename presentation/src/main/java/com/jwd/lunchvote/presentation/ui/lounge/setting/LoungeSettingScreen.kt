@@ -182,7 +182,7 @@ private fun LoungeSettingScreen(
           )
           SettingItem(
             name = stringResource(R.string.lounge_setting_min_dislike_foods_title),
-            description = stringResource(R.string.lounge_setting_min_dislike_foods_body),
+            description = stringResource(R.string.lounge_setting_min_dislike_foods_description),
             value = if (state.lounge.minDislikeFoods != null) stringResource(R.string.lounge_setting_min_dislike_foods_body, state.lounge.minDislikeFoods) else stringResource(R.string.hyphen),
             enabled = state.lounge.minDislikeFoods != null,
             warningText = stringResource(R.string.lounge_setting_min_dislike_foods_warning),
@@ -405,7 +405,7 @@ private fun MaxMembersDialog(
       ) {
         FilledIconButton(
           onClick = { value-- },
-          enabled = value > 1
+          enabled = value > 2
         ) {
           Text(
             text = stringResource(R.string.minus),

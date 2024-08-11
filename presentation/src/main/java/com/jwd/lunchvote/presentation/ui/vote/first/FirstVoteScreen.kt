@@ -190,8 +190,8 @@ private fun FirstVotingScreen(
     Button(
       onClick = { onEvent(FirstVoteEvent.OnClickFinishButton) },
       modifier = Modifier.align(Alignment.CenterHorizontally),
-      enabled = state.foodItemList.count { it.status == LIKE } >= (state.lounge.minLikeFoods ?: DEFAULT_MIN_LIKE_FOODS)
-        && state.foodItemList.count { it.status == DISLIKE } >= (state.lounge.minDislikeFoods ?: DEFAULT_MIN_DISLIKE_FOODS)
+      enabled = state.foodItemList.count { it.status == LIKE } >= (state.lounge.minLikeFoods ?: 0)
+        && state.foodItemList.count { it.status == DISLIKE } >= (state.lounge.minDislikeFoods ?: 0)
     ) {
       Text(text = stringResource(R.string.first_vote_finish_button))
     }
