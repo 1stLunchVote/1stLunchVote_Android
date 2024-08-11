@@ -3,6 +3,7 @@ package com.jwd.lunchvote.domain.usecase
 import com.jwd.lunchvote.domain.entity.Chat
 import com.jwd.lunchvote.domain.entity.Lounge
 import com.jwd.lunchvote.domain.entity.Member
+import com.jwd.lunchvote.domain.entity.Member.Type.DEFAULT
 import com.jwd.lunchvote.domain.entity.User
 import com.jwd.lunchvote.domain.repository.ChatRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
@@ -31,11 +32,10 @@ class JoinLounge @Inject constructor(
     memberRepository.getMemberByUserId(user.id, loungeId)?.let { member ->
       when (member.type) {
         Member.Type.LEAVED -> {
-          memberRepository.updateMemberType(member, Member.Type.DEFAULT)
+          memberRepository.updateMemberType(member, DEFAULT)
           chatRepository.sendChat(
-            chat = Chat.builder(loungeId)
-              .type(Chat.SystemMessageType.JOIN)
-              .user(user)
+            chat = Chat.Builder(loungeId)
+              .join(user)
               .build()
           )
         }
@@ -44,14 +44,12 @@ class JoinLounge @Inject constructor(
       }
     } ?: run {
       memberRepository.createMember(
-        member = Member.builder(loungeId)
-          .user(user)
+        member = Member.Builder(loungeId, user)
           .build()
       )
       chatRepository.sendChat(
-        chat = Chat.builder(loungeId)
-          .type(Chat.SystemMessageType.JOIN)
-          .user(user)
+        chat = Chat.Builder(loungeId)
+          .join(user)
           .build()
       )
     }

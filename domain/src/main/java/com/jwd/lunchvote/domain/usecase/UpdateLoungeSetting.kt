@@ -1,14 +1,8 @@
 package com.jwd.lunchvote.domain.usecase
 
 import com.jwd.lunchvote.domain.entity.Chat
-import com.jwd.lunchvote.domain.entity.Chat.SystemMessageType.SETTING_MAX_MEMBERS
-import com.jwd.lunchvote.domain.entity.Chat.SystemMessageType.SETTING_MIN_DISLIKE_FOODS
-import com.jwd.lunchvote.domain.entity.Chat.SystemMessageType.SETTING_MIN_LIKE_FOODS
-import com.jwd.lunchvote.domain.entity.Chat.SystemMessageType.SETTING_SECOND_VOTE_CANDIDATES
-import com.jwd.lunchvote.domain.entity.Chat.SystemMessageType.SETTING_TIME_LIMIT
 import com.jwd.lunchvote.domain.repository.ChatRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
-import com.jwd.lunchvote.domain.repository.MemberRepository
 import kr.co.inbody.config.config.VoteConfig
 import kr.co.inbody.config.error.LoungeError
 import javax.inject.Inject
@@ -39,9 +33,8 @@ class UpdateLoungeSetting @Inject constructor(
             )
           )
           chatRepository.sendChat(
-            chat = Chat.builder(loungeId)
-              .type(SETTING_TIME_LIMIT)
-              .timeLimit(null)
+            chat = Chat.Builder(loungeId)
+              .setTimeLimit(null)
               .build()
           )
         } else {
@@ -53,9 +46,8 @@ class UpdateLoungeSetting @Inject constructor(
             )
           )
           chatRepository.sendChat(
-            chat = Chat.builder(loungeId)
-              .type(SETTING_TIME_LIMIT)
-              .timeLimit(timeLimit)
+            chat = Chat.Builder(loungeId)
+              .setTimeLimit(timeLimit)
               .build()
           )
         }
@@ -72,9 +64,8 @@ class UpdateLoungeSetting @Inject constructor(
         )
 
         chatRepository.sendChat(
-          chat = Chat.builder(loungeId)
-            .type(SETTING_MAX_MEMBERS)
-            .maxMembers(maxMembers ?: VoteConfig.DEFAULT_MAX_MEMBERS)
+          chat = Chat.Builder(loungeId)
+            .setMaxMembers(maxMembers ?: VoteConfig.DEFAULT_MAX_MEMBERS)
             .build()
         )
       }
@@ -86,9 +77,8 @@ class UpdateLoungeSetting @Inject constructor(
         )
 
         chatRepository.sendChat(
-          chat = Chat.builder(loungeId)
-            .type(SETTING_SECOND_VOTE_CANDIDATES)
-            .secondVoteCandidates(secondVoteCandidates ?: VoteConfig.DEFAULT_SECOND_VOTE_CANDIDATES)
+          chat = Chat.Builder(loungeId)
+            .setSecondVoteCandidates(secondVoteCandidates ?: VoteConfig.DEFAULT_SECOND_VOTE_CANDIDATES)
             .build()
         )
       }
@@ -100,9 +90,8 @@ class UpdateLoungeSetting @Inject constructor(
         )
 
         chatRepository.sendChat(
-          chat = Chat.builder(loungeId)
-            .type(SETTING_MIN_LIKE_FOODS)
-            .minLikeFoods(minLikeFoods)
+          chat = Chat.Builder(loungeId)
+            .setMinLikeFoods(minLikeFoods)
             .build()
         )
       }
@@ -114,9 +103,8 @@ class UpdateLoungeSetting @Inject constructor(
         )
 
         chatRepository.sendChat(
-          chat = Chat.builder(loungeId)
-            .type(SETTING_MIN_DISLIKE_FOODS)
-            .minDislikeFoods(minDislikeFoods)
+          chat = Chat.Builder(loungeId)
+            .setMinDislikeFoods(minDislikeFoods)
             .build()
         )
       }

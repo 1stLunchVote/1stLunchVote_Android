@@ -19,17 +19,32 @@ data class Member(
     STANDBY, VOTING, VOTED
   }
 
-  class Builder(private val loungeId: String) {
+  /**
+   * Member 객체를 생성하는 빌더입니다.
+   *
+   * 방장의 경우, owner()를 호출하여 설정할 수 있습니다.
+   *
+   * example:
+   * ```
+   * val member = Member.Builder(loungeId)
+   *  .user(user)
+   *  .owner()
+   *  .build()
+   *  ```
+   *
+   *  @param loungeId 투표 방 ID
+   *  @param user 유저 객체
+   */
+  class Builder(
+    private val loungeId: String,
+    private val user: User
+  ) {
 
-    private var user: User? = null
     private var type: Type = Type.DEFAULT
 
-    fun user(user: User) = apply { this.user = user }
     fun owner() = apply { this.type = Type.OWNER }
 
     fun build(): Member {
-      val user = requireNotNull(user) { "사용자 정보가 없습니다." }
-
       return Member(
         loungeId = loungeId,
         userId = user.id,
@@ -41,26 +56,5 @@ data class Member(
         deletedAt = null
       )
     }
-  }
-
-  companion object {
-    /**
-     * Member 객체를 생성하는 빌더입니다.
-     *
-     * user는 필수로 설정해야 합니다.
-     *
-     * 방장의 경우, owner()를 호출하여 설정할 수 있습니다.
-     *
-     * example.
-     * ```
-     * val member = Member.builder(loungeId)
-     *  .user(user)
-     *  .owner()
-     *  .build()
-     *  ```
-     *
-     *  @param loungeId 투표 방 ID
-     */
-    fun builder(loungeId: String) = Builder(loungeId)
   }
 }

@@ -1,14 +1,5 @@
 package com.jwd.lunchvote.domain.entity
 
-import com.jwd.lunchvote.domain.entity.Chat.SystemMessageType.CREATE
-import com.jwd.lunchvote.domain.entity.Chat.SystemMessageType.EXILE
-import com.jwd.lunchvote.domain.entity.Chat.SystemMessageType.EXIT
-import com.jwd.lunchvote.domain.entity.Chat.SystemMessageType.JOIN
-import com.jwd.lunchvote.domain.entity.Chat.SystemMessageType.SETTING_MAX_MEMBERS
-import com.jwd.lunchvote.domain.entity.Chat.SystemMessageType.SETTING_MIN_DISLIKE_FOODS
-import com.jwd.lunchvote.domain.entity.Chat.SystemMessageType.SETTING_MIN_LIKE_FOODS
-import com.jwd.lunchvote.domain.entity.Chat.SystemMessageType.SETTING_SECOND_VOTE_CANDIDATES
-import com.jwd.lunchvote.domain.entity.Chat.SystemMessageType.SETTING_TIME_LIMIT
 import kotlinx.coroutines.delay
 import java.time.Instant
 import java.util.UUID
@@ -28,15 +19,21 @@ data class Chat(
     DEFAULT, SYSTEM
   }
 
-  enum class SystemMessageType {
-    CREATE, JOIN, EXIT, EXILE,
-
-    SETTING_TIME_LIMIT, SETTING_MAX_MEMBERS, SETTING_SECOND_VOTE_CANDIDATES, SETTING_MIN_LIKE_FOODS, SETTING_MIN_DISLIKE_FOODS
-  }
-
+  /**
+   * Chat 객체를 생성하는 빌더입니다.
+   *
+   * example:
+   * ```
+   * val chat = Chat.Builder(loungeId)
+   *  .join(user)
+   *  .build()
+   *  ```
+   *
+   * @param loungeId 투표 방 ID
+   */
   class Builder(private val loungeId: String) {
 
-    private var type: SystemMessageType? = null
+    private var type: String = CREATE
 
     private var user: User? = null
     private var member: Member? = null
@@ -47,21 +44,56 @@ data class Chat(
     private var minLikeFoods: Int? = NO_VALUE
     private var minDislikeFoods: Int? = NO_VALUE
 
-    fun type(type: SystemMessageType) = apply { this.type = type }
+    fun create() = apply { this.type = CREATE }
 
-    fun user(user: User) = apply { this.user = user }
-    fun member(member: Member) = apply { this.member = member }
+    fun join(user: User) = apply {
+      this.type = JOIN
+      this.user = user
+    }
+    fun join(member: Member) = apply {
+      this.type = JOIN
+      this.member = member
+    }
+    fun exit(user: User) = apply {
+      this.type = EXIT
+      this.user = user
+    }
+    fun exit(member: Member) = apply {
+      this.type = EXIT
+      this.member = member
+    }
+    fun exile(user: User) = apply {
+      this.type = EXILE
+      this.user = user
+    }
+    fun exile(member: Member) = apply {
+      this.type = EXILE
+      this.member = member
+    }
 
-    fun timeLimit(timeLimit: Int?) = apply { this.timeLimit = timeLimit }
-    fun maxMembers(maxMembers: Int?) = apply { this.maxMembers = maxMembers }
-    fun secondVoteCandidates(secondVoteCandidates: Int?) = apply { this.secondVoteCandidates = secondVoteCandidates }
-    fun minLikeFoods(minLikeFoods: Int?) = apply { this.minLikeFoods = minLikeFoods }
-    fun minDislikeFoods(minDislikeFoods: Int?) = apply { this.minDislikeFoods = minDislikeFoods }
+    fun setTimeLimit(timeLimit: Int?) = apply {
+      this.type = SETTING_TIME_LIMIT
+      this.timeLimit = timeLimit
+    }
+    fun setMaxMembers(maxMembers: Int?) = apply {
+      this.type = SETTING_MAX_MEMBERS
+      this.maxMembers = maxMembers
+    }
+    fun setSecondVoteCandidates(secondVoteCandidates: Int?) = apply {
+      this.type = SETTING_SECOND_VOTE_CANDIDATES
+      this.secondVoteCandidates = secondVoteCandidates
+    }
+    fun setMinLikeFoods(minLikeFoods: Int?) = apply {
+      this.type = SETTING_MIN_LIKE_FOODS
+      this.minLikeFoods = minLikeFoods
+    }
+    fun setMinDislikeFoods(minDislikeFoods: Int?) = apply {
+      this.type = SETTING_MIN_DISLIKE_FOODS
+      this.minDislikeFoods = minDislikeFoods
+    }
 
     suspend fun build(): Chat {
       delay(100)
-
-      val type = requireNotNull(type) { "정의되지 않은 메세지 타입입니다." }
 
       when (type) {
         CREATE -> Unit
@@ -169,35 +201,22 @@ data class Chat(
           type = Type.SYSTEM,
           createdAt = Instant.now().epochSecond
         )
+        else -> throw IllegalArgumentException("지원하지 않는 메세지 타입입니다.")
       }
     }
 
     companion object {
+      const val CREATE = "CREATE"
+      const val JOIN = "JOIN"
+      const val EXIT = "EXIT"
+      const val EXILE = "EXILE"
+      const val SETTING_TIME_LIMIT = "SETTING_TIME_LIMIT"
+      const val SETTING_MAX_MEMBERS = "SETTING_MAX_MEMBERS"
+      const val SETTING_SECOND_VOTE_CANDIDATES = "SETTING_SECOND_VOTE_CANDIDATES"
+      const val SETTING_MIN_LIKE_FOODS = "SETTING_MIN_LIKE_FOODS"
+      const val SETTING_MIN_DISLIKE_FOODS = "SETTING_MIN_DISLIKE_FOODS"
+
       const val NO_VALUE = -1
     }
-  }
-
-  companion object {
-    /**
-     * Chat 객체를 생성하는 빌더입니다.
-     *
-     * loungeId와 type은 필수로 설정해야 합니다.
-     *
-     * 유저가 입장, 퇴장, 추방된 경우 user 또는 member를 설정해야 합니다.
-     *
-     * 또한, 투표 설정을 변경한 경우 설정 값을 설정해야 합니다.
-     *
-     * example:
-     * ```
-     * val chat = Chat.builder(loungeId)
-     *  .type(JOIN)
-     *  .user(user)
-     *  .build()
-     *  ```
-     *
-     *
-     * @param loungeId 투표 방 ID
-     */
-    fun builder(loungeId: String): Builder = Builder(loungeId)
   }
 }

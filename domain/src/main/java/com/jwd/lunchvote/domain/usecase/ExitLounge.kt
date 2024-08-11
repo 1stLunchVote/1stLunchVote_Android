@@ -2,6 +2,7 @@ package com.jwd.lunchvote.domain.usecase
 
 import com.jwd.lunchvote.domain.entity.Chat
 import com.jwd.lunchvote.domain.entity.Member
+import com.jwd.lunchvote.domain.entity.Member.Type.LEAVED
 import com.jwd.lunchvote.domain.repository.ChatRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
@@ -17,12 +18,11 @@ class ExitLounge @Inject constructor(
     loungeRepository.exitLoungeById(member.loungeId)
     if (member.type == Member.Type.OWNER) loungeRepository.quitLoungeById(member.loungeId)
 
-    memberRepository.updateMemberType(member, Member.Type.LEAVED)
+    memberRepository.updateMemberType(member, LEAVED)
 
     chatRepository.sendChat(
-      chat = Chat.builder(member.loungeId)
-        .type(Chat.SystemMessageType.EXIT)
-        .member(member)
+      chat = Chat.Builder(member.loungeId)
+        .exit(member)
         .build()
     )
   }

@@ -19,14 +19,13 @@ class CreateLounge @Inject constructor(
 
     loungeRepository.joinLoungeById(loungeId)
     memberRepository.createMember(
-      member = Member.builder(loungeId)
-        .user(user)
+      member = Member.Builder(loungeId, user)
         .owner()
         .build()
     )
     chatRepository.sendChat(
-      chat = Chat.builder(loungeId)
-        .type(Chat.SystemMessageType.CREATE)
+      chat = Chat.Builder(loungeId)
+        .create()
         .build()
     )
 
