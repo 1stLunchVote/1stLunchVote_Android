@@ -1,13 +1,24 @@
 package com.jwd.lunchvote.presentation.navigation
 
+import android.content.Context
 import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
+import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.ui.MainActivity
 import com.jwd.lunchvote.presentation.ui.friends.FriendListRoute
 import com.jwd.lunchvote.presentation.ui.friends.request.FriendRequestRoute
 import com.jwd.lunchvote.presentation.ui.home.HomeRoute
@@ -27,23 +38,36 @@ import com.jwd.lunchvote.presentation.ui.tips.TipsRoute
 import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteRoute
 import com.jwd.lunchvote.presentation.ui.vote.result.VoteResultRoute
 import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteRoute
+import com.jwd.lunchvote.presentation.util.ConnectionManager
+import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
 
 @Composable
 fun LunchVoteNavHost(
   startDestination: String,
+  connectionManager: ConnectionManager,
   navController: NavHostController,
-  modifier: Modifier = Modifier
+  modifier: Modifier = Modifier,
+  context: Context = LocalContext.current
 ) {
+  fun NavHostController.checkNetwork() =
+    if (connectionManager.currentState == ConnectionManager.LOST) 
+      navigate(LunchVoteNavRoute.NetworkLostDialog.route)
+    else
+      Unit
+  
   fun NavHostController.navigate(route: LunchVoteNavRoute, vararg arguments: Any?) {
     navigate(route.routeWithArgs(arguments.asList()))
+    checkNetwork()
   }
 
   fun NavHostController.navigateWithPop(route: LunchVoteNavRoute, vararg arguments: Any?) {
     navigate(route.routeWithArgs(arguments.asList())) { popBackStack() }
+    checkNetwork()
   }
 
   fun NavHostController.popBackStack(destinationRoute: LunchVoteNavRoute) {
     popBackStack(destinationRoute.name, false)
+    checkNetwork()
   }
 
   fun NavGraphBuilder.composable(
@@ -55,6 +79,23 @@ fun LunchVoteNavHost(
     deepLinks = route.deepLinks,
     content = content
   )
+
+  fun NavGraphBuilder.dialog(
+    route: LunchVoteNavRoute,
+    dialogProperties: DialogProperties = DialogProperties(),
+    content: @Composable (NavBackStackEntry) -> Unit
+  ) = dialog(
+    route = route.route,
+    arguments = route.arguments,
+    deepLinks = route.deepLinks,
+    dialogProperties = dialogProperties,
+    content = content
+  )
+
+  val connectionState by connectionManager.connectionState.collectAsStateWithLifecycle()
+  LaunchedEffect(connectionState) {
+    navController.checkNetwork()
+  }
 
   NavHost(
     navController = navController,
@@ -191,6 +232,29 @@ fun LunchVoteNavHost(
       TipsRoute(
         popBackStack = { navController.popBackStack() }
       )
+    }
+
+    dialog(
+      route = LunchVoteNavRoute.NetworkLostDialog,
+      dialogProperties = DialogProperties(
+        dismissOnBackPress = false,
+        dismissOnClickOutside = false
+      )
+    ) {
+      LunchVoteDialog(
+        title = stringResource(R.string.network_lost_dialog_title),
+        dismissText = stringResource(R.string.network_lost_dialog_dismiss),
+        onDismissRequest = { (context as MainActivity).finish() },
+        confirmText = stringResource(R.string.network_lost_dialog_confirm),
+        onConfirmation = {
+          navController.popBackStack()
+          navController.checkNetwork()
+        }
+      ) {
+        Text(
+          text = stringResource(R.string.network_lost_dialog_body)
+        )
+      }
     }
   }
 }

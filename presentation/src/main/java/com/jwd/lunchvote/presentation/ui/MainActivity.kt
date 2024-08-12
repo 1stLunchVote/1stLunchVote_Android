@@ -23,6 +23,7 @@ import com.jwd.lunchvote.domain.repository.UserStatusRepository
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavHost
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
 import com.jwd.lunchvote.presentation.navigation.route
+import com.jwd.lunchvote.presentation.util.ConnectionManager
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.channels.Channel
@@ -36,6 +37,9 @@ class MainActivity : ComponentActivity() {
 
   @Inject
   lateinit var userStatusRepository: UserStatusRepository
+
+  @Inject
+  lateinit var connectionManager: ConnectionManager
 
   override fun onResume() {
     super.onResume()
@@ -91,6 +95,7 @@ class MainActivity : ComponentActivity() {
             ) {
               LunchVoteNavHost(
                 startDestination = startDestination,
+                connectionManager = connectionManager,
                 navController = navController,
                 modifier = Modifier.padding(padding)
               )
