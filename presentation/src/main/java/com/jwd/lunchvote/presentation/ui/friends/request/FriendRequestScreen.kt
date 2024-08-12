@@ -7,9 +7,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -33,6 +33,7 @@ import com.jwd.lunchvote.presentation.ui.friends.request.FriendRequestContract.F
 import com.jwd.lunchvote.presentation.ui.friends.request.FriendRequestContract.FriendRequestSideEffect
 import com.jwd.lunchvote.presentation.ui.friends.request.FriendRequestContract.FriendRequestState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
+import com.jwd.lunchvote.presentation.widget.LazyColumn
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.MemberProfile
 import com.jwd.lunchvote.presentation.widget.Screen
@@ -51,6 +52,7 @@ fun FriendRequestRoute(
   context: Context = LocalContext.current
 ){
   val state by viewModel.viewState.collectAsStateWithLifecycle()
+  val loading by viewModel.isLoading.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect){
     viewModel.sideEffect.collectLatest {
@@ -66,14 +68,17 @@ fun FriendRequestRoute(
   FriendRequestScreen(
     state = state,
     modifier = modifier,
+    loading = loading,
     onEvent = viewModel::sendEvent
   )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FriendRequestScreen(
   state: FriendRequestState,
   modifier: Modifier = Modifier,
+  loading: Boolean = false,
   onEvent: (FriendRequestEvent) -> Unit = {}
 ){
   Screen(
@@ -87,7 +92,9 @@ private fun FriendRequestScreen(
     scrollable = false
   ) {
     LazyColumn(
+      onRefresh = { onEvent(FriendRequestEvent.ScreenInitialize) },
       modifier = Modifier.fillMaxSize(),
+      isRefreshing = loading,
       verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
       val requestList = state.requestSenderMap.entries.toList().sortedByDescending { it.key.createdAt }

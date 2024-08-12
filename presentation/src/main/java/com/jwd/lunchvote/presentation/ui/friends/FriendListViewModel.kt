@@ -116,8 +116,8 @@ class FriendListViewModel @Inject constructor(
   private suspend fun deleteFriend(friendId: String) {
     friendRepository.deleteFriend(userId, friendId)
 
-    initialize()
     sendSideEffect(FriendListSideEffect.ShowSnackbar(UiText.StringResource(R.string.friend_list_delete_friend_snackbar)))
+    initialize()
   }
 
   private suspend fun sendRequest() {
