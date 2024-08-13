@@ -10,5 +10,4 @@ internal fun ZonedDateTime.toLong() =
 internal fun Long.toZonedDateTime() =
   ZonedDateTime.ofInstant(Instant.ofEpochSecond(this), ZoneId.of("Asia/Seoul"))
 
-internal fun getInitialDateTime() =
-  ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("Asia/Seoul"))
+internal val INITIAL_DATE_TIME = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("Asia/Seoul"))

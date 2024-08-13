@@ -20,8 +20,6 @@ class ChatDataSourceImpl @Inject constructor(
     private const val REFERENCE_CHAT = "Chat"
 
     private const val COLUMN_USER_ID = "userId"
-    private const val COLUMN_USER_NAME = "userName"
-    private const val COLUMN_USER_PROFILE = "userProfile"
     private const val COLUMN_MESSAGE = "message"
     private const val COLUMN_TYPE = "type"
     private const val COLUMN_CREATED_AT = "createdAt"

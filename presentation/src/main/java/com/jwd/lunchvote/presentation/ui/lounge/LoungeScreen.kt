@@ -375,37 +375,37 @@ private fun Preview() {
         memberArchive = listOf(member1.asUI(), member2.asUI(), member3.asUI()),
         chatList = listOf(
           chatBuilder
-            .member(member3)
+            .setUserId(user3.id)
             .exile()
             .build()
             .asUI(),
           chatBuilder
-            .member(member3)
-            .message("안녕하세요")
+            .setUserId(user3.id)
+            .setMessage("안녕하세요")
             .build()
             .asUI(),
           chatBuilder
-            .member(member3)
+            .setUserId(user3.id)
             .join()
             .build()
             .asUI(),
           chatBuilder
-            .member(member1)
-            .message("안녕하세요")
+            .setUserId(user1.id)
+            .setMessage("안녕하세요")
             .build()
             .asUI(),
           chatBuilder
-            .member(member2)
-            .message("반갑습니다")
+            .setUserId(user2.id)
+            .setMessage("반갑습니다")
             .build()
             .asUI(),
           chatBuilder
-            .member(member2)
-            .message("안녕하세요")
+            .setUserId(user2.id)
+            .setMessage("안녕하세요")
             .build()
             .asUI(),
           chatBuilder
-            .member(member2)
+            .setUserId(user2.id)
             .join()
             .build()
             .asUI(),

@@ -46,7 +46,7 @@ class JoinLounge @Inject constructor(
           memberRepository.updateMemberType(member, DEFAULT)
           chatRepository.sendChat(
             chat = Chat.Builder(loungeId)
-              .user(user)
+              .setUserId(userId)
               .join()
               .build()
           )
@@ -61,7 +61,7 @@ class JoinLounge @Inject constructor(
       )
       chatRepository.sendChat(
         chat = Chat.Builder(loungeId)
-          .user(user)
+          .setUserId(userId)
           .join()
           .build()
       )

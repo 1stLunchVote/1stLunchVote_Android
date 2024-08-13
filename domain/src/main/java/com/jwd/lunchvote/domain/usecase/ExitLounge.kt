@@ -30,7 +30,7 @@ class ExitLounge @Inject constructor(
 
     chatRepository.sendChat(
       chat = Chat.Builder(loungeId)
-        .member(member)
+        .setUserId(userId)
         .exit()
         .build()
     )

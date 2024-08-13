@@ -196,8 +196,8 @@ class LoungeViewModel @Inject constructor(
 
     chatRepository.sendChat(
       chat = Chat.Builder(currentState.lounge.id)
-        .user(currentState.user.asDomain())
-        .message(currentState.text)
+        .setUserId(userId)
+        .setMessage(currentState.text)
         .build()
     )
   }

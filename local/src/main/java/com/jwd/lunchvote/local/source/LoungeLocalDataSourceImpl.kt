@@ -77,8 +77,6 @@ class LoungeLocalDataSourceImpl @Inject constructor(
             loungeId = loungeId,
             id = id,
             userId = user.uid,
-            userName = user.displayName.toString(),
-            userProfile = user.photoUrl.toString(),
             message = content,
             type = ChatEntity.Type.SYSTEM,
             createdAt = Instant.now().epochSecond

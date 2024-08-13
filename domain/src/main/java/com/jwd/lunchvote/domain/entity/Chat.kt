@@ -9,9 +9,7 @@ import java.util.UUID
 data class Chat(
   val loungeId: String,
   val id: String,
-  val userId: String,
-  val userName: String,
-  val userProfile: String,
+  val userId: String?,
   val message: String,
   val type: Type,
   val createdAt: Long
@@ -27,7 +25,7 @@ data class Chat(
    * example:
    * ```
    * val chat = Chat.Builder(loungeId)
-   *  .member(member)
+   *  .setUserId(userId)
    *  .join()
    *  .build()
    *  ```
@@ -38,8 +36,7 @@ data class Chat(
 
     private var type: Type = DEFAULT
 
-    private var user: User? = null
-    private var member: Member? = null
+    private var userId: String? = null
 
     private var message: String? = null
     private var messageType: String? = null
@@ -50,16 +47,9 @@ data class Chat(
     private var minLikeFoods: Int? = NO_VALUE
     private var minDislikeFoods: Int? = NO_VALUE
 
-    fun user(user: User) = apply {
-      this.type = DEFAULT
-      this.user = user
-    }
-    fun member(member: Member) = apply {
-      this.type = DEFAULT
-      this.member = member
-    }
+    fun setUserId(userId: String) = apply { this.userId = userId }
 
-    fun message(message: String) = apply {
+    fun setMessage(message: String) = apply {
       this.type = DEFAULT
       this.message = message
     }
@@ -109,28 +99,15 @@ data class Chat(
     }
 
     fun build(): Chat {
-      val userId = when (type) {
-        DEFAULT -> user?.id ?: member?.userId ?: throw ChatError.NoUser
-        SYSTEM -> ""
-      }
-      val userName = when (type) {
-        DEFAULT -> user?.name ?: member?.userName ?: throw ChatError.NoUser
-        SYSTEM -> when (messageType) {
-          JOIN, EXIT, EXILE -> user?.name ?: member?.userName ?: throw ChatError.NoUser
-          else -> ""
-        }
-      }
-      val userProfile = when (type) {
-        DEFAULT -> user?.profileImage ?: member?.userProfile ?: throw ChatError.NoUser
-        SYSTEM -> ""
-      }
+      if (type == DEFAULT || messageType in listOf(JOIN, EXIT, EXILE)) requireNotNull(userId)
+
       val message = when (type) {
         DEFAULT -> message ?: throw ChatError.NoMessage
         SYSTEM -> when (messageType) {
           CREATE -> "투표 방이 생성되었습니다."
-          JOIN -> "${if (userName.length <= 10) userName else "${userName.take(9)}..."}님이 입장하였습니다."
-          EXIT -> "${if (userName.length <= 10) userName else "${userName.take(9)}..."}님이 퇴장하였습니다."
-          EXILE -> "${if (userName.length <= 10) userName else "${userName.take(9)}..."}님이 추방되었습니다."
+          JOIN -> "님이 입장하였습니다."
+          EXIT -> "님이 퇴장하였습니다."
+          EXILE -> "님이 추방되었습니다."
           SETTING_TIME_LIMIT -> "투표 시간 제한이 ${if (timeLimit != null) "${timeLimit}초" else "무제한으"}로 변경되었습니다."
           SETTING_MAX_MEMBERS -> "최대 인원이 ${maxMembers}명으로 변경되었습니다."
           SETTING_SECOND_VOTE_CANDIDATES -> "2차 투표 후보 수가 ${secondVoteCandidates}개로 변경되었습니다."
@@ -146,8 +123,6 @@ data class Chat(
         loungeId = loungeId,
         id = UUID.randomUUID().toString(),
         userId = userId,
-        userName = userName,
-        userProfile = userProfile,
         message = message,
         type = type,
         createdAt = Instant.now().epochSecond

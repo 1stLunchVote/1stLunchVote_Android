@@ -19,9 +19,7 @@ import androidx.room.PrimaryKey
 data class ChatEntity(
   val loungeId: String,
   @PrimaryKey val id: String,
-  val userId: String,
-  val userName: String,
-  val userProfile: String,
+  val userId: String?,
   val message: String,
   val type: Type,
   val createdAt: Long

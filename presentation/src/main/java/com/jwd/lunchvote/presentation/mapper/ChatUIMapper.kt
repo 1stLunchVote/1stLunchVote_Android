@@ -12,8 +12,6 @@ private object ChatUIMapper: BiMapper<ChatUIModel, Chat> {
       loungeId = from.loungeId,
       id = from.id,
       userId = from.userId,
-      userName = from.userName,
-      userProfile = from.userProfile,
       message = from.message,
       type = from.type.asDomain(),
       createdAt = from.createdAt.toLong()
@@ -24,8 +22,6 @@ private object ChatUIMapper: BiMapper<ChatUIModel, Chat> {
       loungeId = from.loungeId,
       id = from.id,
       userId = from.userId,
-      userName = from.userName,
-      userProfile = from.userProfile,
       message = from.message,
       type = from.type.asUI(),
       createdAt = from.createdAt.toZonedDateTime()
