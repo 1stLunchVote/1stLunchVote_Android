@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
@@ -109,7 +110,7 @@ fun ChatBubble(
           ) {
             if (isSameUserWithPrevious.not()) {
               Text(
-                text = chat.userName,
+                text = member.userName,
                 style = MaterialTheme.typography.titleSmall
               )
             }
@@ -137,7 +138,8 @@ fun ChatBubble(
     }
     SYSTEM -> SystemMessage(
       chat = chat,
-      modifier = modifier
+      modifier = modifier,
+      userName = member?.userName ?: ""
     )
   }
 }
@@ -165,24 +167,37 @@ private fun MessageBubble(
 @Composable
 private fun SystemMessage(
   chat: ChatUIModel,
-  modifier: Modifier = Modifier
+  modifier: Modifier = Modifier,
+  userName: String = ""
 ) {
   val shape = RoundedCornerShape(100)
   val color = MaterialTheme.colorScheme.outlineVariant
 
   Box(
-    modifier = modifier
-      .clip(shape)
-      .background(color),
+    modifier = modifier.fillMaxWidth(),
     contentAlignment = Alignment.Center
   ) {
-    Text(
-      text = chat.message,
+    ReversedRow(
       modifier = Modifier
+        .clip(shape)
+        .background(color)
         .padding(horizontal = 12.dp, vertical = 4.dp),
-      color = MaterialTheme.colorScheme.background,
-      style = MaterialTheme.typography.titleSmall
-    )
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.Center
+    ) {
+      Text(
+        text = chat.message,
+        color = MaterialTheme.colorScheme.background,
+        style = MaterialTheme.typography.titleSmall
+      )
+      Text(
+        text = userName,
+        color = MaterialTheme.colorScheme.background,
+        overflow = TextOverflow.Ellipsis,
+        maxLines = 1,
+        style = MaterialTheme.typography.titleSmall
+      )
+    }
   }
 }
 
@@ -190,7 +205,7 @@ private fun SystemMessage(
 @Composable
 private fun ChatBubblePreview() {
   val user1 = User("", "", "김철수", "", 0L, 0L)
-  val user2 = User("", "", "김영희김영희김영희김영희", "", 0L, 0L)
+  val user2 = User("", "", "김영희김영희김영희김영희김영희김영희김영희", "", 0L, 0L)
   val user3 = User("", "", "김영수", "", 0L, 0L)
   val member1 = Member.Builder("", user1).owner().build()
   val member2 = Member.Builder("", user2).build().copy(type = READY)
@@ -214,15 +229,16 @@ private fun ChatBubblePreview() {
       )
       ChatBubble(
         chat = chatBuilder
-          .member(member2)
+          .setUserId(user2.id)
           .join()
           .build()
-          .asUI()
+          .asUI(),
+        member = member2.asUI()
       )
       ChatBubble(
         chat = chatBuilder
-          .member(member2)
-          .message("안녕하세요")
+          .setUserId(user2.id)
+          .setMessage("안녕하세요")
           .build()
           .asUI(),
         member = member2.asUI(),
@@ -230,15 +246,16 @@ private fun ChatBubblePreview() {
       )
       ChatBubble(
         chat = chatBuilder
-          .member(member3)
+          .setUserId(user2.id)
           .join()
           .build()
-          .asUI()
+          .asUI(),
+        member = member2.asUI()
       )
       ChatBubble(
         chat = chatBuilder
-          .member(member3)
-          .message("안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요")
+          .setUserId(user3.id)
+          .setMessage("안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요")
           .build()
           .asUI(),
         member = member3.asUI(),
@@ -246,8 +263,8 @@ private fun ChatBubblePreview() {
       )
       ChatBubble(
         chat = chatBuilder
-          .member(member1)
-          .message("안녕하세요")
+          .setUserId(user1.id)
+          .setMessage("안녕하세요")
           .build()
           .asUI(),
         member = member1.asUI(),
@@ -255,8 +272,8 @@ private fun ChatBubblePreview() {
       )
       ChatBubble(
         chat = chatBuilder
-          .member(member1)
-          .message("안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요")
+          .setUserId(user1.id)
+          .setMessage("안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요")
           .build()
           .asUI(),
         member = member1.asUI(),
@@ -264,10 +281,11 @@ private fun ChatBubblePreview() {
       )
       ChatBubble(
         chat = chatBuilder
-          .member(member3)
+          .setUserId(user3.id)
           .exile()
           .build()
-          .asUI()
+          .asUI(),
+        member = member3.asUI()
       )
       ChatBubble(
         chat = chatBuilder

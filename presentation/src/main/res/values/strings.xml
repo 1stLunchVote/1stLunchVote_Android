@@ -275,6 +275,12 @@
     <string name="profile_delete_user_confirm_dialog_confirm_button">탈퇴</string>
     <string name="profile_delete_user_success_snackbar">정상적으로 탈퇴되었습니다.</string>
 
+    <!-- NetworkLostDialog -->
+    <string name="network_lost_dialog_title">네트워크 오류</string>
+    <string name="network_lost_dialog_body">네트워크가 연결되지 않았습니다. 네트워크 연결 상태를 확인해주세요.</string>
+    <string name="network_lost_dialog_dismiss">앱 종료</string>
+    <string name="network_lost_dialog_confirm">재시도</string>
+
     <!-- Special Characters -->
     <string name="hyphen">-</string>
     <string name="minus">-</string>

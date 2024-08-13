@@ -10,6 +10,7 @@ import com.jwd.lunchvote.domain.entity.Chat
 import com.jwd.lunchvote.domain.entity.Lounge.Status.FIRST_VOTE
 import com.jwd.lunchvote.domain.entity.Lounge.Status.QUIT
 import com.jwd.lunchvote.domain.entity.Member.Type.EXILED
+import com.jwd.lunchvote.domain.entity.Member.Type.LEAVED
 import com.jwd.lunchvote.domain.repository.ChatRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
@@ -20,9 +21,7 @@ import com.jwd.lunchvote.domain.usecase.ExitLounge
 import com.jwd.lunchvote.domain.usecase.JoinLounge
 import com.jwd.lunchvote.domain.usecase.StartFirstVote
 import com.jwd.lunchvote.presentation.R
-import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
-import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel.Type.DEFAULT
 import com.jwd.lunchvote.presentation.model.MemberUIModel.Type.OWNER
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
@@ -38,8 +37,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
-import kr.co.inbody.config.config.NetworkConfig
 import kr.co.inbody.config.error.LoungeError
 import kr.co.inbody.config.error.MemberError
 import kr.co.inbody.config.error.UserError
@@ -77,22 +74,19 @@ class LoungeViewModel @Inject constructor(
     get() = Firebase.auth.currentUser?.uid ?: throw UserError.NoSession
 
   private lateinit var loungeFlow: Job
-  private lateinit var memberListFlow: Job
+  private lateinit var membersFlow: Job
   private lateinit var memberTypeFlow: Job
   private lateinit var chatListFlow: Job
-
-  private fun getOwner(memberList: List<MemberUIModel> = currentState.memberList): MemberUIModel =
-    memberList.find { it.type == OWNER } ?: throw LoungeError.NoOwner
-
-  private fun getMe(memberList: List<MemberUIModel> = currentState.memberList): MemberUIModel =
-    memberList.find { it.userId == userId } ?: throw MemberError.InvalidMember
 
   init {
     launch {
       val user = userRepository.getUserById(userId).asUI()
       updateState(LoungeReduce.UpdateUser(user))
 
-      if (loungeId == null) createLounge() else joinLounge(loungeId)
+      val lounge = loungeId?.let { joinLounge(userId, it).asUI() } ?: createLounge(userId).asUI()
+      updateState(LoungeReduce.UpdateLounge(lounge))
+
+      collectLoungeData(lounge.id)
     }
   }
 
@@ -105,8 +99,7 @@ class LoungeViewModel @Inject constructor(
       is LoungeEvent.OnTextChange -> updateState(LoungeReduce.UpdateText(event.text))
       is LoungeEvent.OnClickSendChatButton -> launch(false) { sendChat() }
       is LoungeEvent.OnClickActionButton -> launch(false) {
-        val owner = getOwner()
-        if (currentState.user.id == owner.userId) startVote() else updateReady()
+        if (currentState.isOwner) startVote() else updateReady()
       }
 
       // DialogEvents
@@ -120,6 +113,8 @@ class LoungeViewModel @Inject constructor(
       is LoungeReduce.UpdateUser -> state.copy(user = reduce.user)
       is LoungeReduce.UpdateLounge -> state.copy(lounge = reduce.lounge)
       is LoungeReduce.UpdateMemberList -> state.copy(memberList = reduce.memberList)
+      is LoungeReduce.UpdateMemberArchive -> state.copy(memberArchive = reduce.memberArchive)
+      is LoungeReduce.UpdateIsOwner -> state.copy(isOwner = reduce.isOwner)
       is LoungeReduce.UpdateChatList -> state.copy(chatList = reduce.chatList)
       is LoungeReduce.UpdateText -> state.copy(text = reduce.text)
     }
@@ -128,6 +123,8 @@ class LoungeViewModel @Inject constructor(
   override fun handleErrors(error: Throwable) {
     sendSideEffect(LoungeSideEffect.ShowSnackbar(UiText.ErrorString(error)))
     when (error) {
+      is LoungeError.LoungeStarted -> sendSideEffect(LoungeSideEffect.PopBackStack)
+      is LoungeError.LoungeFinished -> sendSideEffect(LoungeSideEffect.PopBackStack)
       is LoungeError.LoungeQuit -> sendSideEffect(LoungeSideEffect.PopBackStack)
       is LoungeError.FullMember -> sendSideEffect(LoungeSideEffect.PopBackStack)
       is LoungeError.NoLounge -> sendSideEffect(LoungeSideEffect.PopBackStack)
@@ -138,38 +135,11 @@ class LoungeViewModel @Inject constructor(
     }
   }
 
-  private suspend fun createLounge() {
-    withTimeoutOrNull(NetworkConfig.TIMEOUT) {
-      val user = currentState.user
-      val loungeId = createLounge(user.asDomain())
-      val lounge = loungeRepository.getLoungeById(loungeId).asUI()
-
-      updateState(LoungeReduce.UpdateLounge(lounge))
-
-      collectLoungeData(loungeId)
-
-      userStatusRepository.setUserLounge(user.id, loungeId)
-    } ?: throw LoungeError.CreateLoungeFailed
-  }
-
-  private suspend fun joinLounge(loungeId: String) {
-    withTimeoutOrNull(NetworkConfig.TIMEOUT) {
-      val user = currentState.user
-      val lounge = joinLounge(user.asDomain(), loungeId).asUI()
-
-      updateState(LoungeReduce.UpdateLounge(lounge))
-
-      collectLoungeData(lounge.id)
-
-      userStatusRepository.setUserLounge(user.id, loungeId)
-    } ?: throw LoungeError.JoinLoungeFailed
-  }
-
   private fun collectLoungeData(loungeId: String) {
-    loungeFlow = launch { collectLounge(loungeId) }
-    memberListFlow = launch { collectMemberList(loungeId) }
-    memberTypeFlow = launch { collectMemberType(loungeId) }
-    chatListFlow = launch { collectChatList(loungeId) }
+    loungeFlow = launch(false) { collectLounge(loungeId) }
+    membersFlow = launch(false) { collectMembers(loungeId) }
+    memberTypeFlow = launch(false) { collectMemberType(loungeId) }
+    chatListFlow = launch(false) { collectChatList(loungeId) }
   }
 
   private suspend fun collectLounge(loungeId: String) {
@@ -178,7 +148,7 @@ class LoungeViewModel @Inject constructor(
 
       when (lounge.status) {
         QUIT -> {
-          userStatusRepository.setUserLounge(currentState.user.id, null)
+          userStatusRepository.setUserLounge(userId, null)
 
           sendSideEffect(LoungeSideEffect.ShowSnackbar(UiText.StringResource(R.string.lounge_owner_exited_snackbar)))
           sendSideEffect(LoungeSideEffect.PopBackStack)
@@ -191,16 +161,22 @@ class LoungeViewModel @Inject constructor(
     }
   }
 
-  private suspend fun collectMemberList(loungeId: String) {
-    memberRepository.getMemberListFlow(loungeId).collectLatest { memberList ->
-      updateState(LoungeReduce.UpdateMemberList(memberList.map { it.asUI() }))
+  private suspend fun collectMembers(loungeId: String) {
+    memberRepository.getMemberArchiveFlow(loungeId).collectLatest { archive ->
+      val memberList = archive.filter { it.type !in listOf(LEAVED, EXILED) }.map { it.asUI() }
+      val memberArchive = archive.map { it.asUI() }
+      val isOwner = memberArchive.any { it.userId == userId && it.type == OWNER }
+
+      updateState(LoungeReduce.UpdateMemberList(memberList))
+      updateState(LoungeReduce.UpdateMemberArchive(memberArchive))
+      updateState(LoungeReduce.UpdateIsOwner(isOwner))
     }
   }
 
   private suspend fun collectMemberType(loungeId: String) {
-    memberRepository.getMemberTypeFlow(loungeId, currentState.user.id).collectLatest { type ->
+    memberRepository.getMemberTypeFlow(loungeId, userId).collectLatest { type ->
       if (type == EXILED) {
-        userStatusRepository.setUserLounge(currentState.user.id, null)
+        userStatusRepository.setUserLounge(userId, null)
 
         sendSideEffect(LoungeSideEffect.ShowSnackbar(UiText.StringResource(R.string.lounge_exiled_snackbar)))
         sendSideEffect(LoungeSideEffect.PopBackStack)
@@ -219,8 +195,8 @@ class LoungeViewModel @Inject constructor(
 
     chatRepository.sendChat(
       chat = Chat.Builder(currentState.lounge.id)
-        .user(currentState.user.asDomain())
-        .message(currentState.text)
+        .setUserId(userId)
+        .setMessage(currentState.text)
         .build()
     )
   }
@@ -228,7 +204,7 @@ class LoungeViewModel @Inject constructor(
   private suspend fun startVote() {
     if (currentState.memberList.any { it.type == DEFAULT }) {
       sendSideEffect(LoungeSideEffect.ShowSnackbar(UiText.StringResource(R.string.lounge_not_ready_to_start_snackbar)))
-    } else if (currentState.memberList.size <= 1) {
+    } else if (currentState.memberArchive.size <= 1) {
       sendSideEffect(LoungeSideEffect.ShowSnackbar(UiText.StringResource(R.string.lounge_lack_member_snackbar)))
     } else {
       startFirstVote(currentState.lounge.id)
@@ -236,22 +212,19 @@ class LoungeViewModel @Inject constructor(
   }
 
   private suspend fun updateReady() {
-    val me = getMe()
-    memberRepository.updateMemberReadyType(me.asDomain())
+    val me = memberRepository.getMember(userId, currentState.lounge.id) ?: throw MemberError.InvalidMember
+    memberRepository.updateMemberReadyType(me)
   }
 
   private suspend fun exitLounge() {
     sendSideEffect(LoungeSideEffect.CloseDialog)
 
-    val me = getMe()
-
     loungeFlow.cancel()
-    memberListFlow.cancel()
+    membersFlow.cancel()
     memberTypeFlow.cancel()
     chatListFlow.cancel()
 
-    userStatusRepository.setUserLounge(currentState.user.id, null)
-    exitLounge(me.asDomain())
+    exitLounge(userId)
 
     sendSideEffect(LoungeSideEffect.PopBackStack)
   }

@@ -51,7 +51,6 @@ class UserStatusDataSourceImpl @Inject constructor(
     database
       .getReference(REFERENCE_USER_STATUS)
       .child(userId)
-      .child(COLUMN_LAST_ONLINE)
       .setValue(null)
   }
 

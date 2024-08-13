@@ -47,11 +47,5 @@ dependencies {
   implementation(libs.bundles.hilt)
   ksp(libs.bundles.hilt.compiler)
 
-  implementation(libs.bundles.room)
-  ksp(libs.room.compiler)
-  implementation(libs.dataStore)
-
   implementation(libs.timber)
-
-  implementation(libs.firebase.auth)
 }

@@ -6,9 +6,13 @@ import android.os.Environment
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.LoungeRepository
+import com.jwd.lunchvote.domain.repository.UserStatusRepository
 import com.jwd.lunchvote.domain.usecase.CreateFood
+import com.jwd.lunchvote.domain.usecase.ExitLounge
 import com.jwd.lunchvote.domain.usecase.GetFoodTrend
 import com.jwd.lunchvote.presentation.BuildConfig
 import com.jwd.lunchvote.presentation.R
@@ -27,6 +31,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.co.inbody.config.error.LoungeError
+import kr.co.inbody.config.error.UserError
 import java.io.File
 import java.util.UUID
 import javax.inject.Inject
@@ -34,11 +39,11 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
   private val loungeRepository: LoungeRepository,
+  private val userStatusRepository: UserStatusRepository,
   private val getFoodTrend: GetFoodTrend,
-  savedStateHandle: SavedStateHandle,
-
-  // TODO: Temporary Secret UseCase
-  private val createFood: CreateFood
+  private val exitLounge: ExitLounge,
+  private val createFood: CreateFood,
+  savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<HomeState, HomeEvent, HomeReduce, HomeSideEffect>(savedStateHandle){
   override fun createInitialState(savedState: Parcelable?): HomeState {
     return savedState as? HomeState ?: HomeState()
@@ -51,6 +56,9 @@ class HomeViewModel @Inject constructor(
       _dialogState.emit(dialogState)
     }
   }
+
+  private val userId: String
+    get() = Firebase.auth.currentUser?.uid ?: throw UserError.NoSession
 
   override fun handleEvents(event: HomeEvent) {
     when(event) {
@@ -102,6 +110,9 @@ class HomeViewModel @Inject constructor(
   }
 
   private suspend fun initialize() {
+    val userStatus = userStatusRepository.getUserStatus(userId)
+    if (userStatus?.loungeId != null) exitLounge(userId)
+
     val (foodTrend, foodTrendRatio) = getFoodTrend()
 
     updateState(HomeReduce.UpdateFoodTrend(foodTrend?.asUI()))
@@ -125,7 +136,7 @@ class HomeViewModel @Inject constructor(
     if (BuildConfig.DEBUG) {
       sendSideEffect(HomeSideEffect.CloseDialog)
 
-      val imageBitmap = ImageBitmapFactory().createBitmapFromUri(context, currentState.foodImageUri ?: return)
+      val imageBitmap = ImageBitmapFactory.createBitmapFromUri(context, currentState.foodImageUri ?: return)
       val directory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "images")
         .apply { if (!exists()) mkdirs() }
       val file = File(directory, "${currentState.foodName}.jpg").apply {

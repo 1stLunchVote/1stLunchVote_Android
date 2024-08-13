@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
@@ -16,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -47,7 +47,7 @@ import com.jwd.lunchvote.presentation.ui.friends.FriendListContract.FriendListSi
 import com.jwd.lunchvote.presentation.ui.friends.FriendListContract.FriendListState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
-import com.jwd.lunchvote.presentation.widget.LoadingScreen
+import com.jwd.lunchvote.presentation.widget.LazyColumn
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
@@ -97,18 +97,20 @@ fun FriendListRoute(
     }
   }
 
-  if (loading) LoadingScreen()
-  else FriendListScreen(
+  FriendListScreen(
     state = state,
     modifier = modifier,
+    loading = loading,
     onEvent = viewModel::sendEvent
   )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FriendListScreen(
   state: FriendListState,
   modifier: Modifier = Modifier,
+  loading: Boolean = false,
   onEvent: (FriendListEvent) -> Unit = {}
 ){
   Screen(
@@ -135,7 +137,9 @@ private fun FriendListScreen(
       modifier = Modifier.fillMaxSize()
     ) {
       LazyColumn(
+        onRefresh = { onEvent(FriendListEvent.ScreenInitialize) },
         modifier = Modifier.fillMaxSize(),
+        isRefreshing = loading,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
       ) {

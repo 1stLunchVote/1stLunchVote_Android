@@ -82,8 +82,8 @@ class LoungeMemberViewModel @Inject constructor(
   }
 
   private suspend fun initialize() {
-    val me = memberRepository.getMemberByUserId(userId, loungeId)?.asUI() ?: throw MemberError.InvalidMember
-    val member = memberRepository.getMemberByUserId(memberUserId, loungeId)?.asUI() ?: throw MemberError.InvalidMember
+    val me = memberRepository.getMember(userId, loungeId)?.asUI() ?: throw MemberError.InvalidMember
+    val member = memberRepository.getMember(memberUserId, loungeId)?.asUI() ?: throw MemberError.InvalidMember
     val user = userRepository.getUserById(member.userId).asUI()
 
     updateState(LoungeMemberReduce.UpdateMe(me))

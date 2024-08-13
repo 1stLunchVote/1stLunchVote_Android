@@ -10,6 +10,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.zIndex
 
 @Composable
 fun Screen(
@@ -30,7 +31,7 @@ fun Screen(
       .then(modifier),
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
-    if (topAppBar != null) topAppBar()
+    if (topAppBar != null) Column(Modifier.zIndex(1f)) { topAppBar() }
     content()
   }
 }

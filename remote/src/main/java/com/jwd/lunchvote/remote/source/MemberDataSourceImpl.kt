@@ -58,7 +58,19 @@ class MemberDataSourceImpl @Inject constructor(
       .getValueEventFlow<MemberRemote>()
       .map {
         it.mapNotNull { (key, value) -> value?.asData(key) }
-          .filter { member -> member.type !in listOf(LEAVED, EXILED) }
+          .filter { member -> member.type !in listOf(EXILED, LEAVED) }
+          .sortedBy { member -> member.createdAt }
+      }
+
+  override fun getMemberArchiveFlow(
+    loungeId: String
+  ): Flow<List<MemberData>> =
+    database
+      .getReference(REFERENCE_MEMBER)
+      .child(loungeId)
+      .getValueEventFlow<MemberRemote>()
+      .map {
+        it.mapNotNull { (key, value) -> value?.asData(key) }
           .sortedBy { member -> member.createdAt }
       }
 
@@ -74,7 +86,7 @@ class MemberDataSourceImpl @Inject constructor(
       .values<String>()
       .mapNotNull { type -> type?.asMemberDataType() }
 
-  override suspend fun getMemberByUserId(
+  override suspend fun getMember(
     userId: String,
     loungeId: String
   ): MemberData? =

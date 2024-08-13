@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 
 @Composable
@@ -33,17 +34,23 @@ fun LunchVoteDialog(
   dismissText: String,
   onDismissRequest: () -> Unit,
   dismissEnabled: Boolean = true,
-  confirmText: String,
-  onConfirmation: () -> Unit,
+  confirmText: String? = null,
+  onConfirmation: (() -> Unit)? = null,
   confirmEnabled: Boolean = true,
   icon: @Composable (() -> Unit)? = null,
+  dismissOnBackPress: Boolean = true,
+  dismissOnClickOutside: Boolean = true,
   content: @Composable ColumnScope.() -> Unit,
 ) {
   ProvideTextStyle(
     value = MaterialTheme.typography.bodyMedium
   ) {
     Dialog(
-      onDismissRequest = onDismissRequest
+      onDismissRequest = onDismissRequest,
+      properties = DialogProperties(
+        dismissOnBackPress = dismissOnBackPress,
+        dismissOnClickOutside = dismissOnClickOutside
+      )
     ) {
       Column(
         modifier = modifier
@@ -74,11 +81,12 @@ fun LunchVoteDialog(
           ) {
             Text(dismissText)
           }
-          Button(
-            onClick = onConfirmation,
-            enabled = confirmEnabled
-          ) {
-            Text(confirmText)
+          if (confirmText != null && onConfirmation != null) {
+            Button(
+              onClick = onConfirmation, enabled = confirmEnabled
+            ) {
+              Text(confirmText)
+            }
           }
         }
       }

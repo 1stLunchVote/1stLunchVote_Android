@@ -30,8 +30,8 @@ import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteRoute
 
 @Composable
 fun LunchVoteNavHost(
-  startDestination: String,
   navController: NavHostController,
+  startDestination: String,
   modifier: Modifier = Modifier
 ) {
   fun NavHostController.navigate(route: LunchVoteNavRoute, vararg arguments: Any?) {

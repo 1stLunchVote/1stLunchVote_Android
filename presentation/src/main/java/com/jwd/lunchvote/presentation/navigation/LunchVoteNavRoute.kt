@@ -96,7 +96,9 @@ enum class LunchVoteNavRoute(
   Setting,
   Profile,
 
-  Tips
+  Tips,
+
+  NetworkLostDialog
 }
 
 internal val LunchVoteNavRoute.route: String

@@ -528,7 +528,7 @@ private fun SecretDialog(
       )
     else if (uri.toString().startsWith("content"))
       Image(
-        bitmap = ImageBitmapFactory().createBitmapFromUri(context, uri).asImageBitmap(),
+        bitmap = ImageBitmapFactory.createBitmapFromUri(context, uri).asImageBitmap(),
         contentDescription = "Profile Image",
         modifier = modifier,
         contentScale = ContentScale.Crop

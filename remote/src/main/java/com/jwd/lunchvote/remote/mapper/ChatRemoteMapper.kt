@@ -11,8 +11,6 @@ private object ChatRemoteMapper : BiMapper<ChatRemote, ChatData> {
       loungeId = "",
       id = "",
       userId = from.userId,
-      userName = from.userName,
-      userProfile = from.userProfile,
       message = from.message,
       type = from.type.asChatDataType(),
       createdAt = from.createdAt
@@ -21,8 +19,6 @@ private object ChatRemoteMapper : BiMapper<ChatRemote, ChatData> {
   override fun mapToLeft(from: ChatData): ChatRemote =
     ChatRemote(
       userId = from.userId,
-      userName = from.userName,
-      userProfile = from.userProfile,
       message = from.message,
       type = from.type.asRemote(),
       createdAt = from.createdAt

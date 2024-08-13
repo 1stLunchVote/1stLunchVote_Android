@@ -10,8 +10,6 @@ private object ChatDataMapper : BiMapper<ChatData, Chat> {
       loungeId = from.loungeId,
       id = from.id,
       userId = from.userId,
-      userName = from.userName,
-      userProfile = from.userProfile,
       message = from.message,
       type = from.type.asDomain(),
       createdAt = from.createdAt
@@ -22,8 +20,6 @@ private object ChatDataMapper : BiMapper<ChatData, Chat> {
       id = from.id,
       loungeId = from.loungeId,
       userId = from.userId,
-      userName = from.userName,
-      userProfile = from.userProfile,
       message = from.message,
       type = from.type.asData(),
       createdAt = from.createdAt

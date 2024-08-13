@@ -20,11 +20,14 @@ class MemberRepositoryImpl @Inject constructor(
   override fun getMemberListFlow(loungeId: String): Flow<List<Member>> =
     memberDataSource.getMemberListFlow(loungeId).map { list -> list.map { it.asDomain() } }
 
+  override fun getMemberArchiveFlow(loungeId: String): Flow<List<Member>> =
+    memberDataSource.getMemberArchiveFlow(loungeId).map { list -> list.map { it.asDomain() } }
+
   override fun getMemberTypeFlow(loungeId: String, userId: String): Flow<Member.Type> =
     memberDataSource.getMemberTypeFlow(loungeId, userId).map { it.asDomain() }
 
-  override suspend fun getMemberByUserId(userId: String, loungeId: String): Member? =
-    memberDataSource.getMemberByUserId(userId, loungeId)?.asDomain()
+  override suspend fun getMember(userId: String, loungeId: String): Member? =
+    memberDataSource.getMember(userId, loungeId)?.asDomain()
 
   override suspend fun updateMemberReadyType(member: Member) {
     memberDataSource.updateMemberReadyType(member.asData())

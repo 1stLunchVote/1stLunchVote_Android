@@ -15,6 +15,8 @@ class LoungeContract {
     val user: UserUIModel = UserUIModel(),
     val lounge: LoungeUIModel = LoungeUIModel(),
     val memberList: List<MemberUIModel> = emptyList(),
+    val memberArchive: List<MemberUIModel> = emptyList(),
+    val isOwner: Boolean = false,
     val chatList: List<ChatUIModel> = emptyList(),
     val text: String = ""
   ) : ViewModelContract.State, Parcelable {
@@ -39,6 +41,8 @@ class LoungeContract {
     data class UpdateUser(val user: UserUIModel) : LoungeReduce
     data class UpdateLounge(val lounge: LoungeUIModel) : LoungeReduce
     data class UpdateMemberList(val memberList: List<MemberUIModel>) : LoungeReduce
+    data class UpdateMemberArchive(val memberArchive: List<MemberUIModel>) : LoungeReduce
+    data class UpdateIsOwner(val isOwner: Boolean) : LoungeReduce
     data class UpdateChatList(val chatList: List<ChatUIModel>) : LoungeReduce
     data class UpdateText(val text: String) : LoungeReduce
   }
