@@ -11,19 +11,26 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
 @HiltWorker
-class SetUserOfflineWorkManager @AssistedInject constructor(
+class UserStatusWorkManager @AssistedInject constructor(
   @Assisted context: Context,
   @Assisted workerParams: WorkerParameters,
   private val userStatusRepository: UserStatusRepository
 ): CoroutineWorker(context, workerParams) {
 
   override suspend fun doWork(): Result {
+    val isOnline = inputData.getBoolean(IS_ONLINE, false)
 
     Firebase.auth.currentUser?.uid?.let { userId ->
-      userStatusRepository.setUserOffline(userId)
+      if (isOnline) userStatusRepository.setUserOnline(userId)
+      else userStatusRepository.setUserOffline(userId)
+
       return Result.success()
     } ?: run {
       return Result.failure()
     }
+  }
+
+  companion object {
+    const val IS_ONLINE = "isOnline"
   }
 }

@@ -16,66 +16,45 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import androidx.work.Constraints
+import androidx.work.Data
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
-import com.jwd.lunchvote.domain.repository.UserStatusRepository
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavHost
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
 import com.jwd.lunchvote.presentation.navigation.route
 import com.jwd.lunchvote.presentation.util.ConnectionManager
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
-import com.jwd.lunchvote.presentation.util.SetUserOfflineWorkManager
+import com.jwd.lunchvote.presentation.util.UserStatusWorkManager
+import com.jwd.lunchvote.presentation.util.UserStatusWorkManager.Companion.IS_ONLINE
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity: ComponentActivity() {
 
-  @Inject
-  lateinit var userStatusRepository: UserStatusRepository
-
-  @Inject
-  lateinit var connectionManager: ConnectionManager
+  @Inject lateinit var connectionManager: ConnectionManager
 
   override fun onResume() {
     super.onResume()
-
-    Firebase.auth.currentUser?.uid?.let { userId ->
-      lifecycleScope.launch {
-        userStatusRepository.setUserOnline(userId)
-      }
-    }
+    setUserStatus(isOnline = true)
   }
 
   override fun onDestroy() {
     super.onDestroy()
-
-    val constraints = Constraints.Builder()
-      .setRequiredNetworkType(NetworkType.CONNECTED)
-      .build()
-    val setUserOfflineRequest = OneTimeWorkRequestBuilder<SetUserOfflineWorkManager>()
-      .setConstraints(constraints)
-      .build()
-
-    WorkManager
-      .getInstance(this)
-      .enqueue(setUserOfflineRequest)
+    setUserStatus(isOnline = false)
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-
     installSplashScreen()
 
     // 뒤로가기로 앱 종료 시 백스택에 들어가지 않고 앱이 종료되도록 설정
@@ -132,5 +111,23 @@ class MainActivity: ComponentActivity() {
         }
       }
     }
+  }
+
+  private fun setUserStatus(isOnline: Boolean) {
+    val constraints = Constraints.Builder()
+      .setRequiredNetworkType(NetworkType.CONNECTED)
+      .build()
+    val data = Data.Builder()
+      .putBoolean(IS_ONLINE, isOnline)
+      .build()
+
+    val request = OneTimeWorkRequestBuilder<UserStatusWorkManager>()
+      .setConstraints(constraints)
+      .setInputData(data)
+      .build()
+
+    WorkManager
+      .getInstance(this)
+      .enqueue(request)
   }
 }
