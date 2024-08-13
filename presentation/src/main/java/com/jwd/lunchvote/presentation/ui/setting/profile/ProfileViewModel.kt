@@ -96,7 +96,7 @@ class ProfileViewModel @Inject constructor(
   private suspend fun saveProfileImage(context: Context) {
     sendSideEffect(ProfileSideEffect.CloseDialog)
 
-    val imageBitmap = ImageBitmapFactory().createBitmapFromUri(context, currentState.profileImageUri)
+    val imageBitmap = ImageBitmapFactory.createBitmapFromUri(context, currentState.profileImageUri)
     val directory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "images")
       .apply { if (!exists()) mkdirs() }
     val file = File(directory, "${UUID.randomUUID()}.jpg").apply {

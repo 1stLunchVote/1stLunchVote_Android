@@ -33,8 +33,8 @@ import com.jwd.lunchvote.presentation.navigation.route
 import com.jwd.lunchvote.presentation.util.Connection
 import com.jwd.lunchvote.presentation.util.Connection.LOST
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
-import com.jwd.lunchvote.presentation.util.UserStatusWorkManager
-import com.jwd.lunchvote.presentation.util.UserStatusWorkManager.Companion.IS_ONLINE
+import com.jwd.lunchvote.presentation.work.UserStatusWorker
+import com.jwd.lunchvote.presentation.work.UserStatusWorker.Companion.IS_ONLINE
 import com.jwd.lunchvote.presentation.widget.NetworkLostDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.channels.Channel
@@ -121,7 +121,7 @@ class MainActivity: ComponentActivity() {
       .putBoolean(IS_ONLINE, isOnline)
       .build()
 
-    val request = OneTimeWorkRequestBuilder<UserStatusWorkManager>()
+    val request = OneTimeWorkRequestBuilder<UserStatusWorker>()
       .setConstraints(constraints)
       .setInputData(data)
       .build()

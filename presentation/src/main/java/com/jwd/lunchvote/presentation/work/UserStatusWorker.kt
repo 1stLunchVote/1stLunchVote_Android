@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.presentation.util
+package com.jwd.lunchvote.presentation.work
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
@@ -11,7 +11,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
 @HiltWorker
-class UserStatusWorkManager @AssistedInject constructor(
+class UserStatusWorker @AssistedInject constructor(
   @Assisted context: Context,
   @Assisted workerParams: WorkerParameters,
   private val userStatusRepository: UserStatusRepository

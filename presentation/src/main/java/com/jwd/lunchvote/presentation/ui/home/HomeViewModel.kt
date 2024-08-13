@@ -125,7 +125,7 @@ class HomeViewModel @Inject constructor(
     if (BuildConfig.DEBUG) {
       sendSideEffect(HomeSideEffect.CloseDialog)
 
-      val imageBitmap = ImageBitmapFactory().createBitmapFromUri(context, currentState.foodImageUri ?: return)
+      val imageBitmap = ImageBitmapFactory.createBitmapFromUri(context, currentState.foodImageUri ?: return)
       val directory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "images")
         .apply { if (!exists()) mkdirs() }
       val file = File(directory, "${currentState.foodName}.jpg").apply {

@@ -8,38 +8,39 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import kotlinx.coroutines.delay
 
+/**
+ * 플리커 애니메이션을 적용하는 Composable
+ *
+ * @param modifier Modifier
+ * @param durationMillis 애니메이션 지속 시간
+ * @param delayMillis 애니메이션 반복 딜레이
+ * @param content 애니메이션을 적용할 Composable
+ */
 @Composable
 fun FlickerAnimation(
   modifier: Modifier = Modifier,
+  durationMillis: Int = 240,
+  delayMillis: Int = 120,
   content: @Composable () -> Unit
 ) {
-  var isVisible by remember { mutableStateOf(true) }
   val infiniteTransition = rememberInfiniteTransition(label = "flicking")
   val alpha by infiniteTransition.animateFloat(
-    initialValue = if (isVisible) 0f else 1f,
-    targetValue = if (isVisible) 1f else 0f,
+    initialValue = 0f,
+    targetValue = 1f,
     animationSpec = infiniteRepeatable(
-      animation = tween(durationMillis = 240, easing = LinearEasing),
+      animation = tween(
+        durationMillis = durationMillis,
+        delayMillis = delayMillis,
+        easing = LinearEasing
+      ),
       repeatMode = RepeatMode.Reverse
     ),
     label = "flicker"
   )
 
   Box(modifier = modifier.alpha(alpha)) { content() }
-
-  LaunchedEffect(Unit) {
-    while (true) {
-      isVisible = !isVisible
-      delay(2000)
-    }
-  }
 }
