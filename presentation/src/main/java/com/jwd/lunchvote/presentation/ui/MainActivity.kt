@@ -40,10 +40,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity @Inject constructor(
-  private val userStatusRepository: UserStatusRepository,
-  private val connectionManager: ConnectionManager
-) : ComponentActivity() {
+class MainActivity: ComponentActivity() {
+
+  @Inject
+  lateinit var userStatusRepository: UserStatusRepository
+
+  @Inject
+  lateinit var connectionManager: ConnectionManager
 
   override fun onResume() {
     super.onResume()
@@ -72,7 +75,7 @@ class MainActivity @Inject constructor(
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    
+
     installSplashScreen()
 
     // 뒤로가기로 앱 종료 시 백스택에 들어가지 않고 앱이 종료되도록 설정
