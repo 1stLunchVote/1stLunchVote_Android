@@ -21,7 +21,6 @@ import com.jwd.lunchvote.domain.usecase.ExitLounge
 import com.jwd.lunchvote.domain.usecase.JoinLounge
 import com.jwd.lunchvote.domain.usecase.StartFirstVote
 import com.jwd.lunchvote.presentation.R
-import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.MemberUIModel.Type.DEFAULT
 import com.jwd.lunchvote.presentation.model.MemberUIModel.Type.OWNER

@@ -15,7 +15,6 @@ import com.jwd.lunchvote.remote.model.MemberRemote.Companion.TYPE_EXILED
 import com.jwd.lunchvote.remote.model.MemberRemote.Companion.TYPE_READY
 import com.jwd.lunchvote.remote.util.deleteChild
 import com.jwd.lunchvote.remote.util.getValueEventFlow
-import com.kakao.sdk.common.KakaoSdk.type
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map

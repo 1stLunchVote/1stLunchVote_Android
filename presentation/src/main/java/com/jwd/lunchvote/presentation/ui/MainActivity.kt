@@ -33,9 +33,9 @@ import com.jwd.lunchvote.presentation.navigation.route
 import com.jwd.lunchvote.presentation.util.Connection
 import com.jwd.lunchvote.presentation.util.Connection.LOST
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
+import com.jwd.lunchvote.presentation.widget.NetworkLostDialog
 import com.jwd.lunchvote.presentation.work.UserStatusWorker
 import com.jwd.lunchvote.presentation.work.UserStatusWorker.Companion.IS_ONLINE
-import com.jwd.lunchvote.presentation.widget.NetworkLostDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest

@@ -35,7 +35,6 @@ import androidx.compose.ui.unit.dp
 import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.util.FlickerAnimation
-import kotlinx.coroutines.delay
 
 /**
  * pull-to-refresh 기능이 추가된 LazyColumn

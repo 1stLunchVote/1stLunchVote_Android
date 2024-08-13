@@ -11,7 +11,6 @@ import com.kakao.sdk.common.util.Utility
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.coroutines.coroutineContext
 
 @HiltAndroidApp
 class LunchVoteApplication : Application(), Configuration.Provider {
