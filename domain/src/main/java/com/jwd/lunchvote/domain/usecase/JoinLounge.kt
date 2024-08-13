@@ -11,11 +11,11 @@ import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.entity.Member.Type.DEFAULT
 import com.jwd.lunchvote.domain.entity.Member.Type.EXILED
 import com.jwd.lunchvote.domain.entity.Member.Type.LEAVED
-import com.jwd.lunchvote.domain.entity.User
 import com.jwd.lunchvote.domain.repository.ChatRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
+import com.jwd.lunchvote.domain.repository.UserStatusRepository
 import kr.co.inbody.config.error.LoungeError
 import javax.inject.Inject
 
@@ -23,12 +23,13 @@ class JoinLounge @Inject constructor(
   private val userRepository: UserRepository,
   private val loungeRepository: LoungeRepository,
   private val memberRepository: MemberRepository,
-  private val chatRepository: ChatRepository
+  private val chatRepository: ChatRepository,
+  private val userStatusRepository: UserStatusRepository
 ) {
 
   suspend operator fun invoke(userId: String, loungeId: String): Lounge {
     val user = userRepository.getUserById(userId)
-    val lounge = loungeRepository.getLoungeById(loungeId)
+    var lounge = loungeRepository.getLoungeById(loungeId)
 
     when (lounge.status) {
       CREATED -> Unit
@@ -66,8 +67,10 @@ class JoinLounge @Inject constructor(
       )
     }
 
-    loungeRepository.joinLoungeById(loungeId)
+    lounge = loungeRepository.joinLoungeById(loungeId)
 
-    return loungeRepository.getLoungeById(loungeId)
+    userStatusRepository.setUserLounge(userId, loungeId)
+
+    return lounge
   }
 }

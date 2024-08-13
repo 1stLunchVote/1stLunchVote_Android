@@ -16,9 +16,6 @@ class LoungeRepositoryImpl @Inject constructor(
   override suspend fun checkLoungeExistById(id: String): Boolean =
     loungeDataSource.checkLoungeExistById(id)
 
-  override suspend fun createLounge(): String =
-    loungeDataSource.createLounge()
-
   override suspend fun getLoungeById(id: String): Lounge =
     loungeDataSource.getLoungeById(id).asDomain()
 
@@ -28,9 +25,11 @@ class LoungeRepositoryImpl @Inject constructor(
   override fun getLoungeStatusFlowById(id: String): Flow<Lounge.Status> =
     loungeDataSource.getLoungeStatusFlowById(id).map { it.asDomain() }
 
-  override suspend fun joinLoungeById(id: String) {
-    loungeDataSource.joinLoungeById(id)
-  }
+  override suspend fun createLounge(): String =
+    loungeDataSource.createLounge()
+
+  override suspend fun joinLoungeById(id: String): Lounge =
+    loungeDataSource.joinLoungeById(id).asDomain()
 
   override suspend fun exitLoungeById(id: String) {
     loungeDataSource.exitLoungeById(id)

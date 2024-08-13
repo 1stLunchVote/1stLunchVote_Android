@@ -109,7 +109,7 @@ fun ChatBubble(
           ) {
             if (isSameUserWithPrevious.not()) {
               Text(
-                text = chat.userName,
+                text = member.userName,
                 style = MaterialTheme.typography.titleSmall
               )
             }

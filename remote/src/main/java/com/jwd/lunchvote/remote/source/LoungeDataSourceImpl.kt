@@ -96,7 +96,7 @@ class LoungeDataSourceImpl @Inject constructor(
 
   override suspend fun joinLoungeById(
     id: String
-  ) {
+  ): LoungeData =
     database
       .getReference(REFERENCE_LOUNGE)
       .child(id)
@@ -106,7 +106,10 @@ class LoungeDataSourceImpl @Inject constructor(
         if (members >= maxMembers) throw LoungeError.FullMember
         child(COLUMN_MEMBERS).setValue(members + 1).await()
       }
-  }
+      .get()
+      .await()
+      .getValue(LoungeRemote::class.java)
+      ?.asData(id) ?: throw LoungeError.NoLounge
 
   override suspend fun exitLoungeById(
     id: String

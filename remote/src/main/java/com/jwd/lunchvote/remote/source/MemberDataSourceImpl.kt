@@ -15,6 +15,7 @@ import com.jwd.lunchvote.remote.model.MemberRemote.Companion.TYPE_EXILED
 import com.jwd.lunchvote.remote.model.MemberRemote.Companion.TYPE_READY
 import com.jwd.lunchvote.remote.util.deleteChild
 import com.jwd.lunchvote.remote.util.getValueEventFlow
+import com.kakao.sdk.common.KakaoSdk.type
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -58,7 +59,19 @@ class MemberDataSourceImpl @Inject constructor(
       .getValueEventFlow<MemberRemote>()
       .map {
         it.mapNotNull { (key, value) -> value?.asData(key) }
-          .filter { member -> member.type !in listOf(LEAVED, EXILED) }
+          .filter { member -> member.type !in listOf(EXILED, LEAVED) }
+          .sortedBy { member -> member.createdAt }
+      }
+
+  override fun getMemberArchiveFlow(
+    loungeId: String
+  ): Flow<List<MemberData>> =
+    database
+      .getReference(REFERENCE_MEMBER)
+      .child(loungeId)
+      .getValueEventFlow<MemberRemote>()
+      .map {
+        it.mapNotNull { (key, value) -> value?.asData(key) }
           .sortedBy { member -> member.createdAt }
       }
 

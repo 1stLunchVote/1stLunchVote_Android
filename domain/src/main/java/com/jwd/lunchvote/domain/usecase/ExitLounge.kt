@@ -26,6 +26,8 @@ class ExitLounge @Inject constructor(
 
     memberRepository.updateMemberType(member, LEAVED)
 
+    userStatusRepository.setUserLounge(userId, null)
+
     chatRepository.sendChat(
       chat = Chat.Builder(loungeId)
         .member(member)

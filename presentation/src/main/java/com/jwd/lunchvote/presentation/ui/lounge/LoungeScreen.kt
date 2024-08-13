@@ -59,7 +59,6 @@ import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.ChatUIModel
 import com.jwd.lunchvote.presentation.model.ChatUIModel.Type.SYSTEM
 import com.jwd.lunchvote.presentation.model.MemberUIModel
-import com.jwd.lunchvote.presentation.model.MemberUIModel.Type.OWNER
 import com.jwd.lunchvote.presentation.model.UserUIModel
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.Companion.VOTE_EXIT_DIALOG
 import com.jwd.lunchvote.presentation.ui.lounge.LoungeContract.LoungeEvent
@@ -111,17 +110,16 @@ fun LoungeRoute(
 
   BackHandler { viewModel.sendEvent(LoungeEvent.OnClickBackButton) }
 
-  val isOwner = state.user.id == state.memberList.find { it.type == OWNER }?.userId
   when (dialog) {
     VOTE_EXIT_DIALOG -> VoteExitDialog(
-      isOwner = isOwner,
+      isOwner = state.isOwner,
       onDismissRequest = { viewModel.sendEvent(LoungeEvent.OnClickCancelButtonVoteExitDialog) },
       onConfirmation = { viewModel.sendEvent(LoungeEvent.OnClickConfirmButtonVoteExitDialog) }
     )
   }
 
   if (loading) LoadingScreen(
-    message = if (isOwner) stringResource(R.string.lounge_create_loading)
+    message = if (state.isOwner) stringResource(R.string.lounge_create_loading)
     else stringResource(R.string.lounge_join_loading)
   ) else LoungeScreen(
     state = state,
@@ -166,7 +164,7 @@ private fun LoungeScreen(
     ChatList(
       userId = state.user.id,
       chatList = state.chatList,
-      memberList = state.memberList,
+      memberArchive = state.memberArchive,
       modifier = Modifier
         .fillMaxWidth()
         .weight(1f),
@@ -174,7 +172,7 @@ private fun LoungeScreen(
     )
     LoungeBottomBar(
       text = state.text,
-      isOwner = state.user.id == state.memberList.find { it.type == OWNER }?.userId,
+      isOwner = state.isOwner,
       modifier = Modifier.fillMaxWidth(),
       onTextChange = { onEvent(LoungeEvent.OnTextChange(it)) },
       onClickSendChatButton = { onEvent(LoungeEvent.OnClickSendChatButton) },
@@ -216,7 +214,7 @@ private fun MemberRow(
 private fun ChatList(
   userId: String,
   chatList: List<ChatUIModel>,
-  memberList: List<MemberUIModel>,
+  memberArchive: List<MemberUIModel>,
   modifier: Modifier = Modifier,
   onClickMember: (MemberUIModel) -> Unit
 ) {
@@ -238,7 +236,7 @@ private fun ChatList(
         chat = chat,
         modifier = Modifier.padding(top = if (isSameUserWithPrevious) 4.dp else 16.dp),
         isMine = chat.userId == userId,
-        member = memberList.find { it.userId == chat.userId },
+        member = memberArchive.find { it.userId == chat.userId },
         previousChat = chatList.getOrNull(index + 1),
         nextChat = chatList.getOrNull(index - 1),
         onClickMember = onClickMember
@@ -374,6 +372,7 @@ private fun Preview() {
       LoungeState(
         user = UserUIModel(id = "1"),
         memberList = listOf(member1.asUI(), member2.asUI(), member3.asUI()),
+        memberArchive = listOf(member1.asUI(), member2.asUI(), member3.asUI()),
         chatList = listOf(
           chatBuilder
             .member(member3)

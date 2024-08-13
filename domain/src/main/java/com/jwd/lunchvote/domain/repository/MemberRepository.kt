@@ -7,6 +7,7 @@ interface MemberRepository {
 
   suspend fun createMember(member: Member)
   fun getMemberListFlow(loungeId: String): Flow<List<Member>>
+  fun getMemberArchiveFlow(loungeId: String): Flow<List<Member>>
   fun getMemberTypeFlow(loungeId: String, userId: String): Flow<Member.Type>
   suspend fun getMember(userId: String, loungeId: String): Member?
   suspend fun updateMemberReadyType(member: Member)
