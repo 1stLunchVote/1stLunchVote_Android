@@ -82,9 +82,6 @@ class FirstVoteViewModel @Inject constructor(
   private fun getOwner(memberList: List<MemberUIModel> = currentState.memberList): MemberUIModel =
     memberList.find { it.type == MemberUIModel.Type.OWNER } ?: throw LoungeError.NoOwner
 
-  private fun getMe(memberList: List<MemberUIModel> = currentState.memberList): MemberUIModel =
-    memberList.find { it.userId == userId } ?: throw MemberError.InvalidMember
-
   override fun handleEvents(event: FirstVoteEvent) {
     when(event) {
       is FirstVoteEvent.ScreenInitialize -> launch { initialize() }
@@ -150,9 +147,7 @@ class FirstVoteViewModel @Inject constructor(
     loungeRepository.getLoungeStatusFlowById(loungeId).collectLatest { status ->
       when(status) {
         Lounge.Status.QUIT -> {
-          val me = getMe()
-
-          userStatusRepository.setUserLounge(me.userId, null)
+          userStatusRepository.setUserLounge(userId, null)
 
           sendSideEffect(FirstVoteSideEffect.ShowSnackbar(UiText.StringResource(R.string.first_vote_owner_exited_snackbar)))
           sendSideEffect(FirstVoteSideEffect.PopBackStack)
@@ -169,8 +164,7 @@ class FirstVoteViewModel @Inject constructor(
       updateState(FirstVoteReduce.UpdateMemberList(memberList))
 
       if (memberList.size <= 1) {
-        val me = getMe(memberList)
-        userStatusRepository.setUserLounge(me.userId, null)
+        userStatusRepository.setUserLounge(userId, null)
 
         sendSideEffect(FirstVoteSideEffect.ShowSnackbar(UiText.StringResource(R.string.first_vote_only_owner_snackbar)))
         sendSideEffect(FirstVoteSideEffect.PopBackStack)
@@ -199,15 +193,15 @@ class FirstVoteViewModel @Inject constructor(
   }
 
   private suspend fun finishVote() {
-    val me = getMe()
-    memberRepository.updateMemberStatus(me.asDomain(), MemberUIModel.Status.VOTED.asDomain())
+    val me = memberRepository.getMember(userId, currentState.lounge.id) ?: throw MemberError.InvalidMember
+    memberRepository.updateMemberStatus(me, MemberUIModel.Status.VOTED.asDomain())
 
     updateState(FirstVoteReduce.UpdateFinished(true))
   }
 
   private suspend fun reVote() {
-    val me = getMe()
-    memberRepository.updateMemberStatus(me.asDomain(), MemberUIModel.Status.VOTING.asDomain())
+    val me = memberRepository.getMember(userId, currentState.lounge.id) ?: throw MemberError.InvalidMember
+    memberRepository.updateMemberStatus(me, MemberUIModel.Status.VOTING.asDomain())
 
     updateState(FirstVoteReduce.UpdateFinished(false))
   }
@@ -215,20 +209,19 @@ class FirstVoteViewModel @Inject constructor(
   private suspend fun submitVote() {
     updateState(FirstVoteReduce.UpdateCalculating(true))
 
-    val me = getMe()
     val owner = getOwner()
 
     val likedFoodsId = currentState.foodItemList.filter { it.status == FoodItem.Status.LIKE }.map { it.food.id }
     val dislikedFoodsId = currentState.foodItemList.filter { it.status == FoodItem.Status.DISLIKE }.map { it.food.id }
     val ballot = FirstBallotUIModel(
       loungeId = currentState.lounge.id,
-      userId = me.userId,
+      userId = userId,
       likedFoodIds = likedFoodsId,
       dislikedFoodIds = dislikedFoodsId
     )
     ballotRepository.submitFirstBallot(ballot.asDomain())
 
-    if (me.userId == owner.userId) {
+    if (userId == owner.userId) {
       calculateFirstVote(currentState.lounge.id)
       startSecondVote(currentState.lounge.id)
     }
@@ -238,10 +231,8 @@ class FirstVoteViewModel @Inject constructor(
     loungeStatusFlow.cancel()
     memberListFlow.cancel()
 
-    val me = getMe()
-
-    userStatusRepository.setUserLounge(me.userId, null)
-    exitLounge(me.asDomain())
+    userStatusRepository.setUserLounge(userId, null)
+    exitLounge(userId)
 
     sendSideEffect(FirstVoteSideEffect.PopBackStack)
   }

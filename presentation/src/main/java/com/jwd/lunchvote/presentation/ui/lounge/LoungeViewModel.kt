@@ -84,9 +84,6 @@ class LoungeViewModel @Inject constructor(
   private fun getOwner(memberList: List<MemberUIModel> = currentState.memberList): MemberUIModel =
     memberList.find { it.type == OWNER } ?: throw LoungeError.NoOwner
 
-  private fun getMe(memberList: List<MemberUIModel> = currentState.memberList): MemberUIModel =
-    memberList.find { it.userId == userId } ?: throw MemberError.InvalidMember
-
   init {
     launch {
       val user = userRepository.getUserById(userId).asUI()
@@ -128,6 +125,8 @@ class LoungeViewModel @Inject constructor(
   override fun handleErrors(error: Throwable) {
     sendSideEffect(LoungeSideEffect.ShowSnackbar(UiText.ErrorString(error)))
     when (error) {
+      is LoungeError.LoungeStarted -> sendSideEffect(LoungeSideEffect.PopBackStack)
+      is LoungeError.LoungeFinished -> sendSideEffect(LoungeSideEffect.PopBackStack)
       is LoungeError.LoungeQuit -> sendSideEffect(LoungeSideEffect.PopBackStack)
       is LoungeError.FullMember -> sendSideEffect(LoungeSideEffect.PopBackStack)
       is LoungeError.NoLounge -> sendSideEffect(LoungeSideEffect.PopBackStack)
@@ -141,27 +140,26 @@ class LoungeViewModel @Inject constructor(
   private suspend fun createLounge() {
     withTimeoutOrNull(NetworkConfig.TIMEOUT) {
       val user = currentState.user
-      val loungeId = createLounge(user.asDomain())
+      val loungeId = createLounge(userId)
       val lounge = loungeRepository.getLoungeById(loungeId).asUI()
 
       updateState(LoungeReduce.UpdateLounge(lounge))
 
       collectLoungeData(loungeId)
 
-      userStatusRepository.setUserLounge(user.id, loungeId)
+      userStatusRepository.setUserLounge(userId, loungeId)
     } ?: throw LoungeError.CreateLoungeFailed
   }
 
   private suspend fun joinLounge(loungeId: String) {
     withTimeoutOrNull(NetworkConfig.TIMEOUT) {
-      val user = currentState.user
-      val lounge = joinLounge(user.asDomain(), loungeId).asUI()
+      val lounge = joinLounge(userId, loungeId).asUI()
 
       updateState(LoungeReduce.UpdateLounge(lounge))
 
       collectLoungeData(lounge.id)
 
-      userStatusRepository.setUserLounge(user.id, loungeId)
+      userStatusRepository.setUserLounge(userId, loungeId)
     } ?: throw LoungeError.JoinLoungeFailed
   }
 
@@ -178,7 +176,7 @@ class LoungeViewModel @Inject constructor(
 
       when (lounge.status) {
         QUIT -> {
-          userStatusRepository.setUserLounge(currentState.user.id, null)
+          userStatusRepository.setUserLounge(userId, null)
 
           sendSideEffect(LoungeSideEffect.ShowSnackbar(UiText.StringResource(R.string.lounge_owner_exited_snackbar)))
           sendSideEffect(LoungeSideEffect.PopBackStack)
@@ -198,9 +196,9 @@ class LoungeViewModel @Inject constructor(
   }
 
   private suspend fun collectMemberType(loungeId: String) {
-    memberRepository.getMemberTypeFlow(loungeId, currentState.user.id).collectLatest { type ->
+    memberRepository.getMemberTypeFlow(loungeId, userId).collectLatest { type ->
       if (type == EXILED) {
-        userStatusRepository.setUserLounge(currentState.user.id, null)
+        userStatusRepository.setUserLounge(userId, null)
 
         sendSideEffect(LoungeSideEffect.ShowSnackbar(UiText.StringResource(R.string.lounge_exiled_snackbar)))
         sendSideEffect(LoungeSideEffect.PopBackStack)
@@ -236,22 +234,20 @@ class LoungeViewModel @Inject constructor(
   }
 
   private suspend fun updateReady() {
-    val me = getMe()
-    memberRepository.updateMemberReadyType(me.asDomain())
+    val me = memberRepository.getMember(userId, currentState.lounge.id) ?: throw MemberError.InvalidMember
+    memberRepository.updateMemberReadyType(me)
   }
 
   private suspend fun exitLounge() {
     sendSideEffect(LoungeSideEffect.CloseDialog)
-
-    val me = getMe()
 
     loungeFlow.cancel()
     memberListFlow.cancel()
     memberTypeFlow.cancel()
     chatListFlow.cancel()
 
-    userStatusRepository.setUserLounge(currentState.user.id, null)
-    exitLounge(me.asDomain())
+    userStatusRepository.setUserLounge(userId, null)
+    exitLounge(userId)
 
     sendSideEffect(LoungeSideEffect.PopBackStack)
   }

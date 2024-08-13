@@ -15,16 +15,19 @@ import com.jwd.lunchvote.domain.entity.User
 import com.jwd.lunchvote.domain.repository.ChatRepository
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.MemberRepository
+import com.jwd.lunchvote.domain.repository.UserRepository
 import kr.co.inbody.config.error.LoungeError
 import javax.inject.Inject
 
 class JoinLounge @Inject constructor(
+  private val userRepository: UserRepository,
   private val loungeRepository: LoungeRepository,
   private val memberRepository: MemberRepository,
   private val chatRepository: ChatRepository
 ) {
 
-  suspend operator fun invoke(user: User, loungeId: String): Lounge {
+  suspend operator fun invoke(userId: String, loungeId: String): Lounge {
+    val user = userRepository.getUserById(userId)
     val lounge = loungeRepository.getLoungeById(loungeId)
 
     when (lounge.status) {
@@ -36,7 +39,7 @@ class JoinLounge @Inject constructor(
     }
     if (lounge.members == lounge.maxMembers) throw LoungeError.FullMember
 
-    memberRepository.getMemberByUserId(user.id, loungeId)?.let { member ->
+    memberRepository.getMember(user.id, loungeId)?.let { member ->
       when (member.type) {
         LEAVED -> {
           memberRepository.updateMemberType(member, DEFAULT)

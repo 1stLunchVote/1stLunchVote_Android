@@ -74,7 +74,7 @@ class MemberDataSourceImpl @Inject constructor(
       .values<String>()
       .mapNotNull { type -> type?.asMemberDataType() }
 
-  override suspend fun getMemberByUserId(
+  override suspend fun getMember(
     userId: String,
     loungeId: String
   ): MemberData? =
