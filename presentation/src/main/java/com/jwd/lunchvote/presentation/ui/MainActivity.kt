@@ -13,9 +13,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import androidx.work.Constraints
 import androidx.work.Data
@@ -28,48 +30,25 @@ import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavHost
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
 import com.jwd.lunchvote.presentation.navigation.route
-import com.jwd.lunchvote.presentation.util.ConnectionManager
+import com.jwd.lunchvote.presentation.util.Connection
+import com.jwd.lunchvote.presentation.util.Connection.LOST
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.UserStatusWorkManager
 import com.jwd.lunchvote.presentation.util.UserStatusWorkManager.Companion.IS_ONLINE
+import com.jwd.lunchvote.presentation.widget.NetworkLostDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity: ComponentActivity() {
 
-  @Inject lateinit var connectionManager: ConnectionManager
-
-  override fun onResume() {
-    super.onResume()
-    setUserStatus(isOnline = true)
-  }
-
-  override fun onDestroy() {
-    super.onDestroy()
-    setUserStatus(isOnline = false)
-  }
-
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     installSplashScreen()
-
-    // 뒤로가기로 앱 종료 시 백스택에 들어가지 않고 앱이 종료되도록 설정
-    onBackPressedDispatcher.addCallback(
-      owner = this,
-      onBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-          finish()
-        }
-      }
-    )
-
-    setContent {
-      LunchVoteScreen()
-    }
+    setBackPressToTerminateApp()
+    setContent { LunchVoteScreen() }
   }
 
   @Composable
@@ -87,30 +66,51 @@ class MainActivity: ComponentActivity() {
       Surface(
         modifier = Modifier.fillMaxSize()
       ) {
+        val connectionState by Connection.connectionState.collectAsStateWithLifecycle()
+        if (connectionState == LOST) NetworkLostDialog { finish() }
+
         Scaffold(
           snackbarHost = { SnackbarHost(snackbarHostState) }
         ) { padding ->
           val snackbarChannel: Channel<String> = Channel()
           LaunchedEffect(snackbarChannel) {
-            snackbarChannel
-              .receiveAsFlow()
+            snackbarChannel.receiveAsFlow()
               .collectLatest { message ->
                 snackbarHostState.showSnackbar(message)
               }
           }
+
           CompositionLocalProvider(
             value = LocalSnackbarChannel provides snackbarChannel
           ) {
             LunchVoteNavHost(
-              startDestination = startDestination,
-              connectionManager = connectionManager,
               navController = navController,
+              startDestination = startDestination,
               modifier = Modifier.padding(padding)
             )
           }
         }
       }
     }
+  }
+
+  private fun MainActivity.setBackPressToTerminateApp() {
+    onBackPressedDispatcher.addCallback(
+      owner = this,
+      onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() { finish() }
+      }
+    )
+  }
+
+  override fun onResume() {
+    super.onResume()
+    setUserStatus(isOnline = true)
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    setUserStatus(isOnline = false)
   }
 
   private fun setUserStatus(isOnline: Boolean) {

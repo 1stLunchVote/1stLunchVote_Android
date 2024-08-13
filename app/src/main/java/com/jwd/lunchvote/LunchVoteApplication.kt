@@ -5,11 +5,13 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import com.google.firebase.FirebaseApp
+import com.jwd.lunchvote.presentation.util.Connection
 import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.util.Utility
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.coroutines.coroutineContext
 
 @HiltAndroidApp
 class LunchVoteApplication : Application(), Configuration.Provider {
@@ -28,6 +30,7 @@ class LunchVoteApplication : Application(), Configuration.Provider {
       Timber.tag("keyHash").e(Utility.getKeyHash(applicationContext))
     }
 
+    Connection.initialize(this)
     WorkManager.initialize(this, workManagerConfiguration)
   }
 
