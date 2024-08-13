@@ -33,7 +33,6 @@ import com.jwd.lunchvote.presentation.util.ConnectionManager
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.SetUserOfflineWorkManager
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -41,16 +40,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
-
-  @Inject
-  lateinit var dispatcher: CoroutineDispatcher
-
-  @Inject
-  lateinit var userStatusRepository: UserStatusRepository
-
-  @Inject
-  lateinit var connectionManager: ConnectionManager
+class MainActivity @Inject constructor(
+  private val userStatusRepository: UserStatusRepository,
+  private val connectionManager: ConnectionManager
+) : ComponentActivity() {
 
   override fun onResume() {
     super.onResume()
@@ -79,6 +72,7 @@ class MainActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    
     installSplashScreen()
 
     // 뒤로가기로 앱 종료 시 백스택에 들어가지 않고 앱이 종료되도록 설정
