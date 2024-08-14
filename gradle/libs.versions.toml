@@ -112,15 +112,6 @@ firebase-auth = { group = "com.google.firebase", name = "firebase-auth-ktx", ver
 firebase-functions = { group = "com.google.firebase", name = "firebase-functions-ktx", version.ref = "firebaseFunctions" }
 firebase-gmsAuth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "firebaseGmsAuth" }
 
-retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
-okHttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okHttp" }
-
-room = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
-
-dataStore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "dataStore" }
-
 coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 coil-landscapist = { group = "com.github.skydoves", name = "landscapist-coil", version.ref = "coilLandscapist" }
 
@@ -135,7 +126,6 @@ hilt-compiler = ["hilt-compiler", "hilt-android-compiler"]
 coroutines = ["coroutines", "coroutines-android"]
 compose = ["compose-material", "compose-foundation", "compose-ui", "compose-ui-tooling", "compose-ui-tooling-preview", "compose-hilt", "compose-lifecycle", "compose-constraintLayout"]
 firebase = ["firebase-database", "firebase-firestore", "firebase-auth", "firebase-functions", "firebase-gmsAuth", "firebase-storage"]
-room = ["room", "room-runtime"]
 coil = ["coil", "coil-landscapist"]
 
 [plugins]

@@ -79,11 +79,6 @@ dependencies {
   implementation(platform(libs.compose))
   implementation(libs.bundles.compose)
 
-  implementation(libs.bundles.room)
-  ksp(libs.room.compiler)
-
-  implementation(libs.dataStore)
-
   implementation(libs.bundles.coil)
 
   implementation(libs.timber)
