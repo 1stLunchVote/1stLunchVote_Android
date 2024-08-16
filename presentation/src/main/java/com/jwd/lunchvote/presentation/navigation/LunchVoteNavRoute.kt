@@ -95,6 +95,15 @@ enum class LunchVoteNavRoute(
 
   Setting,
   Profile,
+  ContactList,
+  Contact(
+    arguments = listOf(
+      navArgument("id") {
+        type = NavType.StringType
+      }
+    )
+  ),
+  AddContact,
 
   Tips,
 

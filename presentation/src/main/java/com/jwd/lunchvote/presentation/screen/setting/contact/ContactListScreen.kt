@@ -9,9 +9,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jwd.lunchvote.presentation.screen.setting.contact.ContactContract.ContactEvent
-import com.jwd.lunchvote.presentation.screen.setting.contact.ContactContract.ContactSideEffect
-import com.jwd.lunchvote.presentation.screen.setting.contact.ContactContract.ContactState
+import com.jwd.lunchvote.presentation.screen.setting.contact.ContactListContract.ContactListEvent
+import com.jwd.lunchvote.presentation.screen.setting.contact.ContactListContract.ContactListSideEffect
+import com.jwd.lunchvote.presentation.screen.setting.contact.ContactListContract.ContactListState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
@@ -20,9 +20,10 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun ContactRoute(
+fun ContactListRoute(
   popBackStack: () -> Unit,
-  viewModel: ContactViewModel = hiltViewModel(),
+  navigateToContact: (String) -> Unit,
+  viewModel: ContactListViewModel = hiltViewModel(),
   snackbarChannel: Channel<String> = LocalSnackbarChannel.current,
   context: Context = LocalContext.current
 ) {
@@ -31,25 +32,26 @@ fun ContactRoute(
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
       when(it) {
-        is ContactSideEffect.PopBackStack -> popBackStack()
-        is ContactSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
+        is ContactListSideEffect.PopBackStack -> popBackStack()
+        is ContactListSideEffect.NavigateToContact -> navigateToContact(it.contact.id)
+        is ContactListSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }
 
-  LaunchedEffect(Unit) { viewModel.handleEvents(ContactEvent.ScreenInitialize) }
+  LaunchedEffect(Unit) { viewModel.handleEvents(ContactListEvent.ScreenInitialize) }
 
-  ContactScreen(
+  ContactListScreen(
     state = state,
     onEvent = viewModel::sendEvent
   )
 }
 
 @Composable
-private fun ContactScreen(
-  state: ContactState,
+private fun ContactListScreen(
+  state: ContactListState,
   modifier: Modifier = Modifier,
-  onEvent: (ContactEvent) -> Unit = {}
+  onEvent: (ContactListEvent) -> Unit = {}
 ) {
   Screen(
     modifier = modifier,
@@ -57,7 +59,7 @@ private fun ContactScreen(
       LunchVoteTopBar(
         title = "1:1 문의",
         navIconVisible = true,
-        popBackStack = { onEvent(ContactEvent.OnClickBackButton) }
+        popBackStack = { onEvent(ContactListEvent.OnClickBackButton) }
       )
     }
   ) {
@@ -68,10 +70,8 @@ private fun ContactScreen(
 @Composable
 private fun Preview() {
   ScreenPreview {
-    ContactScreen(
-      ContactState(
-        text = "Hello world!"
-      )
+    ContactListScreen(
+      ContactListState()
     )
   }
 }
