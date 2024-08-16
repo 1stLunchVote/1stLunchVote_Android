@@ -12,7 +12,8 @@ private object ContactDataMapper : BiMapper<ContactData, Contact> {
       title = from.title,
       category = from.category.asDomain(),
       content = from.content,
-      createdAt = from.createdAt
+      createdAt = from.createdAt,
+      deletedAt = from.deletedAt
     )
 
   override fun mapToLeft(from: Contact): ContactData =
@@ -22,7 +23,8 @@ private object ContactDataMapper : BiMapper<ContactData, Contact> {
       title = from.title,
       category = from.category.asData(),
       content = from.content,
-      createdAt = from.createdAt
+      createdAt = from.createdAt,
+      deletedAt = from.deletedAt
     )
 }
 

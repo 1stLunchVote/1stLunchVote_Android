@@ -9,7 +9,7 @@ import com.jwd.lunchvote.remote.util.toTimestamp
 private object ContactReplyRemoteMapper : BiMapper<ContactReplyRemote, ContactReplyData> {
   override fun mapToRight(from: ContactReplyRemote): ContactReplyData =
     ContactReplyData(
-      id = from.id,
+      id = "",
       contactId = from.contactId,
       title = from.title,
       content = from.content,
@@ -18,7 +18,6 @@ private object ContactReplyRemoteMapper : BiMapper<ContactReplyRemote, ContactRe
 
   override fun mapToLeft(from: ContactReplyData): ContactReplyRemote =
     ContactReplyRemote(
-      id = from.id,
       contactId = from.contactId,
       title = from.title,
       content = from.content,
@@ -26,8 +25,8 @@ private object ContactReplyRemoteMapper : BiMapper<ContactReplyRemote, ContactRe
     )
 }
 
-internal fun ContactReplyRemote.asData(): ContactReplyData =
-  ContactReplyRemoteMapper.mapToRight(this)
+internal fun ContactReplyRemote.asData(id: String): ContactReplyData =
+  ContactReplyRemoteMapper.mapToRight(this).copy(id = id)
 
 internal fun ContactReplyData.asRemote(): ContactReplyRemote =
   ContactReplyRemoteMapper.mapToLeft(this)

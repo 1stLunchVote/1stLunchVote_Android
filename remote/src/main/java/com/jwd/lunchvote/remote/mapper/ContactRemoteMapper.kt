@@ -10,17 +10,17 @@ import kr.co.inbody.config.error.ContactError
 private object ContactRemoteMapper : BiMapper<ContactRemote, ContactData> {
   override fun mapToRight(from: ContactRemote): ContactData =
     ContactData(
-      id = from.id,
+      id = "",
       userId = from.userId,
       title = from.title,
       category = from.category.asContactDataCategory(),
       content = from.content,
-      createdAt = from.createdAt.toLong()
+      createdAt = from.createdAt.toLong(),
+      deletedAt = from.deletedAt?.toLong()
     )
 
   override fun mapToLeft(from: ContactData): ContactRemote =
     ContactRemote(
-      id = from.id,
       userId = from.userId,
       title = from.title,
       category = from.category.asRemote(),
@@ -48,8 +48,8 @@ private object ContactRemoteCategoryMapper : BiMapper<String, ContactData.Catego
     }
 }
 
-internal fun ContactRemote.asData(): ContactData =
-  ContactRemoteMapper.mapToRight(this)
+internal fun ContactRemote.asData(id: String): ContactData =
+  ContactRemoteMapper.mapToRight(this).copy(id = id)
 
 internal fun ContactData.asRemote(): ContactRemote =
   ContactRemoteMapper.mapToLeft(this)

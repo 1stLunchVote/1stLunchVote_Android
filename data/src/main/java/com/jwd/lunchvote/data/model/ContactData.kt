@@ -6,7 +6,8 @@ data class ContactData(
   val title: String,
   val category: Category,
   val content: String,
-  val createdAt: Long
+  val createdAt: Long,
+  val deletedAt: Long?
 ) {
 
   enum class Category {

@@ -9,7 +9,8 @@ data class ContactUIModel(
   val title: String = "",
   val category: Category = Category.ETC,
   val content: String = "",
-  val createdAt: ZonedDateTime = INITIAL_DATE_TIME
+  val createdAt: ZonedDateTime = INITIAL_DATE_TIME,
+  val deletedAt: ZonedDateTime? = null
 ) {
 
 
