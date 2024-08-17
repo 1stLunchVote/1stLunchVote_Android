@@ -10,6 +10,7 @@ class ContactListContract {
   @Parcelize
   data class ContactListState(
     val contactList: List<ContactUIModel> = emptyList(),
+    val hasReplyOf: Map<ContactUIModel, Boolean> = emptyMap()
   ): ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this
   }
@@ -23,6 +24,7 @@ class ContactListContract {
 
   sealed interface ContactListReduce : ViewModelContract.Reduce {
     data class UpdateContactList(val contactList: List<ContactUIModel>) : ContactListReduce
+    data class UpdateHasReplyOf(val hasReplyOf: Map<ContactUIModel, Boolean>) : ContactListReduce
   }
 
   sealed interface ContactListSideEffect: ViewModelContract.SideEffect {
