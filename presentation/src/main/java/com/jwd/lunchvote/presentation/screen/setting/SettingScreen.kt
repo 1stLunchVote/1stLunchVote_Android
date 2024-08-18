@@ -45,6 +45,7 @@ import kotlinx.coroutines.flow.collectLatest
 fun SettingRoute(
   popBackStack: () -> Unit,
   navigateToProfile: () -> Unit,
+  navigateToContactList: () -> Unit,
   navigateToLogin: () -> Unit,
   viewModel: SettingViewModel = hiltViewModel(),
   snackbarChannel: Channel<String> = LocalSnackbarChannel.current,
@@ -57,6 +58,7 @@ fun SettingRoute(
       when(it) {
         is SettingSideEffect.PopBackStack -> popBackStack()
         is SettingSideEffect.NavigateToProfile -> navigateToProfile()
+        is SettingSideEffect.NavigateToContactList -> navigateToContactList()
         is SettingSideEffect.NavigateToLogin -> navigateToLogin()
         is SettingSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }

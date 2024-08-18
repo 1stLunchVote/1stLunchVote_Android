@@ -19,6 +19,7 @@ class ContactListContract {
     data object ScreenInitialize: ContactListEvent
 
     data object OnClickBackButton: ContactListEvent
+    data object OnClickAddButton: ContactListEvent
     data class OnClickContact(val contact: ContactUIModel): ContactListEvent
   }
 
@@ -29,6 +30,7 @@ class ContactListContract {
 
   sealed interface ContactListSideEffect: ViewModelContract.SideEffect {
     data object PopBackStack : ContactListSideEffect
+    data object NavigateToAddContact : ContactListSideEffect
     data class NavigateToContact(val contact: ContactUIModel) : ContactListSideEffect
     data class ShowSnackbar(val message: UiText) : ContactListSideEffect
   }

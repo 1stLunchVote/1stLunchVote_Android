@@ -33,6 +33,7 @@ class ContactListViewModel @Inject constructor(
       is ContactListEvent.ScreenInitialize -> launch { initialize() }
 
       is ContactListEvent.OnClickBackButton -> sendSideEffect(ContactListSideEffect.PopBackStack)
+      is ContactListEvent.OnClickAddButton -> sendSideEffect(ContactListSideEffect.NavigateToAddContact)
       is ContactListEvent.OnClickContact -> sendSideEffect(ContactListSideEffect.NavigateToContact(event.contact))
     }
   }

@@ -30,7 +30,7 @@ class SettingViewModel @Inject constructor(
       is SettingEvent.OnClickBackButton -> sendSideEffect(SettingSideEffect.PopBackStack)
       is SettingEvent.OnClickProfileButton -> sendSideEffect(SettingSideEffect.NavigateToProfile)
       is SettingEvent.OnClickAlertSettingButton -> sendSideEffect(SettingSideEffect.ShowSnackbar(UiText.DynamicString("알림 설정")))
-      is SettingEvent.OnClickContactButton -> sendSideEffect(SettingSideEffect.ShowSnackbar(UiText.DynamicString("1:1 문의")))
+      is SettingEvent.OnClickContactButton -> sendSideEffect(SettingSideEffect.NavigateToContactList)
       is SettingEvent.OnClickNoticeButton -> sendSideEffect(SettingSideEffect.ShowSnackbar(UiText.DynamicString("공지사항 및 이용약관")))
       is SettingEvent.OnClickSuggestButton -> sendSideEffect(SettingSideEffect.ShowSnackbar(UiText.DynamicString("개선 제안하기")))
       is SettingEvent.OnClickLogoutButton -> launch { logout() }

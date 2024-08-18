@@ -16,7 +16,7 @@ data class ContactUIModel(
   val deletedAt: ZonedDateTime? = null
 ): Parcelable {
 
-  enum class Category {
-    ACCOUNT, BUG, SUGGESTION, ETC
+  enum class Category(val korean: String) {
+    ACCOUNT("계정관리"), BUG("버그 및 신고"), SUGGESTION("건의사항"), ETC("기타")
   }
 }

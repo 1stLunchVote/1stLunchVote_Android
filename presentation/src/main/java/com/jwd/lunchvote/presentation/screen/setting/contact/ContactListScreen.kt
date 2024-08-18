@@ -10,7 +10,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,11 +24,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.model.ContactUIModel
+import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendListEvent
 import com.jwd.lunchvote.presentation.screen.setting.contact.ContactListContract.ContactListEvent
 import com.jwd.lunchvote.presentation.screen.setting.contact.ContactListContract.ContactListSideEffect
 import com.jwd.lunchvote.presentation.screen.setting.contact.ContactListContract.ContactListState
@@ -40,6 +47,7 @@ import java.util.Locale
 @Composable
 fun ContactListRoute(
   popBackStack: () -> Unit,
+  navigateToAddContact: () -> Unit,
   navigateToContact: (String) -> Unit,
   viewModel: ContactListViewModel = hiltViewModel(),
   snackbarChannel: Channel<String> = LocalSnackbarChannel.current,
@@ -51,6 +59,7 @@ fun ContactListRoute(
     viewModel.sideEffect.collectLatest {
       when(it) {
         is ContactListSideEffect.PopBackStack -> popBackStack()
+        is ContactListSideEffect.NavigateToAddContact -> navigateToAddContact()
         is ContactListSideEffect.NavigateToContact -> navigateToContact(it.contact.id)
         is ContactListSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
@@ -77,7 +86,17 @@ private fun ContactListScreen(
       LunchVoteTopBar(
         title = "1:1 문의",
         navIconVisible = true,
-        popBackStack = { onEvent(ContactListEvent.OnClickBackButton) }
+        popBackStack = { onEvent(ContactListEvent.OnClickBackButton) },
+        actions = {
+          IconButton(
+            onClick = { onEvent(ContactListEvent.OnClickAddButton) }
+          ) {
+            Icon(
+              Icons.Rounded.Add,
+              contentDescription = "add contact"
+            )
+          }
+        }
       )
     },
     scrollable = false
@@ -86,7 +105,7 @@ private fun ContactListScreen(
       modifier = Modifier
         .fillMaxSize()
         .padding(horizontal = 24.dp),
-      verticalArrangement = Arrangement.spacedBy(16.dp),
+      verticalArrangement = if (state.contactList.isNotEmpty()) Arrangement.spacedBy(16.dp) else Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally
     ) {
       items(state.contactList) { contact ->
@@ -95,6 +114,16 @@ private fun ContactListScreen(
           hasReply = state.hasReplyOf[contact] ?: false,
           modifier = Modifier.fillMaxWidth()
         ) { onEvent(ContactListEvent.OnClickContact(contact)) }
+      }
+      if (state.contactList.isEmpty()) {
+        item {
+          Text(
+            text = "문의 내역이 없습니다.\n문의가 필요한 경우, 우측 상단의 + 버튼을 눌러 작성해주세요.",
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.outline,
+            style = MaterialTheme.typography.labelLarge
+          )
+        }
       }
     }
   }

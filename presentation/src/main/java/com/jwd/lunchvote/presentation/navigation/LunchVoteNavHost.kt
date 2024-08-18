@@ -20,6 +20,7 @@ import com.jwd.lunchvote.presentation.screen.lounge.member.LoungeMemberRoute
 import com.jwd.lunchvote.presentation.screen.lounge.setting.LoungeSettingRoute
 import com.jwd.lunchvote.presentation.screen.setting.SettingRoute
 import com.jwd.lunchvote.presentation.screen.setting.contact.ContactListRoute
+import com.jwd.lunchvote.presentation.screen.setting.contact.add_contact.AddContactRoute
 import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileRoute
 import com.jwd.lunchvote.presentation.screen.template.TemplateListRoute
 import com.jwd.lunchvote.presentation.screen.template.add_template.AddTemplateRoute
@@ -179,6 +180,7 @@ fun LunchVoteNavHost(
       SettingRoute(
         popBackStack = { navController.popBackStack() },
         navigateToProfile = { navController.navigate(LunchVoteNavRoute.Profile) },
+        navigateToContactList = { navController.navigate(LunchVoteNavRoute.ContactList) },
         navigateToLogin = { navController.navigateWithPop(LunchVoteNavRoute.Login) }
       )
     }
@@ -191,6 +193,7 @@ fun LunchVoteNavHost(
     composable(LunchVoteNavRoute.ContactList) {
       ContactListRoute(
         popBackStack = { navController.popBackStack() },
+        navigateToAddContact = { navController.navigate(LunchVoteNavRoute.AddContact) },
         navigateToContact = { contactId ->
           navController.navigate(LunchVoteNavRoute.Contact, contactId)
         }
@@ -200,7 +203,12 @@ fun LunchVoteNavHost(
       // ContactRoute
     }
     composable(LunchVoteNavRoute.AddContact) {
-      // AddContactRoute
+      AddContactRoute(
+        popBackStack = { navController.popBackStack() },
+        navigateToContact = { contactId ->
+          navController.navigateWithPop(LunchVoteNavRoute.Contact, contactId)
+        }
+      )
     }
     composable(LunchVoteNavRoute.Tips) {
       TipsRoute(
