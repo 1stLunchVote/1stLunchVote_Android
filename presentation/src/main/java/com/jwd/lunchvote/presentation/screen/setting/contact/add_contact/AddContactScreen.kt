@@ -24,12 +24,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.ContactUIModel
 import com.jwd.lunchvote.presentation.screen.setting.contact.add_contact.AddContactContract.AddContactEvent
 import com.jwd.lunchvote.presentation.screen.setting.contact.add_contact.AddContactContract.AddContactSideEffect
@@ -109,7 +107,7 @@ private fun AddContactScreen(
         modifier = Modifier.fillMaxWidth()
       ) {
         OutlinedTextField(
-          value = state.category?.korean ?: "",
+          value = state.category?.korean ?: "카테고리",
           onValueChange = {},
           modifier = Modifier
             .fillMaxWidth()

@@ -19,6 +19,7 @@ import com.jwd.lunchvote.presentation.screen.lounge.LoungeRoute
 import com.jwd.lunchvote.presentation.screen.lounge.member.LoungeMemberRoute
 import com.jwd.lunchvote.presentation.screen.lounge.setting.LoungeSettingRoute
 import com.jwd.lunchvote.presentation.screen.setting.SettingRoute
+import com.jwd.lunchvote.presentation.screen.setting.contact.ContactRoute
 import com.jwd.lunchvote.presentation.screen.setting.contact.contact_list.ContactListRoute
 import com.jwd.lunchvote.presentation.screen.setting.contact.add_contact.AddContactRoute
 import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileRoute
@@ -200,7 +201,9 @@ fun LunchVoteNavHost(
       )
     }
     composable(LunchVoteNavRoute.Contact) {
-      // ContactRoute
+      ContactRoute(
+        popBackStack = { navController.popBackStack() }
+      )
     }
     composable(LunchVoteNavRoute.AddContact) {
       AddContactRoute(
