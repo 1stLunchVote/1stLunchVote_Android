@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.presentation.screen.setting.contact
+package com.jwd.lunchvote.presentation.screen.setting.contact.contact_list
 
 import android.os.Parcelable
 import com.jwd.lunchvote.core.ui.base.ViewModelContract

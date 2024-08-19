@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.presentation.screen.setting.contact
+package com.jwd.lunchvote.presentation.screen.setting.contact.contact_list
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
@@ -7,10 +7,10 @@ import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.ContactRepository
 import com.jwd.lunchvote.presentation.mapper.asUI
-import com.jwd.lunchvote.presentation.screen.setting.contact.ContactListContract.ContactListEvent
-import com.jwd.lunchvote.presentation.screen.setting.contact.ContactListContract.ContactListReduce
-import com.jwd.lunchvote.presentation.screen.setting.contact.ContactListContract.ContactListSideEffect
-import com.jwd.lunchvote.presentation.screen.setting.contact.ContactListContract.ContactListState
+import com.jwd.lunchvote.presentation.screen.setting.contact.contact_list.ContactListContract.ContactListEvent
+import com.jwd.lunchvote.presentation.screen.setting.contact.contact_list.ContactListContract.ContactListReduce
+import com.jwd.lunchvote.presentation.screen.setting.contact.contact_list.ContactListContract.ContactListSideEffect
+import com.jwd.lunchvote.presentation.screen.setting.contact.contact_list.ContactListContract.ContactListState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kr.co.inbody.config.error.UserError

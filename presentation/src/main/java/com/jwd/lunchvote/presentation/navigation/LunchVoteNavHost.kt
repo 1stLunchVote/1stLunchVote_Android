@@ -19,7 +19,7 @@ import com.jwd.lunchvote.presentation.screen.lounge.LoungeRoute
 import com.jwd.lunchvote.presentation.screen.lounge.member.LoungeMemberRoute
 import com.jwd.lunchvote.presentation.screen.lounge.setting.LoungeSettingRoute
 import com.jwd.lunchvote.presentation.screen.setting.SettingRoute
-import com.jwd.lunchvote.presentation.screen.setting.contact.ContactListRoute
+import com.jwd.lunchvote.presentation.screen.setting.contact.contact_list.ContactListRoute
 import com.jwd.lunchvote.presentation.screen.setting.contact.add_contact.AddContactRoute
 import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileRoute
 import com.jwd.lunchvote.presentation.screen.template.TemplateListRoute
