@@ -8,25 +8,28 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.jwd.lunchvote.presentation.ui.friends.FriendListRoute
-import com.jwd.lunchvote.presentation.ui.friends.request.FriendRequestRoute
-import com.jwd.lunchvote.presentation.ui.home.HomeRoute
-import com.jwd.lunchvote.presentation.ui.login.LoginRoute
-import com.jwd.lunchvote.presentation.ui.login.register.email_verification.EmailVerificationRoute
-import com.jwd.lunchvote.presentation.ui.login.register.nickname.NicknameRoute
-import com.jwd.lunchvote.presentation.ui.login.register.password.PasswordRoute
-import com.jwd.lunchvote.presentation.ui.lounge.LoungeRoute
-import com.jwd.lunchvote.presentation.ui.lounge.member.LoungeMemberRoute
-import com.jwd.lunchvote.presentation.ui.lounge.setting.LoungeSettingRoute
-import com.jwd.lunchvote.presentation.ui.setting.SettingRoute
-import com.jwd.lunchvote.presentation.ui.setting.profile.ProfileRoute
-import com.jwd.lunchvote.presentation.ui.template.TemplateListRoute
-import com.jwd.lunchvote.presentation.ui.template.add_template.AddTemplateRoute
-import com.jwd.lunchvote.presentation.ui.template.edit_template.EditTemplateRoute
-import com.jwd.lunchvote.presentation.ui.tips.TipsRoute
-import com.jwd.lunchvote.presentation.ui.vote.first.FirstVoteRoute
-import com.jwd.lunchvote.presentation.ui.vote.result.VoteResultRoute
-import com.jwd.lunchvote.presentation.ui.vote.second.SecondVoteRoute
+import com.jwd.lunchvote.presentation.screen.friends.FriendListRoute
+import com.jwd.lunchvote.presentation.screen.friends.request.FriendRequestRoute
+import com.jwd.lunchvote.presentation.screen.home.HomeRoute
+import com.jwd.lunchvote.presentation.screen.login.LoginRoute
+import com.jwd.lunchvote.presentation.screen.login.register.email_verification.EmailVerificationRoute
+import com.jwd.lunchvote.presentation.screen.login.register.nickname.NicknameRoute
+import com.jwd.lunchvote.presentation.screen.login.register.password.PasswordRoute
+import com.jwd.lunchvote.presentation.screen.lounge.LoungeRoute
+import com.jwd.lunchvote.presentation.screen.lounge.member.LoungeMemberRoute
+import com.jwd.lunchvote.presentation.screen.lounge.setting.LoungeSettingRoute
+import com.jwd.lunchvote.presentation.screen.setting.SettingRoute
+import com.jwd.lunchvote.presentation.screen.setting.contact.ContactRoute
+import com.jwd.lunchvote.presentation.screen.setting.contact.contact_list.ContactListRoute
+import com.jwd.lunchvote.presentation.screen.setting.contact.add_contact.AddContactRoute
+import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileRoute
+import com.jwd.lunchvote.presentation.screen.template.TemplateListRoute
+import com.jwd.lunchvote.presentation.screen.template.add_template.AddTemplateRoute
+import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateRoute
+import com.jwd.lunchvote.presentation.screen.tips.TipsRoute
+import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteRoute
+import com.jwd.lunchvote.presentation.screen.vote.result.VoteResultRoute
+import com.jwd.lunchvote.presentation.screen.vote.second.SecondVoteRoute
 
 @Composable
 fun LunchVoteNavHost(
@@ -178,6 +181,7 @@ fun LunchVoteNavHost(
       SettingRoute(
         popBackStack = { navController.popBackStack() },
         navigateToProfile = { navController.navigate(LunchVoteNavRoute.Profile) },
+        navigateToContactList = { navController.navigate(LunchVoteNavRoute.ContactList) },
         navigateToLogin = { navController.navigateWithPop(LunchVoteNavRoute.Login) }
       )
     }
@@ -185,6 +189,28 @@ fun LunchVoteNavHost(
       ProfileRoute(
         popBackStack = { navController.popBackStack() },
         navigateToLogin = { navController.navigateWithPop(LunchVoteNavRoute.Login) }
+      )
+    }
+    composable(LunchVoteNavRoute.ContactList) {
+      ContactListRoute(
+        popBackStack = { navController.popBackStack() },
+        navigateToAddContact = { navController.navigate(LunchVoteNavRoute.AddContact) },
+        navigateToContact = { contactId ->
+          navController.navigate(LunchVoteNavRoute.Contact, contactId)
+        }
+      )
+    }
+    composable(LunchVoteNavRoute.Contact) {
+      ContactRoute(
+        popBackStack = { navController.popBackStack() }
+      )
+    }
+    composable(LunchVoteNavRoute.AddContact) {
+      AddContactRoute(
+        popBackStack = { navController.popBackStack() },
+        navigateToContact = { contactId ->
+          navController.navigateWithPop(LunchVoteNavRoute.Contact, contactId)
+        }
       )
     }
     composable(LunchVoteNavRoute.Tips) {

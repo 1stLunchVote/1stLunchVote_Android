@@ -1,5 +1,6 @@
 package com.jwd.lunchvote.di
 
+import com.jwd.lunchvote.data.source.ContactDataSource
 import com.jwd.lunchvote.data.source.local.PreferenceDataSource
 import com.jwd.lunchvote.data.source.remote.BallotDataSource
 import com.jwd.lunchvote.data.source.remote.ChatDataSource
@@ -16,6 +17,7 @@ import com.jwd.lunchvote.data.source.remote.VoteResultDataSource
 import com.jwd.lunchvote.local.source.PreferenceDataSourceImpl
 import com.jwd.lunchvote.remote.source.BallotDataSourceImpl
 import com.jwd.lunchvote.remote.source.ChatDataSourceImpl
+import com.jwd.lunchvote.remote.source.ContactDataSourceImpl
 import com.jwd.lunchvote.remote.source.FoodDataSourceImpl
 import com.jwd.lunchvote.remote.source.FriendDataSourceImpl
 import com.jwd.lunchvote.remote.source.LoginDataSourceImpl
@@ -38,15 +40,21 @@ internal abstract class DataSourceModule {
 
   @Binds
   @Singleton
+  abstract fun bindsBallotDataSource(
+    source: BallotDataSourceImpl
+  ): BallotDataSource
+
+  @Binds
+  @Singleton
   abstract fun bindsChatDataSource(
     source: ChatDataSourceImpl
   ): ChatDataSource
 
   @Binds
   @Singleton
-  abstract fun bindsDataSource(
-    source: BallotDataSourceImpl
-  ): BallotDataSource
+  abstract fun bindsContactDataSource(
+    source: ContactDataSourceImpl
+  ): ContactDataSource
 
   @Binds
   @Singleton
