@@ -2,6 +2,7 @@ package com.jwd.lunchvote.presentation.screen.login
 
 import android.os.Parcelable
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.jwd.lunchvote.core.ui.base.ViewModelContract
 import com.jwd.lunchvote.presentation.util.UiText
 import com.kakao.sdk.auth.model.OAuthToken
@@ -24,7 +25,7 @@ class LoginContract {
     data object OnClickKakaoLoginButton : LoginEvent
     data object OnClickGoogleLoginButton : LoginEvent
     data class ProcessKakaoLogin(val oAuthToken: OAuthToken) : LoginEvent
-    data class ProcessGoogleLogin(val account: GoogleSignInAccount) : LoginEvent
+    data class ProcessGoogleLogin(val credential: GoogleIdTokenCredential) : LoginEvent
   }
 
   sealed interface LoginReduce : ViewModelContract.Reduce {
