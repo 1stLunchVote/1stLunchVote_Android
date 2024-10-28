@@ -36,10 +36,13 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.credentials.CredentialManager
+import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.FirebaseAuth
 import com.jwd.lunchvote.presentation.BuildConfig
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.screen.login.LoginContract.LoginEvent
@@ -48,6 +51,7 @@ import com.jwd.lunchvote.presentation.screen.login.LoginContract.LoginState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.util.login
+import com.jwd.lunchvote.presentation.util.loginWithGoogleCredential
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.GoogleLoginButton
 import com.jwd.lunchvote.presentation.widget.KakaoLoginButton
@@ -64,6 +68,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kr.co.inbody.config.config.EmailConfig
 import kr.co.inbody.config.error.LoginError
+import timber.log.Timber
 
 @Composable
 fun LoginRoute(
@@ -76,28 +81,6 @@ fun LoginRoute(
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
   val loading by viewModel.isLoading.collectAsStateWithLifecycle()
-
-  val googleSignInClient by lazy {
-    val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-      .requestIdToken(BuildConfig.FIREBASE_WEB_CLIENT_ID)
-      .requestEmail()
-      .build()
-    GoogleSignIn.getClient(context, googleSignInOptions)
-  }
-
-  val googleLauncher =
-    rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-      when (it.resultCode) {
-        Activity.RESULT_OK -> {
-          val account = GoogleSignIn.getSignedInAccountFromIntent(it.data)
-          account.result?.let { res ->
-            viewModel.sendEvent(LoginEvent.ProcessGoogleLogin(res))
-          }
-        }
-        Activity.RESULT_CANCELED -> viewModel.throwError(LoginError.LoginCanceled)
-        else -> viewModel.throwError(LoginError.LoginFailure)
-      }
-    }
 
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
@@ -112,11 +95,22 @@ fun LoginRoute(
             if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
               viewModel.throwError(LoginError.LoginCanceled)
             } else {
+              Timber.e(error)
               viewModel.throwError(LoginError.LoginFailure)
             }
           }
         }
-        is LoginSideEffect.LaunchGoogleLogin -> googleLauncher.launch(googleSignInClient.signInIntent)
+        is LoginSideEffect.LaunchGoogleLogin -> {
+          try {
+            val credential = loginWithGoogleCredential(context)
+            viewModel.sendEvent(LoginEvent.ProcessGoogleLogin(credential))
+          } catch (error: GetCredentialCancellationException) {
+            viewModel.throwError(LoginError.LoginCanceled)
+          } catch (error: Throwable) {
+            Timber.e(error)
+            viewModel.throwError(LoginError.LoginFailure)
+          }
+        }
         is LoginSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
@@ -292,12 +286,13 @@ private fun SocialLoginButtons(
       enabled = loading.not(),
       size = LoginButtonSize.Medium
     )
-    GoogleLoginButton(
-      onClick = onClickGoogleLoginButton,
-      modifier = Modifier.fillMaxWidth(),
-      enabled = loading.not(),
-      size = LoginButtonSize.Medium
-    )
+//    TODO: Google Oauth 등록 후 로그인 활성화
+//    GoogleLoginButton(
+//      onClick = onClickGoogleLoginButton,
+//      modifier = Modifier.fillMaxWidth(),
+//      enabled = loading.not(),
+//      size = LoginButtonSize.Medium
+//    )
   }
 }
 

@@ -3,6 +3,7 @@ package com.jwd.lunchvote.presentation.screen.login
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.FirebaseAuthException
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.UserRepository
@@ -48,7 +49,7 @@ class LoginViewModel @Inject constructor(
       is LoginEvent.OnClickKakaoLoginButton -> sendSideEffect(LoginSideEffect.LaunchKakaoLogin)
       is LoginEvent.OnClickGoogleLoginButton -> sendSideEffect(LoginSideEffect.LaunchGoogleLogin)
       is LoginEvent.ProcessKakaoLogin -> kakaoLogin(event.oAuthToken)
-      is LoginEvent.ProcessGoogleLogin -> launch { googleLogin(event.account) }
+      is LoginEvent.ProcessGoogleLogin -> launch { googleLogin(event.credential) }
     }
   }
 
@@ -78,16 +79,16 @@ class LoginViewModel @Inject constructor(
     loginSuccess()
   }
 
-  private suspend fun googleLogin(account: GoogleSignInAccount) {
-    val userId = signInWithGoogleIdToken(account.idToken!!)
-    val exists = userRepository.checkEmailExists(account.email ?: throw LoginError.NoEmail)
-    val name = generateName(account.givenName)
+  private suspend fun googleLogin(credential: GoogleIdTokenCredential) {
+    val userId = signInWithGoogleIdToken(credential.idToken)
+    val exists = userRepository.checkEmailExists(credential.id)
+    val name = generateName(credential.givenName)
     if (exists.not()) {
       val user = UserUIModel(
         id = userId,
-        email = account.email ?: UserConfig.DEFAULT_USER_EMAIL,
+        email = credential.id,
         name = name,
-        profileImage = account.photoUrl?.toString() ?: UserConfig.DEFAULT_USER_PROFILE_IMAGE
+        profileImage = credential.profilePictureUri?.toString() ?: UserConfig.DEFAULT_USER_PROFILE_IMAGE
       )
       userRepository.createUser(user.asDomain())
     }
