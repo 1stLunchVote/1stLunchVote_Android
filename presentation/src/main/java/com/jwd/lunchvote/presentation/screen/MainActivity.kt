@@ -76,7 +76,10 @@ class MainActivity: ComponentActivity() {
           LaunchedEffect(snackbarChannel) {
             snackbarChannel.receiveAsFlow()
               .collectLatest { message ->
-                snackbarHostState.showSnackbar(message)
+                snackbarHostState.showSnackbar(
+                  message = message,
+                  withDismissAction = true
+                )
               }
           }
 
