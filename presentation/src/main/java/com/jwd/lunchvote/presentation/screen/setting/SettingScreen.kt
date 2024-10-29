@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.screen.MainActivity
 import com.jwd.lunchvote.presentation.screen.setting.SettingContract.SettingEvent
 import com.jwd.lunchvote.presentation.screen.setting.SettingContract.SettingSideEffect
 import com.jwd.lunchvote.presentation.screen.setting.SettingContract.SettingState
@@ -90,6 +91,7 @@ fun SettingRoute(
 private fun SettingScreen(
   state: SettingState,
   modifier: Modifier = Modifier,
+  context: Context = LocalContext.current,
   onEvent: (SettingEvent) -> Unit = {}
 ) {
   Screen(
@@ -110,22 +112,18 @@ private fun SettingScreen(
     }
     SettingBlock(name = stringResource(R.string.setting_service)) {
       SettingItem(
-        name = stringResource(R.string.setting_alert),
-        onClickItem = { onEvent(SettingEvent.OnClickAlertSettingButton) }
-      )
-      SettingItem(
         name = stringResource(R.string.setting_contact),
         onClickItem = { onEvent(SettingEvent.OnClickContactButton) }
+      )
+      SettingItem(
+        name = stringResource(R.string.setting_suggest),
+        onClickItem = { onEvent(SettingEvent.OnClickSuggestButton(context as MainActivity)) }
       )
     }
     SettingBlock(name = stringResource(R.string.setting_app_config)) {
       SettingItem(
         name = stringResource(R.string.setting_notice_and_terms),
-        onClickItem = { onEvent(SettingEvent.OnClickNoticeButton) }
-      )
-      SettingItem(
-        name = stringResource(R.string.setting_suggest),
-        onClickItem = { onEvent(SettingEvent.OnClickSuggestButton) }
+        onClickItem = { onEvent(SettingEvent.OnClickPolicyButton(context as MainActivity)) }
       )
       Row(
         modifier = Modifier

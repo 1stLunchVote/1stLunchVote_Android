@@ -12,11 +12,6 @@ class StorageDataSourceImpl @Inject constructor(
   private val dispatcher: CoroutineDispatcher
 ) : StorageDataSource {
 
-  companion object {
-    const val STORAGE_REFERENCE_FOOD = "Food"
-    const val STORAGE_REFERENCE_PROFILE = "Profile"
-  }
-
   override suspend fun uploadFoodImage(
     foodName: String,
     image: ByteArray
@@ -61,4 +56,21 @@ class StorageDataSourceImpl @Inject constructor(
         .await()
         .toString()
     }
+
+  override suspend fun getPrivacyPolicyUri(): String =
+    withContext(dispatcher) {
+      storage
+        .reference
+        .child(STORAGE_REFERENCE_POLICY)
+        .child("Privacy Policy.html")
+        .downloadUrl
+        .await()
+        .toString()
+    }
+
+  companion object {
+    const val STORAGE_REFERENCE_FOOD = "Food"
+    const val STORAGE_REFERENCE_PROFILE = "Profile"
+    const val STORAGE_REFERENCE_POLICY = "Policy"
+  }
 }

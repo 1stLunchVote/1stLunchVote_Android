@@ -1,10 +1,13 @@
 package com.jwd.lunchvote.presentation.screen.setting
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.domain.repository.StorageRepository
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.screen.setting.SettingContract.SettingEvent
 import com.jwd.lunchvote.presentation.screen.setting.SettingContract.SettingReduce
@@ -17,6 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingViewModel @Inject constructor(
+  private val storageRepository: StorageRepository,
   savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<SettingState, SettingEvent, SettingReduce, SettingSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): SettingState {
@@ -29,10 +33,20 @@ class SettingViewModel @Inject constructor(
 
       is SettingEvent.OnClickBackButton -> sendSideEffect(SettingSideEffect.PopBackStack)
       is SettingEvent.OnClickProfileButton -> sendSideEffect(SettingSideEffect.NavigateToProfile)
-      is SettingEvent.OnClickAlertSettingButton -> sendSideEffect(SettingSideEffect.ShowSnackbar(UiText.DynamicString("알림 설정")))
       is SettingEvent.OnClickContactButton -> sendSideEffect(SettingSideEffect.NavigateToContactList)
-      is SettingEvent.OnClickNoticeButton -> sendSideEffect(SettingSideEffect.ShowSnackbar(UiText.DynamicString("공지사항 및 이용약관")))
-      is SettingEvent.OnClickSuggestButton -> sendSideEffect(SettingSideEffect.ShowSnackbar(UiText.DynamicString("개선 제안하기")))
+      is SettingEvent.OnClickSuggestButton -> {
+        val intent = Intent(Intent.ACTION_SENDTO).apply {
+          data = Uri.parse("mailto:shrimp0266@gmail.com") // 이메일 주소
+        }
+        event.activity.startActivity(intent)
+      }
+      is SettingEvent.OnClickPolicyButton -> launch {
+        val uri = storageRepository.getPrivacyPolicyUri()
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+          data = Uri.parse(uri)
+        }
+        event.activity.startActivity(intent)
+      }
       is SettingEvent.OnClickLogoutButton -> launch { logout() }
     }
   }

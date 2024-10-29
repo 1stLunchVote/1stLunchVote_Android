@@ -16,4 +16,7 @@ class StorageRepositoryImpl @Inject constructor(
 
   override suspend fun uploadProfileImage(userId: String, image: ByteArray): String =
     storageDataSource.uploadProfileImage(userId, image)
+
+  override suspend fun getPrivacyPolicyUri(): String =
+    storageDataSource.getPrivacyPolicyUri()
 }
