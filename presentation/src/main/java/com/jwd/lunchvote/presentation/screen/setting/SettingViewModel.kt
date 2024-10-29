@@ -36,7 +36,7 @@ class SettingViewModel @Inject constructor(
       is SettingEvent.OnClickContactButton -> sendSideEffect(SettingSideEffect.NavigateToContactList)
       is SettingEvent.OnClickSuggestButton -> {
         val intent = Intent(Intent.ACTION_SENDTO).apply {
-          data = Uri.parse("mailto:shrimp0266@gmail.com") // 이메일 주소
+          data = Uri.parse("mailto:shrimp0266@gmail.com")
         }
         event.activity.startActivity(intent)
       }
@@ -47,7 +47,7 @@ class SettingViewModel @Inject constructor(
         }
         event.activity.startActivity(intent)
       }
-      is SettingEvent.OnClickLogoutButton -> launch { logout() }
+      is SettingEvent.OnClickLogoutButton -> logout()
     }
   }
 
