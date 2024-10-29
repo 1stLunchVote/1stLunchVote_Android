@@ -51,11 +51,15 @@ class TemplateListViewModel @Inject constructor(
 
       // DialogEvents
       is TemplateListEvent.OnTemplateNameChange -> updateState(TemplateListReduce.UpdateTemplateName(event.templateName))
-      is TemplateListEvent.OnClickDismissButtonAddDialog -> sendSideEffect(TemplateListSideEffect.CloseDialog)
+      is TemplateListEvent.OnClickDismissButtonAddDialog -> {
+        sendSideEffect(TemplateListSideEffect.CloseDialog)
+        updateState(TemplateListReduce.UpdateTemplateName(null))
+      }
       is TemplateListEvent.OnClickConfirmButtonAddDialog -> {
         val templateName = currentState.templateName ?: return
 
         sendSideEffect(TemplateListSideEffect.CloseDialog)
+        updateState(TemplateListReduce.UpdateTemplateName(null))
         sendSideEffect(TemplateListSideEffect.NavigateToAddTemplate(templateName))
       }
     }
