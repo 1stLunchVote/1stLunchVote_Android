@@ -53,6 +53,7 @@ class NicknameViewModel @Inject constructor(
   override fun handleErrors(error: Throwable) {
     when (error) {
       is FirebaseAuthUserCollisionException -> sendSideEffect(NicknameSideEffect.ShowSnackbar(UiText.StringResource(R.string.nickname_email_collision_error_snackbar)))
+      is UserError.DuplicatedName -> sendSideEffect(NicknameSideEffect.ShowSnackbar(UiText.StringResource(R.string.nickname_name_collision_error_snackbar)))
       else -> sendSideEffect(NicknameSideEffect.ShowSnackbar(UiText.ErrorString(error)))
     }
   }
