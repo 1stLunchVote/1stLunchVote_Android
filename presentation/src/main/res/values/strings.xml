@@ -237,11 +237,10 @@
     <string name="setting_my_info">내 정보</string>
     <string name="setting_my_profile">내 프로필</string>
     <string name="setting_service">서비스 이용</string>
-    <string name="setting_alert">알림 설정</string>
     <string name="setting_contact">1:1 문의</string>
+    <string name="setting_suggest">개선 제안하기</string>
     <string name="setting_app_config">앱 설정</string>
     <string name="setting_notice_and_terms">공지사항 및 이용약관</string>
-    <string name="setting_suggest">개선 제안하기</string>
     <string name="setting_app_version">앱 버전</string>
     <string name="setting_app_version_failed">버전 정보를 가져올 수 없습니다.</string>
     <string name="setting_logout">로그아웃</string>

@@ -1,5 +1,6 @@
 package com.jwd.lunchvote.presentation.screen.setting
 
+import android.app.Activity
 import android.os.Parcelable
 import com.jwd.lunchvote.core.ui.base.ViewModelContract
 import com.jwd.lunchvote.presentation.util.UiText
@@ -18,10 +19,9 @@ class SettingContract {
 
     data object OnClickBackButton: SettingEvent
     data object OnClickProfileButton: SettingEvent
-    data object OnClickAlertSettingButton: SettingEvent
     data object OnClickContactButton: SettingEvent
-    data object OnClickNoticeButton: SettingEvent
-    data object OnClickSuggestButton: SettingEvent
+    data class OnClickSuggestButton(val activity: Activity): SettingEvent
+    data class OnClickPolicyButton(val activity: Activity): SettingEvent
     data object OnClickLogoutButton: SettingEvent
   }
 

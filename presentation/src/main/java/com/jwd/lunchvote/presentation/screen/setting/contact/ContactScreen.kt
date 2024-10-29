@@ -1,6 +1,7 @@
 package com.jwd.lunchvote.presentation.screen.setting.contact
 
 import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -183,7 +184,7 @@ private fun ReplyBox(
   Column(
     modifier = modifier
       .fillMaxWidth()
-      .border(1.dp, MaterialTheme.colorScheme.onBackground, RoundedCornerShape(16.dp))
+      .background(MaterialTheme.colorScheme.surfaceDim, RoundedCornerShape(16.dp))
       .padding(18.dp),
     verticalArrangement = Arrangement.spacedBy(16.dp),
     horizontalAlignment = Alignment.CenterHorizontally
@@ -204,7 +205,9 @@ private fun ReplyBox(
         style = MaterialTheme.typography.labelSmall
       )
     }
-    HorizontalDivider()
+    HorizontalDivider(
+      color = MaterialTheme.colorScheme.background,
+    )
     Text(
       text = reply.content,
       modifier = Modifier.fillMaxWidth()
