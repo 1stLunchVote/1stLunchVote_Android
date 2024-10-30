@@ -47,7 +47,6 @@ class LoginViewModel @Inject constructor(
       is LoginEvent.OnClickEmailLoginButton -> launch { emailLogin() }
       is LoginEvent.OnClickRegisterButton -> sendSideEffect(LoginSideEffect.NavigateToEmailVerification)
       is LoginEvent.OnClickKakaoLoginButton -> sendSideEffect(LoginSideEffect.LaunchKakaoLogin)
-      is LoginEvent.OnClickGoogleLoginButton -> sendSideEffect(LoginSideEffect.LaunchGoogleLogin)
       is LoginEvent.ProcessKakaoLogin -> kakaoLogin(event.oAuthToken)
       is LoginEvent.ProcessGoogleLogin -> launch { googleLogin(event.credential) }
     }

@@ -1,9 +1,6 @@
 package com.jwd.lunchvote.presentation.screen.login
 
-import android.app.Activity
 import android.content.Context
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,14 +33,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.credentials.CredentialManager
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.firebase.auth.FirebaseAuth
-import com.jwd.lunchvote.presentation.BuildConfig
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.screen.login.LoginContract.LoginEvent
 import com.jwd.lunchvote.presentation.screen.login.LoginContract.LoginSideEffect
@@ -53,7 +45,6 @@ import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.util.login
 import com.jwd.lunchvote.presentation.util.loginWithGoogleCredential
 import com.jwd.lunchvote.presentation.widget.Gap
-import com.jwd.lunchvote.presentation.widget.GoogleLoginButton
 import com.jwd.lunchvote.presentation.widget.KakaoLoginButton
 import com.jwd.lunchvote.presentation.widget.LoginButtonSize
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
@@ -167,7 +158,6 @@ private fun LoginScreen(
       Gap(minHeight = 64.dp)
       SocialLoginButtons(
         onClickKakaoLoginButton = { onEvent(LoginEvent.OnClickKakaoLoginButton) },
-        onClickGoogleLoginButton = { onEvent(LoginEvent.OnClickGoogleLoginButton) },
         loading = loading,
         modifier = Modifier
           .height(IntrinsicSize.Max)
@@ -272,7 +262,6 @@ private fun RegisterRow(
 @Composable
 private fun SocialLoginButtons(
   onClickKakaoLoginButton: () -> Unit,
-  onClickGoogleLoginButton: () -> Unit,
   loading: Boolean,
   modifier: Modifier = Modifier
 ) {

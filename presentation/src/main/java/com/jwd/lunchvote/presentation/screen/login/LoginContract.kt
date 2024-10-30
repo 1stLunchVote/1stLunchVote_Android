@@ -23,7 +23,6 @@ class LoginContract {
     data object OnClickEmailLoginButton : LoginEvent
     data object OnClickRegisterButton : LoginEvent
     data object OnClickKakaoLoginButton : LoginEvent
-    data object OnClickGoogleLoginButton : LoginEvent
     data class ProcessKakaoLogin(val oAuthToken: OAuthToken) : LoginEvent
     data class ProcessGoogleLogin(val credential: GoogleIdTokenCredential) : LoginEvent
   }
