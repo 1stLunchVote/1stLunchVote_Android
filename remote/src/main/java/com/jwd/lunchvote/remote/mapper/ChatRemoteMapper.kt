@@ -1,6 +1,6 @@
 package com.jwd.lunchvote.remote.mapper
 
-import kr.co.inbody.library.mapper.BiMapper
+import com.jwd.lunchvote.mapper.BiMapper
 import com.jwd.lunchvote.data.model.ChatData
 import com.jwd.lunchvote.remote.model.ChatRemote
 import kr.co.inbody.config.error.ChatError

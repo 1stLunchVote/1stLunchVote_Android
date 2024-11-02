@@ -1,8 +1,8 @@
 package com.jwd.lunchvote.data.mapper
 
-import kr.co.inbody.library.mapper.BiMapper
 import com.jwd.lunchvote.data.model.ContactData
 import com.jwd.lunchvote.domain.entity.Contact
+import com.jwd.lunchvote.mapper.BiMapper
 
 private object ContactDataMapper : BiMapper<ContactData, Contact> {
   override fun mapToRight(from: ContactData): Contact =
@@ -28,8 +28,7 @@ private object ContactDataMapper : BiMapper<ContactData, Contact> {
     )
 }
 
-private object ContactDataTypeMapper :
-  BiMapper<ContactData.Category, Contact.Category> {
+private object ContactDataTypeMapper : BiMapper<ContactData.Category, Contact.Category> {
   override fun mapToRight(from: ContactData.Category): Contact.Category =
     when (from) {
       ContactData.Category.ACCOUNT -> Contact.Category.ACCOUNT

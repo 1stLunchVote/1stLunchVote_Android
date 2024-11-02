@@ -1,8 +1,8 @@
 package com.jwd.lunchvote.data.mapper
 
-import kr.co.inbody.library.mapper.BiMapper
 import com.jwd.lunchvote.data.model.ContactReplyData
 import com.jwd.lunchvote.domain.entity.ContactReply
+import com.jwd.lunchvote.mapper.BiMapper
 
 private object ContactReplyDataMapper : BiMapper<ContactReplyData, ContactReply> {
   override fun mapToRight(from: ContactReplyData): ContactReply =

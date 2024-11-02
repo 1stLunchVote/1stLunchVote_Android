@@ -1,6 +1,6 @@
 package com.jwd.lunchvote.remote.mapper
 
-import kr.co.inbody.library.mapper.BiMapper
+import com.jwd.lunchvote.mapper.BiMapper
 import com.jwd.lunchvote.data.model.MemberData
 import com.jwd.lunchvote.remote.model.MemberRemote
 import kr.co.inbody.config.error.MemberError
@@ -30,8 +30,7 @@ private object MemberRemoteMapper : BiMapper<MemberRemote, MemberData> {
     )
 }
 
-private object MemberRemoteTypeMapper :
-  BiMapper<String, MemberData.Type> {
+private object MemberRemoteTypeMapper : BiMapper<String, MemberData.Type> {
   override fun mapToRight(from: String): MemberData.Type =
     when (from) {
       MemberRemote.TYPE_DEFAULT -> MemberData.Type.DEFAULT
@@ -52,8 +51,7 @@ private object MemberRemoteTypeMapper :
     }
 }
 
-private object MemberRemoteStatusMapper :
-  BiMapper<String, MemberData.Status> {
+private object MemberRemoteStatusMapper : BiMapper<String, MemberData.Status> {
   override fun mapToRight(from: String): MemberData.Status =
     when (from) {
       MemberRemote.STATUS_STANDBY -> MemberData.Status.STANDBY

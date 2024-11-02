@@ -1,6 +1,6 @@
 package com.jwd.lunchvote.remote.mapper
 
-import kr.co.inbody.library.mapper.BiMapper
+import com.jwd.lunchvote.mapper.BiMapper
 import com.jwd.lunchvote.data.model.LoungeData
 import com.jwd.lunchvote.remote.model.LoungeRemote
 import kr.co.inbody.config.error.LoungeError
@@ -30,8 +30,7 @@ private object LoungeRemoteMapper: BiMapper<LoungeRemote, LoungeData> {
     )
 }
 
-private object LoungeRemoteStatusMapper :
-  BiMapper<String, LoungeData.Status> {
+private object LoungeRemoteStatusMapper : BiMapper<String, LoungeData.Status> {
   override fun mapToRight(from: String): LoungeData.Status =
     when (from) {
       LoungeRemote.STATUS_CREATED -> LoungeData.Status.CREATED

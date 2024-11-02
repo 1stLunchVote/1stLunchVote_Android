@@ -1,8 +1,8 @@
 package com.jwd.lunchvote.data.mapper
 
-import kr.co.inbody.library.mapper.BiMapper
 import com.jwd.lunchvote.data.model.FriendData
 import com.jwd.lunchvote.domain.entity.Friend
+import com.jwd.lunchvote.mapper.BiMapper
 
 private object FriendDataMapper : BiMapper<FriendData, Friend> {
   override fun mapToRight(from: FriendData): Friend =

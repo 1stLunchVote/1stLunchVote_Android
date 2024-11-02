@@ -1,6 +1,6 @@
 package com.jwd.lunchvote.remote.mapper
 
-import kr.co.inbody.library.mapper.BiMapper
+import com.jwd.lunchvote.mapper.BiMapper
 import com.jwd.lunchvote.data.model.ContactData
 import com.jwd.lunchvote.remote.model.ContactRemote
 import com.jwd.lunchvote.remote.util.toLong
@@ -29,8 +29,7 @@ private object ContactRemoteMapper : BiMapper<ContactRemote, ContactData> {
     )
 }
 
-private object ContactRemoteCategoryMapper :
-  BiMapper<String, ContactData.Category> {
+private object ContactRemoteCategoryMapper : BiMapper<String, ContactData.Category> {
   override fun mapToRight(from: String): ContactData.Category =
     when (from) {
       ContactRemote.CATEGORY_ACCOUNT -> ContactData.Category.ACCOUNT
