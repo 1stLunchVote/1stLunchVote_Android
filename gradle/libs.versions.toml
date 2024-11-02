@@ -49,12 +49,6 @@ credentialsPlayServices = "1.3.0"
 identify = "20231002"
 identifyGoogleid = "1.1.1"
 
-retrofit = "2.9.0"
-okHttp = "4.12.0"
-
-room = "2.6.1"
-dataStore = "1.1.1"
-
 coil = "2.5.0"
 coilLandscapist = "2.2.13"
 

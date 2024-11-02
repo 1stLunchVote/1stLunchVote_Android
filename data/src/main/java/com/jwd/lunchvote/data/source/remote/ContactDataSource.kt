@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.data.source
+package com.jwd.lunchvote.data.source.remote
 
 import com.jwd.lunchvote.data.model.ContactData
 import com.jwd.lunchvote.data.model.ContactReplyData

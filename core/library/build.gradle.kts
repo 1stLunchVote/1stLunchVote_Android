@@ -1,5 +1,5 @@
 plugins {
-  id("java-library")
+  id(libs.plugins.library.java.get().pluginId)
   alias(libs.plugins.jvm)
 }
 

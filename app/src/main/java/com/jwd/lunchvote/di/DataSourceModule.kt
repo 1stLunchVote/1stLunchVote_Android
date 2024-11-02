@@ -1,6 +1,6 @@
 package com.jwd.lunchvote.di
 
-import com.jwd.lunchvote.data.source.ContactDataSource
+import com.jwd.lunchvote.data.source.remote.ContactDataSource
 import com.jwd.lunchvote.data.source.local.PreferenceDataSource
 import com.jwd.lunchvote.data.source.remote.BallotDataSource
 import com.jwd.lunchvote.data.source.remote.ChatDataSource
@@ -122,17 +122,3 @@ internal abstract class DataSourceModule {
     source: VoteResultDataSourceImpl
   ): VoteResultDataSource
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

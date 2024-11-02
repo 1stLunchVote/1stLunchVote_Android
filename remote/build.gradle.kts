@@ -39,6 +39,7 @@ dependencies {
   implementation(project(":core:config"))
 
   implementation(libs.bundles.android)
+  implementation(libs.bundles.test)
 
   implementation(libs.bundles.hilt)
   ksp(libs.bundles.hilt.compiler)

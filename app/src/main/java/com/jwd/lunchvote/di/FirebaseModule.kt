@@ -15,14 +15,14 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 internal object FirebaseModule {
+
   @Provides
   @Singleton
   fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
 
   @Provides
   @Singleton
-  fun provideFirebaseFunctions(): FirebaseFunctions =
-    FirebaseFunctions.getInstance("asia-northeast3")
+  fun provideFirebaseFunctions(): FirebaseFunctions = FirebaseFunctions.getInstance("asia-northeast3")
 
   @Provides
   @Singleton

@@ -2,7 +2,7 @@ package com.jwd.lunchvote.data.repository
 
 import com.jwd.lunchvote.data.mapper.asData
 import com.jwd.lunchvote.data.mapper.asDomain
-import com.jwd.lunchvote.data.source.ContactDataSource
+import com.jwd.lunchvote.data.source.remote.ContactDataSource
 import com.jwd.lunchvote.domain.entity.Contact
 import com.jwd.lunchvote.domain.entity.ContactReply
 import com.jwd.lunchvote.domain.repository.ContactRepository

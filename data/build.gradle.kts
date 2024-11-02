@@ -34,23 +34,15 @@ android {
 }
 
 dependencies {
-  implementation(project(":domain"))
-  implementation(project(":core:library"))
   implementation(project(":core:config"))
+  implementation(project(":core:library"))
+  implementation(project(":domain"))
+
+  implementation(libs.timber)
 
   implementation(libs.bundles.android)
   implementation(libs.bundles.test)
 
   implementation(libs.bundles.hilt)
   ksp(libs.bundles.hilt.compiler)
-
-  implementation(libs.bundles.coroutines)
-
-  implementation(platform(libs.compose))
-  implementation(libs.bundles.compose)
-
-  implementation(platform(libs.firebase))
-  implementation(libs.bundles.firebase)
-
-  implementation(libs.timber)
 }

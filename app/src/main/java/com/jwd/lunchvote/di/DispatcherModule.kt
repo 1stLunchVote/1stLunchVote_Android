@@ -11,21 +11,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 internal object DispatcherModule {
-    @Provides
-    @Singleton
-    fun providesIODispatcher(): CoroutineDispatcher = Dispatchers.IO
-
-//    @Provides
-//    @Singleton
-//    @Dispatcher(LunchVoteDispatcher.Default)
-//    fun providesDefaultDispatcher() = Dispatchers.Default
+  @Provides
+  @Singleton
+  fun providesIODispatcher(): CoroutineDispatcher = Dispatchers.IO
 }
-//
-//@Qualifier
-//@Retention(AnnotationRetention.RUNTIME)
-//annotation class Dispatcher(val dispatcher: LunchVoteDispatcher)
-//
-//enum class LunchVoteDispatcher {
-//    Default,
-//    IO,
-//}

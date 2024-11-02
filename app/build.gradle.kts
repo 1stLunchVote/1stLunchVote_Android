@@ -58,12 +58,13 @@ android {
 }
 
 dependencies {
-  implementation(project(":core:config"))
   implementation(project(":domain"))
   implementation(project(":presentation"))
   implementation(project(":data"))
   implementation(project(":local"))
   implementation(project(":remote"))
+
+  implementation(libs.timber)
 
   implementation(libs.bundles.android)
   implementation(libs.bundles.test)
@@ -71,14 +72,6 @@ dependencies {
   implementation(libs.bundles.hilt)
   ksp(libs.bundles.hilt.compiler)
 
-  implementation(libs.bundles.coroutines)
-
-  implementation(platform(libs.compose))
-  implementation(libs.bundles.compose)
-
-  implementation(libs.bundles.coil)
-
-  implementation(libs.timber)
   implementation(libs.kakao)
 
   implementation(platform(libs.firebase))

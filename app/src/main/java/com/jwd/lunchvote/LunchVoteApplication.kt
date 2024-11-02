@@ -21,14 +21,13 @@ class LunchVoteApplication : Application(), Configuration.Provider {
   override fun onCreate() {
     super.onCreate()
 
-    FirebaseApp.initializeApp(applicationContext)
-    KakaoSdk.init(applicationContext, BuildConfig.KAKAO_NATIVE_APP_KEY)
-
     if (BuildConfig.DEBUG) {
       Timber.plant(Timber.DebugTree())
       Timber.tag("keyHash").e(Utility.getKeyHash(applicationContext))
     }
 
+    FirebaseApp.initializeApp(applicationContext)
+    KakaoSdk.init(applicationContext, BuildConfig.KAKAO_NATIVE_APP_KEY)
     Connection.initialize(this)
     WorkManager.initialize(this, workManagerConfiguration)
   }
