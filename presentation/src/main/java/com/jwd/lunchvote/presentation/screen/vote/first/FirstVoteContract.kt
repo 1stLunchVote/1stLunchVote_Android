@@ -1,7 +1,7 @@
 package com.jwd.lunchvote.presentation.screen.vote.first
 
 import android.os.Parcelable
-import com.jwd.lunchvote.core.ui.base.ViewModelContract
+import com.jwd.lunchvote.presentation.base.ViewModelContract
 import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.LoungeUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel

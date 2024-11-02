@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.core.ui.theme
+package com.jwd.lunchvote.presentation.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable

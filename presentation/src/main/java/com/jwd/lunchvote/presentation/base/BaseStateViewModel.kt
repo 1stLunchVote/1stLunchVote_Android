@@ -1,13 +1,13 @@
-package com.jwd.lunchvote.core.ui.base
+package com.jwd.lunchvote.presentation.base
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jwd.lunchvote.core.ui.base.ViewModelContract.Event
-import com.jwd.lunchvote.core.ui.base.ViewModelContract.Reduce
-import com.jwd.lunchvote.core.ui.base.ViewModelContract.SideEffect
-import com.jwd.lunchvote.core.ui.base.ViewModelContract.State
+import com.jwd.lunchvote.presentation.base.ViewModelContract.Event
+import com.jwd.lunchvote.presentation.base.ViewModelContract.Reduce
+import com.jwd.lunchvote.presentation.base.ViewModelContract.SideEffect
+import com.jwd.lunchvote.presentation.base.ViewModelContract.State
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job

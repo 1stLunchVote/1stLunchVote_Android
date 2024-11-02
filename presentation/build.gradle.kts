@@ -53,8 +53,6 @@ android {
 dependencies {
   implementation(project(":core:library"))
   implementation(project(":core:config"))
-  implementation(project(":core:ui"))
-  implementation(project(":core:test"))
   implementation(project(":domain"))
   implementation(project(":data"))
   implementation(project(":local"))

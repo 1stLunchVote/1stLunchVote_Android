@@ -1,7 +1,7 @@
 package com.jwd.lunchvote.presentation.screen.lounge.setting
 
 import android.os.Parcelable
-import com.jwd.lunchvote.core.ui.base.ViewModelContract
+import com.jwd.lunchvote.presentation.base.ViewModelContract
 import com.jwd.lunchvote.presentation.model.LoungeUIModel
 import com.jwd.lunchvote.presentation.util.UiText
 import kotlinx.parcelize.Parcelize

@@ -18,7 +18,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
-import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
+import com.jwd.lunchvote.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 
@@ -106,11 +106,9 @@ fun PasswordInvisibleIcon(
 @Preview(showBackground = true)
 @Composable
 private fun DefaultTextFieldPreview() {
-  LunchVoteTheme {
+  com.jwd.lunchvote.theme.LunchVoteTheme {
     LunchVoteTextField(
-      text = "",
-      onTextChange = {},
-      hintText = "hint"
+      text = "", onTextChange = {}, hintText = "hint"
     )
   }
 }
@@ -118,30 +116,20 @@ private fun DefaultTextFieldPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun SearchTextFieldPreview() {
-  LunchVoteTheme {
-    LunchVoteTextField(
-      text = "",
-      onTextChange = {},
-      hintText = "hint",
-      leadingIcon = {
-        SearchIcon()
-      }
-    )
+  com.jwd.lunchvote.theme.LunchVoteTheme {
+    LunchVoteTextField(text = "", onTextChange = {}, hintText = "hint", leadingIcon = {
+      SearchIcon()
+    })
   }
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun PasswordTextFieldPreview() {
-  LunchVoteTheme {
-    LunchVoteTextField(
-      text = "",
-      onTextChange = {},
-      hintText = "hint",
-      trailingIcon = {
-        PasswordVisibleIcon({})
-      },
-      visualTransformation = PasswordVisualTransformation()
+  com.jwd.lunchvote.theme.LunchVoteTheme {
+    LunchVoteTextField(text = "", onTextChange = {}, hintText = "hint", trailingIcon = {
+      PasswordVisibleIcon({})
+    }, visualTransformation = PasswordVisualTransformation()
     )
   }
 }

@@ -26,7 +26,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
+import com.jwd.lunchvote.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavHost
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
 import com.jwd.lunchvote.presentation.navigation.route
@@ -62,23 +62,19 @@ class MainActivity: ComponentActivity() {
       else -> LunchVoteNavRoute.Login.route
     }
 
-    LunchVoteTheme {
+    com.jwd.lunchvote.theme.LunchVoteTheme {
       Surface(
         modifier = Modifier.fillMaxSize()
       ) {
         val connectionState by Connection.connectionState.collectAsStateWithLifecycle()
         if (connectionState == LOST) NetworkLostDialog { finish() }
 
-        Scaffold(
-          snackbarHost = { SnackbarHost(snackbarHostState) }
-        ) { padding ->
+        Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { padding ->
           val snackbarChannel: Channel<String> = Channel()
           LaunchedEffect(snackbarChannel) {
-            snackbarChannel.receiveAsFlow()
-              .collectLatest { message ->
+            snackbarChannel.receiveAsFlow().collectLatest { message ->
                 snackbarHostState.showSnackbar(
-                  message = message,
-                  withDismissAction = true
+                  message = message, withDismissAction = true
                 )
               }
           }

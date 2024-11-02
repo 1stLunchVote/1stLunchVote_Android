@@ -4,7 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.Parcelable
 import androidx.core.net.toUri
-import com.jwd.lunchvote.core.ui.base.ViewModelContract
+import com.jwd.lunchvote.presentation.base.ViewModelContract
 import com.jwd.lunchvote.presentation.model.UserUIModel
 import com.jwd.lunchvote.presentation.util.UiText
 import kotlinx.parcelize.Parcelize

@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
+import com.jwd.lunchvote.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 
 @Composable
@@ -47,7 +47,7 @@ fun VoteExitDialog(
 @Preview
 @Composable
 private fun Preview1() {
-  LunchVoteTheme {
+  com.jwd.lunchvote.theme.LunchVoteTheme {
     VoteExitDialog(isOwner = true)
   }
 }
@@ -55,7 +55,7 @@ private fun Preview1() {
 @Preview
 @Composable
 private fun Preview2() {
-  LunchVoteTheme {
+  com.jwd.lunchvote.theme.LunchVoteTheme {
     VoteExitDialog(isOwner = false)
   }
 }

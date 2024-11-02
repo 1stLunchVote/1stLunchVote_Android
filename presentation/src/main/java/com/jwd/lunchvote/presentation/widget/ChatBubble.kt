@@ -23,7 +23,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
+import com.jwd.lunchvote.theme.LunchVoteTheme
 import com.jwd.lunchvote.domain.entity.Chat
 import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.entity.Member.Type.READY
@@ -213,85 +213,48 @@ private fun ChatBubblePreview() {
 
   val chatBuilder = Chat.Builder("")
 
-  LunchVoteTheme {
+  com.jwd.lunchvote.theme.LunchVoteTheme {
     Column(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(24.dp),
+      modifier = Modifier.fillMaxWidth().padding(24.dp),
       verticalArrangement = Arrangement.spacedBy(16.dp),
       horizontalAlignment = Alignment.CenterHorizontally
     ) {
       ChatBubble(
-        chat = chatBuilder
-          .create()
-          .build()
-          .asUI()
+        chat = chatBuilder.create().build().asUI()
       )
       ChatBubble(
-        chat = chatBuilder
-          .setUserId(user2.id)
-          .join()
-          .build()
-          .asUI(),
-        member = member2.asUI()
+        chat = chatBuilder.setUserId(user2.id).join().build().asUI(), member = member2.asUI()
       )
       ChatBubble(
-        chat = chatBuilder
-          .setUserId(user2.id)
-          .setMessage("안녕하세요")
-          .build()
-          .asUI(),
+        chat = chatBuilder.setUserId(user2.id).setMessage("안녕하세요").build().asUI(),
         member = member2.asUI(),
         isMine = false
       )
       ChatBubble(
-        chat = chatBuilder
-          .setUserId(user2.id)
-          .join()
-          .build()
-          .asUI(),
-        member = member2.asUI()
+        chat = chatBuilder.setUserId(user2.id).join().build().asUI(), member = member2.asUI()
       )
       ChatBubble(
-        chat = chatBuilder
-          .setUserId(user3.id)
-          .setMessage("안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요")
-          .build()
-          .asUI(),
+        chat = chatBuilder.setUserId(user3.id)
+          .setMessage("안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요").build().asUI(),
         member = member3.asUI(),
         isMine = false
       )
       ChatBubble(
-        chat = chatBuilder
-          .setUserId(user1.id)
-          .setMessage("안녕하세요")
-          .build()
-          .asUI(),
+        chat = chatBuilder.setUserId(user1.id).setMessage("안녕하세요").build().asUI(),
         member = member1.asUI(),
         isMine = true
       )
       ChatBubble(
-        chat = chatBuilder
-          .setUserId(user1.id)
-          .setMessage("안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요")
-          .build()
-          .asUI(),
+        chat = chatBuilder.setUserId(user1.id)
+          .setMessage("안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요").build().asUI(),
         member = member1.asUI(),
         isMine = true
       )
       ChatBubble(
-        chat = chatBuilder
-          .setUserId(user3.id)
-          .exile()
-          .build()
-          .asUI(),
-        member = member3.asUI()
+        chat = chatBuilder.setUserId(user3.id).exile().build().asUI(), member = member3.asUI()
       )
       ChatBubble(
-        chat = chatBuilder
-          .setMinLikeFoods(5)
-          .build()
-          .asUI()
+        chat = chatBuilder.setMinLikeFoods(5).build().asUI()
       )
     }
   }

@@ -17,8 +17,6 @@ rootProject.name = "LunchVote"
 include ':app'
 include ':data'
 include ':domain'
-include ':core:ui'
-include ':core:test'
 include ':local'
 include ':remote'
 include ':presentation'

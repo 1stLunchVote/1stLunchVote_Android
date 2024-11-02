@@ -32,7 +32,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
+import com.jwd.lunchvote.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.util.FlickerAnimation
 
@@ -126,15 +126,12 @@ private fun LunchVoteRefreshIndicator(
 @Preview
 @Composable
 private fun Preview() {
-  LunchVoteTheme {
+  com.jwd.lunchvote.theme.LunchVoteTheme {
     Surface {
-      LazyColumn(
-        onRefresh = {}
-      ) {
+      LazyColumn(onRefresh = {}) {
         items(10) {
           Text(
-            text = "하이!",
-            modifier = Modifier.fillMaxSize()
+            text = "하이!", modifier = Modifier.fillMaxSize()
           )
         }
       }

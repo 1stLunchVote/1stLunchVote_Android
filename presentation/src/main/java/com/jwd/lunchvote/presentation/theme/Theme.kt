@@ -1,0 +1,15 @@
+package com.jwd.lunchvote.presentation.theme
+
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+
+@Composable
+fun LunchVoteTheme(
+  content: @Composable () -> Unit
+) {
+  MaterialTheme(
+    colorScheme = lunchVoteColorScheme(),
+    typography = nanumSquareTypography,
+    content = content
+  )
+}

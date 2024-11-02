@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.core.ui.theme
+package com.jwd.lunchvote.presentation.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
@@ -6,7 +6,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.jwd.lunchvote.core.ui.R
+import com.jwd.lunchvote.presentation.R
 
 val nanumSquareFontFamily = FontFamily(
   Font(R.font.nanumsquareneo_regular),

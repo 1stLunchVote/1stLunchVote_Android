@@ -28,7 +28,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
-import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
+import com.jwd.lunchvote.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 
 @Composable
@@ -135,24 +135,18 @@ enum class LoginButtonSize(val scale: Float) {
 @Preview(showBackground = true)
 @Composable
 private fun KakaoLoginButtonPreview() {
-  LunchVoteTheme {
+  com.jwd.lunchvote.theme.LunchVoteTheme {
     Column(
       verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
       KakaoLoginButton(
-        onClick = {},
-        modifier = Modifier.width(200.dp),
-        size = LoginButtonSize.Small
+        onClick = {}, modifier = Modifier.width(200.dp), size = LoginButtonSize.Small
       )
       KakaoLoginButton(
-        onClick = {},
-        modifier = Modifier.width(300.dp),
-        size = LoginButtonSize.Medium
+        onClick = {}, modifier = Modifier.width(300.dp), size = LoginButtonSize.Medium
       )
       KakaoLoginButton(
-        onClick = {},
-        modifier = Modifier.width(400.dp),
-        size = LoginButtonSize.Big
+        onClick = {}, modifier = Modifier.width(400.dp), size = LoginButtonSize.Big
       )
     }
   }
@@ -161,24 +155,18 @@ private fun KakaoLoginButtonPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun GoogleLoginButtonPreview() {
-  LunchVoteTheme {
+  com.jwd.lunchvote.theme.LunchVoteTheme {
     Column(
       verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
       GoogleLoginButton(
-        onClick = {},
-        modifier = Modifier.width(200.dp),
-        size = LoginButtonSize.Small
+        onClick = {}, modifier = Modifier.width(200.dp), size = LoginButtonSize.Small
       )
       GoogleLoginButton(
-        onClick = {},
-        modifier = Modifier.width(300.dp),
-        size = LoginButtonSize.Medium
+        onClick = {}, modifier = Modifier.width(300.dp), size = LoginButtonSize.Medium
       )
       GoogleLoginButton(
-        onClick = {},
-        modifier = Modifier.width(400.dp),
-        size = LoginButtonSize.Big
+        onClick = {}, modifier = Modifier.width(400.dp), size = LoginButtonSize.Big
       )
     }
   }
