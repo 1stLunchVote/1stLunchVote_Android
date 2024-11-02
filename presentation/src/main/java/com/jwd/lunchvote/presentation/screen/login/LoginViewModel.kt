@@ -5,7 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.FirebaseAuthException
-import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.usecase.GenerateName
 import com.jwd.lunchvote.domain.usecase.SignInWithEmailAndPassword
@@ -47,7 +47,6 @@ class LoginViewModel @Inject constructor(
       is LoginEvent.OnClickEmailLoginButton -> launch { emailLogin() }
       is LoginEvent.OnClickRegisterButton -> sendSideEffect(LoginSideEffect.NavigateToEmailVerification)
       is LoginEvent.OnClickKakaoLoginButton -> sendSideEffect(LoginSideEffect.LaunchKakaoLogin)
-      is LoginEvent.OnClickGoogleLoginButton -> sendSideEffect(LoginSideEffect.LaunchGoogleLogin)
       is LoginEvent.ProcessKakaoLogin -> kakaoLogin(event.oAuthToken)
       is LoginEvent.ProcessGoogleLogin -> launch { googleLogin(event.credential) }
     }

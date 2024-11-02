@@ -1,7 +1,7 @@
 package com.jwd.lunchvote.presentation.screen.friends.request
 
 import android.os.Parcelable
-import com.jwd.lunchvote.core.ui.base.ViewModelContract
+import com.jwd.lunchvote.presentation.base.ViewModelContract
 import com.jwd.lunchvote.presentation.model.FriendUIModel
 import com.jwd.lunchvote.presentation.model.UserUIModel
 import com.jwd.lunchvote.presentation.util.UiText

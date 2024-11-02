@@ -1,8 +1,8 @@
 package com.jwd.lunchvote.data.mapper
 
-import com.jwd.lunchvote.core.common.mapper.BiMapper
 import com.jwd.lunchvote.data.model.LoungeData
 import com.jwd.lunchvote.domain.entity.Lounge
+import com.jwd.lunchvote.mapper.BiMapper
 
 private object LoungeDataMapper : BiMapper<LoungeData, Lounge> {
   override fun mapToRight(from: LoungeData): Lounge =

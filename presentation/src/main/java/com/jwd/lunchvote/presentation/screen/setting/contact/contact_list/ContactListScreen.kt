@@ -138,7 +138,7 @@ private fun ContactItem(
 
   Column(
     modifier = modifier
-      .border(1.dp, MaterialTheme.colorScheme.onBackground, RoundedCornerShape(16.dp))
+      .border(1.dp, MaterialTheme.colorScheme.onBackground, MaterialTheme.shapes.medium)
       .clickableWithoutEffect(onClick)
       .padding(start = 18.dp, top = 18.dp, end = 14.dp, bottom = 8.dp),
     verticalArrangement = Arrangement.spacedBy(4.dp),

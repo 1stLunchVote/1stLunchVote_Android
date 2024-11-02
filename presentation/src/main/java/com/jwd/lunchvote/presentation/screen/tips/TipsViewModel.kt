@@ -2,7 +2,7 @@ package com.jwd.lunchvote.presentation.screen.tips
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.presentation.screen.tips.TipsContract.TipsEvent
 import com.jwd.lunchvote.presentation.screen.tips.TipsContract.TipsReduce
 import com.jwd.lunchvote.presentation.screen.tips.TipsContract.TipsSideEffect

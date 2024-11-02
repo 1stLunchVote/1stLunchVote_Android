@@ -20,20 +20,20 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
-import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
+import androidx.compose.material3.pulltorefresh.pullToRefreshIndicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.FlickerAnimation
 
 /**
@@ -56,22 +56,26 @@ fun LazyColumn(
   userScrollEnabled: Boolean = true,
   content: LazyListScope.() -> Unit,
 ) {
-  if (refreshState.isRefreshing) {
-    LaunchedEffect(Unit) {
-      onRefresh()
-    }
-  }
-
   LaunchedEffect(isRefreshing) {
     if (isRefreshing) {
-      refreshState.startRefresh()
+      refreshState.animateToThreshold()
     } else {
-      refreshState.endRefresh()
+      refreshState.animateToHidden()
     }
   }
 
-  Box(
-    modifier = modifier.nestedScroll(refreshState.nestedScrollConnection)
+  PullToRefreshBox(
+    isRefreshing = isRefreshing,
+    onRefresh = onRefresh,
+    modifier = modifier,
+    state = refreshState,
+    indicator = {
+      LunchVoteRefreshIndicator(
+        state = refreshState,
+        isRefreshing = isRefreshing,
+        modifier = Modifier.align(Alignment.TopCenter)
+      )
+    }
   ) {
     LazyColumn(
       modifier = Modifier.fillMaxSize(),
@@ -84,30 +88,30 @@ fun LazyColumn(
       userScrollEnabled = userScrollEnabled,
       content = content
     )
-    PullToRefreshContainer(
-      modifier = Modifier.align(Alignment.TopCenter),
-      state = refreshState,
-      indicator = { LunchVoteRefreshIndicator(it) },
-      containerColor = MaterialTheme.colorScheme.primaryContainer,
-      contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-    )
   }
 }
 
 @Composable
 private fun LunchVoteRefreshIndicator(
   state: PullToRefreshState,
+  isRefreshing: Boolean,
   modifier: Modifier = Modifier,
+  threshold: Dp = 80.dp,
 ) {
-  Crossfade(
-    targetState = state.isRefreshing,
-    animationSpec = tween(durationMillis = 100),
-    label = "refreshing"
-  ) { refreshing ->
-    Box(
-      modifier = modifier.fillMaxSize(),
-      contentAlignment = Alignment.Center
-    ) {
+  Box(
+    modifier = modifier.pullToRefreshIndicator(
+      state = state,
+      isRefreshing = isRefreshing,
+      containerColor = MaterialTheme.colorScheme.primaryContainer,
+      threshold = threshold,
+    ),
+    contentAlignment = Alignment.Center
+  ) {
+    Crossfade(
+      targetState = isRefreshing,
+      animationSpec = tween(durationMillis = 100),
+      label = "refreshing"
+    ) { refreshing ->
       if (refreshing) {
         FlickerAnimation {
           Image(
@@ -117,7 +121,11 @@ private fun LunchVoteRefreshIndicator(
           )
         }
       } else {
-        PullToRefreshDefaults.Indicator(state = state)
+        Image(
+          painterResource(R.drawable.ic_logo),
+          contentDescription = null,
+          modifier = Modifier.size(24.dp)
+        )
       }
     }
   }
@@ -128,13 +136,10 @@ private fun LunchVoteRefreshIndicator(
 private fun Preview() {
   LunchVoteTheme {
     Surface {
-      LazyColumn(
-        onRefresh = {}
-      ) {
+      LazyColumn(onRefresh = {}) {
         items(10) {
           Text(
-            text = "하이!",
-            modifier = Modifier.fillMaxSize()
+            text = "하이!", modifier = Modifier.fillMaxSize()
           )
         }
       }

@@ -1,10 +1,10 @@
 package com.jwd.lunchvote.presentation.screen.template.edit_template
 
 import android.os.Parcelable
-import com.jwd.lunchvote.core.ui.base.ViewModelContract.Event
-import com.jwd.lunchvote.core.ui.base.ViewModelContract.Reduce
-import com.jwd.lunchvote.core.ui.base.ViewModelContract.SideEffect
-import com.jwd.lunchvote.core.ui.base.ViewModelContract.State
+import com.jwd.lunchvote.presentation.base.ViewModelContract.Event
+import com.jwd.lunchvote.presentation.base.ViewModelContract.Reduce
+import com.jwd.lunchvote.presentation.base.ViewModelContract.SideEffect
+import com.jwd.lunchvote.presentation.base.ViewModelContract.State
 import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.util.UiText

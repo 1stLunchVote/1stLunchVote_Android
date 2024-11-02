@@ -25,7 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 
 @Composable
 fun LunchVoteDialog(
@@ -55,8 +55,8 @@ fun LunchVoteDialog(
       Column(
         modifier = modifier
           .fillMaxWidth()
-          .background(MaterialTheme.colorScheme.background, RoundedCornerShape(28.dp))
-          .border(2.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(28.dp))
+          .background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.large)
+          .border(2.dp, MaterialTheme.colorScheme.outlineVariant, MaterialTheme.shapes.large)
           .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
       ) {
@@ -98,21 +98,15 @@ fun LunchVoteDialog(
 @Composable
 private fun LunchVoteDialogPreview() {
   LunchVoteTheme {
-    LunchVoteDialog(
-      title = "투표 방 참여하기",
+    LunchVoteDialog(title = "투표 방 참여하기",
       dismissText = "취소",
       onDismissRequest = {},
       confirmText = "참여",
       onConfirmation = {},
       confirmEnabled = false,
       content = {
-        LunchVoteTextField(
-          text = "",
-          hintText = "초대 코드",
-          onTextChange = {}
-        )
-      }
-    )
+        LunchVoteTextField(text = "", hintText = "초대 코드", onTextChange = {})
+      })
   }
 }
 
@@ -120,8 +114,7 @@ private fun LunchVoteDialogPreview() {
 @Composable
 private fun LunchVoteIconDialogPreview() {
   LunchVoteTheme {
-    LunchVoteDialog(
-      title = "정말 나가시겠습니까?",
+    LunchVoteDialog(title = "정말 나가시겠습니까?",
       dismissText = "취소",
       onDismissRequest = {},
       confirmText = "나가기",
@@ -139,7 +132,6 @@ private fun LunchVoteIconDialogPreview() {
           modifier = Modifier.fillMaxWidth(),
           style = MaterialTheme.typography.bodyMedium
         )
-      }
-    )
+      })
   }
 }

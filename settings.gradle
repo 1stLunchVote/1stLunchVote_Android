@@ -15,12 +15,10 @@ dependencyResolutionManagement {
 }
 rootProject.name = "LunchVote"
 include ':app'
-include ':data'
 include ':domain'
-include ':core:ui'
-include ':core:test'
 include ':local'
 include ':remote'
-include ':core:common'
 include ':presentation'
 include ':core:config'
+include ':core:library'
+include ':data'

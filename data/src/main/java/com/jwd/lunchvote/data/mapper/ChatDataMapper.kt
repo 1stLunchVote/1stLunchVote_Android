@@ -1,8 +1,8 @@
 package com.jwd.lunchvote.data.mapper
 
-import com.jwd.lunchvote.core.common.mapper.BiMapper
 import com.jwd.lunchvote.data.model.ChatData
 import com.jwd.lunchvote.domain.entity.Chat
+import com.jwd.lunchvote.mapper.BiMapper
 
 private object ChatDataMapper : BiMapper<ChatData, Chat> {
   override fun mapToRight(from: ChatData): Chat =
@@ -43,8 +43,7 @@ private object ChatDataTypeMapper : BiMapper<ChatData.Type, Chat.Type> {
 internal fun ChatData.asDomain(): Chat =
   ChatDataMapper.mapToRight(this)
 
-internal fun Chat.asData(): ChatData =
-  ChatDataMapper.mapToLeft(this)
+internal fun Chat.asData(): ChatData = ChatDataMapper.mapToLeft(this)
 
 internal fun ChatData.Type.asDomain(): Chat.Type =
   ChatDataTypeMapper.mapToRight(this)

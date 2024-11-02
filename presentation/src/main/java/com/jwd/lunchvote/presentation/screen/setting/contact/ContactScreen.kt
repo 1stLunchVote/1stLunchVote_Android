@@ -147,7 +147,7 @@ private fun ContactBox(
   Column(
     modifier = modifier
       .fillMaxWidth()
-      .border(1.dp, MaterialTheme.colorScheme.onBackground, RoundedCornerShape(16.dp))
+      .border(1.dp, MaterialTheme.colorScheme.onBackground, MaterialTheme.shapes.medium)
       .padding(18.dp),
     verticalArrangement = Arrangement.spacedBy(16.dp),
     horizontalAlignment = Alignment.CenterHorizontally
@@ -184,7 +184,7 @@ private fun ReplyBox(
   Column(
     modifier = modifier
       .fillMaxWidth()
-      .background(MaterialTheme.colorScheme.surfaceDim, RoundedCornerShape(16.dp))
+      .background(MaterialTheme.colorScheme.surfaceDim, MaterialTheme.shapes.medium)
       .padding(18.dp),
     verticalArrangement = Arrangement.spacedBy(16.dp),
     horizontalAlignment = Alignment.CenterHorizontally

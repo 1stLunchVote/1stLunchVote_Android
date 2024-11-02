@@ -56,13 +56,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.BuildConfig
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.screen.home.HomeContract.HomeEvent
 import com.jwd.lunchvote.presentation.screen.home.HomeContract.HomeSideEffect
 import com.jwd.lunchvote.presentation.screen.home.HomeContract.HomeState
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.ImageBitmapFactory
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.Gap
@@ -333,8 +333,6 @@ private fun HomeButtonSet(
   onClickSettingButton: () -> Unit = {},
   onClickTipsButton: () -> Unit = {}
 ) {
-  val buttonShape = RoundedCornerShape(16.dp)
-
   Column(
     modifier = modifier,
     verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -347,7 +345,7 @@ private fun HomeButtonSet(
         modifier = Modifier
           .weight(1f)
           .height(128.dp)
-          .clip(buttonShape)
+          .clip(MaterialTheme.shapes.medium)
           .background(MaterialTheme.colorScheme.primary)
           .clickable { onClickLoungeButton() }
       ) {
@@ -362,8 +360,8 @@ private fun HomeButtonSet(
         modifier = Modifier
           .weight(1f)
           .height(128.dp)
-          .clip(buttonShape)
-          .border(2.dp, MaterialTheme.colorScheme.primary, buttonShape)
+          .clip(MaterialTheme.shapes.medium)
+          .border(2.dp, MaterialTheme.colorScheme.primary, MaterialTheme.shapes.medium)
           .clickable { onClickJoinLoungeButton() }
       ) {
         Text(
@@ -382,8 +380,8 @@ private fun HomeButtonSet(
         modifier = Modifier
           .weight(1f)
           .height(64.dp)
-          .clip(buttonShape)
-          .border(2.dp, MaterialTheme.colorScheme.primary, buttonShape)
+          .clip(MaterialTheme.shapes.medium)
+          .border(2.dp, MaterialTheme.colorScheme.primary, MaterialTheme.shapes.medium)
           .clickable { onClickTemplateButton() },
         contentAlignment = Alignment.TopEnd
       ) {
@@ -397,8 +395,8 @@ private fun HomeButtonSet(
       Box(
         modifier = Modifier
           .size(64.dp)
-          .clip(buttonShape)
-          .border(2.dp, MaterialTheme.colorScheme.primary, buttonShape)
+          .clip(MaterialTheme.shapes.medium)
+          .border(2.dp, MaterialTheme.colorScheme.primary, MaterialTheme.shapes.medium)
           .clickable { onClickFriendButton() },
         contentAlignment = Alignment.Center
       ) {
@@ -416,7 +414,7 @@ private fun HomeButtonSet(
       Box(
         modifier = Modifier
           .size(52.dp)
-          .clip(buttonShape)
+          .clip(MaterialTheme.shapes.medium)
           .background(MaterialTheme.colorScheme.outline)
           .clickable { onClickSettingButton() },
         contentAlignment = Alignment.Center
@@ -430,8 +428,8 @@ private fun HomeButtonSet(
         modifier = Modifier
           .weight(1f)
           .height(52.dp)
-          .clip(buttonShape)
-          .border(2.dp, MaterialTheme.colorScheme.outline, buttonShape)
+          .clip(MaterialTheme.shapes.medium)
+          .border(2.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.medium)
           .clickable { onClickTipsButton() },
         contentAlignment = Alignment.CenterEnd
       ) {

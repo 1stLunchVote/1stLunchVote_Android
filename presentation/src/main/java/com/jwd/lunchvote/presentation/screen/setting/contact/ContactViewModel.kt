@@ -3,7 +3,7 @@ package com.jwd.lunchvote.presentation.screen.setting.contact
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.ContactRepository
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute

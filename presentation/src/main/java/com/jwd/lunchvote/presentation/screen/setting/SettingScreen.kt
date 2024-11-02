@@ -41,6 +41,7 @@ import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
+import timber.log.Timber
 
 @Composable
 fun SettingRoute(
@@ -67,16 +68,12 @@ fun SettingRoute(
   }
 
   LaunchedEffect(Unit) {
-    val appVersion = try {
-      val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        context.packageManager.getPackageInfo(context.packageName, PackageManager.PackageInfoFlags.of(0))
-      } else {
-        context.packageManager.getPackageInfo(context.packageName, 0)
-      }
-      packageInfo.versionName
-    } catch (e: PackageManager.NameNotFoundException) {
-      UiText.StringResource(R.string.setting_app_version_failed).asString(context)
+    val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      context.packageManager.getPackageInfo(context.packageName, PackageManager.PackageInfoFlags.of(0))
+    } else {
+      context.packageManager.getPackageInfo(context.packageName, 0)
     }
+    val appVersion = packageInfo.versionName
 
     viewModel.handleEvents(SettingEvent.ScreenInitialize(appVersion))
   }
@@ -137,7 +134,7 @@ private fun SettingScreen(
           style = MaterialTheme.typography.titleMedium
         )
         Text(
-          text = state.appVersion,
+          text = state.appVersion ?: stringResource(R.string.setting_app_version_failed),
           style = MaterialTheme.typography.bodyLarge,
           color = MaterialTheme.colorScheme.outline
         )

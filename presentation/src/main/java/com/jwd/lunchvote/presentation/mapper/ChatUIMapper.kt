@@ -1,6 +1,6 @@
 package com.jwd.lunchvote.presentation.mapper
 
-import com.jwd.lunchvote.core.common.mapper.BiMapper
+import com.jwd.lunchvote.mapper.BiMapper
 import com.jwd.lunchvote.domain.entity.Chat
 import com.jwd.lunchvote.presentation.model.ChatUIModel
 import com.jwd.lunchvote.presentation.util.toLong

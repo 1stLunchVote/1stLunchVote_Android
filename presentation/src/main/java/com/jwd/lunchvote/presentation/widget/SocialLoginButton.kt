@@ -23,10 +23,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
-import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 
 @Composable
@@ -53,7 +55,8 @@ fun KakaoLoginButton(
       .clip(RoundedCornerShape(containerRadiusDp))
       .background(containerColor)
       .clickable(enabled = enabled, onClick = onClick)
-      .padding(horizontal = paddingDp),
+      .padding(horizontal = paddingDp)
+      .semantics { contentDescription = "Kakao Login" },
     verticalAlignment = Alignment.CenterVertically
   ) {
     Icon(
@@ -137,19 +140,13 @@ private fun KakaoLoginButtonPreview() {
       verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
       KakaoLoginButton(
-        onClick = {},
-        modifier = Modifier.width(200.dp),
-        size = LoginButtonSize.Small
+        onClick = {}, modifier = Modifier.width(200.dp), size = LoginButtonSize.Small
       )
       KakaoLoginButton(
-        onClick = {},
-        modifier = Modifier.width(300.dp),
-        size = LoginButtonSize.Medium
+        onClick = {}, modifier = Modifier.width(300.dp), size = LoginButtonSize.Medium
       )
       KakaoLoginButton(
-        onClick = {},
-        modifier = Modifier.width(400.dp),
-        size = LoginButtonSize.Big
+        onClick = {}, modifier = Modifier.width(400.dp), size = LoginButtonSize.Big
       )
     }
   }
@@ -163,19 +160,13 @@ private fun GoogleLoginButtonPreview() {
       verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
       GoogleLoginButton(
-        onClick = {},
-        modifier = Modifier.width(200.dp),
-        size = LoginButtonSize.Small
+        onClick = {}, modifier = Modifier.width(200.dp), size = LoginButtonSize.Small
       )
       GoogleLoginButton(
-        onClick = {},
-        modifier = Modifier.width(300.dp),
-        size = LoginButtonSize.Medium
+        onClick = {}, modifier = Modifier.width(300.dp), size = LoginButtonSize.Medium
       )
       GoogleLoginButton(
-        onClick = {},
-        modifier = Modifier.width(400.dp),
-        size = LoginButtonSize.Big
+        onClick = {}, modifier = Modifier.width(400.dp), size = LoginButtonSize.Big
       )
     }
   }

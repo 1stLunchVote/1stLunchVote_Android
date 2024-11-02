@@ -37,7 +37,7 @@ fun LunchVoteNavHost(
   startDestination: String,
   modifier: Modifier = Modifier
 ) {
-  fun NavHostController.navigate(route: LunchVoteNavRoute, vararg arguments: Any?) {
+  fun NavHostController.navigateScreen(route: LunchVoteNavRoute, vararg arguments: Any?) {
     navigate(route.routeWithArgs(arguments.asList()))
   }
 
@@ -67,7 +67,7 @@ fun LunchVoteNavHost(
     composable(LunchVoteNavRoute.Login) {
       LoginRoute(
         navigateToHome = { navController.navigateWithPop(LunchVoteNavRoute.Home) },
-        navigateToEmailVerification = { navController.navigate(LunchVoteNavRoute.EmailVerification) }
+        navigateToEmailVerification = { navController.navigateScreen(LunchVoteNavRoute.EmailVerification) }
       )
     }
     composable(LunchVoteNavRoute.EmailVerification) {
@@ -89,22 +89,22 @@ fun LunchVoteNavHost(
     composable(LunchVoteNavRoute.Home) {
       HomeRoute(
         navigateToLounge = { loungeId ->
-          navController.navigate(LunchVoteNavRoute.Lounge, loungeId)
+          navController.navigateScreen(LunchVoteNavRoute.Lounge, loungeId)
         },
-        navigateToTemplateList = { navController.navigate(LunchVoteNavRoute.TemplateList) },
-        navigateToFriendList = { navController.navigate(LunchVoteNavRoute.FriendList) },
-        navigateToSetting = { navController.navigate(LunchVoteNavRoute.Setting) },
-        navigateToTips = { navController.navigate(LunchVoteNavRoute.Tips) }
+        navigateToTemplateList = { navController.navigateScreen(LunchVoteNavRoute.TemplateList) },
+        navigateToFriendList = { navController.navigateScreen(LunchVoteNavRoute.FriendList) },
+        navigateToSetting = { navController.navigateScreen(LunchVoteNavRoute.Setting) },
+        navigateToTips = { navController.navigateScreen(LunchVoteNavRoute.Tips) }
       )
     }
     composable(LunchVoteNavRoute.Lounge) {
       LoungeRoute(
         popBackStack = { navController.popBackStack(LunchVoteNavRoute.Home) },
         navigateToLoungeSetting = { loungeId ->
-          navController.navigate(LunchVoteNavRoute.LoungeSetting, loungeId)
+          navController.navigateScreen(LunchVoteNavRoute.LoungeSetting, loungeId)
         },
         navigateToMember = { userId, loungeId ->
-          navController.navigate(LunchVoteNavRoute.LoungeMember, userId, loungeId)
+          navController.navigateScreen(LunchVoteNavRoute.LoungeMember, userId, loungeId)
         },
         navigateToFirstVote = { loungeId ->
           navController.navigateWithPop(LunchVoteNavRoute.FirstVote, loungeId)
@@ -145,10 +145,10 @@ fun LunchVoteNavHost(
     composable(LunchVoteNavRoute.TemplateList) {
       TemplateListRoute(
         navigateToAddTemplate = { templateName ->
-          navController.navigate(LunchVoteNavRoute.AddTemplate, templateName)
+          navController.navigateScreen(LunchVoteNavRoute.AddTemplate, templateName)
         },
         navigateToEditTemplate = { templateId ->
-          navController.navigate(LunchVoteNavRoute.EditTemplate, templateId)
+          navController.navigateScreen(LunchVoteNavRoute.EditTemplate, templateId)
         },
         popBackStack = { navController.popBackStack() }
       )
@@ -166,7 +166,7 @@ fun LunchVoteNavHost(
     composable(LunchVoteNavRoute.FriendList) {
        FriendListRoute(
          popBackStack = { navController.popBackStack() },
-         navigateToFriendRequest = { navController.navigate(LunchVoteNavRoute.FriendRequest) },
+         navigateToFriendRequest = { navController.navigateScreen(LunchVoteNavRoute.FriendRequest) },
          navigateToLounge = { friendId ->
            navController.navigateWithPop(LunchVoteNavRoute.Lounge, friendId)
          }
@@ -180,8 +180,8 @@ fun LunchVoteNavHost(
     composable(LunchVoteNavRoute.Setting) {
       SettingRoute(
         popBackStack = { navController.popBackStack() },
-        navigateToProfile = { navController.navigate(LunchVoteNavRoute.Profile) },
-        navigateToContactList = { navController.navigate(LunchVoteNavRoute.ContactList) },
+        navigateToProfile = { navController.navigateScreen(LunchVoteNavRoute.Profile) },
+        navigateToContactList = { navController.navigateScreen(LunchVoteNavRoute.ContactList) },
         navigateToLogin = { navController.navigateWithPop(LunchVoteNavRoute.Login) }
       )
     }
@@ -194,9 +194,9 @@ fun LunchVoteNavHost(
     composable(LunchVoteNavRoute.ContactList) {
       ContactListRoute(
         popBackStack = { navController.popBackStack() },
-        navigateToAddContact = { navController.navigate(LunchVoteNavRoute.AddContact) },
+        navigateToAddContact = { navController.navigateScreen(LunchVoteNavRoute.AddContact) },
         navigateToContact = { contactId ->
-          navController.navigate(LunchVoteNavRoute.Contact, contactId)
+          navController.navigateScreen(LunchVoteNavRoute.Contact, contactId)
         }
       )
     }

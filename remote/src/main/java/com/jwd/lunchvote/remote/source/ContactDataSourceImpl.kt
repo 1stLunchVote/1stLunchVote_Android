@@ -3,7 +3,7 @@ package com.jwd.lunchvote.remote.source
 import com.google.firebase.firestore.FirebaseFirestore
 import com.jwd.lunchvote.data.model.ContactData
 import com.jwd.lunchvote.data.model.ContactReplyData
-import com.jwd.lunchvote.data.source.ContactDataSource
+import com.jwd.lunchvote.data.source.remote.ContactDataSource
 import com.jwd.lunchvote.remote.mapper.asData
 import com.jwd.lunchvote.remote.mapper.asRemote
 import com.jwd.lunchvote.remote.model.ContactRemote

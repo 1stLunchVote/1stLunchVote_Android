@@ -31,12 +31,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.screen.template.TemplateListContract.TemplateListEvent
 import com.jwd.lunchvote.presentation.screen.template.TemplateListContract.TemplateListSideEffect
 import com.jwd.lunchvote.presentation.screen.template.TemplateListContract.TemplateListState
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
@@ -152,15 +152,13 @@ private fun TemplateListItem(
   template: TemplateUIModel,
   onClick: () -> Unit,
 ) {
-  val shape = RoundedCornerShape(8.dp)
-
   Row(
     modifier = Modifier
       .fillMaxWidth()
-      .clip(shape)
+      .clip(MaterialTheme.shapes.medium)
       .clickable { onClick() }
-      .background(MaterialTheme.colorScheme.background, shape)
-      .border(2.dp, MaterialTheme.colorScheme.outlineVariant, shape)
+      .background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.medium)
+      .border(2.dp, MaterialTheme.colorScheme.outlineVariant, MaterialTheme.shapes.medium)
       .padding(horizontal = 16.dp, vertical = 20.dp),
     horizontalArrangement = Arrangement.SpaceBetween,
     verticalAlignment = Alignment.CenterVertically
@@ -188,15 +186,13 @@ private fun TemplateListItem(
 private fun TemplateListButton(
   onClick: () -> Unit
 ) {
-  val shape = RoundedCornerShape(8.dp)
-
   Box(
     modifier = Modifier
       .fillMaxWidth()
-      .clip(shape)
+      .clip(MaterialTheme.shapes.small)
       .clickable { onClick() }
-      .background(MaterialTheme.colorScheme.background, shape)
-      .border(BorderStroke(2.dp, MaterialTheme.colorScheme.outlineVariant), shape)
+      .background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.small)
+      .border(BorderStroke(2.dp, MaterialTheme.colorScheme.outlineVariant), MaterialTheme.shapes.small)
       .padding(vertical = 20.dp),
     contentAlignment = Alignment.Center
   ) {

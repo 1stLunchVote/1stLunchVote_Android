@@ -15,7 +15,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,16 +50,13 @@ fun LunchVoteTopBar(
 @Composable
 private fun LunchVoteTopBarPreview() {
   LunchVoteTheme {
-    LunchVoteTopBar(
-      title = "투표 대기방",
-      actions = {
-        IconButton({}) {
-          Icon(
-            imageVector = Icons.Outlined.Delete,
-            contentDescription = "delete",
-          )
-        }
+    LunchVoteTopBar(title = "투표 대기방", actions = {
+      IconButton({}) {
+        Icon(
+          imageVector = Icons.Outlined.Delete,
+          contentDescription = "delete",
+        )
       }
-    )
+    })
   }
 }

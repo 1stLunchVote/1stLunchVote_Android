@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.util.glow
@@ -60,8 +60,7 @@ private fun StepProgress(
 private fun StepProgressPreview() {
   LunchVoteTheme {
     Row(
-      modifier = Modifier.padding(8.dp),
-      horizontalArrangement = Arrangement.spacedBy(8.dp)
+      modifier = Modifier.padding(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
       StepProgress(true)
       StepProgress(false)

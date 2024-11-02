@@ -1,6 +1,6 @@
 package com.jwd.lunchvote.remote.mapper
 
-import com.jwd.lunchvote.core.common.mapper.BiMapper
+import com.jwd.lunchvote.mapper.BiMapper
 import com.jwd.lunchvote.data.model.TemplateData
 import com.jwd.lunchvote.remote.model.TemplateRemote
 import com.jwd.lunchvote.remote.util.toLong

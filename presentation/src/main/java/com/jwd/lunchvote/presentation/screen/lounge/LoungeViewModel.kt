@@ -5,7 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.entity.Chat
 import com.jwd.lunchvote.domain.entity.Lounge.Status.FIRST_VOTE
 import com.jwd.lunchvote.domain.entity.Lounge.Status.QUIT

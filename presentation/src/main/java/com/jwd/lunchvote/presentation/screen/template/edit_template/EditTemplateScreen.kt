@@ -34,7 +34,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.FoodUIModel
@@ -42,6 +41,7 @@ import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.EditTemplateEvent
 import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.EditTemplateSideEffect
 import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.EditTemplateState
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.FoodItem
 import com.jwd.lunchvote.presentation.widget.LikeDislike
@@ -182,13 +182,11 @@ private fun TemplateTitle(
   dislike: Int,
   modifier: Modifier = Modifier
 ) {
-  val shape = RoundedCornerShape(8.dp)
-
   Column(
     modifier = modifier
-      .clip(shape)
-      .background(MaterialTheme.colorScheme.background, shape)
-      .border(BorderStroke(2.dp, MaterialTheme.colorScheme.outlineVariant), shape)
+      .clip(MaterialTheme.shapes.small)
+      .background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.small)
+      .border(BorderStroke(2.dp, MaterialTheme.colorScheme.outlineVariant), MaterialTheme.shapes.small)
       .padding(vertical = 20.dp),
     verticalArrangement = Arrangement.spacedBy(8.dp),
     horizontalAlignment = CenterHorizontally

@@ -22,12 +22,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
-import com.jwd.lunchvote.core.ui.theme.colorSuccess
-import com.jwd.lunchvote.core.ui.util.circleShadow
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
+import com.jwd.lunchvote.presentation.util.circleShadow
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.FoodUIModel
+import com.jwd.lunchvote.presentation.theme.colorSuccess
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 
@@ -56,13 +56,13 @@ fun FoodItem(
           .let {
             when (foodItem.status) {
               FoodItem.Status.DEFAULT -> it
-                .clip(RoundedCornerShape(16.dp))
-                .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
+                .clip(MaterialTheme.shapes.medium)
+                .border(2.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.medium)
                 .alpha(0.8f)
 
               FoodItem.Status.LIKE -> it
-                .clip(RoundedCornerShape(16.dp))
-                .border(2.dp, colorSuccess, RoundedCornerShape(16.dp))
+                .clip(MaterialTheme.shapes.medium)
+                .border(2.dp, colorSuccess, MaterialTheme.shapes.medium)
                 .circleShadow(colorSuccess, blurRadius = 8.dp)
 
               else -> it
@@ -100,33 +100,21 @@ private fun FoodItemDefaultPreview() {
     Row(
       horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-      FoodItem(
-        foodItem = FoodItem(
-          food = FoodUIModel(
-            name = "햄버거"
-          ),
-          status = FoodItem.Status.DEFAULT
-        ),
-        onClick = {}
-      )
-      FoodItem(
-        foodItem = FoodItem(
-          food = FoodUIModel(
-            name = "햄버거"
-          ),
-          status = FoodItem.Status.LIKE
-        ),
-        onClick = {}
-      )
-      FoodItem(
-        foodItem = FoodItem(
-          food = FoodUIModel(
-            name = "햄버거"
-          ),
-          status = FoodItem.Status.DISLIKE
-        ),
-        onClick = {}
-      )
+      FoodItem(foodItem = FoodItem(
+        food = FoodUIModel(
+          name = "햄버거"
+        ), status = FoodItem.Status.DEFAULT
+      ), onClick = {})
+      FoodItem(foodItem = FoodItem(
+        food = FoodUIModel(
+          name = "햄버거"
+        ), status = FoodItem.Status.LIKE
+      ), onClick = {})
+      FoodItem(foodItem = FoodItem(
+        food = FoodUIModel(
+          name = "햄버거"
+        ), status = FoodItem.Status.DISLIKE
+      ), onClick = {})
     }
   }
 }

@@ -2,7 +2,7 @@ package com.jwd.lunchvote.presentation.screen.vote.result
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import com.jwd.lunchvote.core.ui.base.BaseStateViewModel
+import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.repository.VoteResultRepository
 import com.jwd.lunchvote.presentation.mapper.asUI

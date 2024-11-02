@@ -24,7 +24,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
-import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.util.glow
@@ -117,8 +117,7 @@ fun InviteProfile(
 private fun Preview() {
   LunchVoteTheme {
     Row(
-      modifier = Modifier.padding(24.dp),
-      horizontalArrangement = Arrangement.spacedBy(8.dp)
+      modifier = Modifier.padding(24.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
       MemberProfile(
         member = MemberUIModel()

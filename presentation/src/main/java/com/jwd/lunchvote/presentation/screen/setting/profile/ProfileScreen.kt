@@ -45,12 +45,12 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.UserUIModel
 import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.ProfileEvent
 import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.ProfileSideEffect
 import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.ProfileState
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.ImageBitmapFactory
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.Gap
@@ -203,7 +203,7 @@ private fun ProfileTicket(
     Column(
       modifier = Modifier
         .fillMaxWidth()
-        .clip(RoundedCornerShape(16.dp))
+        .clip(MaterialTheme.shapes.medium)
         .background(MaterialTheme.colorScheme.background),
       horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -469,8 +469,7 @@ private fun EditProfileImageDialogPreview() {
 private fun EditNameDialogPreview() {
   LunchVoteTheme {
     EditNameDialog(
-      initialName = "김태우존잘",
-      name = ""
+      initialName = "김태우존잘", name = ""
     )
   }
 }

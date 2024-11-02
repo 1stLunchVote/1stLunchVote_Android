@@ -29,7 +29,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jwd.lunchvote.core.ui.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.screen.lounge.setting.LoungeSettingContract.Companion.MAX_MEMBERS_DIALOG
 import com.jwd.lunchvote.presentation.screen.lounge.setting.LoungeSettingContract.Companion.MIN_DISLIKE_FOODS_DIALOG
@@ -39,6 +38,7 @@ import com.jwd.lunchvote.presentation.screen.lounge.setting.LoungeSettingContrac
 import com.jwd.lunchvote.presentation.screen.lounge.setting.LoungeSettingContract.LoungeSettingEvent
 import com.jwd.lunchvote.presentation.screen.lounge.setting.LoungeSettingContract.LoungeSettingSideEffect
 import com.jwd.lunchvote.presentation.screen.lounge.setting.LoungeSettingContract.LoungeSettingState
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
@@ -635,7 +635,7 @@ private fun Preview() {
 @Composable
 private fun TimeLimitDialogPreview() {
   LunchVoteTheme {
-     TimeLimitDialog(
+    TimeLimitDialog(
       timeLimit = 10
     )
   }
