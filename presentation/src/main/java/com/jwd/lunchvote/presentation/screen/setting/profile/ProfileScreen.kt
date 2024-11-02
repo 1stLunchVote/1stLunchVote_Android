@@ -203,7 +203,7 @@ private fun ProfileTicket(
     Column(
       modifier = Modifier
         .fillMaxWidth()
-        .clip(RoundedCornerShape(16.dp))
+        .clip(MaterialTheme.shapes.medium)
         .background(MaterialTheme.colorScheme.background),
       horizontalAlignment = Alignment.CenterHorizontally
     ) {

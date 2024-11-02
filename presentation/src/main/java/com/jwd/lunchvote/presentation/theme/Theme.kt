@@ -9,6 +9,7 @@ fun LunchVoteTheme(
 ) {
   MaterialTheme(
     colorScheme = lunchVoteColorScheme(),
+    shapes = lunchVoteShapes(),
     typography = nanumSquareTypography,
     content = content
   )

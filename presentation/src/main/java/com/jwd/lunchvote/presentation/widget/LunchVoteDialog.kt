@@ -55,8 +55,8 @@ fun LunchVoteDialog(
       Column(
         modifier = modifier
           .fillMaxWidth()
-          .background(MaterialTheme.colorScheme.background, RoundedCornerShape(28.dp))
-          .border(2.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(28.dp))
+          .background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.large)
+          .border(2.dp, MaterialTheme.colorScheme.outlineVariant, MaterialTheme.shapes.large)
           .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
       ) {

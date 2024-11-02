@@ -45,9 +45,8 @@ private fun Like(
 ) {
   Row(
     modifier = modifier
-      .padding(bottom = 1.dp)
-      .height(21.dp)
-      .background(colorSuccess, RoundedCornerShape(10.dp)),
+      .height(20.dp)
+      .background(colorSuccess, MaterialTheme.shapes.extraLarge),
     verticalAlignment = Alignment.CenterVertically
   ) {
     Spacer(Modifier.width(4.dp))
@@ -55,7 +54,7 @@ private fun Like(
       painterResource(R.drawable.ic_like),
       null,
       modifier = Modifier
-        .size(11.dp)
+        .size(10.dp)
         .circleShadow(colorOnSuccess, blurRadius = 6.dp)
     )
     Spacer(Modifier.width(4.dp))
@@ -75,16 +74,15 @@ private fun Dislike(
 ) {
   Row(
     modifier = modifier
-      .padding(bottom = 1.dp)
-      .height(21.dp)
-      .background(MaterialTheme.colorScheme.error, RoundedCornerShape(10.dp)),
+      .height(20.dp)
+      .background(MaterialTheme.colorScheme.error, MaterialTheme.shapes.extraLarge),
     verticalAlignment = Alignment.CenterVertically
   ) {
     Spacer(Modifier.width(4.dp))
     Image(
       painterResource(R.drawable.ic_dislike),
       null,
-      modifier = Modifier.size(13.dp)
+      modifier = Modifier.size(12.dp)
     )
     Spacer(Modifier.width(4.dp))
     Text(

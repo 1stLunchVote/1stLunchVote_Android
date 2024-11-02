@@ -56,13 +56,13 @@ fun FoodItem(
           .let {
             when (foodItem.status) {
               FoodItem.Status.DEFAULT -> it
-                .clip(RoundedCornerShape(16.dp))
-                .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
+                .clip(MaterialTheme.shapes.medium)
+                .border(2.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.medium)
                 .alpha(0.8f)
 
               FoodItem.Status.LIKE -> it
-                .clip(RoundedCornerShape(16.dp))
-                .border(2.dp, colorSuccess, RoundedCornerShape(16.dp))
+                .clip(MaterialTheme.shapes.medium)
+                .border(2.dp, colorSuccess, MaterialTheme.shapes.medium)
                 .circleShadow(colorSuccess, blurRadius = 8.dp)
 
               else -> it

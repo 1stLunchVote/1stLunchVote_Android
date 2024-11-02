@@ -170,7 +170,6 @@ private fun SystemMessage(
   modifier: Modifier = Modifier,
   userName: String = ""
 ) {
-  val shape = RoundedCornerShape(100)
   val color = MaterialTheme.colorScheme.outlineVariant
 
   Box(
@@ -179,7 +178,7 @@ private fun SystemMessage(
   ) {
     ReversedRow(
       modifier = Modifier
-        .clip(shape)
+        .clip(MaterialTheme.shapes.extraLarge)
         .background(color)
         .padding(horizontal = 12.dp, vertical = 4.dp),
       verticalAlignment = Alignment.CenterVertically,

@@ -182,13 +182,11 @@ private fun TemplateTitle(
   dislike: Int,
   modifier: Modifier = Modifier
 ) {
-  val shape = RoundedCornerShape(8.dp)
-
   Column(
     modifier = modifier
-      .clip(shape)
-      .background(MaterialTheme.colorScheme.background, shape)
-      .border(BorderStroke(2.dp, MaterialTheme.colorScheme.outlineVariant), shape)
+      .clip(MaterialTheme.shapes.small)
+      .background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.small)
+      .border(BorderStroke(2.dp, MaterialTheme.colorScheme.outlineVariant), MaterialTheme.shapes.small)
       .padding(vertical = 20.dp),
     verticalArrangement = Arrangement.spacedBy(8.dp),
     horizontalAlignment = CenterHorizontally

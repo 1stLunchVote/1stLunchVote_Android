@@ -318,11 +318,11 @@ private fun ChatTextField(
 
     Row(
       modifier = Modifier
-        .clip(RoundedCornerShape(24.dp))
+        .clip(MaterialTheme.shapes.extraLarge)
         .border(
           width = 2.dp,
           color = if (isFocus) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
-          shape = RoundedCornerShape(24.dp)
+          shape = MaterialTheme.shapes.extraLarge
         )
         .padding(start = 24.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
       horizontalArrangement = Arrangement.spacedBy(8.dp),

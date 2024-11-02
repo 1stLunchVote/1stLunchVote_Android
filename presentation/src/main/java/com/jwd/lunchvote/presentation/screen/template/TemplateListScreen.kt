@@ -152,15 +152,13 @@ private fun TemplateListItem(
   template: TemplateUIModel,
   onClick: () -> Unit,
 ) {
-  val shape = RoundedCornerShape(8.dp)
-
   Row(
     modifier = Modifier
       .fillMaxWidth()
-      .clip(shape)
+      .clip(MaterialTheme.shapes.medium)
       .clickable { onClick() }
-      .background(MaterialTheme.colorScheme.background, shape)
-      .border(2.dp, MaterialTheme.colorScheme.outlineVariant, shape)
+      .background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.medium)
+      .border(2.dp, MaterialTheme.colorScheme.outlineVariant, MaterialTheme.shapes.medium)
       .padding(horizontal = 16.dp, vertical = 20.dp),
     horizontalArrangement = Arrangement.SpaceBetween,
     verticalAlignment = Alignment.CenterVertically
@@ -188,15 +186,13 @@ private fun TemplateListItem(
 private fun TemplateListButton(
   onClick: () -> Unit
 ) {
-  val shape = RoundedCornerShape(8.dp)
-
   Box(
     modifier = Modifier
       .fillMaxWidth()
-      .clip(shape)
+      .clip(MaterialTheme.shapes.small)
       .clickable { onClick() }
-      .background(MaterialTheme.colorScheme.background, shape)
-      .border(BorderStroke(2.dp, MaterialTheme.colorScheme.outlineVariant), shape)
+      .background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.small)
+      .border(BorderStroke(2.dp, MaterialTheme.colorScheme.outlineVariant), MaterialTheme.shapes.small)
       .padding(vertical = 20.dp),
     contentAlignment = Alignment.Center
   ) {
