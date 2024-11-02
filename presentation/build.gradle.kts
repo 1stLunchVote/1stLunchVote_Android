@@ -54,8 +54,8 @@ dependencies {
   implementation(project(":core:library"))
   implementation(project(":core:config"))
   implementation(project(":domain"))
-  implementation(project(":data"))
-  implementation(project(":local"))
+
+  implementation(libs.timber)
 
   implementation(libs.bundles.android)
   implementation(libs.bundles.test)
@@ -70,14 +70,12 @@ dependencies {
 
   implementation(libs.bundles.coil)
 
-  implementation(libs.timber)
   implementation(libs.kakao)
 
   implementation(platform(libs.firebase))
   implementation(libs.firebase.dynamicLinks)
   implementation(libs.firebase.auth)
   implementation(libs.firebase.gmsAuth)
-  implementation(libs.firebase.functions)
 
   implementation(libs.bundles.credentials)
 }

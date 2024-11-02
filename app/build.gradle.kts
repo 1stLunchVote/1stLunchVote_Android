@@ -59,10 +59,10 @@ android {
 
 dependencies {
   implementation(project(":domain"))
-  implementation(project(":presentation"))
   implementation(project(":data"))
   implementation(project(":local"))
   implementation(project(":remote"))
+  implementation(project(":presentation"))
 
   implementation(libs.timber)
 

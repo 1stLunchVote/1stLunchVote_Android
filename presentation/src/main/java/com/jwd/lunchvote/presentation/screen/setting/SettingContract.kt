@@ -9,13 +9,13 @@ import kotlinx.parcelize.Parcelize
 class SettingContract {
   @Parcelize
   data class SettingState(
-    val appVersion: String = ""
+    val appVersion: String? = null
   ): ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this
   }
 
   sealed interface SettingEvent: ViewModelContract.Event {
-    data class ScreenInitialize(val appVersion: String): SettingEvent
+    data class ScreenInitialize(val appVersion: String?): SettingEvent
 
     data object OnClickBackButton: SettingEvent
     data object OnClickProfileButton: SettingEvent
@@ -26,7 +26,7 @@ class SettingContract {
   }
 
   sealed interface SettingReduce : ViewModelContract.Reduce {
-    data class UpdateAppVersion(val appVersion: String) : SettingReduce
+    data class UpdateAppVersion(val appVersion: String?) : SettingReduce
   }
 
   sealed interface SettingSideEffect: ViewModelContract.SideEffect {
