@@ -1,6 +1,6 @@
 package com.jwd.lunchvote.presentation.mapper
 
-import com.jwd.lunchvote.core.common.mapper.BiMapper
+import kr.co.inbody.library.mapper.BiMapper
 import com.jwd.lunchvote.domain.entity.Chat
 import com.jwd.lunchvote.presentation.model.ChatUIModel
 import com.jwd.lunchvote.presentation.util.toLong
@@ -28,7 +28,8 @@ private object ChatUIMapper: BiMapper<ChatUIModel, Chat> {
     )
 }
 
-private object ChatUITypeMapper : BiMapper<ChatUIModel.Type, Chat.Type> {
+private object ChatUITypeMapper :
+  BiMapper<ChatUIModel.Type, Chat.Type> {
   override fun mapToRight(from: ChatUIModel.Type): Chat.Type =
     when (from) {
       ChatUIModel.Type.DEFAULT -> Chat.Type.DEFAULT

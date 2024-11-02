@@ -1,6 +1,6 @@
 package com.jwd.lunchvote.presentation.mapper
 
-import com.jwd.lunchvote.core.common.mapper.BiMapper
+import kr.co.inbody.library.mapper.BiMapper
 import com.jwd.lunchvote.domain.entity.FirstBallot
 import com.jwd.lunchvote.presentation.model.FirstBallotUIModel
 

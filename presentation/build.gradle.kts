@@ -51,8 +51,8 @@ android {
 }
 
 dependencies {
+  implementation(project(":core:library"))
   implementation(project(":core:config"))
-  implementation(project(":core:common"))
   implementation(project(":core:ui"))
   implementation(project(":core:test"))
   implementation(project(":domain"))

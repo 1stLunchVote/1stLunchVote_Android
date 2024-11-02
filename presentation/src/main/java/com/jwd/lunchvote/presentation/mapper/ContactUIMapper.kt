@@ -1,6 +1,6 @@
 package com.jwd.lunchvote.presentation.mapper
 
-import com.jwd.lunchvote.core.common.mapper.BiMapper
+import kr.co.inbody.library.mapper.BiMapper
 import com.jwd.lunchvote.domain.entity.Contact
 import com.jwd.lunchvote.presentation.model.ContactUIModel
 import com.jwd.lunchvote.presentation.util.toLong
@@ -30,7 +30,8 @@ private object ContactUIMapper : BiMapper<ContactUIModel, Contact> {
     )
 }
 
-private object ContactUICategoryMapper : BiMapper<ContactUIModel.Category, Contact.Category> {
+private object ContactUICategoryMapper :
+  BiMapper<ContactUIModel.Category, Contact.Category> {
   override fun mapToRight(from: ContactUIModel.Category): Contact.Category =
     when (from) {
       ContactUIModel.Category.ACCOUNT -> Contact.Category.ACCOUNT

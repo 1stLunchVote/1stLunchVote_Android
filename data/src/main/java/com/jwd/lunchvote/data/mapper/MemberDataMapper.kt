@@ -1,6 +1,6 @@
 package com.jwd.lunchvote.data.mapper
 
-import com.jwd.lunchvote.core.common.mapper.BiMapper
+import kr.co.inbody.library.mapper.BiMapper
 import com.jwd.lunchvote.data.model.MemberData
 import com.jwd.lunchvote.domain.entity.Member
 
@@ -30,7 +30,8 @@ private object MemberDataMapper : BiMapper<MemberData, Member> {
     )
 }
 
-private object MemberDataTypeMapper : BiMapper<MemberData.Type, Member.Type> {
+private object MemberDataTypeMapper :
+  BiMapper<MemberData.Type, Member.Type> {
   override fun mapToRight(from: MemberData.Type): Member.Type =
     when (from) {
       MemberData.Type.DEFAULT -> Member.Type.DEFAULT
@@ -50,7 +51,8 @@ private object MemberDataTypeMapper : BiMapper<MemberData.Type, Member.Type> {
     }
 }
 
-private object MemberDataStatusMapper : BiMapper<MemberData.Status, Member.Status> {
+private object MemberDataStatusMapper :
+  BiMapper<MemberData.Status, Member.Status> {
   override fun mapToRight(from: MemberData.Status): Member.Status =
     when (from) {
       MemberData.Status.STANDBY -> Member.Status.STANDBY

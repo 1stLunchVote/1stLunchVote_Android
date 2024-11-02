@@ -1,6 +1,6 @@
 package com.jwd.lunchvote.data.mapper
 
-import com.jwd.lunchvote.core.common.mapper.BiMapper
+import kr.co.inbody.library.mapper.BiMapper
 import com.jwd.lunchvote.data.model.LoungeData
 import com.jwd.lunchvote.domain.entity.Lounge
 
@@ -30,7 +30,8 @@ private object LoungeDataMapper : BiMapper<LoungeData, Lounge> {
     )
 }
 
-private object LoungeStatusDataMapper : BiMapper<LoungeData.Status, Lounge.Status> {
+private object LoungeStatusDataMapper :
+  BiMapper<LoungeData.Status, Lounge.Status> {
   override fun mapToRight(from: LoungeData.Status): Lounge.Status =
     when (from) {
       LoungeData.Status.CREATED -> Lounge.Status.CREATED
