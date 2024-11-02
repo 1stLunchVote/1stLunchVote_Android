@@ -29,7 +29,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jwd.lunchvote.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.screen.lounge.setting.LoungeSettingContract.Companion.MAX_MEMBERS_DIALOG
 import com.jwd.lunchvote.presentation.screen.lounge.setting.LoungeSettingContract.Companion.MIN_DISLIKE_FOODS_DIALOG
@@ -39,6 +38,7 @@ import com.jwd.lunchvote.presentation.screen.lounge.setting.LoungeSettingContrac
 import com.jwd.lunchvote.presentation.screen.lounge.setting.LoungeSettingContract.LoungeSettingEvent
 import com.jwd.lunchvote.presentation.screen.lounge.setting.LoungeSettingContract.LoungeSettingSideEffect
 import com.jwd.lunchvote.presentation.screen.lounge.setting.LoungeSettingContract.LoungeSettingState
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
@@ -634,7 +634,7 @@ private fun Preview() {
 @Preview
 @Composable
 private fun TimeLimitDialogPreview() {
-  com.jwd.lunchvote.theme.LunchVoteTheme {
+  LunchVoteTheme {
     TimeLimitDialog(
       timeLimit = 10
     )
@@ -644,7 +644,7 @@ private fun TimeLimitDialogPreview() {
 @Preview
 @Composable
 private fun MaxMembersDialogPreview() {
-  com.jwd.lunchvote.theme.LunchVoteTheme {
+  LunchVoteTheme {
     MaxMembersDialog(
       maxMembers = 3
     )
@@ -654,7 +654,7 @@ private fun MaxMembersDialogPreview() {
 @Preview
 @Composable
 private fun SecondVoteCandidatesDialogPreview() {
-  com.jwd.lunchvote.theme.LunchVoteTheme {
+  LunchVoteTheme {
     SecondVoteCandidatesDialog(
       secondVoteCandidates = 5
     )
@@ -664,7 +664,7 @@ private fun SecondVoteCandidatesDialogPreview() {
 @Preview
 @Composable
 private fun MinLikeFoodsDialogPreview() {
-  com.jwd.lunchvote.theme.LunchVoteTheme {
+  LunchVoteTheme {
     MinLikeFoodsDialog(
       minLikeFoods = 3
     )
@@ -674,7 +674,7 @@ private fun MinLikeFoodsDialogPreview() {
 @Preview
 @Composable
 private fun MinDislikeFoodsDialogPreview() {
-  com.jwd.lunchvote.theme.LunchVoteTheme {
+  LunchVoteTheme {
     MinDislikeFoodsDialog(
       minDislikeFoods = 2
     )

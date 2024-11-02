@@ -45,12 +45,12 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jwd.lunchvote.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.UserUIModel
 import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.ProfileEvent
 import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.ProfileSideEffect
 import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.ProfileState
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.ImageBitmapFactory
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.Gap
@@ -457,7 +457,7 @@ private fun Preview() {
 @Preview
 @Composable
 private fun EditProfileImageDialogPreview() {
-  com.jwd.lunchvote.theme.LunchVoteTheme {
+  LunchVoteTheme {
     EditProfileImageDialog(
       profileImageUri = "".toUri()
     )
@@ -467,7 +467,7 @@ private fun EditProfileImageDialogPreview() {
 @Preview
 @Composable
 private fun EditNameDialogPreview() {
-  com.jwd.lunchvote.theme.LunchVoteTheme {
+  LunchVoteTheme {
     EditNameDialog(
       initialName = "김태우존잘", name = ""
     )
@@ -477,7 +477,7 @@ private fun EditNameDialogPreview() {
 @Preview
 @Composable
 private fun DeleteUserConfirmDialogPreview() {
-  com.jwd.lunchvote.theme.LunchVoteTheme {
+  LunchVoteTheme {
     DeleteUserConfirmDialog()
   }
 }

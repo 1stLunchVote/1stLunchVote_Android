@@ -31,12 +31,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jwd.lunchvote.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.screen.template.TemplateListContract.TemplateListEvent
 import com.jwd.lunchvote.presentation.screen.template.TemplateListContract.TemplateListSideEffect
 import com.jwd.lunchvote.presentation.screen.template.TemplateListContract.TemplateListState
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
@@ -270,7 +270,7 @@ private fun Preview2() {
 @Preview
 @Composable
 private fun AddDialogPreview() {
-  com.jwd.lunchvote.theme.LunchVoteTheme {
+  LunchVoteTheme {
     AddDialog(
       templateName = "템플릿 이름"
     )

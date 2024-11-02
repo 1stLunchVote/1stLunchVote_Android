@@ -25,7 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.jwd.lunchvote.theme.LunchVoteTheme
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 
 @Composable
 fun LunchVoteDialog(
@@ -97,7 +97,7 @@ fun LunchVoteDialog(
 @Preview
 @Composable
 private fun LunchVoteDialogPreview() {
-  com.jwd.lunchvote.theme.LunchVoteTheme {
+  LunchVoteTheme {
     LunchVoteDialog(title = "투표 방 참여하기",
       dismissText = "취소",
       onDismissRequest = {},
@@ -113,7 +113,7 @@ private fun LunchVoteDialogPreview() {
 @Preview
 @Composable
 private fun LunchVoteIconDialogPreview() {
-  com.jwd.lunchvote.theme.LunchVoteTheme {
+  LunchVoteTheme {
     LunchVoteDialog(title = "정말 나가시겠습니까?",
       dismissText = "취소",
       onDismissRequest = {},

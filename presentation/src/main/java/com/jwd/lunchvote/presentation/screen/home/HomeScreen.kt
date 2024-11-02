@@ -56,13 +56,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jwd.lunchvote.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.BuildConfig
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.screen.home.HomeContract.HomeEvent
 import com.jwd.lunchvote.presentation.screen.home.HomeContract.HomeSideEffect
 import com.jwd.lunchvote.presentation.screen.home.HomeContract.HomeState
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.ImageBitmapFactory
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.Gap
@@ -489,7 +489,7 @@ private fun Preview() {
 @Preview
 @Composable
 private fun JoinDialogPreview() {
-  com.jwd.lunchvote.theme.LunchVoteTheme {
+  LunchVoteTheme {
     JoinDialog("1234")
   }
 }

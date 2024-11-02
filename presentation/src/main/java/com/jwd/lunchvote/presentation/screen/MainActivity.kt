@@ -26,10 +26,10 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import com.jwd.lunchvote.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavHost
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
 import com.jwd.lunchvote.presentation.navigation.route
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.Connection
 import com.jwd.lunchvote.presentation.util.Connection.LOST
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
@@ -62,7 +62,7 @@ class MainActivity: ComponentActivity() {
       else -> LunchVoteNavRoute.Login.route
     }
 
-    com.jwd.lunchvote.theme.LunchVoteTheme {
+    LunchVoteTheme {
       Surface(
         modifier = Modifier.fillMaxSize()
       ) {

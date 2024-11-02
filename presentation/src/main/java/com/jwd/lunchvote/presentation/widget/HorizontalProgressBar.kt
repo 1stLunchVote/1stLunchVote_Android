@@ -15,7 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.jwd.lunchvote.theme.LunchVoteTheme
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import kotlinx.coroutines.delay
 
 @Composable
@@ -49,7 +49,7 @@ fun HorizontalProgressBar(
 @Preview
 @Composable
 private fun Preview() {
-  com.jwd.lunchvote.theme.LunchVoteTheme {
+  LunchVoteTheme {
     Surface {
       HorizontalProgressBar(
         timeLimitSecond = 60, modifier = Modifier.fillMaxWidth()

@@ -18,10 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jwd.lunchvote.theme.colorOnSuccess
-import com.jwd.lunchvote.theme.colorSuccess
 import com.jwd.lunchvote.presentation.util.circleShadow
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.theme.colorOnSuccess
+import com.jwd.lunchvote.presentation.theme.colorSuccess
 
 @Composable
 fun LikeDislike(
@@ -47,7 +47,7 @@ private fun Like(
     modifier = modifier
       .padding(bottom = 1.dp)
       .height(21.dp)
-      .background(com.jwd.lunchvote.theme.colorSuccess, RoundedCornerShape(10.dp)),
+      .background(colorSuccess, RoundedCornerShape(10.dp)),
     verticalAlignment = Alignment.CenterVertically
   ) {
     Spacer(Modifier.width(4.dp))
@@ -56,13 +56,13 @@ private fun Like(
       null,
       modifier = Modifier
         .size(11.dp)
-        .circleShadow(com.jwd.lunchvote.theme.colorOnSuccess, blurRadius = 6.dp)
+        .circleShadow(colorOnSuccess, blurRadius = 6.dp)
     )
     Spacer(Modifier.width(4.dp))
     Text(
       "$amount".padStart(2, '0'),
       style = MaterialTheme.typography.labelLarge,
-      color = com.jwd.lunchvote.theme.colorOnSuccess
+      color = colorOnSuccess
     )
     Spacer(Modifier.width(4.dp))
   }
@@ -90,7 +90,7 @@ private fun Dislike(
     Text(
       "$amount".padStart(2, '0'),
       style = MaterialTheme.typography.labelLarge,
-      color = com.jwd.lunchvote.theme.colorOnSuccess
+      color = colorOnSuccess
     )
     Spacer(Modifier.width(4.dp))
   }

@@ -28,7 +28,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
-import com.jwd.lunchvote.theme.LunchVoteTheme
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 
 @Composable
@@ -135,7 +135,7 @@ enum class LoginButtonSize(val scale: Float) {
 @Preview(showBackground = true)
 @Composable
 private fun KakaoLoginButtonPreview() {
-  com.jwd.lunchvote.theme.LunchVoteTheme {
+  LunchVoteTheme {
     Column(
       verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -155,7 +155,7 @@ private fun KakaoLoginButtonPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun GoogleLoginButtonPreview() {
-  com.jwd.lunchvote.theme.LunchVoteTheme {
+  LunchVoteTheme {
     Column(
       verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {

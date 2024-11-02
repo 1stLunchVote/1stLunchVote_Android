@@ -23,7 +23,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jwd.lunchvote.theme.LunchVoteTheme
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.domain.entity.Chat
 import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.entity.Member.Type.READY
@@ -213,7 +213,7 @@ private fun ChatBubblePreview() {
 
   val chatBuilder = Chat.Builder("")
 
-  com.jwd.lunchvote.theme.LunchVoteTheme {
+  LunchVoteTheme {
     Column(
       modifier = Modifier.fillMaxWidth().padding(24.dp),
       verticalArrangement = Arrangement.spacedBy(16.dp),
