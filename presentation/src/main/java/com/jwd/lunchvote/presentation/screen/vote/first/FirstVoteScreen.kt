@@ -21,6 +21,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -285,7 +286,7 @@ private fun SelectTemplateDialog(
           onValueChange = { },
           modifier = Modifier
             .fillMaxWidth()
-            .menuAnchor(),
+            .menuAnchor(MenuAnchorType.PrimaryNotEditable),
           readOnly = true,
           trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expended) },
           singleLine = true
@@ -296,7 +297,7 @@ private fun SelectTemplateDialog(
           onValueChange = { },
           modifier = Modifier
             .fillMaxWidth()
-            .menuAnchor(),
+            .menuAnchor(MenuAnchorType.PrimaryNotEditable),
           readOnly = true,
           trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expended) },
           singleLine = true

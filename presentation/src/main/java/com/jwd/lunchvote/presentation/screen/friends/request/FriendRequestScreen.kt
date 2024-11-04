@@ -95,6 +95,7 @@ private fun FriendRequestScreen(
       onRefresh = { onEvent(FriendRequestEvent.ScreenInitialize) },
       modifier = Modifier.fillMaxSize(),
       isRefreshing = loading,
+      horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
       val requestList = state.requestSenderMap.entries.toList().sortedByDescending { it.key.createdAt }

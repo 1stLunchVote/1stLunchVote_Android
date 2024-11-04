@@ -2,7 +2,6 @@ package com.jwd.lunchvote.presentation.screen.friends
 
 import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -131,73 +130,68 @@ private fun FriendListScreen(
         }
       )
     },
-    scrollable = false
-  ) {
-    Box(
-      modifier = Modifier.fillMaxSize()
-    ) {
-      LazyColumn(
-        onRefresh = { onEvent(FriendListEvent.ScreenInitialize) },
-        modifier = Modifier.fillMaxSize(),
-        isRefreshing = loading,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-      ) {
-        friendItemGroup(
-          titleId = R.string.friend_list_lounge_group_title,
-          friendList = state.joinedFriendList
-        ) { friend ->
-          FriendItem(
-            friend = friend,
-            modifier = Modifier.fillMaxWidth(),
-            online = true,
-            onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id)) },
-            onClickJoinButton = { onEvent(FriendListEvent.OnClickJoinButton(friend.id)) }
-          )
-        }
-        friendItemGroup(
-          titleId = R.string.friend_list_online_group_title,
-          friendList = state.onlineFriendList
-        ) { friend ->
-          FriendItem(
-            friend = friend,
-            modifier = Modifier.fillMaxWidth(),
-            online = true,
-            onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id)) }
-          )
-        }
-        friendItemGroup(
-          titleId = R.string.friend_list_offline_group_title,
-          friendList = state.offlineFriendList
-        ) { friend ->
-          FriendItem(
-            friend = friend,
-            modifier = Modifier.fillMaxWidth(),
-            online = false,
-            onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id)) },
-          )
-        }
-        item {
-          Text(
-            text = stringResource(R.string.friend_list_tooltip),
-            modifier = Modifier.padding(top = 16.dp),
-            color = MaterialTheme.colorScheme.outlineVariant,
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.labelMedium
-          )
-        }
-      }
+    actions = {
       FloatingActionButton(
         onClick = { onEvent(FriendListEvent.OnClickRequestButton) },
-        modifier = Modifier
-          .align(Alignment.BottomEnd)
-          .padding(end = 32.dp, bottom = 48.dp),
         containerColor = MaterialTheme.colorScheme.primary,
         contentColor = MaterialTheme.colorScheme.onPrimary,
       ) {
         Icon(
           imageVector = Icons.Outlined.Add,
           contentDescription = "add friend"
+        )
+      }
+    },
+    scrollable = false
+  ) {
+    LazyColumn(
+      onRefresh = { onEvent(FriendListEvent.ScreenInitialize) },
+      modifier = Modifier.fillMaxSize(),
+      isRefreshing = loading,
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+      friendItemGroup(
+        titleId = R.string.friend_list_lounge_group_title,
+        friendList = state.joinedFriendList
+      ) { friend ->
+        FriendItem(
+          friend = friend,
+          modifier = Modifier.fillMaxWidth(),
+          online = true,
+          onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id)) },
+          onClickJoinButton = { onEvent(FriendListEvent.OnClickJoinButton(friend.id)) }
+        )
+      }
+      friendItemGroup(
+        titleId = R.string.friend_list_online_group_title,
+        friendList = state.onlineFriendList
+      ) { friend ->
+        FriendItem(
+          friend = friend,
+          modifier = Modifier.fillMaxWidth(),
+          online = true,
+          onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id)) }
+        )
+      }
+      friendItemGroup(
+        titleId = R.string.friend_list_offline_group_title,
+        friendList = state.offlineFriendList
+      ) { friend ->
+        FriendItem(
+          friend = friend,
+          modifier = Modifier.fillMaxWidth(),
+          online = false,
+          onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id)) },
+        )
+      }
+      item {
+        Text(
+          text = stringResource(R.string.friend_list_tooltip),
+          modifier = Modifier.padding(top = 16.dp),
+          color = MaterialTheme.colorScheme.outlineVariant,
+          textAlign = TextAlign.Center,
+          style = MaterialTheme.typography.labelMedium
         )
       }
     }

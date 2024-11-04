@@ -136,7 +136,7 @@ private fun LoginScreen(
   ) {
     Column(
       modifier = Modifier
-        .fillMaxSize()
+        .weight(1f)
         .padding(horizontal = 24.dp)
         .padding(top = 24.dp, bottom = 32.dp)
     ) {

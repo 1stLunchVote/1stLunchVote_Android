@@ -2,10 +2,7 @@ package com.jwd.lunchvote.presentation.screen.vote.result
 
 import android.content.Context
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
@@ -87,35 +84,31 @@ private fun VoteResultScreen(
       )
     }
   ) {
-    Column(
-      modifier = Modifier.fillMaxSize(),
-      verticalArrangement = Arrangement.Center,
-      horizontalAlignment = Alignment.CenterHorizontally
+    Gap()
+    Text(
+      text = stringResource(R.string.vote_result_header),
+      style = MaterialTheme.typography.bodyLarge
+    )
+    Gap(height = 8.dp)
+    VoteResultImage(
+      foodImageUri = state.food.imageUrl,
+      voteRatio = state.voteRatio,
+      modifier = Modifier.size(156.dp)
+    )
+    Gap(height = 48.dp)
+    Text(
+      text = state.food.name,
+      style = MaterialTheme.typography.headlineSmall
+    )
+    Gap(height = 80.dp)
+    Button(
+      onClick = { onEvent(VoteResultEvent.OnClickHomeButton) }
     ) {
       Text(
-        text = stringResource(R.string.vote_result_header),
-        style = MaterialTheme.typography.bodyLarge
+        text = stringResource(R.string.vote_result_home_button)
       )
-      Gap(height = 8.dp)
-      VoteResultImage(
-        foodImageUri = state.food.imageUrl,
-        voteRatio = state.voteRatio,
-        modifier = Modifier.size(156.dp)
-      )
-      Gap(height = 48.dp)
-      Text(
-        text = state.food.name,
-        style = MaterialTheme.typography.headlineSmall
-      )
-      Gap(height = 80.dp)
-      Button(
-        onClick = { onEvent(VoteResultEvent.OnClickHomeButton) }
-      ) {
-        Text(
-          text = stringResource(R.string.vote_result_home_button)
-        )
-      }
     }
+    Gap()
   }
 }
 
