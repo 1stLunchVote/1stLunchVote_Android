@@ -41,6 +41,7 @@ import com.jwd.lunchvote.presentation.screen.lounge.setting.LoungeSettingContrac
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
+import com.jwd.lunchvote.presentation.util.conditional
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
@@ -237,14 +238,14 @@ private fun SettingItem(
     Row(
       modifier = Modifier
         .fillMaxWidth()
-        .let { if (enabled) it else it.alpha(0.75f) },
+        .conditional(enabled.not()) { alpha(0.75f) },
       horizontalArrangement = Arrangement.spacedBy(16.dp),
       verticalAlignment = Alignment.CenterVertically
     ) {
       Column(
         modifier = Modifier
           .weight(1f)
-          .let { if (enabled) it else it.alpha(0.5f) },
+          .conditional(enabled.not()) { alpha(0.5f) },
         verticalArrangement = Arrangement.spacedBy(8.dp)
       ) {
         Text(

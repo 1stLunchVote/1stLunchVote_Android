@@ -34,14 +34,12 @@ import com.jwd.lunchvote.presentation.screen.setting.SettingContract.SettingEven
 import com.jwd.lunchvote.presentation.screen.setting.SettingContract.SettingSideEffect
 import com.jwd.lunchvote.presentation.screen.setting.SettingContract.SettingState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
-import com.jwd.lunchvote.presentation.util.UiText
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
-import timber.log.Timber
 
 @Composable
 fun SettingRoute(

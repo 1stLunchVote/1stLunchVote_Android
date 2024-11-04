@@ -1,7 +1,7 @@
 package com.jwd.lunchvote.presentation.mapper
 
-import com.jwd.lunchvote.mapper.BiMapper
 import com.jwd.lunchvote.domain.entity.Member
+import com.jwd.lunchvote.mapper.BiMapper
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.util.toLong
 import com.jwd.lunchvote.presentation.util.toZonedDateTime

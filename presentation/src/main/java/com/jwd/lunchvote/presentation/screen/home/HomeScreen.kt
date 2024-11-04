@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.HorizontalDivider
@@ -65,7 +64,7 @@ import com.jwd.lunchvote.presentation.screen.home.HomeContract.HomeState
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.ImageBitmapFactory
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
-import com.jwd.lunchvote.presentation.util.modifyIf
+import com.jwd.lunchvote.presentation.util.conditional
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
 import com.jwd.lunchvote.presentation.widget.LunchVoteIcon
@@ -154,7 +153,7 @@ private fun HomeScreen(
       LunchVoteIcon(
         modifier = Modifier
           .padding(vertical = 8.dp)
-          .modifyIf(BuildConfig.DEBUG) {
+          .conditional(BuildConfig.DEBUG) {
             pointerInput(Unit) {
               detectTapGestures(onLongPress = { onEvent(HomeEvent.OnClickSecretButton) })
             }

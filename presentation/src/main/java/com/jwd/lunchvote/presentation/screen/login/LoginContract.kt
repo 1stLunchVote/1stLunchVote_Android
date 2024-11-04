@@ -1,7 +1,6 @@
 package com.jwd.lunchvote.presentation.screen.login
 
 import android.os.Parcelable
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.jwd.lunchvote.presentation.base.ViewModelContract
 import com.jwd.lunchvote.presentation.util.UiText

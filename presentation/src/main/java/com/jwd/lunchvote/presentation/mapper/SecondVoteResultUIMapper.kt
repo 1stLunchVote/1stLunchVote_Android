@@ -1,7 +1,7 @@
 package com.jwd.lunchvote.presentation.mapper
 
-import com.jwd.lunchvote.mapper.BiMapper
 import com.jwd.lunchvote.domain.entity.SecondVoteResult
+import com.jwd.lunchvote.mapper.BiMapper
 import com.jwd.lunchvote.presentation.model.SecondVoteResultUIModel
 
 private object VoteResultUIMapper : BiMapper<SecondVoteResultUIModel, SecondVoteResult> {

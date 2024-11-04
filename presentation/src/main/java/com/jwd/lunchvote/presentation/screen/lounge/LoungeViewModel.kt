@@ -5,7 +5,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.entity.Chat
 import com.jwd.lunchvote.domain.entity.Lounge.Status.FIRST_VOTE
 import com.jwd.lunchvote.domain.entity.Lounge.Status.QUIT
@@ -21,6 +20,7 @@ import com.jwd.lunchvote.domain.usecase.ExitLounge
 import com.jwd.lunchvote.domain.usecase.JoinLounge
 import com.jwd.lunchvote.domain.usecase.StartFirstVote
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.MemberUIModel.Type.DEFAULT
 import com.jwd.lunchvote.presentation.model.MemberUIModel.Type.OWNER

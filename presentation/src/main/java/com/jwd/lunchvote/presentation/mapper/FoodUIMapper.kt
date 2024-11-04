@@ -1,7 +1,7 @@
 package com.jwd.lunchvote.presentation.mapper
 
-import com.jwd.lunchvote.mapper.BiMapper
 import com.jwd.lunchvote.domain.entity.Food
+import com.jwd.lunchvote.mapper.BiMapper
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 
 private object FoodUIMapper : BiMapper<FoodUIModel, Food> {

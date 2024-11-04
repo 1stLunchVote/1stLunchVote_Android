@@ -3,11 +3,11 @@ package com.jwd.lunchvote.presentation.screen.login.register.nickname
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
-import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.usecase.CreateUserWithEmailAndPassword
 import com.jwd.lunchvote.domain.usecase.SignInWithEmailAndPassword
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.model.UserUIModel
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute

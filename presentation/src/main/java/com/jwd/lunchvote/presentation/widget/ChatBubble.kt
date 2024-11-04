@@ -23,7 +23,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.domain.entity.Chat
 import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.entity.Member.Type.READY
@@ -33,6 +32,7 @@ import com.jwd.lunchvote.presentation.model.ChatUIModel
 import com.jwd.lunchvote.presentation.model.ChatUIModel.Type.DEFAULT
 import com.jwd.lunchvote.presentation.model.ChatUIModel.Type.SYSTEM
 import com.jwd.lunchvote.presentation.model.MemberUIModel
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 

@@ -2,9 +2,9 @@ package com.jwd.lunchvote.presentation.screen.login.register.password
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.usecase.GetEmail
 import com.jwd.lunchvote.domain.usecase.SetEmail
+import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.presentation.screen.login.register.password.PasswordContract.PasswordEvent
 import com.jwd.lunchvote.presentation.screen.login.register.password.PasswordContract.PasswordReduce
 import com.jwd.lunchvote.presentation.screen.login.register.password.PasswordContract.PasswordSideEffect

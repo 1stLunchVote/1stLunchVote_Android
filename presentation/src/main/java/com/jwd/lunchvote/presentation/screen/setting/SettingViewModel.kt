@@ -6,9 +6,9 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.StorageRepository
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.presentation.screen.setting.SettingContract.SettingEvent
 import com.jwd.lunchvote.presentation.screen.setting.SettingContract.SettingReduce
 import com.jwd.lunchvote.presentation.screen.setting.SettingContract.SettingSideEffect

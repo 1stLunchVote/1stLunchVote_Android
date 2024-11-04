@@ -2,16 +2,15 @@ package com.jwd.lunchvote.presentation.screen.login
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.FirebaseAuthException
-import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.usecase.GenerateName
 import com.jwd.lunchvote.domain.usecase.SignInWithEmailAndPassword
 import com.jwd.lunchvote.domain.usecase.SignInWithGoogleIdToken
 import com.jwd.lunchvote.domain.usecase.SignInWithKakaoIdToken
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.model.UserUIModel
 import com.jwd.lunchvote.presentation.screen.login.LoginContract.LoginEvent

@@ -14,9 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.MemberUIModel
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.glow
 
 @Composable
@@ -43,7 +43,7 @@ private fun StepProgress(
     Box(
       modifier = modifier
         .size(16.dp)
-        .glow(MaterialTheme.colorScheme.primary, 8.dp)
+        .glow(MaterialTheme.colorScheme.primary, 16.dp)
         .background(MaterialTheme.colorScheme.primary, CircleShape)
     )
   } else {

@@ -38,7 +38,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodItem.Status.DISLIKE
 import com.jwd.lunchvote.presentation.model.FoodItem.Status.LIKE
@@ -48,6 +47,7 @@ import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.FirstV
 import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.FirstVoteEvent
 import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.FirstVoteSideEffect
 import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.FirstVoteState
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.FoodItem
 import com.jwd.lunchvote.presentation.widget.Gap

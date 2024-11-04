@@ -24,9 +24,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
-import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.MemberUIModel
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
+import com.jwd.lunchvote.presentation.util.conditional
 import com.jwd.lunchvote.presentation.util.glow
 import com.skydoves.landscapist.coil.CoilImage
 
@@ -45,10 +46,8 @@ fun MemberProfile(
   Box(
     modifier = modifier
       .size(48.dp)
-      .let {
-        if (member.type == MemberUIModel.Type.READY || member.type == MemberUIModel.Type.OWNER) {
-          it.glow(MaterialTheme.colorScheme.primary, 24.dp)
-        } else it
+      .conditional(member.type == MemberUIModel.Type.READY || member.type == MemberUIModel.Type.OWNER) {
+        glow(MaterialTheme.colorScheme.primary, 48.dp)
       }
       .clip(CircleShape)
       .border(2.dp, borderColor, CircleShape)
@@ -117,7 +116,8 @@ fun InviteProfile(
 private fun Preview() {
   LunchVoteTheme {
     Row(
-      modifier = Modifier.padding(24.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)
+      modifier = Modifier.padding(24.dp),
+      horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
       MemberProfile(
         member = MemberUIModel()
