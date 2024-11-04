@@ -134,7 +134,7 @@ private fun LoungeScreen(
   onEvent: (LoungeEvent) -> Unit = {}
 ) {
   Screen(
-    modifier = modifier,
+    modifier = modifier.padding(horizontal = 24.dp),
     topAppBar = {
       LunchVoteTopBar(
         title = stringResource(R.string.lounge_topbar_title),
@@ -149,6 +149,16 @@ private fun LoungeScreen(
             )
           }
         }
+      )
+    },
+    bottomAppBar = {
+      LoungeBottomBar(
+        text = state.text,
+        isOwner = state.isOwner,
+        modifier = Modifier.fillMaxWidth(),
+        onTextChange = { onEvent(LoungeEvent.OnTextChange(it)) },
+        onClickSendChatButton = { onEvent(LoungeEvent.OnClickSendChatButton) },
+        onClickActionButton = { onEvent(LoungeEvent.OnClickActionButton) }
       )
     },
     scrollable = false
@@ -169,14 +179,6 @@ private fun LoungeScreen(
         .weight(1f),
       onClickMember = { onEvent(LoungeEvent.OnClickMember(it)) }
     )
-    LoungeBottomBar(
-      text = state.text,
-      isOwner = state.isOwner,
-      modifier = Modifier.fillMaxWidth(),
-      onTextChange = { onEvent(LoungeEvent.OnTextChange(it)) },
-      onClickSendChatButton = { onEvent(LoungeEvent.OnClickSendChatButton) },
-      onClickActionButton = { onEvent(LoungeEvent.OnClickActionButton) }
-    )
   }
 }
 
@@ -189,7 +191,7 @@ private fun MemberRow(
   modifier: Modifier = Modifier
 ) {
   Row(
-    modifier = modifier.padding(start = 32.dp, top = 16.dp, end = 32.dp, bottom = 8.dp),
+    modifier = modifier.padding(top = 16.dp, bottom = 8.dp),
     horizontalArrangement = Arrangement.SpaceBetween
   ) {
     memberList.forEach { member ->
@@ -220,7 +222,7 @@ private fun ChatList(
   val lazyListState = rememberLazyListState()
 
   LazyColumn(
-    modifier = modifier.padding(24.dp),
+    modifier = modifier.padding(vertical = 24.dp),
     state = lazyListState,
     verticalArrangement = Arrangement.Top,
     horizontalAlignment = Alignment.CenterHorizontally,

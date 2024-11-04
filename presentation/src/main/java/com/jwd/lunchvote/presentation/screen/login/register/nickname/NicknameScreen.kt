@@ -65,9 +65,7 @@ private fun NicknameScreen(
   onEvent: (NicknameEvent) -> Unit = {}
 ) {
   Screen(
-    modifier = modifier
-      .fillMaxSize()
-      .padding(horizontal = 24.dp)
+    modifier = modifier.padding(horizontal = 24.dp)
   ) {
     Gap()
     Text(

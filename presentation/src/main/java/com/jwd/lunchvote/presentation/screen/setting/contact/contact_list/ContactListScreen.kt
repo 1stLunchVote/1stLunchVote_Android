@@ -10,10 +10,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.model.ContactUIModel
+import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendListEvent
 import com.jwd.lunchvote.presentation.screen.setting.contact.contact_list.ContactListContract.ContactListEvent
 import com.jwd.lunchvote.presentation.screen.setting.contact.contact_list.ContactListContract.ContactListSideEffect
 import com.jwd.lunchvote.presentation.screen.setting.contact.contact_list.ContactListContract.ContactListState
@@ -78,30 +82,30 @@ private fun ContactListScreen(
   onEvent: (ContactListEvent) -> Unit = {}
 ) {
   Screen(
-    modifier = modifier,
+    modifier = modifier.padding(horizontal = 24.dp),
     topAppBar = {
       LunchVoteTopBar(
         title = "1:1 문의",
         navIconVisible = true,
-        popBackStack = { onEvent(ContactListEvent.OnClickBackButton) },
-        actions = {
-          IconButton(
-            onClick = { onEvent(ContactListEvent.OnClickAddButton) }
-          ) {
-            Icon(
-              Icons.Rounded.Add,
-              contentDescription = "add contact"
-            )
-          }
-        }
+        popBackStack = { onEvent(ContactListEvent.OnClickBackButton) }
       )
+    },
+    actions = {
+      FloatingActionButton(
+        onClick = { onEvent(ContactListEvent.OnClickAddButton) },
+        containerColor = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary,
+      ) {
+        Icon(
+          imageVector = Icons.Outlined.Add,
+          contentDescription = "add contact"
+        )
+      }
     },
     scrollable = false
   ) {
     LazyColumn(
-      modifier = Modifier
-        .fillMaxSize()
-        .padding(horizontal = 24.dp),
+      modifier = Modifier.fillMaxSize(),
       verticalArrangement = if (state.contactList.isNotEmpty()) Arrangement.spacedBy(16.dp) else Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -115,7 +119,7 @@ private fun ContactListScreen(
       if (state.contactList.isEmpty()) {
         item {
           Text(
-            text = "문의 내역이 없습니다.\n문의가 필요한 경우, 우측 상단의 + 버튼을 눌러 작성해주세요.",
+            text = "문의 내역이 없습니다.\n문의가 필요한 경우, + 버튼을 눌러 작성해주세요.",
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.outline,
             style = MaterialTheme.typography.labelLarge

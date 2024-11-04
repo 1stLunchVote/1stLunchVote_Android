@@ -96,7 +96,7 @@ private fun LoungeMemberScreen(
   onEvent: (LoungeMemberEvent) -> Unit = {}
 ) {
   Screen(
-    modifier = modifier,
+    modifier = modifier.padding(32.dp),
     topAppBar = {
       LunchVoteTopBar(
         title = "참여자 정보",
@@ -105,9 +105,7 @@ private fun LoungeMemberScreen(
     }
   ) {
     Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(32.dp),
+      modifier = Modifier.fillMaxWidth(),
       horizontalArrangement = Arrangement.spacedBy(32.dp),
       verticalAlignment = Alignment.CenterVertically
     ) {

@@ -123,7 +123,7 @@ private fun LoginScreen(
   onEvent: (LoginEvent) -> Unit = {}
 ) {
   Screen(
-    modifier = modifier,
+    modifier = modifier.padding(start = 24.dp, top = 24.dp, bottom = 32.dp, end = 24.dp),
     topAppBar = {
       Image(
         painterResource(R.drawable.bg_login_title),
@@ -134,36 +134,29 @@ private fun LoginScreen(
       )
     }
   ) {
-    Column(
+    LoginFields(
+      email = state.email,
+      password = state.password,
+      onEmailChange = { onEvent(LoginEvent.OnEmailChange(it)) },
+      onPasswordChange = { onEvent(LoginEvent.OnPasswordChange(it)) },
+      onClickEmailLoginButton = { onEvent(LoginEvent.OnClickEmailLoginButton) },
+      loading = loading,
+      modifier = Modifier.fillMaxWidth()
+    )
+    Gap(height = 8.dp)
+    RegisterRow(
+      onClickRegisterButton = { onEvent(LoginEvent.OnClickRegisterButton) },
+      loading = loading,
+      modifier = Modifier.fillMaxWidth()
+    )
+    Gap(minHeight = 64.dp)
+    SocialLoginButtons(
+      onClickKakaoLoginButton = { onEvent(LoginEvent.OnClickKakaoLoginButton) },
+      loading = loading,
       modifier = Modifier
-        .weight(1f)
-        .padding(horizontal = 24.dp)
-        .padding(top = 24.dp, bottom = 32.dp)
-    ) {
-      LoginFields(
-        email = state.email,
-        password = state.password,
-        onEmailChange = { onEvent(LoginEvent.OnEmailChange(it)) },
-        onPasswordChange = { onEvent(LoginEvent.OnPasswordChange(it)) },
-        onClickEmailLoginButton = { onEvent(LoginEvent.OnClickEmailLoginButton) },
-        loading = loading,
-        modifier = Modifier.fillMaxWidth()
-      )
-      Gap(height = 8.dp)
-      RegisterRow(
-        onClickRegisterButton = { onEvent(LoginEvent.OnClickRegisterButton) },
-        loading = loading,
-        modifier = Modifier.fillMaxWidth()
-      )
-      Gap(minHeight = 64.dp)
-      SocialLoginButtons(
-        onClickKakaoLoginButton = { onEvent(LoginEvent.OnClickKakaoLoginButton) },
-        loading = loading,
-        modifier = Modifier
-          .height(IntrinsicSize.Max)
-          .fillMaxWidth()
-      )
-    }
+        .height(IntrinsicSize.Max)
+        .fillMaxWidth()
+    )
   }
 }
 

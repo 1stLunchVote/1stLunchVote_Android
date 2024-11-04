@@ -121,7 +121,7 @@ fun HomeRoute(
         onConfirmation = { viewModel.sendEvent(HomeEvent.OnClickConfirmButtonJoinDialog) }
       )
     }
-    HomeContract.SECRET_DIALOG -> { // Only for Debug
+    HomeContract.SECRET_DIALOG -> {
       if (BuildConfig.DEBUG) {
         SecretDialog(foodName = state.foodName,
           foodImageUri = state.foodImageUri,
@@ -148,7 +148,7 @@ private fun HomeScreen(
   onEvent: (HomeEvent) -> Unit = {}
 ){
   Screen(
-    modifier = modifier.padding(horizontal = 32.dp),
+    modifier = modifier.padding(start = 32.dp, top = 0.dp, bottom = 32.dp, end = 32.dp),
     topAppBar = {
       LunchVoteIcon(
         modifier = Modifier
@@ -182,7 +182,6 @@ private fun HomeScreen(
       onClickSettingButton = { onEvent(HomeEvent.OnClickSettingButton) },
       onClickTipsButton = { onEvent(HomeEvent.OnClickTipsButton) },
     )
-    Gap(height = 32.dp)
   }
 }
 

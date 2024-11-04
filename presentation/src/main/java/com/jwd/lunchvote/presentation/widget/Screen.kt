@@ -3,9 +3,11 @@ package com.jwd.lunchvote.presentation.widget
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -20,17 +22,21 @@ import com.jwd.lunchvote.presentation.util.conditional
 fun Screen(
   modifier: Modifier = Modifier,
   topAppBar: @Composable (ColumnScope.() -> Unit)? = null,
+  bottomAppBar: @Composable (ColumnScope.() -> Unit)? = null,
   actions: @Composable (ColumnScope.() -> Unit)? = null,
   scrollable: Boolean = true,
   content: @Composable ColumnScope.() -> Unit
 ) {
   Box(
-    modifier = Modifier.height(LocalConfiguration.current.screenHeightDp.dp)
+    modifier = Modifier
+      .fillMaxWidth()
+      .height(LocalConfiguration.current.screenHeightDp.dp),
+    contentAlignment = Alignment.TopCenter
   ) {
     Column(
       modifier = Modifier
-        .fillMaxSize()
-        .then(modifier),
+        .widthIn(max = 1024.dp)
+        .fillMaxHeight(),
       horizontalAlignment = Alignment.CenterHorizontally
     ) {
       if (topAppBar != null) {
@@ -41,11 +47,13 @@ fun Screen(
       Column(
         modifier = Modifier
           .weight(1f)
-          .conditional(scrollable) {
-            verticalScroll(rememberScrollState())
-          }
-      ) {
-        content()
+          .conditional(scrollable) { verticalScroll(rememberScrollState()) }
+          .then(modifier)
+      ) { content() }
+      if (bottomAppBar != null) {
+        Column(
+          modifier = Modifier.zIndex(1f)
+        ) { bottomAppBar() }
       }
     }
     if (actions != null) {

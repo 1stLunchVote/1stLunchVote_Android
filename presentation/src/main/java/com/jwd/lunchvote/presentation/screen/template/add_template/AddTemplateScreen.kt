@@ -111,7 +111,7 @@ private fun AddTemplateScreen(
         leadingIcon = { SearchIcon() }
       )
       LazyVerticalGrid(
-        columns = GridCells.Fixed(3),
+        columns = GridCells.FixedSize(100.dp),
         modifier = Modifier
           .fillMaxWidth()
           .weight(1f),
@@ -123,6 +123,7 @@ private fun AddTemplateScreen(
         items(filteredFoodList) { foodItem ->
           FoodItem(
             foodItem = foodItem,
+            size = 100.dp,
             onClick = { onEvent(AddTemplateEvent.OnClickFoodItem(foodItem)) }
           )
         }

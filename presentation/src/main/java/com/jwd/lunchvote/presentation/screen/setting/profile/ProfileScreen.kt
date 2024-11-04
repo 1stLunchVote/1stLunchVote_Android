@@ -134,7 +134,7 @@ private fun ProfileScreen(
   onEvent: (ProfileEvent) -> Unit = {}
 ) {
   Screen(
-    modifier = modifier,
+    modifier = modifier.padding(24.dp),
     topAppBar = {
       LunchVoteTopBar(
         title = stringResource(R.string.profile_title),
@@ -147,9 +147,7 @@ private fun ProfileScreen(
       profileImage = state.user.profileImage,
       name = state.user.name,
       email = state.user.email,
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(24.dp)
+      modifier = Modifier.fillMaxWidth()
     )
     Row(
       modifier = Modifier.fillMaxWidth(),
@@ -174,7 +172,8 @@ private fun ProfileScreen(
     }
     Gap(minHeight = 32.dp)
     TextButton(
-      onClick = { onEvent(ProfileEvent.OnClickDeleteUserButton) }
+      onClick = { onEvent(ProfileEvent.OnClickDeleteUserButton) },
+      modifier = Modifier.align(Alignment.CenterHorizontally)
     ) {
       Text(
         text = stringResource(R.string.profile_delete_user),

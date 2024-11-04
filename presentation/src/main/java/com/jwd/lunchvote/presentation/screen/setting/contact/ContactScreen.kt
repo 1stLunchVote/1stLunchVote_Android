@@ -21,12 +21,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.ContactReplyUIModel
 import com.jwd.lunchvote.presentation.model.ContactUIModel
 import com.jwd.lunchvote.presentation.screen.setting.contact.ContactContract.Companion.DELETE_DIALOG
@@ -36,6 +38,7 @@ import com.jwd.lunchvote.presentation.screen.setting.contact.ContactContract.Con
 import com.jwd.lunchvote.presentation.util.INITIAL_DATE_TIME
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
+import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
@@ -88,53 +91,48 @@ private fun ContactScreen(
   onEvent: (ContactEvent) -> Unit = {}
 ) {
   Screen(
-    modifier = modifier,
+    modifier = modifier.padding(horizontal = 24.dp),
     topAppBar = {
       LunchVoteTopBar(
-        title = "1:1 문의",
+        title = stringResource(R.string.contact_title),
         navIconVisible = true,
         popBackStack = { onEvent(ContactEvent.OnClickBackButton) }
       )
     }
   ) {
-    Column(
-      modifier = Modifier
-        .fillMaxSize()
-        .padding(horizontal = 24.dp),
-      verticalArrangement = Arrangement.spacedBy(16.dp),
-      horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-      ContactBox(contact = state.contact)
-      if (state.reply != null) {
-        ReplyBox(reply = state.reply)
-      } else {
-        Column(
-          modifier = Modifier.fillMaxWidth(),
-          verticalArrangement = Arrangement.spacedBy(4.dp),
-          horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-          Text(
-            text = "담당자가 최대한 빠르게 확인 후 답변드리겠습니다.",
-            color = MaterialTheme.colorScheme.outline,
-            style = MaterialTheme.typography.labelMedium
-          )
-          Text(
-            text = "* 휴무일에는 답변이 어려운 점 양해 부탁드립니다.",
-            color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.labelSmall
-          )
-        }
+    ContactBox(contact = state.contact)
+    Gap(height = 16.dp)
+    if (state.reply != null) {
+      ReplyBox(reply = state.reply)
+    } else {
+      Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+      ) {
+        Text(
+          text = stringResource(R.string.contact_notice_1),
+          color = MaterialTheme.colorScheme.outline,
+          style = MaterialTheme.typography.labelMedium
+        )
+        Text(
+          text = stringResource(R.string.contact_notice_2),
+          color = MaterialTheme.colorScheme.error,
+          style = MaterialTheme.typography.labelSmall
+        )
       }
-      Text(
-        text = "문의 삭제",
-        modifier = Modifier
-          .clickableWithoutEffect { onEvent(ContactEvent.OnClickDeleteButton) }
-          .padding(vertical = 12.dp),
-        style = MaterialTheme.typography.titleSmall,
-        color = MaterialTheme.colorScheme.error,
-        textDecoration = TextDecoration.Underline
-      )
     }
+    Gap(height = 16.dp)
+    Text(
+      text = "문의 삭제",
+      modifier = Modifier
+        .clickableWithoutEffect { onEvent(ContactEvent.OnClickDeleteButton) }
+        .padding(vertical = 12.dp)
+        .align(Alignment.CenterHorizontally),
+      style = MaterialTheme.typography.titleSmall,
+      color = MaterialTheme.colorScheme.error,
+      textDecoration = TextDecoration.Underline
+    )
   }
 }
 
@@ -246,7 +244,24 @@ private fun DeleteDialog(
 
 @Preview
 @Composable
-private fun Preview() {
+private fun NoReply() {
+  ScreenPreview {
+    ContactScreen(
+      ContactState(
+        contact = ContactUIModel(
+          id = "1",
+          title = "문의 제목",
+          content = "문의 내용",
+          createdAt = INITIAL_DATE_TIME
+        )
+      )
+    )
+  }
+}
+
+@Preview
+@Composable
+private fun Reply() {
   ScreenPreview {
     ContactScreen(
       ContactState(

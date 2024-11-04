@@ -76,9 +76,7 @@ private fun PasswordScreen(
   onEvent: (PasswordEvent) -> Unit = {}
 ) {
   Screen(
-    modifier = modifier
-      .fillMaxSize()
-      .padding(horizontal = 24.dp)
+    modifier = modifier.padding(horizontal = 24.dp)
   ) {
     val formatError = state.password.isNotEmpty() && (state.password.length < 10 || state.password.length > 20)
     val confirmError = state.password.isNotEmpty() && state.passwordConfirm.isNotEmpty() && state.password != state.passwordConfirm

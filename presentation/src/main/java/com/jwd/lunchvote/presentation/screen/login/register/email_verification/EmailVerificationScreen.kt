@@ -3,7 +3,6 @@ package com.jwd.lunchvote.presentation.screen.login.register.email_verification
 import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -65,9 +64,7 @@ private fun EmailVerificationScreen(
   onEvent: (EmailVerificationEvent) -> Unit = {}
 ) {
   Screen(
-    modifier = modifier
-      .fillMaxSize()
-      .padding(horizontal = 24.dp)
+    modifier = modifier.padding(horizontal = 24.dp)
   ) {
     Gap()
     Text(
