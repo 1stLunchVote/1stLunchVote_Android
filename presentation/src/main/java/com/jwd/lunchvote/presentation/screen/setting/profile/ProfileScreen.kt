@@ -181,7 +181,6 @@ private fun ProfileScreen(
         textDecoration = TextDecoration.Underline
       )
     }
-    Gap(height = 32.dp)
   }
 }
 

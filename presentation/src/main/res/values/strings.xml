@@ -184,13 +184,13 @@
     <!-- AddTemplateScreen -->
     <string name="add_template_title">템플릿 생성</string>
     <string name="add_template_hint_text">검색</string>
-    <string name="add_template_add_button">템플릿 생성</string>
+    <string name="add_template_add_button">생성</string>
     <string name="add_template_add_snackbar">템플릿이 저장되었습니다.</string>
 
     <!-- EditTemplateScreen -->
     <string name="edit_template_title">템플릿 편집</string>
     <string name="edit_template_hint_text">검색</string>
-    <string name="edit_template_save_button">템플릿 수정</string>
+    <string name="edit_template_save_button">수정</string>
     <string name="edit_template_save_snackbar">템플릿이 수정되었습니다.</string>
     <string name="edit_template_delete_snackbar">템플릿이 삭제되었습니다.</string>
     <!-- EditTemplateConfirmDialog -->
