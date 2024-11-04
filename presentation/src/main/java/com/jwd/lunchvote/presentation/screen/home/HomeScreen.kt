@@ -65,8 +65,10 @@ import com.jwd.lunchvote.presentation.screen.home.HomeContract.HomeState
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.ImageBitmapFactory
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
+import com.jwd.lunchvote.presentation.util.modifyIf
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
+import com.jwd.lunchvote.presentation.widget.LunchVoteIcon
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
@@ -149,23 +151,15 @@ private fun HomeScreen(
   Screen(
     modifier = modifier.padding(horizontal = 32.dp),
     topAppBar = {
-      Image(
-        painterResource(R.drawable.ic_logo),
-        contentDescription = null,
+      LunchVoteIcon(
         modifier = Modifier
           .padding(vertical = 8.dp)
-          .size(48.dp)
-          .align(Alignment.CenterHorizontally)
-          .let {
-            // Only for Debug
-            if (BuildConfig.DEBUG) {
-              it.pointerInput(Unit) {
-                detectTapGestures(
-                  onLongPress = { onEvent(HomeEvent.OnClickSecretButton) }
-                )
-              }
-            } else it
-          }
+          .modifyIf(BuildConfig.DEBUG) {
+            pointerInput(Unit) {
+              detectTapGestures(onLongPress = { onEvent(HomeEvent.OnClickSecretButton) })
+            }
+          },
+        size = 48.dp
       )
     }
   ) {

@@ -17,23 +17,21 @@ fun Modifier.modifyIf(condition: Boolean, modify: Modifier.() -> Modifier) =
 fun Modifier.circleShadow(
   color: Color = colorPrimary,
   blurRadius: Dp = 0.dp,
-) = then(
-  drawBehind {
-    drawIntoCanvas { canvas ->
-      val paint = Paint()
-      val frameworkPaint = paint.asFrameworkPaint()
-      if (blurRadius != 0.dp) {
-        frameworkPaint.maskFilter = (BlurMaskFilter(
-          blurRadius.toPx(), BlurMaskFilter.Blur.NORMAL
-        ))
-      }
-      frameworkPaint.color = color.toArgb()
-
-      canvas.drawCircle(
-        center = center,
-        radius = blurRadius.toPx(),
-        paint = paint,
-      )
+): Modifier = this.drawBehind {
+  drawIntoCanvas { canvas ->
+    val paint = Paint()
+    val frameworkPaint = paint.asFrameworkPaint()
+    if (blurRadius != 0.dp) {
+      frameworkPaint.maskFilter = (BlurMaskFilter(
+        blurRadius.toPx(), BlurMaskFilter.Blur.NORMAL
+      ))
     }
+    frameworkPaint.color = color.toArgb()
+
+    canvas.drawCircle(
+      center = center,
+      radius = blurRadius.toPx(),
+      paint = paint,
+    )
   }
-)
+}

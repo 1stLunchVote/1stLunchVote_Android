@@ -114,18 +114,10 @@ private fun LunchVoteRefreshIndicator(
     ) { refreshing ->
       if (refreshing) {
         FlickerAnimation {
-          Image(
-            painterResource(R.drawable.ic_logo),
-            contentDescription = null,
-            modifier = Modifier.size(24.dp)
-          )
+          LunchVoteIcon()
         }
       } else {
-        Image(
-          painterResource(R.drawable.ic_logo),
-          contentDescription = null,
-          modifier = Modifier.size(24.dp)
-        )
+        LunchVoteIcon()
       }
     }
   }
