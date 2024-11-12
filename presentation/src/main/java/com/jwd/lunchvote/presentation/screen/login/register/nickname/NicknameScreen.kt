@@ -1,7 +1,6 @@
 package com.jwd.lunchvote.presentation.screen.login.register.nickname
 
 import android.content.Context
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button

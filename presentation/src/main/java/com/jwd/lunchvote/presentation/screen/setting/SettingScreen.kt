@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -34,7 +33,6 @@ import com.jwd.lunchvote.presentation.screen.MainActivity
 import com.jwd.lunchvote.presentation.screen.setting.SettingContract.SettingEvent
 import com.jwd.lunchvote.presentation.screen.setting.SettingContract.SettingSideEffect
 import com.jwd.lunchvote.presentation.screen.setting.SettingContract.SettingState
-import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.ProfileEvent
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.widget.Gap
