@@ -72,9 +72,11 @@ class MainActivity: ComponentActivity() {
         Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { padding ->
           val snackbarChannel: Channel<String> = Channel()
           LaunchedEffect(snackbarChannel) {
-            snackbarChannel.receiveAsFlow().collectLatest { message ->
+            snackbarChannel.receiveAsFlow()
+              .collectLatest { message ->
                 snackbarHostState.showSnackbar(
-                  message = message, withDismissAction = true
+                  message = message,
+                  withDismissAction = true
                 )
               }
           }
