@@ -1,12 +1,7 @@
 package com.jwd.lunchvote.presentation.screen.template.edit_template
 
 import android.content.Context
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,17 +10,13 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -37,14 +28,13 @@ import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
-import com.jwd.lunchvote.presentation.screen.template.add_template.AddTemplateContract.AddTemplateEvent
 import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.EditTemplateEvent
 import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.EditTemplateSideEffect
 import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.EditTemplateState
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
+import com.jwd.lunchvote.presentation.widget.FAB
 import com.jwd.lunchvote.presentation.widget.FoodGrid
-import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
@@ -128,16 +118,10 @@ private fun EditTemplateScreen(
     },
     actions = {
       if (state.foodItemList.any { it.status != FoodItem.Status.DEFAULT }) {
-        FloatingActionButton(
-          onClick = { onEvent(EditTemplateEvent.OnClickSaveButton) },
-          containerColor = MaterialTheme.colorScheme.primary,
-          contentColor = MaterialTheme.colorScheme.onPrimary
-        ) {
-          Text(
-            text = stringResource(R.string.edit_template_save_button),
-            modifier = Modifier.padding(horizontal = 24.dp)
-          )
-        }
+        FAB(
+          text = stringResource(R.string.edit_template_save_button),
+          onClick = { onEvent(EditTemplateEvent.OnClickSaveButton) }
+        )
       }
     },
     scrollable = false

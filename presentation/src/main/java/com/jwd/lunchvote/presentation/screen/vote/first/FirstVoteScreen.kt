@@ -4,23 +4,16 @@ import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Warning
-import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
@@ -48,26 +41,23 @@ import com.jwd.lunchvote.presentation.model.FoodItem.Status.LIKE
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
-import com.jwd.lunchvote.presentation.screen.template.add_template.AddTemplateContract.AddTemplateEvent
 import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.FirstVoteDialog
 import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.FirstVoteEvent
 import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.FirstVoteSideEffect
 import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.FirstVoteState
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
+import com.jwd.lunchvote.presentation.widget.FAB
 import com.jwd.lunchvote.presentation.widget.FoodGrid
-import com.jwd.lunchvote.presentation.widget.FoodItem
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.HorizontalProgressBar
 import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
-import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.MemberProgress
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
-import com.jwd.lunchvote.presentation.widget.SearchIcon
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -147,29 +137,17 @@ private fun FirstVoteScreen(
     },
     actions = {
       if (state.finished) {
-        FloatingActionButton(
-          onClick = { onEvent(FirstVoteEvent.OnClickReVoteButton) },
-          containerColor = MaterialTheme.colorScheme.primary,
-          contentColor = MaterialTheme.colorScheme.onPrimary
-        ) {
-          Text(
-            text = stringResource(R.string.first_vote_re_vote_button),
-            modifier = Modifier.padding(horizontal = 24.dp)
-          )
-        }
+        FAB(
+          text = stringResource(R.string.first_vote_re_vote_button),
+          onClick = { onEvent(FirstVoteEvent.OnClickFinishButton) }
+        )
       } else {
         if (state.foodItemList.count { it.status == LIKE } >= (state.lounge.minLikeFoods ?: 0)
           && state.foodItemList.count { it.status == DISLIKE } >= (state.lounge.minDislikeFoods ?: 0)) {
-          FloatingActionButton(
-            onClick = { onEvent(FirstVoteEvent.OnClickFinishButton) },
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary
-          ) {
-            Text(
-              text = stringResource(R.string.first_vote_finish_button),
-              modifier = Modifier.padding(horizontal = 24.dp)
-            )
-          }
+          FAB(
+            text = stringResource(R.string.first_vote_finish_button),
+            onClick = { onEvent(FirstVoteEvent.OnClickFinishButton) }
+          )
         }
       }
     },
