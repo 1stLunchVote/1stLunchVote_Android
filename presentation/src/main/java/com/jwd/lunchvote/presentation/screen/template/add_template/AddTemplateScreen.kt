@@ -48,6 +48,7 @@ import com.jwd.lunchvote.presentation.screen.template.add_template.AddTemplateCo
 import com.jwd.lunchvote.presentation.screen.template.add_template.AddTemplateContract.AddTemplateSideEffect
 import com.jwd.lunchvote.presentation.screen.template.add_template.AddTemplateContract.AddTemplateState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
+import com.jwd.lunchvote.presentation.widget.FoodGrid
 import com.jwd.lunchvote.presentation.widget.FoodItem
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LikeDislike
@@ -123,45 +124,16 @@ private fun AddTemplateScreen(
     },
     scrollable = false
   ) {
-    Box(
-      modifier = Modifier.fillMaxSize()
-    ) {
-      val gridState = rememberLazyGridState()
-      TemplateTitle(
-        name = state.name,
-        like = state.foodItemList.count { it.status == FoodItem.Status.LIKE },
-        dislike = state.foodItemList.count { it.status == FoodItem.Status.DISLIKE },
-        modifier = Modifier.fillMaxWidth(),
-        gridState = gridState
-      )
-      LazyVerticalGrid(
-        columns = GridCells.Fixed(3),
-        modifier = Modifier.fillMaxWidth(),
-        state = gridState,
-        contentPadding = PaddingValues(top = 104.dp, start = 8.dp, end = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-      ) {
-        val filteredFoodList = state.foodItemList.filter { it.food.name.contains(state.searchKeyword) }
-
-        item(span = { GridItemSpan(3) }) {
-          LunchVoteTextField(
-            text = state.searchKeyword,
-            onTextChange = { onEvent(AddTemplateEvent.OnSearchKeywordChange(it)) },
-            hintText = stringResource(R.string.add_template_hint_text),
-            modifier = Modifier.padding(bottom = 8.dp),
-            leadingIcon = { SearchIcon() }
-          )
-        }
-
-        items(filteredFoodList) { foodItem ->
-          FoodItem(
-            foodItem = foodItem,
-            onClick = { onEvent(AddTemplateEvent.OnClickFoodItem(foodItem)) }
-          )
-        }
-      }
-    }
+    FoodGrid(
+      templateName = state.name,
+      searchKeyword = state.searchKeyword,
+      like = state.foodItemList.count { it.status == FoodItem.Status.LIKE },
+      dislike = state.foodItemList.count { it.status == FoodItem.Status.DISLIKE },
+      filteredFoodList = state.foodItemList,
+      modifier = Modifier.fillMaxSize(),
+      onSearchKeywordChange = { onEvent(AddTemplateEvent.OnSearchKeywordChange(it)) },
+      onClickFoodItem = { onEvent(AddTemplateEvent.OnClickFoodItem(it)) }
+    )
   }
 }
 

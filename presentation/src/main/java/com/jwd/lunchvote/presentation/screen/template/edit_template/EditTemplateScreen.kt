@@ -6,16 +6,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material3.Button
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -42,15 +40,13 @@ import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplate
 import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.EditTemplateState
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
-import com.jwd.lunchvote.presentation.widget.FoodItem
+import com.jwd.lunchvote.presentation.widget.FoodGrid
 import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
-import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
-import com.jwd.lunchvote.presentation.widget.SearchIcon
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -106,7 +102,9 @@ private fun EditTemplateScreen(
   onEvent: (EditTemplateEvent) -> Unit = {}
 ) {
   Screen(
-    modifier = modifier,
+    modifier = modifier
+      .padding(horizontal = 24.dp)
+      .padding(top = 8.dp),
     topAppBar = {
       LunchVoteTopBar(
         title = stringResource(R.string.edit_template_title),
@@ -124,53 +122,32 @@ private fun EditTemplateScreen(
         }
       )
     },
-    scrollable = false
-  ) {
-    Column(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 24.dp)
-        .padding(top = 16.dp, bottom = 24.dp),
-      verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-      TemplateTitle(
-        name = state.template.name,
-        like = state.foodItemList.count { it.status == FoodItem.Status.LIKE },
-        dislike = state.foodItemList.count { it.status == FoodItem.Status.DISLIKE },
-        modifier = Modifier.fillMaxWidth()
-      )
-      LunchVoteTextField(
-        text = state.searchKeyword,
-        onTextChange = { onEvent(EditTemplateEvent.OnSearchKeywordChange(it)) },
-        hintText = stringResource(R.string.edit_template_hint_text),
-        modifier = Modifier.fillMaxWidth(),
-        leadingIcon = { SearchIcon() }
-      )
-      LazyVerticalGrid(
-        columns = GridCells.Fixed(3),
-        modifier = Modifier
-          .fillMaxWidth()
-          .weight(1f),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-      ) {
-        val filteredFoodItemList = state.foodItemList.filter { it.food.name.contains(state.searchKeyword) }
-
-        items(filteredFoodItemList) { foodItem ->
-          FoodItem(
-            foodItem = foodItem,
-            onClick = { onEvent(EditTemplateEvent.OnClickFoodItem(foodItem)) }
+    actions = {
+      if (state.foodItemList.any { it.status != FoodItem.Status.DEFAULT }) {
+        FloatingActionButton(
+          onClick = { onEvent(EditTemplateEvent.OnClickSaveButton) },
+          containerColor = MaterialTheme.colorScheme.primary,
+          contentColor = MaterialTheme.colorScheme.onPrimary
+        ) {
+          Text(
+            text = stringResource(R.string.edit_template_save_button),
+            modifier = Modifier.padding(horizontal = 24.dp)
           )
         }
       }
-      Button(
-        onClick = { onEvent(EditTemplateEvent.OnClickSaveButton) },
-        modifier = Modifier.align(CenterHorizontally),
-        enabled = state.foodItemList.any { it.status != FoodItem.Status.DEFAULT }
-      ) {
-        Text(text = stringResource(R.string.edit_template_save_button))
-      }
-    }
+    },
+    scrollable = false
+  ) {
+    FoodGrid(
+      templateName = state.template.name,
+      searchKeyword = state.searchKeyword,
+      like = state.foodItemList.count { it.status == FoodItem.Status.LIKE },
+      dislike = state.foodItemList.count { it.status == FoodItem.Status.DISLIKE },
+      filteredFoodList = state.foodItemList,
+      modifier = Modifier.fillMaxSize(),
+      onSearchKeywordChange = { onEvent(EditTemplateEvent.OnSearchKeywordChange(it)) },
+      onClickFoodItem = { onEvent(EditTemplateEvent.OnClickFoodItem(it)) }
+    )
   }
 }
 
