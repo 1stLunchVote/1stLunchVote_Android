@@ -124,16 +124,27 @@ private fun AddTemplateScreen(
     },
     scrollable = false
   ) {
-    FoodGrid(
-      templateName = state.name,
-      searchKeyword = state.searchKeyword,
-      like = state.foodItemList.count { it.status == FoodItem.Status.LIKE },
-      dislike = state.foodItemList.count { it.status == FoodItem.Status.DISLIKE },
-      filteredFoodList = state.foodItemList,
-      modifier = Modifier.fillMaxSize(),
-      onSearchKeywordChange = { onEvent(AddTemplateEvent.OnSearchKeywordChange(it)) },
-      onClickFoodItem = { onEvent(AddTemplateEvent.OnClickFoodItem(it)) }
-    )
+    Box(
+      modifier = Modifier.fillMaxSize()
+    ) {
+      val gridState = rememberLazyGridState()
+      TemplateTitle(
+        name = state.name,
+        like = state.foodItemList.count { it.status == FoodItem.Status.LIKE },
+        dislike = state.foodItemList.count { it.status == FoodItem.Status.DISLIKE },
+        modifier = Modifier.fillMaxWidth(),
+        gridState = gridState
+      )
+      FoodGrid(
+        searchKeyword = state.searchKeyword,
+        filteredFoodList = state.foodItemList.filter { it.food.name.contains(state.searchKeyword) },
+        onSearchKeywordChange = { onEvent(AddTemplateEvent.OnSearchKeywordChange(it)) },
+        onClickFoodItem = { onEvent(AddTemplateEvent.OnClickFoodItem(it)) },
+        gridState = gridState,
+        topPadding = 104.dp,
+        bottomPadding = 104.dp
+      )
+    }
   }
 }
 

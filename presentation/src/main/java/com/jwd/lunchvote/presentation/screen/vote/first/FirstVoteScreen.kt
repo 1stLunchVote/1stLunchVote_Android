@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +20,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
@@ -40,16 +42,20 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.FoodItem.Status.DISLIKE
 import com.jwd.lunchvote.presentation.model.FoodItem.Status.LIKE
+import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
+import com.jwd.lunchvote.presentation.screen.template.add_template.AddTemplateContract.AddTemplateEvent
 import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.FirstVoteDialog
 import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.FirstVoteEvent
 import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.FirstVoteSideEffect
 import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.FirstVoteState
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
+import com.jwd.lunchvote.presentation.widget.FoodGrid
 import com.jwd.lunchvote.presentation.widget.FoodItem
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.HorizontalProgressBar
@@ -121,7 +127,9 @@ private fun FirstVoteScreen(
   onEvent: (FirstVoteEvent) -> Unit = {}
 ) {
   Screen(
-    modifier = modifier,
+    modifier = modifier
+      .padding(horizontal = 24.dp)
+      .padding(top = 16.dp),
     topAppBar = {
       LunchVoteTopBar(
         title = stringResource(R.string.first_vote_title),
@@ -137,68 +145,73 @@ private fun FirstVoteScreen(
         }
       }
     },
+    actions = {
+      if (state.finished) {
+        FloatingActionButton(
+          onClick = { onEvent(FirstVoteEvent.OnClickReVoteButton) },
+          containerColor = MaterialTheme.colorScheme.primary,
+          contentColor = MaterialTheme.colorScheme.onPrimary
+        ) {
+          Text(
+            text = stringResource(R.string.first_vote_re_vote_button),
+            modifier = Modifier.padding(horizontal = 24.dp)
+          )
+        }
+      } else {
+        if (state.foodItemList.count { it.status == LIKE } >= (state.lounge.minLikeFoods ?: 0)
+          && state.foodItemList.count { it.status == DISLIKE } >= (state.lounge.minDislikeFoods ?: 0)) {
+          FloatingActionButton(
+            onClick = { onEvent(FirstVoteEvent.OnClickFinishButton) },
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary
+          ) {
+            Text(
+              text = stringResource(R.string.first_vote_finish_button),
+              modifier = Modifier.padding(horizontal = 24.dp)
+            )
+          }
+        }
+      }
+    },
     scrollable = false
   ) {
-    if (state.finished) FirstVoteWaitingScreen(state = state, onEvent = onEvent)
-    else FirstVotingScreen(state = state, onEvent = onEvent)
-  }
-}
-
-@Composable
-private fun FirstVotingScreen(
-  state: FirstVoteState,
-  modifier: Modifier = Modifier,
-  onEvent: (FirstVoteEvent) -> Unit = {}
-) {
-  Column(
-    modifier = modifier
-      .fillMaxSize()
-      .padding(start = 32.dp, top = 16.dp, end = 32.dp, bottom = 24.dp),
-    verticalArrangement = Arrangement.spacedBy(16.dp)
-  ) {
-    FirstVoteInformationRow(
-      like = state.foodItemList.count { it.status == LIKE },
-      dislike = state.foodItemList.count { it.status == DISLIKE },
-      memberList = state.memberList,
-      modifier = Modifier.fillMaxWidth()
-    )
-    LunchVoteTextField(
-      text = state.searchKeyword,
-      onTextChange = { onEvent(FirstVoteEvent.OnSearchKeywordChange(it)) },
-      hintText = stringResource(R.string.first_vote_hint_text),
-      modifier = Modifier.fillMaxWidth(),
-      leadingIcon = { SearchIcon() }
-    )
-    LazyVerticalGrid(
-      columns = GridCells.Fixed(3),
-      modifier = Modifier
-        .fillMaxWidth()
-        .weight(1f),
-      verticalArrangement = Arrangement.spacedBy(8.dp),
-      horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-      val filteredFoodList = state.foodItemList.filter { it.food.name.contains(state.searchKeyword) }
-
-      items(filteredFoodList) { foodItem ->
-        FoodItem(
-          foodItem = foodItem,
-          onClick = { onEvent(FirstVoteEvent.OnClickFoodItem(foodItem)) }
+    if (state.finished) {
+      Column(
+        modifier = Modifier
+          .fillMaxWidth()
+          .weight(1f),
+        verticalArrangement = Arrangement.spacedBy(40.dp, alignment = Alignment.CenterVertically),
+        horizontalAlignment = Alignment.CenterHorizontally
+      ) {
+        Text(
+          text = stringResource(R.string.first_vote_waiting_title),
+          style = MaterialTheme.typography.titleLarge
+        )
+        MemberProgress(state.memberList.map { it.status })
+        Text(
+          text = stringResource(R.string.first_vote_waiting_body, state.memberList.count { it.status == MemberUIModel.Status.VOTED }),
+          style = MaterialTheme.typography.bodyMedium
         )
       }
-    }
-    Button(
-      onClick = { onEvent(FirstVoteEvent.OnClickFinishButton) },
-      modifier = Modifier.align(Alignment.CenterHorizontally),
-      enabled = state.foodItemList.count { it.status == LIKE } >= (state.lounge.minLikeFoods ?: 0)
-        && state.foodItemList.count { it.status == DISLIKE } >= (state.lounge.minDislikeFoods ?: 0)
-    ) {
-      Text(text = stringResource(R.string.first_vote_finish_button))
+    } else {
+      InformationRow(
+        like = state.foodItemList.count { it.status == LIKE },
+        dislike = state.foodItemList.count { it.status == DISLIKE },
+        memberList = state.memberList,
+        modifier = Modifier.fillMaxWidth()
+      )
+      FoodGrid(
+        searchKeyword = state.searchKeyword,
+        filteredFoodList = state.foodItemList.filter { it.food.name.contains(state.searchKeyword) },
+        onSearchKeywordChange = { onEvent(FirstVoteEvent.OnSearchKeywordChange(it)) },
+        onClickFoodItem = { onEvent(FirstVoteEvent.OnClickFoodItem(it)) },
+      )
     }
   }
 }
 
 @Composable
-private fun FirstVoteInformationRow(
+private fun InformationRow(
   like: Int,
   dislike: Int,
   memberList: List<MemberUIModel>,
@@ -211,45 +224,6 @@ private fun FirstVoteInformationRow(
   ) {
     LikeDislike(like, dislike)
     MemberProgress(memberList.map { it.status })
-  }
-}
-
-@Composable
-private fun FirstVoteWaitingScreen(
-  state: FirstVoteState,
-  modifier: Modifier = Modifier,
-  onEvent: (FirstVoteEvent) -> Unit = {}
-) {
-  Column(
-    modifier = modifier
-      .fillMaxSize()
-      .padding(24.dp),
-    verticalArrangement = Arrangement.spacedBy(40.dp),
-    horizontalAlignment = Alignment.CenterHorizontally
-  ) {
-    Column(
-      modifier = Modifier
-        .fillMaxWidth()
-        .weight(1f),
-      verticalArrangement = Arrangement.spacedBy(40.dp, alignment = Alignment.CenterVertically),
-      horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-      Text(
-        text = stringResource(R.string.first_vote_waiting_title),
-        style = MaterialTheme.typography.titleLarge
-      )
-      MemberProgress(state.memberList.map { it.status })
-      Text(
-        text = stringResource(R.string.first_vote_waiting_body, state.memberList.count { it.status == MemberUIModel.Status.VOTED }),
-        style = MaterialTheme.typography.bodyMedium
-      )
-    }
-    Button(
-      onClick = { onEvent(FirstVoteEvent.OnClickReVoteButton) },
-      modifier = Modifier.align(Alignment.CenterHorizontally)
-    ) {
-      Text(text = stringResource(R.string.first_vote_re_vote_button))
-    }
   }
 }
 
@@ -359,7 +333,13 @@ private fun Preview1() {
           MemberUIModel(status = MemberUIModel.Status.VOTING),
           MemberUIModel(status = MemberUIModel.Status.VOTED),
           MemberUIModel(status = MemberUIModel.Status.VOTING)
-        )
+        ),
+        foodItemList = List(32) {
+          FoodItem(
+            food = FoodUIModel(name = "${it}번째 음식"),
+            status = if (it % 2 == 0) FoodItem.Status.DISLIKE else FoodItem.Status.LIKE
+          )
+        }
       )
     )
   }
