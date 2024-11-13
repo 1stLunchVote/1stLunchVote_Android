@@ -129,7 +129,17 @@ private fun EmailVerificationScreen(
 
 @Preview
 @Composable
-private fun Preview1() {
+private fun Default() {
+  ScreenPreview {
+    EmailVerificationScreen(
+      EmailVerificationState()
+    )
+  }
+}
+
+@Preview
+@Composable
+private fun ValidEmail() {
   ScreenPreview {
     EmailVerificationScreen(
       EmailVerificationState(
@@ -141,7 +151,19 @@ private fun Preview1() {
 
 @Preview
 @Composable
-private fun Preview2() {
+private fun InvalidEmail() {
+  ScreenPreview {
+    EmailVerificationScreen(
+      EmailVerificationState(
+        email = "email"
+      )
+    )
+  }
+}
+
+@Preview
+@Composable
+private fun EmailSent() {
   ScreenPreview {
     EmailVerificationScreen(
       EmailVerificationState(
