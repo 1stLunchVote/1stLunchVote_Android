@@ -42,23 +42,16 @@ import com.jwd.lunchvote.presentation.util.conditional
 import com.jwd.lunchvote.presentation.util.innerShadow
 import com.jwd.lunchvote.presentation.util.outerShadow
 
-enum class TextFieldType {
-  ACTIVE,
-  VALID,
-  ERROR
-}
-
 @Composable
 fun LunchVoteTextField(
   text: String,
   onTextChange: (String) -> Unit,
   hintText: String,
   modifier: Modifier = Modifier,
-  type: TextFieldType = TextFieldType.ACTIVE,
   enabled: Boolean = true,
+  isError: Boolean? = null,
   leadingIcon: @Composable (() -> Unit)? = null,
   trailingIcon: @Composable (() -> Unit)? = null,
-  isError: Boolean = false,
   visualTransformation: VisualTransformation = VisualTransformation.None,
   keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
   maxLines: Int = 1,
@@ -71,10 +64,10 @@ fun LunchVoteTextField(
     focused = enabled && isFocused
   }
 
-  val color = when (type) {
-    TextFieldType.ACTIVE -> MaterialTheme.colorScheme.primary
-    TextFieldType.VALID -> MaterialTheme.colorScheme.tertiary
-    TextFieldType.ERROR -> MaterialTheme.colorScheme.error
+  val color = when (isError) {
+    null -> MaterialTheme.colorScheme.primary
+    false -> MaterialTheme.colorScheme.tertiary
+    true -> MaterialTheme.colorScheme.error
   }
 
   BasicTextField(
@@ -242,21 +235,21 @@ private fun Preview() {
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f),
-          type = TextFieldType.VALID
+          isError = false
         )
         LunchVoteTextField(
           text = "",
           onTextChange = {},
           hintText = "Blank",
           modifier = Modifier.weight(1f),
-          type = TextFieldType.VALID
+          isError = false
         )
         LunchVoteTextField(
           text = "",
           onTextChange = {},
           hintText = "Focused",
           modifier = Modifier.weight(1f),
-          type = TextFieldType.VALID,
+          isError = false,
           isFocused = true
         )
         LunchVoteTextField(
@@ -264,7 +257,7 @@ private fun Preview() {
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f),
-          type = TextFieldType.VALID,
+          isError = false,
           isFocused = true
         )
         LunchVoteTextField(
@@ -272,7 +265,7 @@ private fun Preview() {
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f),
-          type = TextFieldType.VALID,
+          isError = false,
           enabled = false
         )
       }
@@ -284,21 +277,21 @@ private fun Preview() {
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f),
-          type = TextFieldType.ERROR
+          isError = true
         )
         LunchVoteTextField(
           text = "",
           onTextChange = {},
           hintText = "Blank",
           modifier = Modifier.weight(1f),
-          type = TextFieldType.ERROR
+          isError = true
         )
         LunchVoteTextField(
           text = "",
           onTextChange = {},
           hintText = "Focused",
           modifier = Modifier.weight(1f),
-          type = TextFieldType.ERROR,
+          isError = true,
           isFocused = true
         )
         LunchVoteTextField(
@@ -306,7 +299,7 @@ private fun Preview() {
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f),
-          type = TextFieldType.ERROR,
+          isError = true,
           isFocused = true
         )
         LunchVoteTextField(
@@ -314,7 +307,7 @@ private fun Preview() {
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f),
-          type = TextFieldType.ERROR,
+          isError = true,
           enabled = false
         )
       }

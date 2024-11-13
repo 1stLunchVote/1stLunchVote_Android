@@ -95,7 +95,7 @@ private fun EmailVerificationScreen(
           hintText = stringResource(R.string.email_verification_email_hint),
           modifier = Modifier.fillMaxWidth(),
           enabled = state.emailSent.not(),
-          isError = state.email.isNotEmpty() && isValid.not()
+          isError = if (state.email.isEmpty()) null else state.email.isNotEmpty() && isValid.not()
         )
         Text(
           text = stringResource(R.string.email_verification_email_format_error),
