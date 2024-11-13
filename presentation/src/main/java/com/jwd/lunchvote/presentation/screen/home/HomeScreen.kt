@@ -165,8 +165,7 @@ private fun HomeScreen(
     Gap(minHeight = 24.dp)
     FoodTrendChart(
       foodTrend = state.foodTrend,
-      foodTrendRatio = state.foodTrendRatio,
-      modifier = Modifier.align(Alignment.CenterHorizontally)
+      foodTrendRatio = state.foodTrendRatio
     )
     Gap(minHeight = 36.dp)
     HomeDivider(

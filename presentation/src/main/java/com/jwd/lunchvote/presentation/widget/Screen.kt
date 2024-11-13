@@ -48,7 +48,8 @@ fun Screen(
         modifier = Modifier
           .weight(1f)
           .conditional(scrollable) { verticalScroll(rememberScrollState()) }
-          .then(modifier)
+          .then(modifier),
+        horizontalAlignment = Alignment.CenterHorizontally
       ) { content() }
       if (bottomAppBar != null) {
         Column(
