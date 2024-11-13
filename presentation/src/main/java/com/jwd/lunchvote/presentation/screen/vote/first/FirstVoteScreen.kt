@@ -183,6 +183,7 @@ private fun FirstVoteScreen(
         filteredFoodList = state.foodItemList.filter { it.food.name.contains(state.searchKeyword) },
         onSearchKeywordChange = { onEvent(FirstVoteEvent.OnSearchKeywordChange(it)) },
         onClickFoodItem = { onEvent(FirstVoteEvent.OnClickFoodItem(it)) },
+        bottomPadding = 104.dp
       )
     }
   }
