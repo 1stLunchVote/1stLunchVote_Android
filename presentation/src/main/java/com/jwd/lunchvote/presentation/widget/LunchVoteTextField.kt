@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -138,9 +141,36 @@ fun LunchVoteTextField(
           )
         }
       }
+      if (isError == true) {
+        ErrorIcon()
+      }
       trailingIcon?.invoke()
     }
   }
+}
+
+@Composable
+fun CheckIcon(
+  modifier: Modifier = Modifier
+) {
+  Icon(
+    imageVector = Icons.Rounded.Check,
+    contentDescription = "search",
+    modifier = modifier.size(20.dp),
+    tint = MaterialTheme.colorScheme.tertiary
+  )
+}
+
+@Composable
+fun ErrorIcon(
+  modifier: Modifier = Modifier
+) {
+  Icon(
+    imageVector = Icons.Rounded.Warning,
+    contentDescription = "error",
+    modifier = modifier.size(20.dp),
+    tint = MaterialTheme.colorScheme.error
+  )
 }
 
 @Composable
@@ -266,7 +296,10 @@ private fun Preview() {
           hintText = "",
           modifier = Modifier.weight(1f),
           isError = false,
-          enabled = false
+          enabled = false,
+          trailingIcon = {
+            CheckIcon()
+          }
         )
       }
       Row(

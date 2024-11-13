@@ -25,6 +25,8 @@ import com.jwd.lunchvote.presentation.screen.login.register.email_verification.E
 import com.jwd.lunchvote.presentation.screen.login.register.email_verification.EmailVerificationContract.EmailVerificationSideEffect
 import com.jwd.lunchvote.presentation.screen.login.register.email_verification.EmailVerificationContract.EmailVerificationState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
+import com.jwd.lunchvote.presentation.widget.CheckIcon
+import com.jwd.lunchvote.presentation.widget.ErrorIcon
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.Screen
@@ -95,11 +97,17 @@ private fun EmailVerificationScreen(
           hintText = stringResource(R.string.email_verification_email_hint),
           modifier = Modifier.fillMaxWidth(),
           enabled = state.emailSent.not(),
-          isError = if (state.email.isEmpty()) null else state.email.isNotEmpty() && isValid.not()
+          isError = if (state.email.isEmpty()) null else state.email.isNotEmpty() && isValid.not(),
+          trailingIcon = {
+            if (state.emailSent) {
+              CheckIcon()
+            }
+          }
         )
         Text(
           text = stringResource(R.string.email_verification_email_format_error),
-          modifier = Modifier.padding(horizontal = 8.dp)
+          modifier = Modifier
+            .padding(horizontal = 8.dp)
             .alpha(if (state.email.isNotEmpty() && isValid.not()) 1f else 0f),
           color = MaterialTheme.colorScheme.error,
           style = MaterialTheme.typography.labelMedium
