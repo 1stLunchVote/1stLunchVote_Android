@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
@@ -35,6 +36,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.util.conditional
 import com.jwd.lunchvote.presentation.util.innerShadow
@@ -66,7 +68,13 @@ fun LunchVoteTextField(
 ) {
   var focused by remember { mutableStateOf(isFocused) }
   LaunchedEffect(isFocused) {
-    focused = isFocused
+    focused = enabled && isFocused
+  }
+
+  val color = when (type) {
+    TextFieldType.ACTIVE -> MaterialTheme.colorScheme.primary
+    TextFieldType.VALID -> MaterialTheme.colorScheme.tertiary
+    TextFieldType.ERROR -> MaterialTheme.colorScheme.error
   }
 
   BasicTextField(
@@ -91,13 +99,6 @@ fun LunchVoteTextField(
       }
     )
   ) { innerTextField ->
-
-    val color = when (type) {
-      TextFieldType.ACTIVE -> MaterialTheme.colorScheme.primary
-      TextFieldType.VALID -> MaterialTheme.colorScheme.tertiary
-      TextFieldType.ERROR -> MaterialTheme.colorScheme.error
-    }
-
     Row(
       modifier = modifier
         .conditional(condition = focused, modifierIf = {
@@ -121,6 +122,9 @@ fun LunchVoteTextField(
         }, modifierElse = {
           background(MaterialTheme.colorScheme.onBackground.copy(0.1f), MaterialTheme.shapes.small)
         })
+        .conditional(enabled.not()) {
+          alpha(0.32f)
+        }
         .padding(16.dp),
       horizontalArrangement = Arrangement.spacedBy(8.dp),
       verticalAlignment = Alignment.CenterVertically
@@ -185,10 +189,10 @@ fun PasswordInvisibleIcon(
   )
 }
 
-@Preview(showBackground = true)
+@Preview(widthDp = 1024, showBackground = true)
 @Composable
 private fun Preview() {
-  ScreenPreview {
+  LunchVoteTheme {
     Column(
       modifier = Modifier.padding(16.dp),
       verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -197,24 +201,37 @@ private fun Preview() {
         horizontalArrangement = Arrangement.spacedBy(8.dp)
       ) {
         LunchVoteTextField(
-          text = "",
+          text = "Active",
           onTextChange = {},
-          hintText = "Default",
+          hintText = "",
           modifier = Modifier.weight(1f)
         )
         LunchVoteTextField(
           text = "",
           onTextChange = {},
-          hintText = "Default",
+          hintText = "Blank",
+          modifier = Modifier.weight(1f)
+        )
+        LunchVoteTextField(
+          text = "",
+          onTextChange = {},
+          hintText = "Focused",
           modifier = Modifier.weight(1f),
           isFocused = true
         )
         LunchVoteTextField(
-          text = "Active",
+          text = "Typed",
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f),
           isFocused = true
+        )
+        LunchVoteTextField(
+          text = "Disabled",
+          onTextChange = {},
+          hintText = "",
+          modifier = Modifier.weight(1f),
+          enabled = false
         )
       }
       Row(
@@ -228,12 +245,35 @@ private fun Preview() {
           type = TextFieldType.VALID
         )
         LunchVoteTextField(
-          text = "Valid",
+          text = "",
+          onTextChange = {},
+          hintText = "Blank",
+          modifier = Modifier.weight(1f),
+          type = TextFieldType.VALID
+        )
+        LunchVoteTextField(
+          text = "",
+          onTextChange = {},
+          hintText = "Focused",
+          modifier = Modifier.weight(1f),
+          type = TextFieldType.VALID,
+          isFocused = true
+        )
+        LunchVoteTextField(
+          text = "Typed",
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f),
           type = TextFieldType.VALID,
           isFocused = true
+        )
+        LunchVoteTextField(
+          text = "Disabled",
+          onTextChange = {},
+          hintText = "",
+          modifier = Modifier.weight(1f),
+          type = TextFieldType.VALID,
+          enabled = false
         )
       }
       Row(
@@ -247,26 +287,40 @@ private fun Preview() {
           type = TextFieldType.ERROR
         )
         LunchVoteTextField(
-          text = "Error",
+          text = "",
+          onTextChange = {},
+          hintText = "Blank",
+          modifier = Modifier.weight(1f),
+          type = TextFieldType.ERROR
+        )
+        LunchVoteTextField(
+          text = "",
+          onTextChange = {},
+          hintText = "Focused",
+          modifier = Modifier.weight(1f),
+          type = TextFieldType.ERROR,
+          isFocused = true
+        )
+        LunchVoteTextField(
+          text = "Typed",
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f),
           type = TextFieldType.ERROR,
           isFocused = true
         )
+        LunchVoteTextField(
+          text = "Disabled",
+          onTextChange = {},
+          hintText = "",
+          modifier = Modifier.weight(1f),
+          type = TextFieldType.ERROR,
+          enabled = false
+        )
       }
       Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
       ) {
-        LunchVoteTextField(
-          text = "",
-          onTextChange = {},
-          hintText = "Search",
-          modifier = Modifier.weight(1f),
-          leadingIcon = {
-            SearchIcon()
-          }
-        )
         LunchVoteTextField(
           text = "Search",
           onTextChange = {},
@@ -277,7 +331,26 @@ private fun Preview() {
           }
         )
         LunchVoteTextField(
-          text = "Search",
+          text = "",
+          onTextChange = {},
+          hintText = "Blank",
+          modifier = Modifier.weight(1f),
+          leadingIcon = {
+            SearchIcon()
+          }
+        )
+        LunchVoteTextField(
+          text = "",
+          onTextChange = {},
+          hintText = "Focused",
+          modifier = Modifier.weight(1f),
+          leadingIcon = {
+            SearchIcon()
+          },
+          isFocused = true
+        )
+        LunchVoteTextField(
+          text = "Typed",
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f),
@@ -286,20 +359,20 @@ private fun Preview() {
           },
           isFocused = true
         )
+        LunchVoteTextField(
+          text = "Disabled",
+          onTextChange = {},
+          hintText = "",
+          modifier = Modifier.weight(1f),
+          enabled = false,
+          leadingIcon = {
+            SearchIcon()
+          }
+        )
       }
       Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
       ) {
-        LunchVoteTextField(
-          text = "",
-          onTextChange = {},
-          hintText = "Password",
-          modifier = Modifier.weight(1f),
-          trailingIcon = {
-            PasswordVisibleIcon({})
-          },
-          visualTransformation = PasswordVisualTransformation()
-        )
         LunchVoteTextField(
           text = "Password",
           onTextChange = {},
@@ -307,11 +380,31 @@ private fun Preview() {
           modifier = Modifier.weight(1f),
           trailingIcon = {
             PasswordVisibleIcon({})
+          }
+        )
+        LunchVoteTextField(
+          text = "",
+          onTextChange = {},
+          hintText = "Blank",
+          modifier = Modifier.weight(1f),
+          trailingIcon = {
+            PasswordVisibleIcon({})
           },
           visualTransformation = PasswordVisualTransformation()
         )
         LunchVoteTextField(
-          text = "Password",
+          text = "",
+          onTextChange = {},
+          hintText = "Focused",
+          modifier = Modifier.weight(1f),
+          trailingIcon = {
+            PasswordVisibleIcon({})
+          },
+          visualTransformation = PasswordVisualTransformation(),
+          isFocused = true
+        )
+        LunchVoteTextField(
+          text = "Typed",
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f),
@@ -320,6 +413,17 @@ private fun Preview() {
           },
           visualTransformation = PasswordVisualTransformation(),
           isFocused = true
+        )
+        LunchVoteTextField(
+          text = "Disabled",
+          onTextChange = {},
+          hintText = "",
+          modifier = Modifier.weight(1f),
+          enabled = false,
+          trailingIcon = {
+            PasswordVisibleIcon({})
+          },
+          visualTransformation = PasswordVisualTransformation()
         )
       }
     }
