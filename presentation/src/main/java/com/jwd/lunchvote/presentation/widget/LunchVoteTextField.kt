@@ -150,6 +150,101 @@ fun LunchVoteTextField(
 }
 
 @Composable
+fun LunchVoteTextField(
+  text: String,
+  onTextChange: (String) -> Unit,
+  hintText: String,
+  modifier: Modifier = Modifier,
+  enabled: Boolean = true,
+  isError: Boolean? = null,
+  errorMessage: String? = null,
+  leadingIcon: @Composable (() -> Unit)? = null,
+  trailingIcon: @Composable (() -> Unit)? = null,
+  visualTransformation: VisualTransformation = VisualTransformation.None,
+  keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+  maxLines: Int = 1,
+  focusManager: FocusManager = LocalFocusManager.current,
+  keyboardController: SoftwareKeyboardController? = LocalSoftwareKeyboardController.current,
+  isFocused: Boolean = false
+) {
+  Column(
+    modifier = modifier,
+    verticalArrangement = Arrangement.spacedBy(4.dp)
+  ) {
+    LunchVoteTextField(
+      text = text,
+      onTextChange = onTextChange,
+      hintText = hintText,
+      enabled = enabled,
+      isError = isError,
+      leadingIcon = leadingIcon,
+      trailingIcon = trailingIcon,
+      visualTransformation = visualTransformation,
+      keyboardOptions = keyboardOptions,
+      maxLines = maxLines,
+      focusManager = focusManager,
+      keyboardController = keyboardController,
+      isFocused = isFocused
+    )
+    errorMessage?.let { message ->
+      Text(
+        text = message,
+        modifier = Modifier
+          .padding(horizontal = 8.dp)
+          .conditional(isError == null || isError == false) { alpha(0f) },
+        color = MaterialTheme.colorScheme.error,
+        style = MaterialTheme.typography.labelMedium
+      )
+    }
+  }
+}
+
+@Composable
+fun LunchVotePasswordField(
+  text: String,
+  onTextChange: (String) -> Unit,
+  hintText: String,
+  modifier: Modifier = Modifier,
+  enabled: Boolean = true,
+  isError: Boolean? = null,
+  errorMessage: String? = null,
+  keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+  focusManager: FocusManager = LocalFocusManager.current,
+  keyboardController: SoftwareKeyboardController? = LocalSoftwareKeyboardController.current,
+  isFocused: Boolean = false,
+  isVisible: Boolean = false
+) {
+  var visible by remember { mutableStateOf(isFocused) }
+  LaunchedEffect(isFocused) {
+    visible = enabled && isVisible
+  }
+
+  LunchVoteTextField(
+    text = text,
+    onTextChange = onTextChange,
+    hintText = hintText,
+    modifier = modifier,
+    enabled = enabled,
+    isError = isError,
+    errorMessage = errorMessage,
+    trailingIcon = {
+      if (text.isNotEmpty()) {
+        if (visible) PasswordInvisibleIcon(
+          onClick = { visible = false }
+        ) else PasswordVisibleIcon(
+          onClick = { visible = true }
+        )
+      }
+    },
+    visualTransformation = if (isVisible) VisualTransformation.None else PasswordVisualTransformation(),
+    keyboardOptions = keyboardOptions,
+    focusManager = focusManager,
+    keyboardController = keyboardController,
+    isFocused = isFocused
+  )
+}
+
+@Composable
 fun CheckIcon(
   modifier: Modifier = Modifier
 ) {
@@ -399,57 +494,39 @@ private fun Preview() {
       Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
       ) {
-        LunchVoteTextField(
+        LunchVotePasswordField(
           text = "Password",
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f),
-          trailingIcon = {
-            PasswordVisibleIcon({})
-          }
+          isVisible = true
         )
-        LunchVoteTextField(
+        LunchVotePasswordField(
           text = "",
           onTextChange = {},
           hintText = "Blank",
-          modifier = Modifier.weight(1f),
-          trailingIcon = {
-            PasswordVisibleIcon({})
-          },
-          visualTransformation = PasswordVisualTransformation()
+          modifier = Modifier.weight(1f)
         )
-        LunchVoteTextField(
+        LunchVotePasswordField(
           text = "",
           onTextChange = {},
           hintText = "Focused",
           modifier = Modifier.weight(1f),
-          trailingIcon = {
-            PasswordVisibleIcon({})
-          },
-          visualTransformation = PasswordVisualTransformation(),
           isFocused = true
         )
-        LunchVoteTextField(
+        LunchVotePasswordField(
           text = "Typed",
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f),
-          trailingIcon = {
-            PasswordVisibleIcon({})
-          },
-          visualTransformation = PasswordVisualTransformation(),
           isFocused = true
         )
-        LunchVoteTextField(
+        LunchVotePasswordField(
           text = "Disabled",
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f),
-          enabled = false,
-          trailingIcon = {
-            PasswordVisibleIcon({})
-          },
-          visualTransformation = PasswordVisualTransformation()
+          enabled = false
         )
       }
     }

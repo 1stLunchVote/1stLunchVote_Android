@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,7 +25,6 @@ import com.jwd.lunchvote.presentation.screen.login.register.email_verification.E
 import com.jwd.lunchvote.presentation.screen.login.register.email_verification.EmailVerificationContract.EmailVerificationState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.CheckIcon
-import com.jwd.lunchvote.presentation.widget.ErrorIcon
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.Screen
@@ -98,19 +96,12 @@ private fun EmailVerificationScreen(
           modifier = Modifier.fillMaxWidth(),
           enabled = state.emailSent.not(),
           isError = if (state.email.isEmpty()) null else state.email.isNotEmpty() && isValid.not(),
+          errorMessage = stringResource(R.string.email_verification_email_format_error),
           trailingIcon = {
             if (state.emailSent) {
               CheckIcon()
             }
           }
-        )
-        Text(
-          text = stringResource(R.string.email_verification_email_format_error),
-          modifier = Modifier
-            .padding(horizontal = 8.dp)
-            .alpha(if (state.email.isNotEmpty() && isValid.not()) 1f else 0f),
-          color = MaterialTheme.colorScheme.error,
-          style = MaterialTheme.typography.labelMedium
         )
       }
       if (state.emailSent.not()) {

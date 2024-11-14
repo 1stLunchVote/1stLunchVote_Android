@@ -11,15 +11,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -30,9 +24,7 @@ import com.jwd.lunchvote.presentation.screen.login.register.password.PasswordCon
 import com.jwd.lunchvote.presentation.screen.login.register.password.PasswordContract.PasswordState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.Gap
-import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
-import com.jwd.lunchvote.presentation.widget.PasswordInvisibleIcon
-import com.jwd.lunchvote.presentation.widget.PasswordVisibleIcon
+import com.jwd.lunchvote.presentation.widget.LunchVotePasswordField
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import kotlinx.coroutines.channels.Channel
@@ -108,52 +100,22 @@ private fun PasswordScreen(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(4.dp)
       ) {
-        var isPasswordVisible by remember { mutableStateOf(false) }
-        LunchVoteTextField(
+        LunchVotePasswordField(
           text = state.password,
           onTextChange = { onEvent(PasswordEvent.OnPasswordChange(it)) },
           hintText = stringResource(R.string.password_password_hint),
           modifier = Modifier.fillMaxWidth(),
-          isError = formatError,
-          trailingIcon = {
-            if (state.password.isNotEmpty()) {
-              if (isPasswordVisible) PasswordInvisibleIcon(
-                onClick = { isPasswordVisible = false }
-              ) else PasswordVisibleIcon(
-                onClick = { isPasswordVisible = true }
-              )
-            }
-          },
-          visualTransformation = if (isPasswordVisible) VisualTransformation.None
-          else PasswordVisualTransformation()
+          isError = if (state.password.isEmpty()) null else formatError,
+          errorMessage = stringResource(R.string.password_password_format_error),
         )
-
-        var isPasswordConfirmVisible by remember { mutableStateOf(false) }
-        LunchVoteTextField(
+        LunchVotePasswordField(
           text = state.passwordConfirm,
           onTextChange = { onEvent(PasswordEvent.OnPasswordConfirmChange(it)) },
           hintText = stringResource(R.string.password_password_confirm_hint),
           modifier = Modifier.fillMaxWidth(),
-          isError = confirmError,
-          trailingIcon = {
-            if (state.passwordConfirm.isNotEmpty()) {
-              if (isPasswordConfirmVisible) PasswordInvisibleIcon(
-                onClick = { isPasswordConfirmVisible = false }
-              ) else PasswordVisibleIcon(
-                onClick = { isPasswordConfirmVisible = true }
-              )
-            }
-          },
-          visualTransformation = if (isPasswordConfirmVisible) VisualTransformation.None
-          else PasswordVisualTransformation()
-        )
-        Text(
-          text = if (confirmError) stringResource(R.string.password_password_confirm_error) else stringResource(R.string.password_password_format_error),
-          modifier = Modifier
-            .padding(horizontal = 8.dp)
-            .alpha(if (confirmError || formatError) 1f else 0f),
-          color = MaterialTheme.colorScheme.error,
-          style = MaterialTheme.typography.labelMedium
+          enabled = state.password.isNotEmpty(),
+          isError = if (state.passwordConfirm.isEmpty()) null else confirmError,
+          errorMessage = stringResource(R.string.password_password_confirm_error)
         )
       }
       Button(
@@ -171,7 +133,7 @@ private fun PasswordScreen(
 
 @Preview
 @Composable
-private fun Preview1() {
+private fun Default() {
   ScreenPreview {
     PasswordScreen(
       PasswordState(
@@ -183,7 +145,7 @@ private fun Preview1() {
 
 @Preview
 @Composable
-private fun Preview2() {
+private fun PasswordError() {
   ScreenPreview {
     PasswordScreen(
       PasswordState(
@@ -196,7 +158,7 @@ private fun Preview2() {
 
 @Preview
 @Composable
-private fun Preview3() {
+private fun PasswordConfirmError() {
   ScreenPreview {
     PasswordScreen(
       PasswordState(
@@ -210,7 +172,7 @@ private fun Preview3() {
 
 @Preview
 @Composable
-private fun Preview4() {
+private fun Valid() {
   ScreenPreview {
     PasswordScreen(
       PasswordState(
