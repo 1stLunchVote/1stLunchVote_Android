@@ -401,7 +401,7 @@ private fun EditNameDialog(
       onTextChange = onNameChange,
       hintText = stringResource(R.string.profile_edit_name_dialog_hint_text),
       modifier = Modifier.fillMaxWidth(),
-      isError = name.isEmpty() || name == initialName
+      isError = name.isEmpty()
     )
   }
 }
