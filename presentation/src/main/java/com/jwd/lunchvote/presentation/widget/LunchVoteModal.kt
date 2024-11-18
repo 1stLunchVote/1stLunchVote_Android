@@ -34,7 +34,7 @@ import com.jwd.lunchvote.presentation.util.animatePopUp
 import com.jwd.lunchvote.presentation.util.outerShadow
 
 @Composable
-fun Modal(
+fun LunchVoteModal(
   title: String,
   onDismissRequest: () -> Unit,
   modifier: Modifier = Modifier,
@@ -106,10 +106,12 @@ fun Modal(
           )
         }
         content?.invoke()
-        Column(
-          modifier = Modifier.padding(top = 16.dp, bottom = 24.dp)
-        ) {
-          buttons?.invoke(this)
+        buttons?.let {
+          Column(
+            modifier = Modifier.padding(top = 16.dp, bottom = 24.dp)
+          ) {
+            buttons()
+          }
         }
       }
     }
@@ -127,22 +129,20 @@ private fun DialogIcon(
     contentAlignment = Alignment.Center
   ) {
     Box(
-      modifier = modifier
+      modifier = Modifier
         .background(iconColor.copy(alpha = 0.16f), CircleShape)
         .animatePopUp(48.dp)
     )
     Box(
-      modifier = modifier
+      modifier = Modifier
         .background(iconColor.copy(alpha = 0.16f), CircleShape)
-        .animatePopUp(32.dp),
-      contentAlignment = Alignment.Center
-    ) {
-      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.primary) {
-        icon?.invoke() ?: Icon(
-          imageVector = Icons.Rounded.Check,
-          contentDescription = "Check"
-        )
-      }
+        .animatePopUp(32.dp)
+    )
+    CompositionLocalProvider(LocalContentColor provides iconColor) {
+      icon?.invoke() ?: Icon(
+        imageVector = Icons.Rounded.Check,
+        contentDescription = "Check"
+      )
     }
   }
 }
@@ -176,24 +176,15 @@ fun DialogButton(
       Text(text)
     }
   }
-
 }
 
 @Preview
 @Composable
 private fun Preview() {
   ScreenPreview {
-    Modal(
+    LunchVoteModal(
       title = "Blog post published",
       onDismissRequest = {},
-      icon = {
-        Icon(
-          imageVector = Icons.Rounded.Check,
-          contentDescription = "Check",
-          modifier = Modifier.size(24.dp),
-          tint = MaterialTheme.colorScheme.primary
-        )
-      },
       body = "This blog post has been published. Team members will be able to edit this post.",
     ) {
       DialogButton(
@@ -206,8 +197,6 @@ private fun Preview() {
         isDismiss = true
       )
     }
-    Screen {
-
-    }
+    Screen {}
   }
 }

@@ -68,7 +68,7 @@ internal fun Modifier.animatePopUp(
       durationMillis = durationMillis,
       easing = LinearEasing
     ),
-    label = "popup",
+    label = "popUp",
     finishedListener = {
       targetScale = 0.96f
     }
@@ -79,4 +79,29 @@ internal fun Modifier.animatePopUp(
   }
 
   return Modifier.size(maxSize * scale).then(this)
+}
+
+/**
+ * 페이드 인 애니메이션을 적용하는 Modifier
+ * @param durationMillis 애니메이션 지속 시간
+ */
+@Composable
+internal fun Modifier.animateFadeIn(
+  durationMillis: Int = 240,
+): Modifier {
+  var targetAlpha by remember { mutableFloatStateOf(0f) }
+  val alpha by animateFloatAsState(
+    targetValue = targetAlpha,
+    animationSpec = tween(
+      durationMillis = durationMillis,
+      easing = LinearEasing
+    ),
+    label = "fadeIn"
+  )
+
+  LaunchedEffect(Unit) {
+    targetAlpha = 1f
+  }
+
+  return this.alpha(alpha)
 }

@@ -70,7 +70,7 @@ import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
 import com.jwd.lunchvote.presentation.widget.LunchVoteIcon
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
-import com.jwd.lunchvote.presentation.widget.Modal
+import com.jwd.lunchvote.presentation.widget.LunchVoteModal
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.skydoves.landscapist.ImageOptions
@@ -445,10 +445,11 @@ private fun JoinDialog(
   onLoungeIdChange: (String) -> Unit = {},
   onConfirmation: () -> Unit = {},
 ) {
-  Modal(
+  LunchVoteModal(
     title = stringResource(R.string.join_dialog_title),
     onDismissRequest = onDismissRequest,
     modifier = modifier,
+    icon = { LunchVoteIcon(size = 16.dp) },
     body = stringResource(R.string.join_dialog_body),
     closable = true,
     content = {
