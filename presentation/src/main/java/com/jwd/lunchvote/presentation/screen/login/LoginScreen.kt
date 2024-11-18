@@ -46,6 +46,7 @@ import com.jwd.lunchvote.presentation.util.loginWithGoogleCredential
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.KakaoLoginButton
 import com.jwd.lunchvote.presentation.widget.LoginButtonSize
+import com.jwd.lunchvote.presentation.widget.LunchVotePasswordField
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.PasswordInvisibleIcon
 import com.jwd.lunchvote.presentation.widget.PasswordVisibleIcon
@@ -174,43 +175,30 @@ private fun LoginFields(
     verticalArrangement = Arrangement.spacedBy(8.dp)
   ) {
     val isValid = EmailConfig.REGEX.matches(email)
-    var isVisible by remember { mutableStateOf(false) }
 
-    LunchVoteTextField(
-      text = email,
-      onTextChange = onEmailChange,
-      hintText = stringResource(R.string.login_email_hint),
+    Column(
       modifier = Modifier.fillMaxWidth(),
-      enabled = loading.not(),
-      keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
-    )
-    LunchVoteTextField(
-      text = password,
-      onTextChange = onPasswordChange,
-      hintText = stringResource(R.string.login_password_hint),
-      modifier = Modifier.fillMaxWidth(),
-      enabled = loading.not(),
-      trailingIcon = {
-        if (password.isNotEmpty()) {
-          if (isVisible) PasswordInvisibleIcon(
-            onClick = { isVisible = false }
-          ) else PasswordVisibleIcon(
-            onClick = { isVisible = true }
-          )
-        }
-      },
-      keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-      visualTransformation = if (isVisible) VisualTransformation.None
-      else PasswordVisualTransformation()
-    )
-    Text(
-      text = stringResource(R.string.login_email_format_error),
-      modifier = Modifier
-        .padding(horizontal = 8.dp)
-        .alpha(if (email.isNotEmpty() && isValid.not()) 1f else 0f),
-      color = MaterialTheme.colorScheme.error,
-      style = MaterialTheme.typography.labelMedium
-    )
+      verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+      LunchVoteTextField(
+        text = email,
+        onTextChange = onEmailChange,
+        hintText = stringResource(R.string.login_email_hint),
+        modifier = Modifier.fillMaxWidth(),
+        enabled = loading.not(),
+        isError = email.isNotEmpty() && isValid.not(),
+        errorMessage = stringResource(R.string.login_email_format_error),
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+      )
+      LunchVotePasswordField(
+        text = password,
+        onTextChange = onPasswordChange,
+        hintText = stringResource(R.string.login_password_hint),
+        modifier = Modifier.fillMaxWidth(),
+        enabled = loading.not(),
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+      )
+    }
     Button(
       onClick = onClickEmailLoginButton,
       modifier = Modifier.fillMaxWidth(),
@@ -279,7 +267,7 @@ private fun SocialLoginButtons(
 
 @Preview
 @Composable
-private fun Preview1() {
+private fun Default() {
   ScreenPreview {
     LoginScreen(
       LoginState()
@@ -289,7 +277,7 @@ private fun Preview1() {
 
 @Preview
 @Composable
-private fun Preview2() {
+private fun InvalidEmail() {
   ScreenPreview {
     LoginScreen(
       LoginState(
@@ -301,7 +289,7 @@ private fun Preview2() {
 
 @Preview
 @Composable
-private fun Preview3() {
+private fun Valid() {
   ScreenPreview {
     LoginScreen(
       LoginState(
@@ -314,7 +302,7 @@ private fun Preview3() {
 
 @Preview
 @Composable
-private fun Preview4() {
+private fun Loading() {
   ScreenPreview {
     LoginScreen(
       LoginState(
