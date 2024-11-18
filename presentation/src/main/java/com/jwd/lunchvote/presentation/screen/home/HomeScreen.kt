@@ -449,7 +449,7 @@ private fun JoinDialog(
     title = stringResource(R.string.join_dialog_title),
     onDismissRequest = onDismissRequest,
     modifier = modifier,
-    icon = { LunchVoteIcon(size = 16.dp) },
+    icon = { LunchVoteIcon() },
     body = stringResource(R.string.join_dialog_body),
     closable = true,
     content = {

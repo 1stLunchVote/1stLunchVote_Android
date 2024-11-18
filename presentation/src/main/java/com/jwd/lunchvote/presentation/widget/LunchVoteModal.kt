@@ -138,11 +138,16 @@ private fun DialogIcon(
         .background(iconColor.copy(alpha = 0.16f), CircleShape)
         .animatePopUp(32.dp)
     )
-    CompositionLocalProvider(LocalContentColor provides iconColor) {
-      icon?.invoke() ?: Icon(
-        imageVector = Icons.Rounded.Check,
-        contentDescription = "Check"
-      )
+    Box(
+      modifier = Modifier.animatePopUp(24.dp),
+      contentAlignment = Alignment.Center
+    ) {
+      CompositionLocalProvider(LocalContentColor provides iconColor) {
+        icon?.invoke() ?: Icon(
+          imageVector = Icons.Rounded.Check,
+          contentDescription = "Check"
+        )
+      }
     }
   }
 }
