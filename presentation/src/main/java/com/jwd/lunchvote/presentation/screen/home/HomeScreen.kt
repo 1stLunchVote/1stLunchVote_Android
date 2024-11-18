@@ -65,10 +65,12 @@ import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.ImageBitmapFactory
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.conditional
+import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
 import com.jwd.lunchvote.presentation.widget.LunchVoteIcon
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
+import com.jwd.lunchvote.presentation.widget.Modal
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.skydoves.landscapist.ImageOptions
@@ -443,21 +445,31 @@ private fun JoinDialog(
   onLoungeIdChange: (String) -> Unit = {},
   onConfirmation: () -> Unit = {},
 ) {
-  LunchVoteDialog(
+  Modal(
     title = stringResource(R.string.join_dialog_title),
-    dismissText = stringResource(R.string.join_dialog_dismiss_button),
     onDismissRequest = onDismissRequest,
-    confirmText = stringResource(R.string.join_dialog_confirm_button),
-    onConfirmation = onConfirmation,
     modifier = modifier,
-    confirmEnabled = loungeId.isNotBlank()
-  ) {
-    LunchVoteTextField(
-      text = loungeId,
-      onTextChange = onLoungeIdChange,
-      hintText = stringResource(R.string.join_dialog_hint_text)
-    )
-  }
+    body = stringResource(R.string.join_dialog_body),
+    closable = true,
+    content = {
+      LunchVoteTextField(
+        text = loungeId,
+        onTextChange = onLoungeIdChange,
+        hintText = stringResource(R.string.join_dialog_hint_text)
+      )
+    },
+    buttons = {
+      DialogButton(
+        text = stringResource(R.string.join_dialog_confirm_button),
+        onClick = onConfirmation
+      )
+      DialogButton(
+        text = stringResource(R.string.join_dialog_dismiss_button),
+        onClick = onDismissRequest,
+        isDismiss = true
+      )
+    }
+  )
 }
 
 @Preview

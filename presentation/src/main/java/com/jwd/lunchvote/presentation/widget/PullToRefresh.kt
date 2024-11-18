@@ -30,7 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
-import com.jwd.lunchvote.presentation.util.FlickerAnimation
+import com.jwd.lunchvote.presentation.util.animateFlicker
 
 /**
  * pull-to-refresh 기능이 추가된 LazyColumn
@@ -109,9 +109,9 @@ private fun LunchVoteRefreshIndicator(
       label = "refreshing"
     ) { refreshing ->
       if (refreshing) {
-        FlickerAnimation {
-          LunchVoteIcon()
-        }
+        LunchVoteIcon(
+          modifier = Modifier.animateFlicker()
+        )
       } else {
         LunchVoteIcon()
       }

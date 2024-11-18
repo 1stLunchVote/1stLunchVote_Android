@@ -58,6 +58,7 @@
     <!-- JoinDialog -->
     <string name="join_dialog_title">투표 방 참여하기</string>
     <string name="join_dialog_hint_text">초대 코드</string>
+    <string name="join_dialog_body">초대 코드를 입력해주세요.</string>
     <string name="join_dialog_dismiss_button">취소</string>
     <string name="join_dialog_confirm_button">참여</string>
 

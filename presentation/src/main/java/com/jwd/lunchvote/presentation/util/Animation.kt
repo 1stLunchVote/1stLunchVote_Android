@@ -3,30 +3,34 @@ package com.jwd.lunchvote.presentation.util
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.unit.Dp
 
 /**
- * 플리커 애니메이션을 적용하는 Composable
+ * 플리커 애니메이션을 적용하는 Modifier
  *
  * @param modifier Modifier
  * @param durationMillis 애니메이션 지속 시간
  * @param delayMillis 애니메이션 반복 딜레이
- * @param content 애니메이션을 적용할 Composable
  */
 @Composable
-fun FlickerAnimation(
+internal fun Modifier.animateFlicker(
   modifier: Modifier = Modifier,
   durationMillis: Int = 240,
   delayMillis: Int = 120,
-  content: @Composable () -> Unit
-) {
+): Modifier {
   val infiniteTransition = rememberInfiniteTransition(label = "flicking")
   val alpha by infiniteTransition.animateFloat(
     initialValue = 0f,
@@ -42,5 +46,37 @@ fun FlickerAnimation(
     label = "flicker"
   )
 
-  Box(modifier = modifier.alpha(alpha)) { content() }
+  return this.then(modifier.alpha(alpha))
+}
+
+
+/**
+ * 팝업 애니메이션을 적용하는 Modifier
+ *
+ * @param maxSize 최대 크기
+ * @param durationMillis 애니메이션 지속 시간
+ */
+@Composable
+internal fun Modifier.animatePopUp(
+  maxSize: Dp,
+  durationMillis: Int = 240,
+): Modifier {
+  var targetScale by remember { mutableFloatStateOf(0.32f) }
+  val scale by animateFloatAsState(
+    targetValue = targetScale,
+    animationSpec = tween(
+      durationMillis = durationMillis,
+      easing = LinearEasing
+    ),
+    label = "popup",
+    finishedListener = {
+      targetScale = 0.96f
+    }
+  )
+
+  LaunchedEffect(Unit) {
+    targetScale = 1f
+  }
+
+  return Modifier.size(maxSize * scale).then(this)
 }
