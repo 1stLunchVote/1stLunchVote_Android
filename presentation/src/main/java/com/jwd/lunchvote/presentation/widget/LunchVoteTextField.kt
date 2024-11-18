@@ -97,7 +97,7 @@ fun LunchVoteTextField(
   ) { innerTextField ->
     Row(
       modifier = modifier
-        .conditional(condition = focused, modifierIf = {
+        .conditional(focused, modifierIf = {
           outerShadow(
             color = color,
             shape = MaterialTheme.shapes.small,
@@ -113,7 +113,7 @@ fun LunchVoteTextField(
           )
         })
         .background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.small)
-        .conditional(condition = text.isNotEmpty() || focused, modifierIf = {
+        .conditional(text.isNotEmpty() || focused, modifierIf = {
           border(1.dp, color, MaterialTheme.shapes.small)
         }, modifierElse = {
           background(MaterialTheme.colorScheme.onBackground.copy(0.1f), MaterialTheme.shapes.small)
