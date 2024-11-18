@@ -222,7 +222,8 @@
     <string name="friend_list_send_request_snackbar">친구 신청이 전송되었습니다.</string>
     <!-- FriendListRequestDialog -->
     <string name="friend_list_request_dialog_title">친구 초대하기</string>
-    <string name="friend_list_request_dialog_hint_text">친구의 닉네임을 입력해주세요</string>
+    <string name="friend_list_request_dialog_body">친구의 닉네임을 입력해주세요.</string>
+    <string name="friend_list_request_dialog_hint_text">닉네임</string>
     <string name="friend_list_request_dialog_dismiss_text">취소</string>
     <string name="friend_list_request_dialog_confirm_text">친구 초대</string>
     

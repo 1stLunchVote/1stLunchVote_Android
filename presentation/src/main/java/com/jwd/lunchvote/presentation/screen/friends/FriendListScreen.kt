@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.rounded.Notifications
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -46,8 +47,10 @@ import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendLi
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
+import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.LazyColumn
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
+import com.jwd.lunchvote.presentation.widget.LunchVoteModal
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.MemberProfile
@@ -296,21 +299,37 @@ private fun RequestDialog(
   onFriendNameChange: (String) -> Unit = {},
   onConfirmation: () -> Unit = {},
 ) {
-  LunchVoteDialog(
+  LunchVoteModal(
     title = stringResource(R.string.friend_list_request_dialog_title),
-    dismissText = stringResource(R.string.friend_list_request_dialog_dismiss_text),
     onDismissRequest = onDismissRequest,
-    confirmText = stringResource(R.string.friend_list_request_dialog_confirm_text),
-    onConfirmation = onConfirmation,
     modifier = modifier,
-    confirmEnabled = friendName.isNotBlank()
-  ) {
-    LunchVoteTextField(
-      text = friendName,
-      onTextChange = onFriendNameChange,
-      hintText = stringResource(R.string.friend_list_request_dialog_hint_text)
-    )
-  }
+    icon = {
+      Icon(
+        imageVector = Icons.Rounded.Person,
+        contentDescription = "friend request"
+      )
+    },
+    body = stringResource(R.string.friend_list_request_dialog_body),
+    content = {
+      LunchVoteTextField(
+        text = friendName,
+        onTextChange = onFriendNameChange,
+        hintText = stringResource(R.string.friend_list_request_dialog_hint_text)
+      )
+    },
+    buttons = {
+      DialogButton(
+        text = stringResource(R.string.friend_list_request_dialog_confirm_text),
+        onClick = onConfirmation,
+        enabled = friendName.isNotBlank()
+      )
+      DialogButton(
+        text = stringResource(R.string.friend_list_request_dialog_dismiss_text),
+        onClick = onDismissRequest,
+        isDismiss = true
+      )
+    }
+  )
 }
 
 @Preview
