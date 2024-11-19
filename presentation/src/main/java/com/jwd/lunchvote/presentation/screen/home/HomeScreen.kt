@@ -603,3 +603,14 @@ private fun SecretDialog(
     }
   }
 }
+
+@Preview
+@Composable
+private fun SecretDialogPreview() {
+  LunchVoteTheme {
+    SecretDialog(
+      foodName = "햄버거",
+      foodImageUri = Uri.EMPTY
+    )
+  }
+}

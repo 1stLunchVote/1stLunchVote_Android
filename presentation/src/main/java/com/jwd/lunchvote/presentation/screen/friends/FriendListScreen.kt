@@ -41,15 +41,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.UserUIModel
-import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendListEvent
-import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendListSideEffect
-import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendListState
+import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.*
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.LazyColumn
-import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
 import com.jwd.lunchvote.presentation.widget.LunchVoteModal
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
@@ -71,7 +68,6 @@ fun FriendListRoute(
 ){
   val state by viewModel.viewState.collectAsStateWithLifecycle()
   val loading by viewModel.isLoading.collectAsStateWithLifecycle()
-  val dialog by viewModel.dialogState.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect){
     viewModel.sideEffect.collectLatest {
@@ -79,8 +75,6 @@ fun FriendListRoute(
         is FriendListSideEffect.PopBackStack -> popBackStack()
         is FriendListSideEffect.NavigateToFriendRequest -> navigateToFriendRequest()
         is FriendListSideEffect.NavigateToLounge -> navigateToLounge(it.loungeId)
-        is FriendListSideEffect.OpenRequestDialog -> viewModel.setDialogState(FriendListContract.REQUEST_DIALOG)
-        is FriendListSideEffect.CloseDialog -> viewModel.setDialogState("")
         is FriendListSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
@@ -88,15 +82,13 @@ fun FriendListRoute(
 
   LaunchedEffect(Unit) { viewModel.sendEvent(FriendListEvent.ScreenInitialize) }
 
-  when (dialog) {
-    FriendListContract.REQUEST_DIALOG -> {
-      RequestDialog(
-        friendName = state.friendName ?: "",
-        onDismissRequest = { viewModel.sendEvent(FriendListEvent.OnClickCancelButtonRequestDialog) },
-        onFriendNameChange = { viewModel.sendEvent(FriendListEvent.OnFriendNameChange(it)) },
-        onConfirmation = { viewModel.sendEvent(FriendListEvent.OnClickConfirmButtonRequestDialog) }
-      )
-    }
+  state.requestDialogState?.let { dialogState ->
+    RequestDialog(
+      friendName = dialogState.friendName,
+      onDismissRequest = { viewModel.sendEvent(RequestDialogEvent.OnClickCancelButton) },
+      onFriendNameChange = { viewModel.sendEvent(RequestDialogEvent.OnFriendNameChange(it)) },
+      onConfirmation = { viewModel.sendEvent(RequestDialogEvent.OnClickConfirmButton) }
+    )
   }
 
   FriendListScreen(
