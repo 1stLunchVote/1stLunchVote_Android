@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,14 +32,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.UserUIModel
+import com.jwd.lunchvote.presentation.screen.lounge.member.LoungeMemberContract.ExileDialogEvent
 import com.jwd.lunchvote.presentation.screen.lounge.member.LoungeMemberContract.LoungeMemberEvent
 import com.jwd.lunchvote.presentation.screen.lounge.member.LoungeMemberContract.LoungeMemberSideEffect
 import com.jwd.lunchvote.presentation.screen.lounge.member.LoungeMemberContract.LoungeMemberState
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
+import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
-import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
+import com.jwd.lunchvote.presentation.widget.LunchVoteModal
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
@@ -57,26 +60,18 @@ fun LoungeMemberRoute(
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
   val loading by viewModel.isLoading.collectAsStateWithLifecycle()
-  val dialog by viewModel.dialogState.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
       when (it) {
         is LoungeMemberSideEffect.PopBackStack -> popBackStack()
-        is LoungeMemberSideEffect.OpenExileConfirmDialog -> viewModel.openDialog(LoungeMemberContract.EXILE_CONFIRM_DIALOG)
-        is LoungeMemberSideEffect.CloseDialog -> viewModel.openDialog("")
         is LoungeMemberSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }
 
-  when (dialog) {
-    LoungeMemberContract.EXILE_CONFIRM_DIALOG -> {
-      ExileConfirmDialog(
-        onDismissRequest = { viewModel.sendEvent(LoungeMemberEvent.OnClickCancelButtonExileConfirmDialog) },
-        onConfirmation = { viewModel.sendEvent(LoungeMemberEvent.OnClickConfirmButtonExileConfirmDialog) }
-      )
-    }
+  state.exileDialogState?.let {
+    ExileConfirmDialog(onEvent = viewModel::sendEvent)
   }
 
   LaunchedEffect(Unit) { viewModel.sendEvent(LoungeMemberEvent.ScreenInitialize) }
@@ -99,7 +94,7 @@ private fun LoungeMemberScreen(
     modifier = modifier.padding(32.dp),
     topAppBar = {
       LunchVoteTopBar(
-        title = "참여자 정보",
+        title = stringResource(R.string.lounge_member_title),
         popBackStack = { onEvent(LoungeMemberEvent.OnClickBackButton) }
       )
     }
@@ -142,7 +137,7 @@ private fun LoungeMemberScreen(
         .align(Alignment.CenterHorizontally)
     ) {
       Text(
-        text = "추방하기",
+        text = stringResource(R.string.lounge_member_exile),
         color = MaterialTheme.colorScheme.error,
         textDecoration = TextDecoration.Underline
       )
@@ -153,29 +148,35 @@ private fun LoungeMemberScreen(
 @Composable
 private fun ExileConfirmDialog(
   modifier: Modifier = Modifier,
-  onDismissRequest: () -> Unit = {},
-  onConfirmation: () -> Unit = {}
+  onEvent: (ExileDialogEvent) -> Unit = {}
 ) {
-  LunchVoteDialog(
-    title = "추방하시겠습니까?",
-    dismissText = "취소",
-    onDismissRequest = onDismissRequest,
-    confirmText = "추방",
-    onConfirmation = onConfirmation,
+  LunchVoteModal(
+    title = stringResource(R.string.lm_exile_dialog_title),
+    onDismissRequest = { onEvent(ExileDialogEvent.OnClickCancelButton) },
     modifier = modifier,
     icon = {
       Icon(
         imageVector = Icons.Rounded.Warning,
-        contentDescription = null,
-        modifier = Modifier.size(28.dp)
+        contentDescription = "Warning"
+      )
+    },
+    iconColor = MaterialTheme.colorScheme.error,
+    body = stringResource(R.string.lm_exile_dialog_body),
+    closable = false,
+    buttons = {
+      DialogButton(
+        text = stringResource(R.string.lm_exile_dialog_cancel_button),
+        onClick = { onEvent(ExileDialogEvent.OnClickCancelButton) },
+        isDismiss = true,
+        color = MaterialTheme.colorScheme.onSurface
+      )
+      DialogButton(
+        text = stringResource(R.string.lm_exile_dialog_exile_button),
+        onClick = { onEvent(ExileDialogEvent.OnClickExileButton) },
+        color = MaterialTheme.colorScheme.error
       )
     }
-  ) {
-    Text(
-      text = "추방된 사용자는 해당 방에 다시 들어올 수 없습니다.",
-      modifier = Modifier.fillMaxWidth()
-    )
-  }
+  )
 }
 
 @Preview
@@ -184,7 +185,12 @@ private fun Preview() {
   ScreenPreview {
     LoungeMemberScreen(
       LoungeMemberState(
+        me = MemberUIModel(
+          userId = "123",
+          type = MemberUIModel.Type.OWNER,
+        ),
         user = UserUIModel(
+          id = "234",
           name = "김철수",
           email = "email@email.com"
         )
@@ -195,7 +201,7 @@ private fun Preview() {
 
 @Preview
 @Composable
-private fun ExileConfirmDialogPreview() {
+private fun ExileDialogPreview() {
   LunchVoteTheme {
     ExileConfirmDialog()
   }

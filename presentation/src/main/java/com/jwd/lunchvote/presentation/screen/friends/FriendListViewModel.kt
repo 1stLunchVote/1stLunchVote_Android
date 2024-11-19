@@ -47,6 +47,7 @@ class FriendListViewModel @Inject constructor(
       is FriendListEvent.OnClickJoinButton -> launch { joinLounge(event.friendId) }
       is FriendListEvent.OnClickDeleteFriendButton -> launch { deleteFriend(event.friendId) }
       is FriendListEvent.OnClickRequestButton -> updateState(FriendListReduce.UpdateRequestDialogState(RequestDialogState()))
+
       is RequestDialogEvent -> handleRequestDialogEvents(event)
     }
   }
@@ -65,6 +66,7 @@ class FriendListViewModel @Inject constructor(
       is FriendListReduce.UpdateOnlineFriendList -> state.copy(onlineFriendList = reduce.onlineFriendList)
       is FriendListReduce.UpdateOfflineFriendList -> state.copy(offlineFriendList = reduce.offlineFriendList)
       is FriendListReduce.UpdateRequestDialogState -> state.copy(requestDialogState = reduce.requestDialogState)
+
       is RequestDialogReduce -> state.copy(requestDialogState = reduceRequestDialogState(state.requestDialogState, reduce))
     }
   }

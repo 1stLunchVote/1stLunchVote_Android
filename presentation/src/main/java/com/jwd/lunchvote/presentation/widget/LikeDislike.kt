@@ -49,7 +49,7 @@ private fun Like(
 ) {
   Row(
     modifier = modifier
-      .background(MaterialTheme.colorScheme.tertiary, MaterialTheme.shapes.extraLarge)
+      .background(MaterialTheme.colorScheme.secondary, MaterialTheme.shapes.extraLarge)
       .padding(horizontal = 6.dp),
     horizontalArrangement = Arrangement.spacedBy(4.dp),
     verticalAlignment = Alignment.CenterVertically
@@ -57,14 +57,14 @@ private fun Like(
     Box(
       modifier = Modifier
         .size(12.dp)
-        .glow(MaterialTheme.colorScheme.onTertiary, 12.dp)
-        .border(2.dp, MaterialTheme.colorScheme.onTertiary, CircleShape)
-        .background(MaterialTheme.colorScheme.tertiary, CircleShape)
+        .glow(MaterialTheme.colorScheme.onSecondary, 12.dp)
+        .border(2.dp, MaterialTheme.colorScheme.onSecondary, CircleShape)
+        .background(MaterialTheme.colorScheme.secondary, CircleShape)
     )
     Text(
       text = "$amount".padStart(2, '0'),
       style = MaterialTheme.typography.labelLarge,
-      color = MaterialTheme.colorScheme.onTertiary
+      color = MaterialTheme.colorScheme.onSecondary
     )
   }
 }

@@ -47,7 +47,9 @@ class HomeContract {
   @Parcelize
   data class JoinDialogState(
     val loungeId: String = ""
-  ) : ViewModelContract.State, Parcelable
+  ) : ViewModelContract.State, Parcelable {
+    override fun toParcelable(): Parcelable = this
+  }
 
   sealed interface JoinDialogEvent : HomeEvent {
     data class OnLoungeIdChange(val loungeId: String) : JoinDialogEvent
@@ -63,7 +65,9 @@ class HomeContract {
   data class SecretDialogState(
     val foodName: String = "",
     val foodImageUri: Uri = Uri.EMPTY,
-  ) : ViewModelContract.State, Parcelable
+  ) : ViewModelContract.State, Parcelable {
+    override fun toParcelable(): Parcelable = this
+  }
 
   sealed interface SecretDialogEvent : HomeEvent {
     data class OnFoodNameChange(val foodName: String) : SecretDialogEvent

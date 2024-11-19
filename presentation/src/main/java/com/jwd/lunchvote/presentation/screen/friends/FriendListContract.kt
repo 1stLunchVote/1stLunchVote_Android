@@ -42,7 +42,9 @@ class FriendListContract {
   @Parcelize
   data class RequestDialogState(
     val friendName: String = ""
-  ) : ViewModelContract.State, Parcelable
+  ) : ViewModelContract.State, Parcelable {
+    override fun toParcelable(): Parcelable = this
+  }
 
   sealed interface RequestDialogEvent : FriendListEvent {
     data class OnFriendNameChange(val friendName: String) : RequestDialogEvent

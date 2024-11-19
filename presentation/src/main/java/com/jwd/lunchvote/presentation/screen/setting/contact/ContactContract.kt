@@ -11,7 +11,8 @@ class ContactContract {
   @Parcelize
   data class ContactState(
     val contact: ContactUIModel = ContactUIModel(),
-    val reply: ContactReplyUIModel? = null
+    val reply: ContactReplyUIModel? = null,
+    val deleteDialogState: DeleteDialogState? = null
   ) : ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this
   }
@@ -21,25 +22,26 @@ class ContactContract {
 
     data object OnClickBackButton : ContactEvent
     data object OnClickDeleteButton : ContactEvent
-
-    // DialogEvent
-    data object OnClickCancelButtonDeleteDialog : ContactEvent
-    data object OnClickDeleteButtonDeleteDialog : ContactEvent
   }
 
   sealed interface ContactReduce : ViewModelContract.Reduce {
     data class UpdateContact(val contact: ContactUIModel) : ContactReduce
     data class UpdateReply(val reply: ContactReplyUIModel?) : ContactReduce
+    data class UpdateDeleteDialogState(val deleteDialogState: DeleteDialogState?) : ContactReduce
   }
 
   sealed interface ContactSideEffect : ViewModelContract.SideEffect {
     data object PopBackStack : ContactSideEffect
-    data object OpenDeleteDialog : ContactSideEffect
-    data object CloseDialog : ContactSideEffect
     data class ShowSnackbar(val message: UiText) : ContactSideEffect
   }
 
-  companion object {
-    const val DELETE_DIALOG = "delete_dialog"
+  @Parcelize
+  data object DeleteDialogState : ViewModelContract.State, Parcelable {
+    override fun toParcelable(): Parcelable = this
+  }
+
+  sealed interface DeleteDialogEvent : ContactEvent {
+    data object OnClickCancelButton : DeleteDialogEvent
+    data object OnClickDeleteButton : DeleteDialogEvent
   }
 }

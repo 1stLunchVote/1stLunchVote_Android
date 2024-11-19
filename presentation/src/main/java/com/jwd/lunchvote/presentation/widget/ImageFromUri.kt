@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.util.ImageBitmapFactory
@@ -67,7 +68,7 @@ fun ImageFromUri(
       contentAlignment = Alignment.Center
     ) {
       Text(
-        text = stringResource(R.string.profile_edit_profile_image_dialog_no_image),
+        text = stringResource(R.string.p_profile_image_dialog_no_image),
         color = MaterialTheme.colorScheme.outline
       )
     }
@@ -78,7 +79,9 @@ fun ImageFromUri(
 fun ImageWithUploadButton(
   uri: Uri,
   onImageChange: (Uri) -> Unit,
-  onError: () -> Unit
+  modifier: Modifier = Modifier,
+  size: Dp = 160.dp,
+  onError: () -> Unit = {},
 ) {
   val albumLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { imageUri: Uri? ->
     if (imageUri != null) onImageChange(imageUri)
@@ -86,7 +89,7 @@ fun ImageWithUploadButton(
   }
 
   Box(
-    modifier = Modifier.size(160.dp),
+    modifier = modifier.size(size),
     contentAlignment = Alignment.BottomEnd
   ) {
     ImageFromUri(

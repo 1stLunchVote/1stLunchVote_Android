@@ -1,12 +1,9 @@
 package com.jwd.lunchvote.presentation.screen.setting.profile
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.os.Environment
 import android.os.Parcelable
 import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.jwd.lunchvote.domain.repository.StorageRepository
@@ -15,20 +12,23 @@ import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
+import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.DeleteDialogEvent
+import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.DeleteDialogState
+import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.NameDialogEvent
+import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.NameDialogReduce
+import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.NameDialogState
 import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.ProfileEvent
+import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.ProfileImageDialogEvent
+import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.ProfileImageDialogReduce
+import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.ProfileImageDialogState
 import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.ProfileReduce
 import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.ProfileSideEffect
 import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.ProfileState
 import com.jwd.lunchvote.presentation.util.ImageBitmapFactory
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kr.co.inbody.config.error.UserError
-import java.io.File
 import java.util.UUID
 import javax.inject.Inject
 
@@ -42,41 +42,66 @@ class ProfileViewModel @Inject constructor(
     return savedState as? ProfileState ?: ProfileState()
   }
 
-  private val _dialogState = MutableStateFlow("")
-  val dialogState: StateFlow<String> = _dialogState.asStateFlow()
-  fun setDialogState(dialogState: String) {
-    viewModelScope.launch {
-      _dialogState.emit(dialogState)
-    }
-  }
-
   override fun handleEvents(event: ProfileEvent) {
     when(event) {
       is ProfileEvent.ScreenInitialize -> launch { initialize() }
 
       is ProfileEvent.OnClickBackButton -> sendSideEffect(ProfileSideEffect.PopBackStack)
-      is ProfileEvent.OnClickEditProfileImageButton -> sendSideEffect(ProfileSideEffect.OpenEditProfileImageDialog)
-      is ProfileEvent.OnClickEditNameButton -> sendSideEffect(ProfileSideEffect.OpenEditNameDialog)
-      is ProfileEvent.OnClickDeleteUserButton -> sendSideEffect(ProfileSideEffect.OpenDeleteUserConfirmDialog)
+      is ProfileEvent.OnClickEditProfileImageButton -> updateState(ProfileReduce.UpdateProfileImageDialogState(ProfileImageDialogState(currentState.user.profileImage.toUri())))
+      is ProfileEvent.OnClickEditNameButton -> updateState(ProfileReduce.UpdateNameDialogState(NameDialogState(currentState.user.name)))
+      is ProfileEvent.OnClickDeleteUserButton -> updateState(ProfileReduce.UpdateDeleteDialogState(DeleteDialogState))
 
-      // DialogEvent
-      is ProfileEvent.OnProfileImageChangeEditProfileImageDialog -> updateState(ProfileReduce.UpdateProfileImage(event.profileImageUri))
-      is ProfileEvent.OnImageLoadErrorEditProfileImageDialog -> sendSideEffect(ProfileSideEffect.ShowSnackbar(UiText.StringResource(R.string.profile_edit_profile_image_dialog_image_load_error)))
-      is ProfileEvent.OnClickCancelButtonEditProfileImageDialog -> sendSideEffect(ProfileSideEffect.CloseDialog)
-      is ProfileEvent.OnClickSaveButtonEditProfileImageDialog -> launch { saveProfileImage(event.context) }
-      is ProfileEvent.OnNameChangeEditNameDialog -> updateState(ProfileReduce.UpdateName(event.name))
-      is ProfileEvent.OnClickCancelButtonEditNameDialog -> sendSideEffect(ProfileSideEffect.CloseDialog)
-      is ProfileEvent.OnClickSaveButtonEditNameDialog -> launch { saveName() }
-      is ProfileEvent.OnClickCancelButtonDeleteUserConfirmDialog -> sendSideEffect(ProfileSideEffect.CloseDialog)
-      is ProfileEvent.OnClickConfirmButtonDeleteUserConfirmDialog -> launch { deleteUser() }
+      is ProfileImageDialogEvent -> handleProfileImageDialogEvents(event)
+      is NameDialogEvent -> handleNameDialogEvents(event)
+      is DeleteDialogEvent -> handleDeleteDialogEvents(event)
+    }
+  }
+
+  private fun handleProfileImageDialogEvents(event: ProfileImageDialogEvent) {
+    when (event) {
+      is ProfileImageDialogEvent.OnProfileImageChange -> updateState(ProfileImageDialogReduce.UpdateProfileImage(event.profileImageUri))
+      is ProfileImageDialogEvent.OnImageLoadError -> sendSideEffect(ProfileSideEffect.ShowSnackbar(UiText.StringResource(R.string.p_profile_image_dialog_image_load_error)))
+      is ProfileImageDialogEvent.OnClickCancelButton -> updateState(ProfileReduce.UpdateProfileImageDialogState(null))
+      is ProfileImageDialogEvent.OnClickSaveButton -> launch { saveProfileImage(event.context) }
+    }
+  }
+
+  private fun handleNameDialogEvents(event: NameDialogEvent) {
+    when (event) {
+      is NameDialogEvent.OnNameChange -> updateState(NameDialogReduce.UpdateName(event.name))
+      is NameDialogEvent.OnClickCancelButton -> updateState(ProfileReduce.UpdateNameDialogState(null))
+      is NameDialogEvent.OnClickSaveButton -> launch { saveName() }
+    }
+  }
+
+  private fun handleDeleteDialogEvents(event: DeleteDialogEvent) {
+    when (event) {
+      is DeleteDialogEvent.OnClickCancelButton -> updateState(ProfileReduce.UpdateDeleteDialogState(null))
+      is DeleteDialogEvent.OnClickDeleteButton -> launch { deleteUser() }
     }
   }
 
   override fun reduceState(state: ProfileState, reduce: ProfileReduce): ProfileState {
     return when (reduce) {
       is ProfileReduce.UpdateUser -> state.copy(user = reduce.user)
-      is ProfileReduce.UpdateProfileImage -> state.copy(profileImageUri = reduce.profileImageUri)
-      is ProfileReduce.UpdateName -> state.copy(name = reduce.name)
+      is ProfileReduce.UpdateProfileImageDialogState -> state.copy(profileImageDialogState = reduce.profileImageDialogState)
+      is ProfileReduce.UpdateNameDialogState -> state.copy(nameDialogState = reduce.nameDialogState)
+      is ProfileReduce.UpdateDeleteDialogState -> state.copy(deleteDialogState = reduce.deleteDialogState)
+
+      is ProfileImageDialogReduce -> state.copy(profileImageDialogState = reduceProfileImageDialogState(state.profileImageDialogState, reduce))
+      is NameDialogReduce -> state.copy(nameDialogState = reduceNameDialogState(state.nameDialogState, reduce))
+    }
+  }
+
+  private fun reduceProfileImageDialogState(state: ProfileImageDialogState?, reduce: ProfileImageDialogReduce): ProfileImageDialogState? {
+    return when (reduce) {
+      is ProfileImageDialogReduce.UpdateProfileImage -> state?.copy(profileImageUri = reduce.profileImageUri)
+    }
+  }
+
+  private fun reduceNameDialogState(state: NameDialogState?, reduce: NameDialogReduce): NameDialogState? {
+    return when (reduce) {
+      is NameDialogReduce.UpdateName -> state?.copy(name = reduce.name)
     }
   }
 
@@ -89,52 +114,44 @@ class ProfileViewModel @Inject constructor(
     val user = userRepository.getUserById(currentUser.uid).asUI()
 
     updateState(ProfileReduce.UpdateUser(user))
-    updateState(ProfileReduce.UpdateProfileImage(user.profileImage.toUri()))
-    updateState(ProfileReduce.UpdateName(user.name))
   }
 
   private suspend fun saveProfileImage(context: Context) {
-    sendSideEffect(ProfileSideEffect.CloseDialog)
+    val dialogState = currentState.profileImageDialogState ?: return
+    updateState(ProfileReduce.UpdateProfileImageDialogState(null))
 
-    val imageBitmap = ImageBitmapFactory.createBitmapFromUri(context, currentState.profileImageUri)
-    val directory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "images")
-      .apply { if (!exists()) mkdirs() }
-    val file = File(directory, "${UUID.randomUUID()}.jpg").apply {
-      outputStream().use { outputStream ->
-        imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-      }
-    }
-
-    val imageUrl = file.readBytes()
-    val image = storageRepository.uploadProfileImage(currentState.user.id, imageUrl)
+    val imageByteArray = ImageBitmapFactory.createByteArrayFromUri(context, dialogState.profileImageUri, UUID.randomUUID().toString())
+    val image = storageRepository.uploadProfileImage(currentState.user.id, imageByteArray)
     val user = currentState.user.copy(profileImage = image)
     userRepository.updateUser(user.asDomain())
     
-    sendSideEffect(ProfileSideEffect.ShowSnackbar(UiText.StringResource(R.string.profile_edit_profile_image_success_snackbar)))
+    sendSideEffect(ProfileSideEffect.ShowSnackbar(UiText.StringResource(R.string.p_profile_image_success_snackbar)))
     initialize()
   }
 
   private suspend fun saveName() {
-    val name = currentState.name
-    val nameExists = userRepository.checkNameExists(name)
+    val dialogState = currentState.nameDialogState ?: return
+
+    val nameExists = userRepository.checkNameExists(dialogState.name)
     if (nameExists) throw UserError.DuplicatedName
 
-    sendSideEffect(ProfileSideEffect.CloseDialog)
+    updateState(ProfileReduce.UpdateNameDialogState(null))
 
-    val user = currentState.user.copy(name = name)
+    val user = currentState.user.copy(name = dialogState.name)
 
     userRepository.updateUser(user.asDomain())
-    sendSideEffect(ProfileSideEffect.ShowSnackbar(UiText.StringResource(R.string.profile_edit_name_success_snackbar)))
+    sendSideEffect(ProfileSideEffect.ShowSnackbar(UiText.StringResource(R.string.p_name_success_snackbar)))
     initialize()
   }
 
   private suspend fun deleteUser() {
-    sendSideEffect(ProfileSideEffect.CloseDialog)
+    currentState.deleteDialogState ?: return
+    updateState(ProfileReduce.UpdateDeleteDialogState(null))
 
     val currentUser = Firebase.auth.currentUser ?: throw UserError.NoUser
     currentUser.delete().await()
 
-    sendSideEffect(ProfileSideEffect.ShowSnackbar(UiText.StringResource(R.string.profile_delete_user_success_snackbar)))
+    sendSideEffect(ProfileSideEffect.ShowSnackbar(UiText.StringResource(R.string.p_delete_dialog_success_snackbar)))
     sendSideEffect(ProfileSideEffect.NavigateToLogin)
   }
 }

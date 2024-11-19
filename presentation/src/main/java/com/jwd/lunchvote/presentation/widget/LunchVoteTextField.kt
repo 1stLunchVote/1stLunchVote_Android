@@ -69,7 +69,7 @@ fun LunchVoteTextField(
 
   val color = when (isError) {
     null -> MaterialTheme.colorScheme.primary
-    false -> MaterialTheme.colorScheme.tertiary
+    false -> MaterialTheme.colorScheme.secondary
     true -> MaterialTheme.colorScheme.error
   }
 
@@ -252,7 +252,7 @@ fun CheckIcon(
     imageVector = Icons.Rounded.Check,
     contentDescription = "search",
     modifier = modifier.size(20.dp),
-    tint = MaterialTheme.colorScheme.tertiary
+    tint = MaterialTheme.colorScheme.secondary
   )
 }
 

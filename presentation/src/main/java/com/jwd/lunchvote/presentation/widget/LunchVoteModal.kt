@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
@@ -164,6 +164,7 @@ fun RowScope.DialogButton(
   text: String,
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
+  color: Color = MaterialTheme.colorScheme.primary,
   enabled: Boolean = true,
   isDismiss: Boolean = false
 ) {
@@ -172,7 +173,11 @@ fun RowScope.DialogButton(
       onClick = onClick,
       enabled = enabled,
       modifier = modifier.weight(1f),
-      shape = MaterialTheme.shapes.small
+      shape = MaterialTheme.shapes.small,
+      colors = ButtonDefaults.buttonColors(
+        containerColor = color,
+        contentColor = MaterialTheme.colorScheme.onPrimary
+      )
     ) {
       Text(text)
     }
@@ -183,7 +188,10 @@ fun RowScope.DialogButton(
         .weight(1f)
         .alpha(0.64f),
       enabled = enabled,
-      shape = MaterialTheme.shapes.small
+      shape = MaterialTheme.shapes.small,
+      colors = ButtonDefaults.outlinedButtonColors(
+        contentColor = color,
+      )
     ) {
       Text(text)
     }

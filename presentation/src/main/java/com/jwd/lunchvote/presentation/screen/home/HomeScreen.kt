@@ -427,27 +427,27 @@ private fun JoinDialog(
   onConfirmation: () -> Unit = {},
 ) {
   LunchVoteModal(
-    title = stringResource(R.string.join_dialog_title),
+    title = stringResource(R.string.h_join_dialog_title),
     onDismissRequest = onDismissRequest,
     modifier = modifier,
     icon = { LunchVoteIcon() },
-    body = stringResource(R.string.join_dialog_body),
+    body = stringResource(R.string.h_join_dialog_body),
     closable = true,
     content = {
       LunchVoteTextField(
         text = loungeId,
         onTextChange = onLoungeIdChange,
-        hintText = stringResource(R.string.join_dialog_hint_text)
+        hintText = stringResource(R.string.h_join_dialog_hint_text)
       )
     },
     buttons = {
       DialogButton(
-        text = stringResource(R.string.join_dialog_dismiss_button),
+        text = stringResource(R.string.h_join_dialog_dismiss_button),
         onClick = onDismissRequest,
         isDismiss = true
       )
       DialogButton(
-        text = stringResource(R.string.join_dialog_confirm_button),
+        text = stringResource(R.string.h_join_dialog_confirm_button),
         onClick = onConfirmation
       )
     }

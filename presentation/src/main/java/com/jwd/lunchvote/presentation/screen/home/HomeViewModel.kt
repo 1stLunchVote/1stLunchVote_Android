@@ -61,6 +61,7 @@ class HomeViewModel @Inject constructor(
       is HomeEvent.OnClickSettingButton -> sendSideEffect(HomeSideEffect.NavigateToSetting)
       is HomeEvent.OnClickTipsButton -> sendSideEffect(HomeSideEffect.NavigateToTips)
       is HomeEvent.OnLongPressIcon -> updateState(HomeReduce.UpdateSecretDialogState(SecretDialogState()))
+
       is JoinDialogEvent -> handleJoinDialogEvents(event)
       is SecretDialogEvent -> handleSecretDialogEvents(event)
     }
@@ -78,7 +79,7 @@ class HomeViewModel @Inject constructor(
     when(event) {
       is SecretDialogEvent.OnFoodNameChange -> updateState(SecretDialogReduce.UpdateFoodName(event.foodName))
       is SecretDialogEvent.OnFoodImageChange -> updateState(SecretDialogReduce.UpdateFoodImageUri(event.foodImageUri))
-      is SecretDialogEvent.OnImageLoadError -> sendSideEffect(HomeSideEffect.ShowSnackbar(UiText.StringResource(R.string.profile_edit_profile_image_dialog_image_load_error)))
+      is SecretDialogEvent.OnImageLoadError -> sendSideEffect(HomeSideEffect.ShowSnackbar(UiText.StringResource(R.string.p_profile_image_dialog_image_load_error)))
       is SecretDialogEvent.OnClickCancelButton -> updateState(HomeReduce.UpdateSecretDialogState(null))
       is SecretDialogEvent.OnClickUploadButton -> launch { uploadFood(event.context) }
     }
@@ -90,6 +91,7 @@ class HomeViewModel @Inject constructor(
       is HomeReduce.UpdateFoodTrendRatio -> state.copy(foodTrendRatio = reduce.foodTrendRatio)
       is HomeReduce.UpdateJoinDialogState -> state.copy(joinDialogState = reduce.joinDialogState)
       is HomeReduce.UpdateSecretDialogState -> state.copy(secretDialogState = reduce.secretDialogState)
+
       is JoinDialogReduce -> state.copy(joinDialogState = reduceJoinDialogState(state.joinDialogState, reduce))
       is SecretDialogReduce -> state.copy(secretDialogState = reduceSecretDialogState(state.secretDialogState, reduce))
     }

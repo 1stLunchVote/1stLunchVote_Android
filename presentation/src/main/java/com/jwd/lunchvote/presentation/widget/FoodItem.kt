@@ -71,7 +71,7 @@ private fun FoodImage(
   Box(
     modifier = modifier
       .conditional(status == FoodItem.Status.LIKE){
-        glow(MaterialTheme.colorScheme.tertiary, size.div(2), 16.dp)
+        glow(MaterialTheme.colorScheme.secondary, size.div(2), 16.dp)
       }
       .conditional(status == FoodItem.Status.DISLIKE) { alpha(0.5f) },
   ) {

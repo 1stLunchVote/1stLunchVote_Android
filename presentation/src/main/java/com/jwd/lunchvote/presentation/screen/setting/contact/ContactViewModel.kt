@@ -11,6 +11,8 @@ import com.jwd.lunchvote.presentation.screen.setting.contact.ContactContract.Con
 import com.jwd.lunchvote.presentation.screen.setting.contact.ContactContract.ContactReduce
 import com.jwd.lunchvote.presentation.screen.setting.contact.ContactContract.ContactSideEffect
 import com.jwd.lunchvote.presentation.screen.setting.contact.ContactContract.ContactState
+import com.jwd.lunchvote.presentation.screen.setting.contact.ContactContract.DeleteDialogEvent
+import com.jwd.lunchvote.presentation.screen.setting.contact.ContactContract.DeleteDialogState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,24 +34,21 @@ class ContactViewModel @Inject constructor(
   private val contactId: String =
     savedStateHandle[LunchVoteNavRoute.Contact.arguments.first().name] ?: throw RouteError.NoArguments
 
-  private val _dialogState = MutableStateFlow("")
-  val dialogState: StateFlow<String> = _dialogState.asStateFlow()
-  fun setDialogState(dialogState: String) {
-    viewModelScope.launch {
-      _dialogState.emit(dialogState)
-    }
-  }
-
   override fun handleEvents(event: ContactEvent) {
     when(event) {
       is ContactEvent.ScreenInitialize -> launch { initialize() }
 
       is ContactEvent.OnClickBackButton -> sendSideEffect(ContactSideEffect.PopBackStack)
-      is ContactEvent.OnClickDeleteButton -> sendSideEffect(ContactSideEffect.OpenDeleteDialog)
+      is ContactEvent.OnClickDeleteButton -> updateState(ContactReduce.UpdateDeleteDialogState(DeleteDialogState))
 
-      // DialogEvent
-      is ContactEvent.OnClickCancelButtonDeleteDialog -> sendSideEffect(ContactSideEffect.CloseDialog)
-      is ContactEvent.OnClickDeleteButtonDeleteDialog -> launch { deleteContact() }
+      is DeleteDialogEvent -> handleDeleteDialogEvents(event)
+    }
+  }
+
+  private fun handleDeleteDialogEvents(event: DeleteDialogEvent) {
+    when(event) {
+      is DeleteDialogEvent.OnClickCancelButton -> updateState(ContactReduce.UpdateDeleteDialogState(null))
+      is DeleteDialogEvent.OnClickDeleteButton -> launch { deleteContact() }
     }
   }
 
@@ -57,6 +56,7 @@ class ContactViewModel @Inject constructor(
     return when (reduce) {
       is ContactReduce.UpdateContact -> state.copy(contact = reduce.contact)
       is ContactReduce.UpdateReply -> state.copy(reply = reduce.reply)
+      is ContactReduce.UpdateDeleteDialogState -> state.copy(deleteDialogState = reduce.deleteDialogState)
     }
   }
 

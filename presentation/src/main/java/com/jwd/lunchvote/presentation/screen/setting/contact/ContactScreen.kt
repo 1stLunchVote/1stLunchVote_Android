@@ -7,9 +7,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -21,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,15 +28,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.ContactReplyUIModel
 import com.jwd.lunchvote.presentation.model.ContactUIModel
-import com.jwd.lunchvote.presentation.screen.setting.contact.ContactContract.Companion.DELETE_DIALOG
 import com.jwd.lunchvote.presentation.screen.setting.contact.ContactContract.ContactEvent
 import com.jwd.lunchvote.presentation.screen.setting.contact.ContactContract.ContactSideEffect
 import com.jwd.lunchvote.presentation.screen.setting.contact.ContactContract.ContactState
+import com.jwd.lunchvote.presentation.screen.setting.contact.ContactContract.DeleteDialogEvent
 import com.jwd.lunchvote.presentation.util.INITIAL_DATE_TIME
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
+import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.Gap
-import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
+import com.jwd.lunchvote.presentation.widget.LunchVoteModal
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
@@ -55,24 +54,18 @@ fun ContactRoute(
   context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
-  val dialog by viewModel.dialogState.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
       when(it) {
         is ContactSideEffect.PopBackStack -> popBackStack()
-        is ContactSideEffect.OpenDeleteDialog -> viewModel.setDialogState(DELETE_DIALOG)
-        is ContactSideEffect.CloseDialog -> viewModel.setDialogState("")
         is ContactSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }
 
-  when(dialog) {
-    DELETE_DIALOG -> DeleteDialog(
-      onDismissRequest = { viewModel.sendEvent(ContactEvent.OnClickCancelButtonDeleteDialog) },
-      onConfirmation = { viewModel.sendEvent(ContactEvent.OnClickDeleteButtonDeleteDialog) }
-    )
+  state.deleteDialogState?.let {
+    DeleteDialog(onEvent = viewModel::sendEvent)
   }
 
   LaunchedEffect(Unit) { viewModel.handleEvents(ContactEvent.ScreenInitialize) }
@@ -123,7 +116,7 @@ private fun ContactScreen(
     }
     Gap(height = 16.dp)
     Text(
-      text = "문의 삭제",
+      text = stringResource(R.string.contact_delete_button),
       modifier = Modifier
         .clickableWithoutEffect { onEvent(ContactEvent.OnClickDeleteButton) }
         .padding(vertical = 12.dp)
@@ -214,28 +207,32 @@ private fun ReplyBox(
 @Composable
 private fun DeleteDialog(
   modifier: Modifier = Modifier,
-  onDismissRequest: () -> Unit = {},
-  onConfirmation: () -> Unit = {}
+  onEvent: (DeleteDialogEvent) -> Unit = {}
 ) {
-  LunchVoteDialog(
-    title = "문의 삭제",
-    dismissText = "취소",
-    onDismissRequest = onDismissRequest,
-    confirmText = "삭제",
-    onConfirmation = onConfirmation,
+  LunchVoteModal(
+    title = stringResource(R.string.c_delete_dialog_title),
+    onDismissRequest = { onEvent(DeleteDialogEvent.OnClickCancelButton) },
     modifier = modifier,
     icon = {
       Icon(
-        Icons.Outlined.Delete,
-        contentDescription = null,
-        modifier = Modifier.size(28.dp)
+        Icons.Rounded.Delete,
+        contentDescription = "Delete"
       )
     },
-    content = {
-      Text(
-        text = "문의를 삭제하시겠습니까?",
-        modifier = Modifier.fillMaxWidth(),
-        textAlign = TextAlign.Center
+    iconColor = MaterialTheme.colorScheme.error,
+    body = stringResource(R.string.c_delete_dialog_body),
+    closable = false,
+    buttons = {
+      DialogButton(
+        text = stringResource(R.string.c_delete_dialog_cancel_button),
+        onClick = { onEvent(DeleteDialogEvent.OnClickCancelButton) },
+        isDismiss = true,
+        color = MaterialTheme.colorScheme.onSurface
+      )
+      DialogButton(
+        text = stringResource(R.string.c_delete_dialog_delete_button),
+        onClick = { onEvent(DeleteDialogEvent.OnClickDeleteButton) },
+        color = MaterialTheme.colorScheme.error
       )
     }
   )
@@ -278,5 +275,13 @@ private fun Reply() {
         )
       )
     )
+  }
+}
+
+@Preview
+@Composable
+private fun DeleteDialogPreview() {
+  ScreenPreview {
+    DeleteDialog()
   }
 }

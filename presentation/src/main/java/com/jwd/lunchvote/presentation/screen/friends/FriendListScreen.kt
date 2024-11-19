@@ -292,7 +292,7 @@ private fun RequestDialog(
   onConfirmation: () -> Unit = {},
 ) {
   LunchVoteModal(
-    title = stringResource(R.string.friend_list_request_dialog_title),
+    title = stringResource(R.string.fl_request_dialog_title),
     onDismissRequest = onDismissRequest,
     modifier = modifier,
     icon = {
@@ -301,23 +301,23 @@ private fun RequestDialog(
         contentDescription = "friend request"
       )
     },
-    body = stringResource(R.string.friend_list_request_dialog_body),
+    body = stringResource(R.string.fl_request_dialog_body),
     content = {
       LunchVoteTextField(
         text = friendName,
         onTextChange = onFriendNameChange,
-        hintText = stringResource(R.string.friend_list_request_dialog_hint_text)
+        hintText = stringResource(R.string.fl_request_dialog_hint_text)
       )
     },
     buttons = {
       DialogButton(
-        text = stringResource(R.string.friend_list_request_dialog_dismiss_text),
+        text = stringResource(R.string.fl_request_dialog_dismiss_text),
         onClick = onDismissRequest,
         modifier = Modifier.weight(1f),
         isDismiss = true
       )
       DialogButton(
-        text = stringResource(R.string.friend_list_request_dialog_confirm_text),
+        text = stringResource(R.string.fl_request_dialog_confirm_text),
         onClick = onConfirmation,
         modifier = Modifier.weight(1f),
         enabled = friendName.isNotBlank()
