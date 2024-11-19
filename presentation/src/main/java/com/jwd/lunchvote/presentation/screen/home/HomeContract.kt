@@ -13,11 +13,8 @@ class HomeContract {
   data class HomeState(
     val foodTrend: FoodUIModel? = null,
     val foodTrendRatio: Float = 0f,
-    val loungeId: String? = null,
-
-    // Only for Debug
-    val foodName: String? = null,
-    val foodImageUri: Uri? = null,
+    val joinDialogState: JoinDialogState? = null,
+    val secretDialogState: SecretDialogState? = null,
   ) : ViewModelContract.State, Parcelable
 
   sealed interface HomeEvent : ViewModelContract.Event {
@@ -28,29 +25,14 @@ class HomeContract {
     data object OnClickFriendButton : HomeEvent
     data object OnClickSettingButton : HomeEvent
     data object OnClickTipsButton : HomeEvent
-
-    // DialogEvents
-    data class OnLoungeIdChange(val loungeId: String) : HomeEvent
-    data object OnClickCancelButtonJoinDialog : HomeEvent
-    data object OnClickConfirmButtonJoinDialog : HomeEvent
-
-    // Only for Debug
-    data object OnClickSecretButton : HomeEvent
-    data class OnFoodNameChangeOfSecretDialog(val foodName: String?) : HomeEvent
-    data class OnFoodImageChangeOfSecretDialog(val foodImageUri: Uri?) : HomeEvent
-    data object OnImageLoadErrorOfSecretDialog : HomeEvent
-    data object OnClickCancelButtonOfSecretDialog : HomeEvent
-    data class OnClickUploadButtonOfSecretDialog(val context: Context) : HomeEvent
+    data object OnLongPressIcon : HomeEvent
   }
 
   sealed interface HomeReduce : ViewModelContract.Reduce {
     data class UpdateFoodTrend(val foodTrend: FoodUIModel?) : HomeReduce
     data class UpdateFoodTrendRatio(val foodTrendRatio: Float) : HomeReduce
-    data class UpdateLoungeId(val loungeId: String?) : HomeReduce
-
-    // Only for Debug
-    data class UpdateFoodName(val foodName: String?) : HomeReduce
-    data class UpdateFoodImageUri(val foodImageUri: Uri?) : HomeReduce
+    data class UpdateJoinDialogState(val joinDialogState: JoinDialogState?) : HomeReduce
+    data class UpdateSecretDialogState(val secretDialogState: SecretDialogState?) : HomeReduce
   }
 
   sealed interface HomeSideEffect : ViewModelContract.SideEffect {
@@ -59,18 +41,40 @@ class HomeContract {
     data object NavigateToFriendList : HomeSideEffect
     data object NavigateToSetting : HomeSideEffect
     data object NavigateToTips : HomeSideEffect
-    data object OpenJoinDialog : HomeSideEffect
-    data object CloseDialog : HomeSideEffect
     data class ShowSnackbar(val message: UiText) : HomeSideEffect
-
-    // Only for Debug
-    data object OpenSecretDialog : HomeSideEffect
   }
 
-  companion object {
-    const val JOIN_DIALOG = "join_dialog"
+  @Parcelize
+  data class JoinDialogState(
+    val loungeId: String = ""
+  ) : ViewModelContract.State, Parcelable
 
-    // Only for Debug
-    const val SECRET_DIALOG = "secret_dialog"
+  sealed interface JoinDialogEvent : HomeEvent {
+    data class OnLoungeIdChange(val loungeId: String) : JoinDialogEvent
+    data object OnClickCancelButton : JoinDialogEvent
+    data object OnClickConfirmButton : JoinDialogEvent
+  }
+
+  sealed interface JoinDialogReduce : HomeReduce {
+    data class UpdateLoungeId(val loungeId: String) : JoinDialogReduce
+  }
+
+  @Parcelize
+  data class SecretDialogState(
+    val foodName: String = "",
+    val foodImageUri: Uri = Uri.EMPTY,
+  ) : ViewModelContract.State, Parcelable
+
+  sealed interface SecretDialogEvent : HomeEvent {
+    data class OnFoodNameChange(val foodName: String) : SecretDialogEvent
+    data class OnFoodImageChange(val foodImageUri: Uri) : SecretDialogEvent
+    data object OnImageLoadError : SecretDialogEvent
+    data object OnClickCancelButton : SecretDialogEvent
+    data class OnClickUploadButton(val context: Context) : SecretDialogEvent
+  }
+
+  sealed interface SecretDialogReduce : HomeReduce {
+    data class UpdateFoodName(val foodName: String) : SecretDialogReduce
+    data class UpdateFoodImageUri(val foodImageUri: Uri) : SecretDialogReduce
   }
 }

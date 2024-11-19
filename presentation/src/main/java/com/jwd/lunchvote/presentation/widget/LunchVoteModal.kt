@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -44,7 +46,7 @@ fun LunchVoteModal(
   closable: Boolean = false,
   canDismiss: Boolean = true,
   content: @Composable (() -> Unit)? = null,
-  buttons: @Composable (ColumnScope.() -> Unit)? = null,
+  buttons: @Composable (RowScope.() -> Unit)? = null,
 ) {
   Dialog(
     onDismissRequest = onDismissRequest,
@@ -83,7 +85,9 @@ fun LunchVoteModal(
         }
       }
       Column(
-        modifier = Modifier.padding(horizontal = 24.dp),
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 24.dp),
       ) {
         Column(
           modifier = Modifier
@@ -107,8 +111,11 @@ fun LunchVoteModal(
         }
         content?.invoke()
         buttons?.let {
-          Column(
-            modifier = Modifier.padding(top = 16.dp, bottom = 24.dp)
+          Row(
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(top = 16.dp, bottom = 24.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
           ) {
             buttons()
           }
@@ -153,7 +160,7 @@ private fun DialogIcon(
 }
 
 @Composable
-fun DialogButton(
+fun RowScope.DialogButton(
   text: String,
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
@@ -163,8 +170,8 @@ fun DialogButton(
   if (isDismiss.not()) {
     Button(
       onClick = onClick,
-      modifier = modifier.fillMaxWidth(),
       enabled = enabled,
+      modifier = modifier.weight(1f),
       shape = MaterialTheme.shapes.small
     ) {
       Text(text)
@@ -173,7 +180,7 @@ fun DialogButton(
     OutlinedButton(
       onClick = onClick,
       modifier = modifier
-        .fillMaxWidth()
+        .weight(1f)
         .alpha(0.64f),
       enabled = enabled,
       shape = MaterialTheme.shapes.small
@@ -193,13 +200,15 @@ private fun Preview() {
       body = "This blog post has been published. Team members will be able to edit this post.",
     ) {
       DialogButton(
-        text = "Confirm",
-        onClick = {}
-      )
-      DialogButton(
         text = "Cancel",
         onClick = {},
+        modifier = Modifier.fillMaxWidth(),
         isDismiss = true
+      )
+      DialogButton(
+        text = "Confirm",
+        onClick = {},
+        modifier = Modifier.fillMaxWidth()
       )
     }
     Screen {}

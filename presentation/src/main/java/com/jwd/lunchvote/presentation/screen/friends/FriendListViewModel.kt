@@ -46,7 +46,7 @@ class FriendListViewModel @Inject constructor(
       is FriendListEvent.OnClickFriendRequestButton -> sendSideEffect(FriendListSideEffect.NavigateToFriendRequest)
       is FriendListEvent.OnClickJoinButton -> launch { joinLounge(event.friendId) }
       is FriendListEvent.OnClickDeleteFriendButton -> launch { deleteFriend(event.friendId) }
-      is FriendListEvent.OnClickRequestButton -> updateState(RequestDialogReduce.OpenDialog)
+      is FriendListEvent.OnClickRequestButton -> updateState(FriendListReduce.UpdateRequestDialogState(RequestDialogState()))
       is RequestDialogEvent -> handleRequestDialogEvents(event)
     }
   }
@@ -54,7 +54,7 @@ class FriendListViewModel @Inject constructor(
   private fun handleRequestDialogEvents(event: RequestDialogEvent) {
     when(event) {
       is RequestDialogEvent.OnFriendNameChange -> updateState(RequestDialogReduce.UpdateFriendName(event.friendName))
-      is RequestDialogEvent.OnClickCancelButton -> updateState(RequestDialogReduce.CloseDialog)
+      is RequestDialogEvent.OnClickCancelButton -> updateState(FriendListReduce.UpdateRequestDialogState(null))
       is RequestDialogEvent.OnClickConfirmButton -> launch { sendRequest() }
     }
   }
@@ -64,14 +64,13 @@ class FriendListViewModel @Inject constructor(
       is FriendListReduce.UpdateJoinedFriendList -> state.copy(joinedFriendList = reduce.joinedFriendList)
       is FriendListReduce.UpdateOnlineFriendList -> state.copy(onlineFriendList = reduce.onlineFriendList)
       is FriendListReduce.UpdateOfflineFriendList -> state.copy(offlineFriendList = reduce.offlineFriendList)
+      is FriendListReduce.UpdateRequestDialogState -> state.copy(requestDialogState = reduce.requestDialogState)
       is RequestDialogReduce -> state.copy(requestDialogState = reduceRequestDialogState(state.requestDialogState, reduce))
     }
   }
 
   private fun reduceRequestDialogState(state: RequestDialogState?, reduce: RequestDialogReduce): RequestDialogState? {
     return when(reduce) {
-      is RequestDialogReduce.OpenDialog -> RequestDialogState()
-      is RequestDialogReduce.CloseDialog -> null
       is RequestDialogReduce.UpdateFriendName -> state?.copy(friendName = reduce.friendName)
     }
   }
@@ -123,7 +122,7 @@ class FriendListViewModel @Inject constructor(
   private suspend fun sendRequest() {
     val friendName = currentState.requestDialogState?.friendName ?: return
 
-    updateState(RequestDialogReduce.CloseDialog)
+    updateState(FriendListReduce.UpdateRequestDialogState(null))
 
     val user = userRepository.getUserById(userId).asUI()
     if (friendName == user.name) {

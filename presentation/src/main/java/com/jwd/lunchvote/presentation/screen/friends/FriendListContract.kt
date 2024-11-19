@@ -29,6 +29,7 @@ class FriendListContract {
     data class UpdateJoinedFriendList(val joinedFriendList: List<UserUIModel>) : FriendListReduce
     data class UpdateOnlineFriendList(val onlineFriendList: List<UserUIModel>) : FriendListReduce
     data class UpdateOfflineFriendList(val offlineFriendList: List<UserUIModel>) : FriendListReduce
+    data class UpdateRequestDialogState(val requestDialogState: RequestDialogState?) : FriendListReduce
   }
 
   sealed interface FriendListSideEffect : ViewModelContract.SideEffect {
@@ -41,7 +42,7 @@ class FriendListContract {
   @Parcelize
   data class RequestDialogState(
     val friendName: String = ""
-  ) : Parcelable
+  ) : ViewModelContract.State, Parcelable
 
   sealed interface RequestDialogEvent : FriendListEvent {
     data class OnFriendNameChange(val friendName: String) : RequestDialogEvent
@@ -50,8 +51,6 @@ class FriendListContract {
   }
 
   sealed interface RequestDialogReduce : FriendListReduce {
-    data object OpenDialog : RequestDialogReduce
-    data object CloseDialog : RequestDialogReduce
     data class UpdateFriendName(val friendName: String) : RequestDialogReduce
   }
 }

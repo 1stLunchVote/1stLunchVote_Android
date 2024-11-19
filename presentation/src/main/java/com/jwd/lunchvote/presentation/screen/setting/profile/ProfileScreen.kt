@@ -53,6 +53,7 @@ import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.ImageBitmapFactory
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.Gap
+import com.jwd.lunchvote.presentation.widget.ImageFromUri
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
@@ -296,46 +297,6 @@ private fun EditProfileImageDialog(
   val albumLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { imageUri: Uri? ->
     if (imageUri != null) onProfileImageChange(imageUri)
     else onImageError()
-  }
-
-  @Composable
-  fun ImageFromUri(
-    uri: Uri,
-    modifier: Modifier = Modifier
-  ) {
-    if (uri.toString().startsWith("http"))
-      CoilImage(
-        imageModel = { profileImageUri.toString() },
-        modifier = modifier,
-        imageOptions = ImageOptions(
-          contentScale = ContentScale.Crop
-        ),
-        previewPlaceholder = R.drawable.ic_food_image_temp
-      )
-    else if (uri.toString().startsWith("content"))
-      Image(
-        bitmap = ImageBitmapFactory.createBitmapFromUri(context, uri).asImageBitmap(),
-        contentDescription = "Profile Image",
-        modifier = modifier,
-        contentScale = ContentScale.Crop
-      )
-    else if (File(uri.toString()).exists())
-      Image(
-        bitmap = BitmapFactory.decodeFile(uri.toString()).asImageBitmap(),
-        contentDescription = null,
-        modifier = modifier,
-        contentScale = ContentScale.Crop
-      )
-    else
-      Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
-      ) {
-        Text(
-          text = stringResource(R.string.profile_edit_profile_image_dialog_no_image),
-          color = MaterialTheme.colorScheme.outline
-        )
-      }
   }
 
   LunchVoteDialog(

@@ -1,10 +1,7 @@
 package com.jwd.lunchvote.presentation.screen.home
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -23,12 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,11 +34,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -61,23 +51,22 @@ import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.screen.home.HomeContract.HomeEvent
 import com.jwd.lunchvote.presentation.screen.home.HomeContract.HomeSideEffect
 import com.jwd.lunchvote.presentation.screen.home.HomeContract.HomeState
+import com.jwd.lunchvote.presentation.screen.home.HomeContract.JoinDialogEvent
+import com.jwd.lunchvote.presentation.screen.home.HomeContract.SecretDialogEvent
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
-import com.jwd.lunchvote.presentation.util.ImageBitmapFactory
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.conditional
 import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.Gap
-import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
+import com.jwd.lunchvote.presentation.widget.ImageWithUploadButton
 import com.jwd.lunchvote.presentation.widget.LunchVoteIcon
-import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.LunchVoteModal
+import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
-import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
-import java.io.File
 
 @Composable
 fun HomeRoute(
@@ -92,7 +81,6 @@ fun HomeRoute(
   context: Context = LocalContext.current
 ){
   val state by viewModel.viewState.collectAsStateWithLifecycle()
-  val dialog by viewModel.dialogState.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect){
     viewModel.sideEffect.collectLatest {
@@ -102,38 +90,31 @@ fun HomeRoute(
         is HomeSideEffect.NavigateToFriendList -> navigateToFriendList()
         is HomeSideEffect.NavigateToSetting -> navigateToSetting()
         is HomeSideEffect.NavigateToTips -> navigateToTips()
-        is HomeSideEffect.OpenJoinDialog -> viewModel.setDialogState(HomeContract.JOIN_DIALOG)
-        is HomeSideEffect.CloseDialog -> viewModel.setDialogState("")
         is HomeSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
-
-        // TODO: Temporary Secret SideEffects
-        is HomeSideEffect.OpenSecretDialog -> viewModel.setDialogState(HomeContract.SECRET_DIALOG)
       }
     }
   }
 
   LaunchedEffect(Unit) { viewModel.sendEvent(HomeEvent.ScreenInitialize) }
 
-  when (dialog) {
-    HomeContract.JOIN_DIALOG -> {
-      JoinDialog(
-        loungeId = state.loungeId ?: "",
-        onDismissRequest = { viewModel.sendEvent(HomeEvent.OnClickCancelButtonJoinDialog) },
-        onLoungeIdChange = { viewModel.sendEvent(HomeEvent.OnLoungeIdChange(it)) },
-        onConfirmation = { viewModel.sendEvent(HomeEvent.OnClickConfirmButtonJoinDialog) }
-      )
-    }
-    HomeContract.SECRET_DIALOG -> {
-      if (BuildConfig.DEBUG) {
-        SecretDialog(foodName = state.foodName,
-          foodImageUri = state.foodImageUri,
-          onDismissRequest = { viewModel.sendEvent(HomeEvent.OnClickCancelButtonOfSecretDialog) },
-          onFoodNameChange = { viewModel.sendEvent(HomeEvent.OnFoodNameChangeOfSecretDialog(it)) },
-          onFoodImageChange = { viewModel.sendEvent(HomeEvent.OnFoodImageChangeOfSecretDialog(it)) },
-          onImageError = { viewModel.sendEvent(HomeEvent.OnImageLoadErrorOfSecretDialog) },
-          onConfirmation = { viewModel.sendEvent(HomeEvent.OnClickUploadButtonOfSecretDialog(context)) })
-      }
-    }
+  state.joinDialogState?.let { dialogState ->
+    JoinDialog(
+      loungeId = dialogState.loungeId,
+      onDismissRequest = { viewModel.sendEvent(JoinDialogEvent.OnClickCancelButton) },
+      onLoungeIdChange = { viewModel.sendEvent(JoinDialogEvent.OnLoungeIdChange(it)) },
+      onConfirmation = { viewModel.sendEvent(JoinDialogEvent.OnClickConfirmButton) }
+    )
+  }
+  state.secretDialogState?.let { dialogState ->
+    SecretDialog(
+      foodName = dialogState.foodName,
+      foodImageUri = dialogState.foodImageUri,
+      onDismissRequest = { viewModel.sendEvent(SecretDialogEvent.OnClickCancelButton) },
+      onFoodNameChange = { viewModel.sendEvent(SecretDialogEvent.OnFoodNameChange(it)) },
+      onFoodImageChange = { viewModel.sendEvent(SecretDialogEvent.OnFoodImageChange(it)) },
+      onImageError = { viewModel.sendEvent(SecretDialogEvent.OnImageLoadError) },
+      onConfirmation = { viewModel.sendEvent(SecretDialogEvent.OnClickUploadButton(context)) }
+    )
   }
 
   HomeScreen(
@@ -150,21 +131,21 @@ private fun HomeScreen(
   onEvent: (HomeEvent) -> Unit = {}
 ){
   Screen(
-    modifier = modifier.padding(start = 32.dp, top = 0.dp, bottom = 32.dp, end = 32.dp),
+    modifier = modifier.padding(32.dp),
     topAppBar = {
       LunchVoteIcon(
         modifier = Modifier
           .padding(vertical = 8.dp)
           .conditional(BuildConfig.DEBUG) {
             pointerInput(Unit) {
-              detectTapGestures(onLongPress = { onEvent(HomeEvent.OnClickSecretButton) })
+              detectTapGestures(onLongPress = { onEvent(HomeEvent.OnLongPressIcon) })
             }
           },
         size = 48.dp
       )
     }
   ) {
-    Gap(minHeight = 24.dp)
+    Gap(minHeight = 4.dp)
     FoodTrendChart(
       foodTrend = state.foodTrend,
       foodTrendRatio = state.foodTrendRatio
@@ -461,13 +442,13 @@ private fun JoinDialog(
     },
     buttons = {
       DialogButton(
-        text = stringResource(R.string.join_dialog_confirm_button),
-        onClick = onConfirmation
-      )
-      DialogButton(
         text = stringResource(R.string.join_dialog_dismiss_button),
         onClick = onDismissRequest,
         isDismiss = true
+      )
+      DialogButton(
+        text = stringResource(R.string.join_dialog_confirm_button),
+        onClick = onConfirmation
       )
     }
   )
@@ -499,109 +480,51 @@ private fun JoinDialogPreview() {
 // TODO: Temporary Secret Dialog
 @Composable
 private fun SecretDialog(
-  foodName: String?,
-  foodImageUri: Uri?,
+  foodName: String,
+  foodImageUri: Uri,
   modifier: Modifier = Modifier,
   onDismissRequest: () -> Unit = {},
   onFoodNameChange: (String) -> Unit = {},
   onFoodImageChange: (Uri) -> Unit = {},
   onImageError: () -> Unit = {},
-  onConfirmation: () -> Unit = {},
-  context: Context = LocalContext.current
+  onConfirmation: () -> Unit = {}
 ) {
-  val albumLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { imageUri: Uri? ->
-    if (imageUri != null) onFoodImageChange(imageUri)
-    else onImageError()
-  }
-
-  @Composable
-  fun ImageFromUri(
-    uri: Uri,
-    modifier: Modifier = Modifier
-  ) {
-    if (uri.toString().startsWith("http"))
-      CoilImage(
-        imageModel = { foodImageUri?.toString() },
-        modifier = modifier,
-        imageOptions = ImageOptions(
-          contentScale = ContentScale.Crop
-        ),
-        previewPlaceholder = R.drawable.ic_food_image_temp
-      )
-    else if (uri.toString().startsWith("content"))
-      Image(
-        bitmap = ImageBitmapFactory.createBitmapFromUri(context, uri).asImageBitmap(),
-        contentDescription = "Profile Image",
-        modifier = modifier,
-        contentScale = ContentScale.Crop
-      )
-    else if (File(uri.toString()).exists())
-      Image(
-        bitmap = BitmapFactory.decodeFile(uri.toString()).asImageBitmap(),
-        contentDescription = null,
-        modifier = modifier,
-        contentScale = ContentScale.Crop
-      )
-    else
-      Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
-      ) {
-        Text(
-          text = stringResource(R.string.profile_edit_profile_image_dialog_no_image),
-          color = MaterialTheme.colorScheme.outline
-        )
-      }
-  }
-
-  LunchVoteDialog(
+  LunchVoteModal(
     title = "음식 추가",
-    dismissText = "취소",
     onDismissRequest = onDismissRequest,
-    confirmText = "추가",
-    onConfirmation = onConfirmation,
-    modifier = modifier
-  ) {
-    Column(
-      verticalArrangement = Arrangement.spacedBy(16.dp),
-      horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-      LunchVoteTextField(
-        text = foodName ?: "",
-        onTextChange = onFoodNameChange,
-        hintText = "음식 이름"
-      )
-      Box(
-        modifier = Modifier
-          .size(160.dp)
-          .align(Alignment.CenterHorizontally),
-        contentAlignment = Alignment.BottomEnd
+    modifier = modifier,
+    icon = { LunchVoteIcon() },
+    body = "음식을 추가해주세요. (개발자 전용)",
+    closable = true,
+    content = {
+      Column(
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
       ) {
-        ImageFromUri(
-          uri = foodImageUri ?: Uri.EMPTY,
-          modifier = Modifier
-            .size(160.dp)
-            .clip(CircleShape)
-            .border(2.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape)
+        ImageWithUploadButton(
+          uri = foodImageUri,
+          onImageChange = onFoodImageChange,
+          onError = onImageError
         )
-        IconButton(
-          onClick = { albumLauncher.launch("image/*") },
-          colors = IconButtonColors(
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-            containerColor = MaterialTheme.colorScheme.primary,
-            disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-            disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-          )
-        ) {
-          Icon(
-            Icons.Outlined.Edit,
-            contentDescription = null,
-            modifier = Modifier.size(28.dp)
-          )
-        }
+        LunchVoteTextField(
+          text = foodName,
+          onTextChange = onFoodNameChange,
+          hintText = "음식 이름"
+        )
       }
+    },
+    buttons = {
+      DialogButton(
+        text = "취소",
+        onClick = onDismissRequest,
+        isDismiss = true
+      )
+      DialogButton(
+        text = "추가",
+        onClick = onConfirmation
+      )
     }
-  }
+  )
 }
 
 @Preview

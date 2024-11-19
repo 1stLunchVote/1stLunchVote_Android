@@ -311,14 +311,16 @@ private fun RequestDialog(
     },
     buttons = {
       DialogButton(
-        text = stringResource(R.string.friend_list_request_dialog_confirm_text),
-        onClick = onConfirmation,
-        enabled = friendName.isNotBlank()
-      )
-      DialogButton(
         text = stringResource(R.string.friend_list_request_dialog_dismiss_text),
         onClick = onDismissRequest,
+        modifier = Modifier.weight(1f),
         isDismiss = true
+      )
+      DialogButton(
+        text = stringResource(R.string.friend_list_request_dialog_confirm_text),
+        onClick = onConfirmation,
+        modifier = Modifier.weight(1f),
+        enabled = friendName.isNotBlank()
       )
     }
   )
