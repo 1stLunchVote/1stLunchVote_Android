@@ -12,6 +12,7 @@ class FriendListContract {
     val joinedFriendList: List<UserUIModel> = emptyList(),
     val onlineFriendList: List<UserUIModel> = emptyList(),
     val offlineFriendList: List<UserUIModel> = emptyList(),
+
     val requestDialogState: RequestDialogState? = null
   ) : ViewModelContract.State, Parcelable
 
@@ -49,7 +50,7 @@ class FriendListContract {
   sealed interface RequestDialogEvent : FriendListEvent {
     data class OnFriendNameChange(val friendName: String) : RequestDialogEvent
     data object OnClickCancelButton : RequestDialogEvent
-    data object OnClickConfirmButton : RequestDialogEvent
+    data object OnClickRequestButton : RequestDialogEvent
   }
 
   sealed interface RequestDialogReduce : FriendListReduce {

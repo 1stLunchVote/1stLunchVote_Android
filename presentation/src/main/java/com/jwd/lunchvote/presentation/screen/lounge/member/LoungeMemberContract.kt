@@ -13,6 +13,7 @@ class LoungeMemberContract {
     val me: MemberUIModel = MemberUIModel(),
     val member: MemberUIModel = MemberUIModel(),
     val user: UserUIModel = UserUIModel(),
+
     val exileDialogState: ExileDialogState? = null
   ) : ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this

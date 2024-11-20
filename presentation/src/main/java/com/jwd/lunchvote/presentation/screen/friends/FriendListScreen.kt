@@ -88,9 +88,7 @@ fun FriendListRoute(
   state.requestDialogState?.let { dialogState ->
     RequestDialog(
       friendName = dialogState.friendName,
-      onDismissRequest = { viewModel.sendEvent(RequestDialogEvent.OnClickCancelButton) },
-      onFriendNameChange = { viewModel.sendEvent(RequestDialogEvent.OnFriendNameChange(it)) },
-      onConfirmation = { viewModel.sendEvent(RequestDialogEvent.OnClickConfirmButton) }
+      onEvent = viewModel::sendEvent
     )
   }
 
@@ -290,13 +288,11 @@ private fun FriendItem(
 private fun RequestDialog(
   friendName: String,
   modifier: Modifier = Modifier,
-  onDismissRequest: () -> Unit = {},
-  onFriendNameChange: (String) -> Unit = {},
-  onConfirmation: () -> Unit = {},
+  onEvent: (RequestDialogEvent) -> Unit = {}
 ) {
   LunchVoteModal(
     title = stringResource(R.string.fl_request_dialog_title),
-    onDismissRequest = onDismissRequest,
+    onDismissRequest = { onEvent(RequestDialogEvent.OnClickCancelButton) },
     modifier = modifier,
     icon = {
       Icon(
@@ -308,20 +304,20 @@ private fun RequestDialog(
     content = {
       LunchVoteTextField(
         text = friendName,
-        onTextChange = onFriendNameChange,
+        onTextChange = { onEvent(RequestDialogEvent.OnFriendNameChange(it)) },
         hintText = stringResource(R.string.fl_request_dialog_hint_text)
       )
     },
     buttons = {
       DialogButton(
-        text = stringResource(R.string.fl_request_dialog_dismiss_text),
-        onClick = onDismissRequest,
+        text = stringResource(R.string.fl_request_dialog_cancel_text),
+        onClick = { onEvent(RequestDialogEvent.OnClickCancelButton) },
         modifier = Modifier.weight(1f),
         isDismiss = true
       )
       DialogButton(
-        text = stringResource(R.string.fl_request_dialog_confirm_text),
-        onClick = onConfirmation,
+        text = stringResource(R.string.fl_request_dialog_request_text),
+        onClick = { onEvent(RequestDialogEvent.OnClickRequestButton) },
         modifier = Modifier.weight(1f),
         enabled = friendName.isNotBlank()
       )

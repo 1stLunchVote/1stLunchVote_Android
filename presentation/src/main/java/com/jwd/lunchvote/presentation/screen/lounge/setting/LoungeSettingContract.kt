@@ -11,6 +11,7 @@ class LoungeSettingContract {
   data class LoungeSettingState(
     val lounge: LoungeUIModel = LoungeUIModel(),
     val isOwner: Boolean = false,
+
     val timeLimitDialogState: TimeLimitDialogState? = null,
     val maxMembersDialogState: MaxMembersDialogState? = null,
     val secondVoteCandidatesDialogState: SecondVoteCandidatesDialogState? = null,

@@ -313,13 +313,13 @@ private fun TimeLimitDialog(
           Text(
             text = stringResource(
               when (timeLimit) {
-                10 -> R.string.lounge_setting_time_limit_dialog_time_preset_0
-                20 -> R.string.lounge_setting_time_limit_dialog_time_preset_1
-                30 -> R.string.lounge_setting_time_limit_dialog_time_preset_2
-                60 -> R.string.lounge_setting_time_limit_dialog_time_preset_3
-                90 -> R.string.lounge_setting_time_limit_dialog_time_preset_4
-                120 -> R.string.lounge_setting_time_limit_dialog_time_preset_5
-                else -> R.string.lounge_setting_time_limit_dialog_time_preset_6
+                10 -> R.string.ls_time_limit_dialog_time_preset_10sec
+                20 -> R.string.ls_time_limit_dialog_time_preset_20sec
+                30 -> R.string.ls_time_limit_dialog_time_preset_30sec
+                60 -> R.string.ls_time_limit_dialog_time_preset_60sec
+                90 -> R.string.ls_time_limit_dialog_time_preset_90sec
+                120 -> R.string.ls_time_limit_dialog_time_preset_120sec
+                else -> R.string.ls_time_limit_dialog_time_preset_unlimited
               }
             ),
             modifier = Modifier.weight(1f),
@@ -338,7 +338,7 @@ private fun TimeLimitDialog(
         }
         if (timeLimit == 10) {
           Text(
-            text = stringResource(R.string.lounge_setting_time_limit_dialog_warning),
+            text = stringResource(R.string.ls_time_limit_dialog_warning),
             modifier = Modifier.fillMaxWidth(),
             color = MaterialTheme.colorScheme.error,
             textAlign = TextAlign.Center,
@@ -349,12 +349,12 @@ private fun TimeLimitDialog(
     },
     buttons = {
       DialogButton(
-        text = stringResource(R.string.lounge_setting_dialog_dismiss_text),
+        text = stringResource(R.string.ls_dialog_cancel_text),
         onClick = { onEvent(TimeLimitDialogEvent.OnClickCancelButton) },
         isDismiss = true
       )
       DialogButton(
-        text = stringResource(R.string.lounge_setting_dialog_confirm_text),
+        text = stringResource(R.string.ls_dialog_apply_text),
         onClick = { onEvent(TimeLimitDialogEvent.OnClickConfirmButton) },
         enabled = timeLimit != initialValue
       )
@@ -419,12 +419,12 @@ private fun MaxMembersDialog(
     },
     buttons = {
       DialogButton(
-        text = stringResource(R.string.lounge_setting_dialog_dismiss_text),
+        text = stringResource(R.string.ls_dialog_cancel_text),
         onClick = { onEvent(MaxMembersDialogEvent.OnClickCancelButton) },
         isDismiss = true
       )
       DialogButton(
-        text = stringResource(R.string.lounge_setting_dialog_confirm_text),
+        text = stringResource(R.string.ls_dialog_apply_text),
         onClick = { onEvent(MaxMembersDialogEvent.OnClickConfirmButton) },
         enabled = maxMembers != initialValue
       )
@@ -489,12 +489,12 @@ private fun SecondVoteCandidatesDialog(
     },
     buttons = {
       DialogButton(
-        text = stringResource(R.string.lounge_setting_dialog_dismiss_text),
+        text = stringResource(R.string.ls_dialog_cancel_text),
         onClick = { onEvent(SecondVoteCandidatesDialogEvent.OnClickCancelButton) },
         isDismiss = true
       )
       DialogButton(
-        text = stringResource(R.string.lounge_setting_dialog_confirm_text),
+        text = stringResource(R.string.ls_dialog_apply_text),
         onClick = { onEvent(SecondVoteCandidatesDialogEvent.OnClickConfirmButton) },
         enabled = secondVoteCandidates != initialValue
       )
@@ -559,12 +559,12 @@ private fun MinLikeFoodsDialog(
     },
     buttons = {
       DialogButton(
-        text = stringResource(R.string.lounge_setting_dialog_dismiss_text),
+        text = stringResource(R.string.ls_dialog_cancel_text),
         onClick = { onEvent(MinLikeFoodsDialogEvent.OnClickCancelButton) },
         isDismiss = true
       )
       DialogButton(
-        text = stringResource(R.string.lounge_setting_dialog_confirm_text),
+        text = stringResource(R.string.ls_dialog_apply_text),
         onClick = { onEvent(MinLikeFoodsDialogEvent.OnClickConfirmButton) },
         enabled = minLikeFoods != initialValue
       )
@@ -629,12 +629,12 @@ private fun MinDislikeFoodsDialog(
     },
     buttons = {
       DialogButton(
-        text = stringResource(R.string.lounge_setting_dialog_dismiss_text),
+        text = stringResource(R.string.ls_dialog_cancel_text),
         onClick = { onEvent(MinDislikeFoodsDialogEvent.OnClickCancelButton) },
         isDismiss = true
       )
       DialogButton(
-        text = stringResource(R.string.lounge_setting_dialog_confirm_text),
+        text = stringResource(R.string.ls_dialog_apply_text),
         onClick = { onEvent(MinDislikeFoodsDialogEvent.OnClickConfirmButton) },
         enabled = minDislikeFoods != initialValue
       )

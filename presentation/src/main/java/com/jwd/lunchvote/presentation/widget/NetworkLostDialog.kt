@@ -31,7 +31,7 @@ fun NetworkLostDialog(
     canDismiss = false,
     buttons = {
       DialogButton(
-        text = stringResource(R.string.network_lost_dialog_dismiss),
+        text = stringResource(R.string.network_lost_dialog_quit_button),
         onClick = onClickQuitButton,
         color = MaterialTheme.colorScheme.error
       )

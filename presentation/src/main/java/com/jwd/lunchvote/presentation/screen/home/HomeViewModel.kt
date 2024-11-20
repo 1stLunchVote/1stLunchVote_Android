@@ -42,7 +42,7 @@ class HomeViewModel @Inject constructor(
   private val exitLounge: ExitLounge,
   private val createFood: CreateFood,
   savedStateHandle: SavedStateHandle
-): BaseStateViewModel<HomeState, HomeEvent, HomeReduce, HomeSideEffect>(savedStateHandle){
+): BaseStateViewModel<HomeState, HomeEvent, HomeReduce, HomeSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): HomeState {
     return savedState as? HomeState ?: HomeState()
   }
@@ -71,7 +71,7 @@ class HomeViewModel @Inject constructor(
     when(event) {
       is JoinDialogEvent.OnLoungeIdChange -> updateState(JoinDialogReduce.UpdateLoungeId(event.loungeId))
       is JoinDialogEvent.OnClickCancelButton -> updateState(HomeReduce.UpdateJoinDialogState(null))
-      is JoinDialogEvent.OnClickConfirmButton -> launch { checkLoungeExist() }
+      is JoinDialogEvent.OnClickJoinButton -> launch { checkLoungeExist() }
     }
   }
 
@@ -135,12 +135,12 @@ class HomeViewModel @Inject constructor(
     else throw LoungeError.NoLounge
   }
 
-  // Only for Debug
   private suspend fun uploadFood(context: Context) {
-    if (BuildConfig.DEBUG) {
-      val dialogState = currentState.secretDialogState ?: return
-      updateState(HomeReduce.UpdateSecretDialogState(null))
+    val dialogState = currentState.secretDialogState ?: return
+    updateState(HomeReduce.UpdateSecretDialogState(null))
 
+    // Only for Debug
+    if (BuildConfig.DEBUG) {
       val food = FoodUIModel(
         id = UUID.randomUUID().toString(),
         name = dialogState.foodName

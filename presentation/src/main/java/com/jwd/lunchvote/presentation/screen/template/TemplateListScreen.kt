@@ -229,12 +229,12 @@ private fun AddDialog(
     },
     buttons = {
       DialogButton(
-        text = stringResource(R.string.tl_add_dialog_dismiss_button),
+        text = stringResource(R.string.tl_add_dialog_cancel_button),
         onClick = { onEvent(AddDialogEvent.OnClickCancelButton) },
         isDismiss = true
       )
       DialogButton(
-        text = stringResource(R.string.tl_add_dialog_confirm_button),
+        text = stringResource(R.string.tl_add_dialog_add_button),
         onClick = { onEvent(AddDialogEvent.OnClickAddButton) },
         enabled = templateName.isNotBlank()
       )

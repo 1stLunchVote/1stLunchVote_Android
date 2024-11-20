@@ -13,8 +13,9 @@ class HomeContract {
   data class HomeState(
     val foodTrend: FoodUIModel? = null,
     val foodTrendRatio: Float = 0f,
+
     val joinDialogState: JoinDialogState? = null,
-    val secretDialogState: SecretDialogState? = null,
+    val secretDialogState: SecretDialogState? = null
   ) : ViewModelContract.State, Parcelable
 
   sealed interface HomeEvent : ViewModelContract.Event {
@@ -54,7 +55,7 @@ class HomeContract {
   sealed interface JoinDialogEvent : HomeEvent {
     data class OnLoungeIdChange(val loungeId: String) : JoinDialogEvent
     data object OnClickCancelButton : JoinDialogEvent
-    data object OnClickConfirmButton : JoinDialogEvent
+    data object OnClickJoinButton : JoinDialogEvent
   }
 
   sealed interface JoinDialogReduce : HomeReduce {

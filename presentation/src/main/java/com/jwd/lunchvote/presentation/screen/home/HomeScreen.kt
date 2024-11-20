@@ -100,9 +100,7 @@ fun HomeRoute(
   state.joinDialogState?.let { dialogState ->
     JoinDialog(
       loungeId = dialogState.loungeId,
-      onDismissRequest = { viewModel.sendEvent(JoinDialogEvent.OnClickCancelButton) },
-      onLoungeIdChange = { viewModel.sendEvent(JoinDialogEvent.OnLoungeIdChange(it)) },
-      onConfirmation = { viewModel.sendEvent(JoinDialogEvent.OnClickConfirmButton) }
+      onEvent = viewModel::sendEvent
     )
   }
   state.secretDialogState?.let { dialogState ->
@@ -422,13 +420,11 @@ private fun HomeButtonSet(
 private fun JoinDialog(
   loungeId: String,
   modifier: Modifier = Modifier,
-  onDismissRequest: () -> Unit = {},
-  onLoungeIdChange: (String) -> Unit = {},
-  onConfirmation: () -> Unit = {},
+  onEvent: (JoinDialogEvent) -> Unit = {}
 ) {
   LunchVoteModal(
     title = stringResource(R.string.h_join_dialog_title),
-    onDismissRequest = onDismissRequest,
+    onDismissRequest = { onEvent(JoinDialogEvent.OnClickCancelButton) },
     modifier = modifier,
     icon = { LunchVoteIcon() },
     body = stringResource(R.string.h_join_dialog_body),
@@ -436,19 +432,19 @@ private fun JoinDialog(
     content = {
       LunchVoteTextField(
         text = loungeId,
-        onTextChange = onLoungeIdChange,
+        onTextChange = { onEvent(JoinDialogEvent.OnLoungeIdChange(it)) },
         hintText = stringResource(R.string.h_join_dialog_hint_text)
       )
     },
     buttons = {
       DialogButton(
-        text = stringResource(R.string.h_join_dialog_dismiss_button),
-        onClick = onDismissRequest,
+        text = stringResource(R.string.h_join_dialog_cancel_button),
+        onClick = { onEvent(JoinDialogEvent.OnClickCancelButton) },
         isDismiss = true
       )
       DialogButton(
-        text = stringResource(R.string.h_join_dialog_confirm_button),
-        onClick = onConfirmation
+        text = stringResource(R.string.h_join_dialog_join_button),
+        onClick = { onEvent(JoinDialogEvent.OnClickJoinButton) }
       )
     }
   )

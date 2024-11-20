@@ -56,7 +56,7 @@ class FriendListViewModel @Inject constructor(
     when(event) {
       is RequestDialogEvent.OnFriendNameChange -> updateState(RequestDialogReduce.UpdateFriendName(event.friendName))
       is RequestDialogEvent.OnClickCancelButton -> updateState(FriendListReduce.UpdateRequestDialogState(null))
-      is RequestDialogEvent.OnClickConfirmButton -> launch { sendRequest() }
+      is RequestDialogEvent.OnClickRequestButton -> launch { sendRequest() }
     }
   }
 
@@ -122,17 +122,16 @@ class FriendListViewModel @Inject constructor(
   }
 
   private suspend fun sendRequest() {
-    val friendName = currentState.requestDialogState?.friendName ?: return
-
+    val dialogState = currentState.requestDialogState ?: return
     updateState(FriendListReduce.UpdateRequestDialogState(null))
 
     val user = userRepository.getUserById(userId).asUI()
-    if (friendName == user.name) {
+    if (dialogState.friendName == user.name) {
       sendSideEffect(FriendListSideEffect.ShowSnackbar(UiText.StringResource(R.string.friend_list_self_snackbar)))
       return
     }
 
-    val friend = userRepository.getUserByName(friendName).asUI()
+    val friend = userRepository.getUserByName(dialogState.friendName).asUI()
     if (friend in (currentState.onlineFriendList + currentState.offlineFriendList)) {
       sendSideEffect(FriendListSideEffect.ShowSnackbar(UiText.StringResource(R.string.friend_list_already_friend_snackbar)))
       return
