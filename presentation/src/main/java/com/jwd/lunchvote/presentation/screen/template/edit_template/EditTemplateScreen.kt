@@ -32,15 +32,15 @@ import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplate
 import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.SaveDialogEvent
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
+import com.jwd.lunchvote.presentation.widget.Dialog
 import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.FAB
 import com.jwd.lunchvote.presentation.widget.FoodGrid
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
-import com.jwd.lunchvote.presentation.widget.LunchVoteModal
-import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.TemplateTitle
+import com.jwd.lunchvote.presentation.widget.TopBar
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -92,7 +92,7 @@ private fun EditTemplateScreen(
       .padding(horizontal = 24.dp)
       .padding(top = 8.dp),
     topAppBar = {
-      LunchVoteTopBar(
+      TopBar(
         title = stringResource(R.string.edit_template_title),
         navIconVisible = true,
         popBackStack = { onEvent(EditTemplateEvent.OnClickBackButton) },
@@ -147,7 +147,7 @@ private fun SaveDialog(
   modifier: Modifier = Modifier,
   onEvent: (SaveDialogEvent) -> Unit = {}
 ) {
-  LunchVoteModal(
+  Dialog(
     title = stringResource(R.string.et_save_dialog_title),
     onDismissRequest = { onEvent(SaveDialogEvent.OnClickCancelButton) },
     modifier = modifier,
@@ -173,7 +173,7 @@ private fun DeleteDialog(
   modifier: Modifier = Modifier,
   onEvent: (DeleteDialogEvent) -> Unit = {}
 ) {
-  LunchVoteModal(
+  Dialog(
     title = stringResource(R.string.et_delete_dialog_title),
     onDismissRequest = { onEvent(DeleteDialogEvent.OnClickCancelButton) },
     modifier = modifier,

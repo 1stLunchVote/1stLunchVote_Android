@@ -38,13 +38,13 @@ import com.jwd.lunchvote.presentation.screen.lounge.member.LoungeMemberContract.
 import com.jwd.lunchvote.presentation.screen.lounge.member.LoungeMemberContract.LoungeMemberState
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
+import com.jwd.lunchvote.presentation.widget.Dialog
 import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
-import com.jwd.lunchvote.presentation.widget.LunchVoteModal
-import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import com.jwd.lunchvote.presentation.widget.TopBar
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 import kotlinx.coroutines.channels.Channel
@@ -93,7 +93,7 @@ private fun LoungeMemberScreen(
   Screen(
     modifier = modifier.padding(32.dp),
     topAppBar = {
-      LunchVoteTopBar(
+      TopBar(
         title = stringResource(R.string.lounge_member_title),
         popBackStack = { onEvent(LoungeMemberEvent.OnClickBackButton) }
       )
@@ -150,7 +150,7 @@ private fun ExileDialog(
   modifier: Modifier = Modifier,
   onEvent: (ExileDialogEvent) -> Unit = {}
 ) {
-  LunchVoteModal(
+  Dialog(
     title = stringResource(R.string.lm_exile_dialog_title),
     onDismissRequest = { onEvent(ExileDialogEvent.OnClickCancelButton) },
     modifier = modifier,

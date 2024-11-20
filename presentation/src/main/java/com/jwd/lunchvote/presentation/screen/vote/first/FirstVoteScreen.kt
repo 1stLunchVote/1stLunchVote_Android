@@ -44,19 +44,19 @@ import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.FirstV
 import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.InformationDialogEvent
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
+import com.jwd.lunchvote.presentation.widget.Dialog
 import com.jwd.lunchvote.presentation.widget.DialogButton
+import com.jwd.lunchvote.presentation.widget.DropDownMenu
 import com.jwd.lunchvote.presentation.widget.FAB
 import com.jwd.lunchvote.presentation.widget.FoodGrid
 import com.jwd.lunchvote.presentation.widget.HorizontalProgressBar
 import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
-import com.jwd.lunchvote.presentation.widget.LunchVoteDropDown
 import com.jwd.lunchvote.presentation.widget.LunchVoteIcon
-import com.jwd.lunchvote.presentation.widget.LunchVoteModal
-import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.MemberProgress
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import com.jwd.lunchvote.presentation.widget.TopBar
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -115,7 +115,7 @@ private fun FirstVoteScreen(
       .padding(horizontal = 24.dp)
       .padding(top = 16.dp),
     topAppBar = {
-      LunchVoteTopBar(
+      TopBar(
         title = stringResource(R.string.first_vote_title),
         navIconVisible = false
       )
@@ -221,7 +221,7 @@ private fun InformationDialog(
   modifier: Modifier = Modifier,
   onEvent: (InformationDialogEvent) -> Unit = {}
 ) {
-  LunchVoteModal(
+  Dialog(
     title = stringResource(R.string.fv_information_dialog_title),
     onDismissRequest = { onEvent(InformationDialogEvent.OnClickSkipButton) },
     modifier = modifier,
@@ -229,7 +229,7 @@ private fun InformationDialog(
     body = stringResource(R.string.fv_information_dialog_body),
     canDismiss = false,
     content = {
-      LunchVoteDropDown(
+      DropDownMenu(
         list = templateList,
         selected = template,
         onItemSelected = { onEvent(InformationDialogEvent.OnTemplateSelected(it)) },
@@ -259,7 +259,7 @@ private fun ExitDialog(
   modifier: Modifier = Modifier,
   onEvent: (ExitDialogEvent) -> Unit = {}
 ) {
-  LunchVoteModal(
+  Dialog(
     title = stringResource(R.string.fv_exit_dialog_title),
     onDismissRequest = { onEvent(ExitDialogEvent.OnClickCancelButton) },
     modifier = modifier,

@@ -30,9 +30,9 @@ import com.jwd.lunchvote.presentation.screen.vote.result.VoteResultContract.Vote
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
-import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import com.jwd.lunchvote.presentation.widget.TopBar
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 import kotlinx.coroutines.channels.Channel
@@ -78,7 +78,7 @@ private fun VoteResultScreen(
   Screen(
     modifier = modifier,
     topAppBar = {
-      LunchVoteTopBar(
+      TopBar(
         title = stringResource(R.string.vote_result_title),
         navIconVisible = false
       )

@@ -16,7 +16,7 @@ fun NetworkLostDialog(
   modifier: Modifier = Modifier,
   onClickQuitButton: () -> Unit = {}
 ) {
-  LunchVoteModal(
+  Dialog(
     title = stringResource(R.string.network_lost_dialog_title),
     onDismissRequest = onClickQuitButton,
     modifier = modifier,

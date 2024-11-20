@@ -23,12 +23,12 @@ import com.jwd.lunchvote.presentation.screen.setting.contact.add_contact.AddCont
 import com.jwd.lunchvote.presentation.screen.setting.contact.add_contact.AddContactContract.AddContactSideEffect
 import com.jwd.lunchvote.presentation.screen.setting.contact.add_contact.AddContactContract.AddContactState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
+import com.jwd.lunchvote.presentation.widget.DropDownMenu
 import com.jwd.lunchvote.presentation.widget.Gap
-import com.jwd.lunchvote.presentation.widget.LunchVoteDropDown
-import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
-import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import com.jwd.lunchvote.presentation.widget.TextField
+import com.jwd.lunchvote.presentation.widget.TopBar
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -67,21 +67,21 @@ private fun AddContactScreen(
   Screen(
     modifier = modifier.padding(horizontal = 24.dp),
     topAppBar = {
-      LunchVoteTopBar(
+      TopBar(
         title = "1:1 문의",
         navIconVisible = true,
         popBackStack = { onEvent(AddContactEvent.OnClickBackButton) }
       )
     }
   ) {
-    LunchVoteTextField(
+    TextField(
       text = state.title,
       onTextChange = { onEvent(AddContactEvent.OnTitleChange(it)) },
       hintText = "제목",
       modifier = Modifier.fillMaxWidth()
     )
     Gap(height = 16.dp)
-    LunchVoteDropDown(
+    DropDownMenu(
       list = ContactUIModel.Category.entries.toList(),
       selected = state.category,
       onItemSelected = { onEvent(AddContactEvent.OnCategoryChange(it)) },
@@ -91,7 +91,7 @@ private fun AddContactScreen(
       placeholder = "카테고리"
     )
     Gap(height = 16.dp)
-    LunchVoteTextField(
+    TextField(
       text = state.content,
       onTextChange = { onEvent(AddContactEvent.OnContentChange(it)) },
       hintText = "내용",

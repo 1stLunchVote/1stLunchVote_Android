@@ -48,14 +48,14 @@ import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.RequestD
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
+import com.jwd.lunchvote.presentation.widget.Dialog
 import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.LazyColumn
-import com.jwd.lunchvote.presentation.widget.LunchVoteModal
-import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
-import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.MemberProfile
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import com.jwd.lunchvote.presentation.widget.TextField
+import com.jwd.lunchvote.presentation.widget.TopBar
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -111,7 +111,7 @@ private fun FriendListScreen(
   Screen(
     modifier = modifier,
     topAppBar = {
-      LunchVoteTopBar(
+      TopBar(
         title = stringResource(R.string.friend_list_title),
         popBackStack = { onEvent(FriendListEvent.OnClickBackButton) },
         actions = {
@@ -290,7 +290,7 @@ private fun RequestDialog(
   modifier: Modifier = Modifier,
   onEvent: (RequestDialogEvent) -> Unit = {}
 ) {
-  LunchVoteModal(
+  Dialog(
     title = stringResource(R.string.fl_request_dialog_title),
     onDismissRequest = { onEvent(RequestDialogEvent.OnClickCancelButton) },
     modifier = modifier,
@@ -302,7 +302,7 @@ private fun RequestDialog(
     },
     body = stringResource(R.string.fl_request_dialog_body),
     content = {
-      LunchVoteTextField(
+      TextField(
         text = friendName,
         onTextChange = { onEvent(RequestDialogEvent.OnFriendNameChange(it)) },
         hintText = stringResource(R.string.fl_request_dialog_hint_text)

@@ -33,9 +33,9 @@ import com.jwd.lunchvote.presentation.screen.setting.contact.contact_list.Contac
 import com.jwd.lunchvote.presentation.screen.setting.contact.contact_list.ContactListContract.ContactListState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
-import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import com.jwd.lunchvote.presentation.widget.TopBar
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import java.time.format.DateTimeFormatter
@@ -80,7 +80,7 @@ private fun ContactListScreen(
   Screen(
     modifier = modifier.padding(horizontal = 24.dp),
     topAppBar = {
-      LunchVoteTopBar(
+      TopBar(
         title = "1:1 문의",
         navIconVisible = true,
         popBackStack = { onEvent(ContactListEvent.OnClickBackButton) }

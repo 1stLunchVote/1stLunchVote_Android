@@ -35,12 +35,12 @@ import com.jwd.lunchvote.presentation.screen.setting.contact.ContactContract.Del
 import com.jwd.lunchvote.presentation.util.INITIAL_DATE_TIME
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
+import com.jwd.lunchvote.presentation.widget.Dialog
 import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.Gap
-import com.jwd.lunchvote.presentation.widget.LunchVoteModal
-import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import com.jwd.lunchvote.presentation.widget.TopBar
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import java.time.format.DateTimeFormatter
@@ -85,7 +85,7 @@ private fun ContactScreen(
   Screen(
     modifier = modifier.padding(horizontal = 24.dp),
     topAppBar = {
-      LunchVoteTopBar(
+      TopBar(
         title = stringResource(R.string.contact_title),
         navIconVisible = true,
         popBackStack = { onEvent(ContactEvent.OnClickBackButton) }
@@ -209,7 +209,7 @@ private fun DeleteDialog(
   modifier: Modifier = Modifier,
   onEvent: (DeleteDialogEvent) -> Unit = {}
 ) {
-  LunchVoteModal(
+  Dialog(
     title = stringResource(R.string.c_delete_dialog_title),
     onDismissRequest = { onEvent(DeleteDialogEvent.OnClickCancelButton) },
     modifier = modifier,

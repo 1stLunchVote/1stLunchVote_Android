@@ -40,14 +40,14 @@ import com.jwd.lunchvote.presentation.screen.template.TemplateListContract.Templ
 import com.jwd.lunchvote.presentation.screen.template.TemplateListContract.TemplateListState
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
+import com.jwd.lunchvote.presentation.widget.Dialog
 import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
-import com.jwd.lunchvote.presentation.widget.LunchVoteModal
-import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
-import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import com.jwd.lunchvote.presentation.widget.TextField
+import com.jwd.lunchvote.presentation.widget.TopBar
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -102,7 +102,7 @@ private fun TemplateListScreen(
   Screen(
     modifier = modifier,
     topAppBar = {
-      LunchVoteTopBar(
+      TopBar(
         title = stringResource(R.string.template_list_title),
         navIconVisible = true,
         popBackStack = { onEvent(TemplateListEvent.OnClickBackButton) }
@@ -207,7 +207,7 @@ private fun AddDialog(
   modifier: Modifier = Modifier,
   onEvent: (AddDialogEvent) -> Unit = {}
 ) {
-  LunchVoteModal(
+  Dialog(
     title = stringResource(R.string.tl_add_dialog_title),
     onDismissRequest = { onEvent(AddDialogEvent.OnClickCancelButton) },
     modifier = modifier,
@@ -221,7 +221,7 @@ private fun AddDialog(
     body = stringResource(R.string.tl_add_dialog_body),
     closable = true,
     content = {
-      LunchVoteTextField(
+      TextField(
         text = templateName,
         hintText = stringResource(R.string.tl_add_dialog_hint_text),
         onTextChange = { onEvent(AddDialogEvent.OnTemplateNameChange(it)) },

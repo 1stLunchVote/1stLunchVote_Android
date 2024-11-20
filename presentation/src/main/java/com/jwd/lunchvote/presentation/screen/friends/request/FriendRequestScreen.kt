@@ -34,10 +34,10 @@ import com.jwd.lunchvote.presentation.screen.friends.request.FriendRequestContra
 import com.jwd.lunchvote.presentation.screen.friends.request.FriendRequestContract.FriendRequestState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.LazyColumn
-import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.MemberProfile
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import com.jwd.lunchvote.presentation.widget.TopBar
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import java.time.format.DateTimeFormatter
@@ -84,7 +84,7 @@ private fun FriendRequestScreen(
   Screen(
     modifier = modifier,
     topAppBar = {
-      LunchVoteTopBar(
+      TopBar(
         title = stringResource(R.string.friend_request_title),
         popBackStack = { onEvent(FriendRequestEvent.OnClickBackButton) }
       )

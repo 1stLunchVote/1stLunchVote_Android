@@ -39,7 +39,7 @@ fun FoodGrid(
     horizontalArrangement = Arrangement.SpaceBetween
   ) {
     item(span = { GridItemSpan(3) }) {
-      LunchVoteTextField(
+      TextField(
         text = searchKeyword,
         onTextChange = onSearchKeywordChange,
         hintText = stringResource(R.string.add_template_hint_text),

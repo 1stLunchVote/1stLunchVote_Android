@@ -41,11 +41,11 @@ import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.util.conditional
+import com.jwd.lunchvote.presentation.widget.Dialog
 import com.jwd.lunchvote.presentation.widget.DialogButton
-import com.jwd.lunchvote.presentation.widget.LunchVoteModal
-import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import com.jwd.lunchvote.presentation.widget.TopBar
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kr.co.inbody.config.config.VoteConfig
@@ -123,7 +123,7 @@ private fun LoungeSettingScreen(
   Screen(
     modifier = modifier,
     topAppBar = {
-      LunchVoteTopBar(
+      TopBar(
         title = stringResource(R.string.lounge_setting_title),
         popBackStack = { onEvent(LoungeSettingEvent.OnClickBackButton) }
       )
@@ -276,7 +276,7 @@ private fun TimeLimitDialog(
   modifier: Modifier = Modifier,
   onEvent: (TimeLimitDialogEvent) -> Unit = {}
 ) {
-  LunchVoteModal(
+  Dialog(
     title = stringResource(R.string.lounge_setting_time_limit_title),
     onDismissRequest = { onEvent(TimeLimitDialogEvent.OnClickCancelButton) },
     modifier = modifier,
@@ -370,7 +370,7 @@ private fun MaxMembersDialog(
   range: IntRange = 2..6,
   onEvent: (MaxMembersDialogEvent) -> Unit = {}
 ) {
-  LunchVoteModal(
+  Dialog(
     title = stringResource(R.string.lounge_setting_max_members_title),
     onDismissRequest = { onEvent(MaxMembersDialogEvent.OnClickCancelButton) },
     modifier = modifier,
@@ -440,7 +440,7 @@ private fun SecondVoteCandidatesDialog(
   range: IntRange = 2..10,
   onEvent: (SecondVoteCandidatesDialogEvent) -> Unit = {}
 ) {
-  LunchVoteModal(
+  Dialog(
     title = stringResource(R.string.lounge_setting_second_vote_candidates_title),
     onDismissRequest = { onEvent(SecondVoteCandidatesDialogEvent.OnClickCancelButton) },
     modifier = modifier,
@@ -510,7 +510,7 @@ private fun MinLikeFoodsDialog(
   range: IntRange = 1..5,
   onEvent: (MinLikeFoodsDialogEvent) -> Unit = {}
 ) {
-  LunchVoteModal(
+  Dialog(
     title = stringResource(R.string.lounge_setting_min_like_foods_title),
     onDismissRequest = { onEvent(MinLikeFoodsDialogEvent.OnClickCancelButton) },
     modifier = modifier,
@@ -580,7 +580,7 @@ private fun MinDislikeFoodsDialog(
   range: IntRange = 0..5,
   onEvent: (MinDislikeFoodsDialogEvent) -> Unit = {}
 ) {
-  LunchVoteModal(
+  Dialog(
     title = stringResource(R.string.lounge_setting_min_dislike_foods_title),
     onDismissRequest = { onEvent(MinDislikeFoodsDialogEvent.OnClickCancelButton) },
     modifier = modifier,

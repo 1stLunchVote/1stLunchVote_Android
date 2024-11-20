@@ -24,7 +24,7 @@ import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun <T>LunchVoteDropDown(
+fun <T>DropDownMenu(
   list: List<T>,
   selected: T?,
   onItemSelected: (T) -> Unit,
@@ -41,7 +41,7 @@ fun <T>LunchVoteDropDown(
     modifier = modifier
   ) {
     if (list.isEmpty()) {
-      LunchVoteTextField(
+      TextField(
         text = "",
         onTextChange = {},
         hintText = placeholder,
@@ -49,7 +49,7 @@ fun <T>LunchVoteDropDown(
         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expended) }
       )
     } else {
-      LunchVoteTextField(
+      TextField(
         text = if (selected != null) getItemName(selected) else "",
         onTextChange = {},
         hintText = hintText,
@@ -88,7 +88,7 @@ private fun Preview() {
       Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
       ) {
-        LunchVoteDropDown(
+        DropDownMenu(
           list = emptyList(),
           selected = null,
           onItemSelected = {},
@@ -97,7 +97,7 @@ private fun Preview() {
           modifier = Modifier.weight(1f),
           placeholder = "아이템이 없습니다."
         )
-        LunchVoteDropDown(
+        DropDownMenu(
           list = listOf("Item 1", "Item 2", "Item 3"),
           selected = null,
           onItemSelected = {},
@@ -105,7 +105,7 @@ private fun Preview() {
           hintText = "아이템을 선택해주세요.",
           modifier = Modifier.weight(1f)
         )
-        LunchVoteDropDown(
+        DropDownMenu(
           list = listOf("Item 1", "Item 2", "Item 3"),
           selected = "Item 1",
           onItemSelected = {},

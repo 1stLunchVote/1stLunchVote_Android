@@ -56,14 +56,14 @@ import com.jwd.lunchvote.presentation.screen.home.HomeContract.SecretDialogEvent
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.conditional
+import com.jwd.lunchvote.presentation.widget.Dialog
 import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.ImageWithUploadButton
 import com.jwd.lunchvote.presentation.widget.LunchVoteIcon
-import com.jwd.lunchvote.presentation.widget.LunchVoteModal
-import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import com.jwd.lunchvote.presentation.widget.TextField
 import com.skydoves.landscapist.coil.CoilImage
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
@@ -422,7 +422,7 @@ private fun JoinDialog(
   modifier: Modifier = Modifier,
   onEvent: (JoinDialogEvent) -> Unit = {}
 ) {
-  LunchVoteModal(
+  Dialog(
     title = stringResource(R.string.h_join_dialog_title),
     onDismissRequest = { onEvent(JoinDialogEvent.OnClickCancelButton) },
     modifier = modifier,
@@ -430,7 +430,7 @@ private fun JoinDialog(
     body = stringResource(R.string.h_join_dialog_body),
     closable = true,
     content = {
-      LunchVoteTextField(
+      TextField(
         text = loungeId,
         onTextChange = { onEvent(JoinDialogEvent.OnLoungeIdChange(it)) },
         hintText = stringResource(R.string.h_join_dialog_hint_text)
@@ -485,7 +485,7 @@ private fun SecretDialog(
   onImageError: () -> Unit = {},
   onConfirmation: () -> Unit = {}
 ) {
-  LunchVoteModal(
+  Dialog(
     title = "음식 추가",
     onDismissRequest = onDismissRequest,
     modifier = modifier,
@@ -502,7 +502,7 @@ private fun SecretDialog(
           onImageChange = onFoodImageChange,
           onError = onImageError
         )
-        LunchVoteTextField(
+        TextField(
           text = foodName,
           onTextChange = onFoodNameChange,
           hintText = "음식 이름"

@@ -67,15 +67,15 @@ import com.jwd.lunchvote.presentation.screen.lounge.LoungeContract.LoungeState
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.ChatBubble
+import com.jwd.lunchvote.presentation.widget.Dialog
 import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.EmptyProfile
 import com.jwd.lunchvote.presentation.widget.InviteProfile
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
-import com.jwd.lunchvote.presentation.widget.LunchVoteModal
-import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.MemberProfile
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import com.jwd.lunchvote.presentation.widget.TopBar
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -135,7 +135,7 @@ private fun LoungeScreen(
   Screen(
     modifier = modifier.padding(horizontal = 24.dp),
     topAppBar = {
-      LunchVoteTopBar(
+      TopBar(
         title = stringResource(R.string.lounge_topbar_title),
         popBackStack = { onEvent(LoungeEvent.OnClickBackButton) },
         actions = {
@@ -361,7 +361,7 @@ private fun ExitDialog(
   modifier: Modifier = Modifier,
   onEvent: (ExitDialogEvent) -> Unit = {}
 ) {
-  LunchVoteModal(
+  Dialog(
     title = stringResource(R.string.l_exit_dialog_title),
     onDismissRequest = { onEvent(ExitDialogEvent.OnClickCancelButton) },
     modifier = modifier,

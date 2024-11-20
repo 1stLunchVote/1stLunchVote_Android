@@ -36,7 +36,7 @@ import com.jwd.lunchvote.presentation.util.animatePopUp
 import com.jwd.lunchvote.presentation.util.outerShadow
 
 @Composable
-fun LunchVoteModal(
+fun Dialog(
   title: String,
   onDismissRequest: () -> Unit,
   modifier: Modifier = Modifier,
@@ -202,7 +202,7 @@ fun RowScope.DialogButton(
 @Composable
 private fun Preview() {
   ScreenPreview {
-    LunchVoteModal(
+    Dialog(
       title = "Blog post published",
       onDismissRequest = {},
       body = "This blog post has been published. Team members will be able to edit this post.",

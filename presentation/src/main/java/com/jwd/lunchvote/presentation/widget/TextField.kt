@@ -46,7 +46,7 @@ import com.jwd.lunchvote.presentation.util.innerShadow
 import com.jwd.lunchvote.presentation.util.outerShadow
 
 @Composable
-fun LunchVoteTextField(
+fun TextField(
   text: String,
   onTextChange: (String) -> Unit,
   hintText: String,
@@ -174,7 +174,7 @@ fun LunchVoteTextField(
     modifier = modifier,
     verticalArrangement = Arrangement.spacedBy(4.dp)
   ) {
-    LunchVoteTextField(
+    TextField(
       text = text,
       onTextChange = onTextChange,
       hintText = hintText,
@@ -324,33 +324,33 @@ private fun Preview() {
       Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
       ) {
-        LunchVoteTextField(
+        TextField(
           text = "Active",
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f)
         )
-        LunchVoteTextField(
+        TextField(
           text = "",
           onTextChange = {},
           hintText = "Blank",
           modifier = Modifier.weight(1f)
         )
-        LunchVoteTextField(
+        TextField(
           text = "",
           onTextChange = {},
           hintText = "Focused",
           modifier = Modifier.weight(1f),
           isFocused = true
         )
-        LunchVoteTextField(
+        TextField(
           text = "Typed",
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f),
           isFocused = true
         )
-        LunchVoteTextField(
+        TextField(
           text = "Disabled",
           onTextChange = {},
           hintText = "",
@@ -361,21 +361,21 @@ private fun Preview() {
       Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
       ) {
-        LunchVoteTextField(
+        TextField(
           text = "Valid",
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f),
           isError = false
         )
-        LunchVoteTextField(
+        TextField(
           text = "",
           onTextChange = {},
           hintText = "Blank",
           modifier = Modifier.weight(1f),
           isError = false
         )
-        LunchVoteTextField(
+        TextField(
           text = "",
           onTextChange = {},
           hintText = "Focused",
@@ -383,7 +383,7 @@ private fun Preview() {
           isError = false,
           isFocused = true
         )
-        LunchVoteTextField(
+        TextField(
           text = "Typed",
           onTextChange = {},
           hintText = "",
@@ -391,7 +391,7 @@ private fun Preview() {
           isError = false,
           isFocused = true
         )
-        LunchVoteTextField(
+        TextField(
           text = "Disabled",
           onTextChange = {},
           hintText = "",
@@ -406,21 +406,21 @@ private fun Preview() {
       Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
       ) {
-        LunchVoteTextField(
+        TextField(
           text = "Error",
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f),
           isError = true
         )
-        LunchVoteTextField(
+        TextField(
           text = "",
           onTextChange = {},
           hintText = "Blank",
           modifier = Modifier.weight(1f),
           isError = true
         )
-        LunchVoteTextField(
+        TextField(
           text = "",
           onTextChange = {},
           hintText = "Focused",
@@ -428,7 +428,7 @@ private fun Preview() {
           isError = true,
           isFocused = true
         )
-        LunchVoteTextField(
+        TextField(
           text = "Typed",
           onTextChange = {},
           hintText = "",
@@ -436,7 +436,7 @@ private fun Preview() {
           isError = true,
           isFocused = true
         )
-        LunchVoteTextField(
+        TextField(
           text = "Disabled",
           onTextChange = {},
           hintText = "",
@@ -448,7 +448,7 @@ private fun Preview() {
       Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
       ) {
-        LunchVoteTextField(
+        TextField(
           text = "Search",
           onTextChange = {},
           hintText = "",
@@ -457,7 +457,7 @@ private fun Preview() {
             SearchIcon()
           }
         )
-        LunchVoteTextField(
+        TextField(
           text = "",
           onTextChange = {},
           hintText = "Blank",
@@ -466,7 +466,7 @@ private fun Preview() {
             SearchIcon()
           }
         )
-        LunchVoteTextField(
+        TextField(
           text = "",
           onTextChange = {},
           hintText = "Focused",
@@ -476,7 +476,7 @@ private fun Preview() {
           },
           isFocused = true
         )
-        LunchVoteTextField(
+        TextField(
           text = "Typed",
           onTextChange = {},
           hintText = "",
@@ -486,7 +486,7 @@ private fun Preview() {
           },
           isFocused = true
         )
-        LunchVoteTextField(
+        TextField(
           text = "Disabled",
           onTextChange = {},
           hintText = "",

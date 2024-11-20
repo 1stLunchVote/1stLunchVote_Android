@@ -23,9 +23,9 @@ import com.jwd.lunchvote.presentation.screen.login.register.nickname.NicknameCon
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
-import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import com.jwd.lunchvote.presentation.widget.TextField
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -79,7 +79,7 @@ private fun NicknameScreen(
       style = MaterialTheme.typography.bodyLarge
     )
     Gap(height = 64.dp)
-    LunchVoteTextField(
+    TextField(
       text = state.nickname,
       onTextChange = { onEvent(NicknameEvent.OnNicknameChange(it)) },
       hintText = stringResource(R.string.nickname_nickname_hint),

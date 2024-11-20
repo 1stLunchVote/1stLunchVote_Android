@@ -47,15 +47,15 @@ import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.Pro
 import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.ProfileState
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
+import com.jwd.lunchvote.presentation.widget.Dialog
 import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.ImageWithUploadButton
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
-import com.jwd.lunchvote.presentation.widget.LunchVoteModal
-import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
-import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import com.jwd.lunchvote.presentation.widget.TextField
+import com.jwd.lunchvote.presentation.widget.TopBar
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 import kotlinx.coroutines.channels.Channel
@@ -117,7 +117,7 @@ private fun ProfileScreen(
   Screen(
     modifier = modifier.padding(24.dp),
     topAppBar = {
-      LunchVoteTopBar(
+      TopBar(
         title = stringResource(R.string.profile_title),
         popBackStack = { onEvent(ProfileEvent.OnClickBackButton) }
       )
@@ -271,7 +271,7 @@ private fun ProfileImageDialog(
   onEvent: (ProfileImageDialogEvent) -> Unit = {},
   context: Context = LocalContext.current
 ) {
-  LunchVoteModal(
+  Dialog(
     title = stringResource(R.string.p_profile_image_dialog_title),
     onDismissRequest = { onEvent(ProfileImageDialogEvent.OnClickCancelButton) },
     modifier = modifier,
@@ -316,7 +316,7 @@ private fun NameDialog(
   modifier: Modifier = Modifier,
   onEvent: (NameDialogEvent) -> Unit = {}
 ) {
-  LunchVoteModal(
+  Dialog(
     title = stringResource(R.string.p_name_dialog_title),
     onDismissRequest = { onEvent(NameDialogEvent.OnClickCancelButton) },
     modifier = modifier,
@@ -330,7 +330,7 @@ private fun NameDialog(
     body = stringResource(R.string.p_name_dialog_body),
     closable = false,
     content = {
-      LunchVoteTextField(
+      TextField(
         text = name,
         onTextChange = { onEvent(NameDialogEvent.OnNameChange(it)) },
         hintText = stringResource(R.string.p_name_dialog_hint_text),
@@ -358,7 +358,7 @@ private fun DeleteDialog(
   modifier: Modifier = Modifier,
   onEvent: (ProfileContract.DeleteDialogEvent) -> Unit = {}
 ) {
-  LunchVoteModal(
+  Dialog(
     title = stringResource(R.string.p_delete_dialog_title),
     onDismissRequest = { onEvent(DeleteDialogEvent.OnClickCancelButton) },
     modifier = modifier,

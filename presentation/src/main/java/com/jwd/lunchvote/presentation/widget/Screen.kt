@@ -10,12 +10,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.conditional
 
 @Composable
@@ -63,6 +65,17 @@ fun Screen(
           .align(Alignment.BottomEnd)
           .padding(end = 32.dp, bottom = 48.dp)
       ) { actions() }
+    }
+  }
+}
+
+@Composable
+fun ScreenPreview(
+  content: @Composable () -> Unit
+) {
+  LunchVoteTheme {
+    Surface {
+      content()
     }
   }
 }

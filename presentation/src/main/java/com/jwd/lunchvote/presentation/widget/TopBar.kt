@@ -19,7 +19,7 @@ import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LunchVoteTopBar(
+fun TopBar(
   title: String,
   modifier: Modifier = Modifier,
   navIconVisible: Boolean = true,
@@ -50,7 +50,7 @@ fun LunchVoteTopBar(
 @Composable
 private fun Preview() {
   LunchVoteTheme {
-    LunchVoteTopBar(title = "투표 대기방", actions = {
+    TopBar(title = "투표 대기방", actions = {
       IconButton({}) {
         Icon(
           imageVector = Icons.Rounded.Delete,
