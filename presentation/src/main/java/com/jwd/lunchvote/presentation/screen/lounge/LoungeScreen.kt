@@ -23,8 +23,8 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -143,7 +143,7 @@ private fun LoungeScreen(
             onClick = { onEvent(LoungeEvent.OnClickSettingButton) }
           ) {
             Icon(
-              Icons.Outlined.Settings,
+              Icons.Rounded.Settings,
               contentDescription = "Settings"
             )
           }

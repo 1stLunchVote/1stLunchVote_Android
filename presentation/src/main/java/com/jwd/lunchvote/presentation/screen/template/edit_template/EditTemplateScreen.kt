@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -102,7 +101,7 @@ private fun EditTemplateScreen(
             onClick = { onEvent(EditTemplateEvent.OnClickDeleteButton) }
           ) {
             Icon(
-              Icons.Outlined.Delete,
+              Icons.Rounded.Delete,
               contentDescription = "delete"
             )
           }

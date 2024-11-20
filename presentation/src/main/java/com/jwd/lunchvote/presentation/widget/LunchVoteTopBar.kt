@@ -3,8 +3,8 @@ package com.jwd.lunchvote.presentation.widget
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -24,7 +24,7 @@ fun LunchVoteTopBar(
   modifier: Modifier = Modifier,
   navIconVisible: Boolean = true,
   popBackStack: () -> Unit = {},
-  actions: @Composable RowScope.() -> Unit = { }
+  actions: @Composable RowScope.() -> Unit = {}
 ) {
   CenterAlignedTopAppBar(
     title = { Text(text = title) },
@@ -33,7 +33,7 @@ fun LunchVoteTopBar(
       if (navIconVisible) {
         IconButton(popBackStack) {
           Icon(
-            Icons.AutoMirrored.Filled.ArrowBack,
+            Icons.AutoMirrored.Rounded.ArrowBack,
             contentDescription = "Navigate Up",
           )
         }
@@ -48,12 +48,12 @@ fun LunchVoteTopBar(
 
 @Preview
 @Composable
-private fun LunchVoteTopBarPreview() {
+private fun Preview() {
   LunchVoteTheme {
     LunchVoteTopBar(title = "투표 대기방", actions = {
       IconButton({}) {
         Icon(
-          imageVector = Icons.Outlined.Delete,
+          imageVector = Icons.Rounded.Delete,
           contentDescription = "delete",
         )
       }

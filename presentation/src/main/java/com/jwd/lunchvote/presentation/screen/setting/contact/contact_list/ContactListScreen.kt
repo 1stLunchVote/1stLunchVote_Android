@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -93,7 +93,7 @@ private fun ContactListScreen(
         contentColor = MaterialTheme.colorScheme.onPrimary,
       ) {
         Icon(
-          imageVector = Icons.Outlined.Add,
+          imageVector = Icons.Rounded.Add,
           contentDescription = "add contact"
         )
       }

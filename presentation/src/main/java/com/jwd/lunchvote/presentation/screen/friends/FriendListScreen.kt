@@ -11,7 +11,7 @@ import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Button
@@ -133,7 +133,7 @@ private fun FriendListScreen(
         contentColor = MaterialTheme.colorScheme.onPrimary,
       ) {
         Icon(
-          imageVector = Icons.Outlined.Add,
+          imageVector = Icons.Rounded.Add,
           contentDescription = "add friend"
         )
       }
