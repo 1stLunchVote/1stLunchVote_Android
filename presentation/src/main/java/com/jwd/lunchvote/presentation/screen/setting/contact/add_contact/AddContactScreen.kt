@@ -33,6 +33,7 @@ import com.jwd.lunchvote.presentation.screen.setting.contact.add_contact.AddCont
 import com.jwd.lunchvote.presentation.screen.setting.contact.add_contact.AddContactContract.AddContactState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.Gap
+import com.jwd.lunchvote.presentation.widget.LunchVoteDropDown
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
@@ -66,7 +67,6 @@ fun AddContactRoute(
   )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AddContactScreen(
   state: AddContactState,
@@ -90,37 +90,15 @@ private fun AddContactScreen(
       modifier = Modifier.fillMaxWidth()
     )
     Gap(height = 16.dp)
-    var expended by remember { mutableStateOf(false) }
-    ExposedDropdownMenuBox(
-      expanded = expended,
-      onExpandedChange = { expended = it },
-      modifier = Modifier.fillMaxWidth()
-    ) {
-      OutlinedTextField(
-        value = state.category?.korean ?: "카테고리",
-        onValueChange = {},
-        modifier = Modifier
-          .fillMaxWidth()
-          .menuAnchor(MenuAnchorType.PrimaryNotEditable),
-        readOnly = true,
-        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expended) },
-        singleLine = true
-      )
-      ExposedDropdownMenu(
-        expanded = expended,
-        onDismissRequest = { expended = false }
-      ) {
-        ContactUIModel.Category.entries.forEach { category ->
-          DropdownMenuItem(
-            text = { Text(text = category.korean) },
-            onClick = {
-              onEvent(AddContactEvent.OnCategoryChange(category))
-              expended = false
-            }
-          )
-        }
-      }
-    }
+    LunchVoteDropDown(
+      list = ContactUIModel.Category.entries.toList(),
+      selected = state.category,
+      onItemSelected = { onEvent(AddContactEvent.OnCategoryChange(it)) },
+      getItemName = { it.korean },
+      hintText = "카테고리",
+      modifier = Modifier.fillMaxWidth(),
+      placeholder = "카테고리"
+    )
     Gap(height = 16.dp)
     LunchVoteTextField(
       text = state.content,

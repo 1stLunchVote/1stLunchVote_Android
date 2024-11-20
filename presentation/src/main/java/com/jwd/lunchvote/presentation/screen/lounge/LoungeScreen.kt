@@ -25,6 +25,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
+import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -59,20 +60,22 @@ import com.jwd.lunchvote.presentation.model.ChatUIModel
 import com.jwd.lunchvote.presentation.model.ChatUIModel.Type.SYSTEM
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.UserUIModel
-import com.jwd.lunchvote.presentation.screen.lounge.LoungeContract.Companion.VOTE_EXIT_DIALOG
+import com.jwd.lunchvote.presentation.screen.lounge.LoungeContract.ExitDialogEvent
 import com.jwd.lunchvote.presentation.screen.lounge.LoungeContract.LoungeEvent
 import com.jwd.lunchvote.presentation.screen.lounge.LoungeContract.LoungeSideEffect
 import com.jwd.lunchvote.presentation.screen.lounge.LoungeContract.LoungeState
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.ChatBubble
+import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.EmptyProfile
 import com.jwd.lunchvote.presentation.widget.InviteProfile
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
+import com.jwd.lunchvote.presentation.widget.LunchVoteModal
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.MemberProfile
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
-import com.jwd.lunchvote.presentation.widget.VoteExitDialog
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -90,7 +93,6 @@ fun LoungeRoute(
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
   val loading by viewModel.isLoading.collectAsStateWithLifecycle()
-  val dialog by viewModel.dialogState.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
@@ -99,8 +101,6 @@ fun LoungeRoute(
         is LoungeSideEffect.NavigateToLoungeSetting -> navigateToLoungeSetting(it.loungeId)
         is LoungeSideEffect.NavigateToMember -> navigateToMember(it.userId, it.loungeId)
         is LoungeSideEffect.NavigateToVote -> navigateToFirstVote(it.loungeId)
-        is LoungeSideEffect.OpenVoteExitDialog -> viewModel.openDialog(VOTE_EXIT_DIALOG)
-        is LoungeSideEffect.CloseDialog -> viewModel.openDialog("")
         is LoungeSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
         is LoungeSideEffect.CopyToClipboard -> clipboardManager.setText(AnnotatedString(it.loungeId))
       }
@@ -109,11 +109,10 @@ fun LoungeRoute(
 
   BackHandler { viewModel.sendEvent(LoungeEvent.OnClickBackButton) }
 
-  when (dialog) {
-    VOTE_EXIT_DIALOG -> VoteExitDialog(
+  state.exitDialogState?.let {
+    ExitDialog(
       isOwner = state.isOwner,
-      onDismissRequest = { viewModel.sendEvent(LoungeEvent.OnClickCancelButtonVoteExitDialog) },
-      onConfirmation = { viewModel.sendEvent(LoungeEvent.OnClickConfirmButtonVoteExitDialog) }
+      onEvent = viewModel::sendEvent
     )
   }
 
@@ -356,6 +355,41 @@ private fun ChatTextField(
   }
 }
 
+@Composable
+private fun ExitDialog(
+  isOwner: Boolean,
+  modifier: Modifier = Modifier,
+  onEvent: (ExitDialogEvent) -> Unit = {}
+) {
+  LunchVoteModal(
+    title = stringResource(R.string.l_exit_dialog_title),
+    onDismissRequest = { onEvent(ExitDialogEvent.OnClickCancelButton) },
+    modifier = modifier,
+    icon = {
+      Icon(
+        imageVector = Icons.Rounded.Warning,
+        contentDescription = "Warning"
+      )
+    },
+    iconColor = MaterialTheme.colorScheme.error,
+    body = if (isOwner) stringResource(R.string.l_exit_dialog_body_owner)
+      else stringResource(R.string.l_exit_dialog_body_not_owner),
+    buttons = {
+      DialogButton(
+        text = stringResource(R.string.l_exit_dialog_cancel_button),
+        onClick = { onEvent(ExitDialogEvent.OnClickCancelButton) },
+        color = MaterialTheme.colorScheme.onSurface,
+        isDismiss = true
+      )
+      DialogButton(
+        text = stringResource(R.string.l_exit_dialog_exit_button),
+        onClick = { onEvent(ExitDialogEvent.OnClickExitButton) },
+        color = MaterialTheme.colorScheme.error
+      )
+    }
+  )
+}
+
 @Preview
 @Composable
 private fun Preview() {
@@ -416,6 +450,26 @@ private fun Preview() {
             .asUI()
         )
       )
+    )
+  }
+}
+
+@Preview
+@Composable
+private fun ExitDialogOwnerPreview() {
+  LunchVoteTheme {
+    ExitDialog(
+      isOwner = true
+    )
+  }
+}
+
+@Preview
+@Composable
+private fun ExitDialogMemberPreview() {
+  LunchVoteTheme {
+    ExitDialog(
+      isOwner = false
     )
   }
 }

@@ -35,14 +35,6 @@ class EditTemplateViewModel @Inject constructor(
   private val templateId: String =
     savedStateHandle[LunchVoteNavRoute.EditTemplate.arguments.first().name] ?: throw RouteError.NoArguments
 
-  private val _dialogState = MutableStateFlow("")
-  val dialogState: StateFlow<String> = _dialogState.asStateFlow()
-  fun setDialogState(dialogState: String) {
-    viewModelScope.launch {
-      _dialogState.emit(dialogState)
-    }
-  }
-
   override fun handleEvents(event: EditTemplateEvent) {
     when(event) {
       is EditTemplateEvent.ScreenInitialize -> launch { initialize() }

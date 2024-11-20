@@ -18,7 +18,9 @@ class LoungeContract {
     val memberArchive: List<MemberUIModel> = emptyList(),
     val isOwner: Boolean = false,
     val chatList: List<ChatUIModel> = emptyList(),
-    val text: String = ""
+    val text: String = "",
+
+    val exitDialogState: ExitDialogState? = null
   ) : ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this
   }
@@ -31,10 +33,6 @@ class LoungeContract {
     data class OnTextChange(val text: String) : LoungeEvent
     data object OnClickSendChatButton : LoungeEvent
     data object OnClickActionButton : LoungeEvent
-
-    // DialogEvents
-    data object OnClickCancelButtonVoteExitDialog : LoungeEvent
-    data object OnClickConfirmButtonVoteExitDialog : LoungeEvent
   }
 
   sealed interface LoungeReduce : ViewModelContract.Reduce {
@@ -45,6 +43,7 @@ class LoungeContract {
     data class UpdateIsOwner(val isOwner: Boolean) : LoungeReduce
     data class UpdateChatList(val chatList: List<ChatUIModel>) : LoungeReduce
     data class UpdateText(val text: String) : LoungeReduce
+    data class UpdateExitDialogState(val exitDialogState: ExitDialogState?) : LoungeReduce
   }
 
   sealed interface LoungeSideEffect : ViewModelContract.SideEffect {
@@ -52,13 +51,17 @@ class LoungeContract {
     data class NavigateToLoungeSetting(val loungeId: String) : LoungeSideEffect
     data class NavigateToMember(val userId: String, val loungeId: String) : LoungeSideEffect
     data class NavigateToVote(val loungeId: String) : LoungeSideEffect
-    data object OpenVoteExitDialog : LoungeSideEffect
-    data object CloseDialog : LoungeSideEffect
     data class ShowSnackbar(val message: UiText) : LoungeSideEffect
     data class CopyToClipboard(val loungeId: String) : LoungeSideEffect
   }
 
-  companion object {
-    const val VOTE_EXIT_DIALOG = "vote_exit_dialog"
+  @Parcelize
+  data object ExitDialogState : ViewModelContract.State, Parcelable {
+    override fun toParcelable(): Parcelable = this
+  }
+
+  sealed interface ExitDialogEvent : LoungeEvent {
+    data object OnClickCancelButton : ExitDialogEvent
+    data object OnClickExitButton : ExitDialogEvent
   }
 }

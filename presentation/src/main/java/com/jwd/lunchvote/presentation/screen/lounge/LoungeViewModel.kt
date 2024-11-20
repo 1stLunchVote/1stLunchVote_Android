@@ -25,6 +25,8 @@ import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.MemberUIModel.Type.DEFAULT
 import com.jwd.lunchvote.presentation.model.MemberUIModel.Type.OWNER
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
+import com.jwd.lunchvote.presentation.screen.lounge.LoungeContract.ExitDialogEvent
+import com.jwd.lunchvote.presentation.screen.lounge.LoungeContract.ExitDialogState
 import com.jwd.lunchvote.presentation.screen.lounge.LoungeContract.LoungeEvent
 import com.jwd.lunchvote.presentation.screen.lounge.LoungeContract.LoungeReduce
 import com.jwd.lunchvote.presentation.screen.lounge.LoungeContract.LoungeSideEffect
@@ -62,14 +64,6 @@ class LoungeViewModel @Inject constructor(
   private val loungeId: String? =
     savedStateHandle[LunchVoteNavRoute.Lounge.arguments.first().name]
 
-  private val _dialogState = MutableStateFlow("")
-  val dialogState: StateFlow<String> = _dialogState.asStateFlow()
-  fun openDialog(dialogState: String) {
-    viewModelScope.launch {
-      _dialogState.emit(dialogState)
-    }
-  }
-
   private val userId: String
     get() = Firebase.auth.currentUser?.uid ?: throw UserError.NoSession
 
@@ -92,7 +86,7 @@ class LoungeViewModel @Inject constructor(
 
   override fun handleEvents(event: LoungeEvent) {
     when (event) {
-      is LoungeEvent.OnClickBackButton -> sendSideEffect(LoungeSideEffect.OpenVoteExitDialog)
+      is LoungeEvent.OnClickBackButton -> updateState(LoungeReduce.UpdateExitDialogState(ExitDialogState))
       is LoungeEvent.OnClickSettingButton -> sendSideEffect(LoungeSideEffect.NavigateToLoungeSetting(currentState.lounge.id))
       is LoungeEvent.OnClickMember -> sendSideEffect(LoungeSideEffect.NavigateToMember(event.member.userId, currentState.lounge.id))
       is LoungeEvent.OnClickInviteButton -> sendSideEffect(LoungeSideEffect.CopyToClipboard(currentState.lounge.id))
@@ -102,9 +96,14 @@ class LoungeViewModel @Inject constructor(
         if (currentState.isOwner) startVote() else updateReady()
       }
 
-      // DialogEvents
-      is LoungeEvent.OnClickCancelButtonVoteExitDialog -> sendSideEffect(LoungeSideEffect.CloseDialog)
-      is LoungeEvent.OnClickConfirmButtonVoteExitDialog -> launch(false) { exitLounge() }
+      is ExitDialogEvent -> handleExitDialogEvents(event)
+    }
+  }
+
+  private fun handleExitDialogEvents(event: ExitDialogEvent) {
+    when (event) {
+      is ExitDialogEvent.OnClickCancelButton -> updateState(LoungeReduce.UpdateExitDialogState(null))
+      is ExitDialogEvent.OnClickExitButton -> launch(false) { exitLounge() }
     }
   }
 
@@ -117,6 +116,7 @@ class LoungeViewModel @Inject constructor(
       is LoungeReduce.UpdateIsOwner -> state.copy(isOwner = reduce.isOwner)
       is LoungeReduce.UpdateChatList -> state.copy(chatList = reduce.chatList)
       is LoungeReduce.UpdateText -> state.copy(text = reduce.text)
+      is LoungeReduce.UpdateExitDialogState -> state.copy(exitDialogState = reduce.exitDialogState)
     }
   }
 
@@ -217,7 +217,8 @@ class LoungeViewModel @Inject constructor(
   }
 
   private suspend fun exitLounge() {
-    sendSideEffect(LoungeSideEffect.CloseDialog)
+    currentState.exitDialogState ?: return
+    updateState(LoungeReduce.UpdateExitDialogState(null))
 
     loungeFlow.cancel()
     membersFlow.cancel()

@@ -87,6 +87,12 @@
     <string name="lounge_not_ready_to_start_snackbar">모든 멤버가 준비해야합니다.</string>
     <string name="lounge_lack_member_snackbar">멤버가 최소 2명 있어야 합니다.</string>
     <string name="lounge_exited_snackbar">투표 대기방에서 나왔습니다.</string>
+    <!--  ExitDialog  -->
+    <string name="l_exit_dialog_title">방을 나가시겠습니까?</string>
+    <string name="l_exit_dialog_body_owner">방장이 나갈 경우 투표방이 사라집니다.</string>
+    <string name="l_exit_dialog_body_not_owner">초대 코드를 입력하면 다시 들어올 수 있습니다.</string>
+    <string name="l_exit_dialog_cancel_button">취소</string>
+    <string name="l_exit_dialog_exit_button">나가기</string>
 
     <!-- LoungeMemberScreen -->
     <string name="lounge_member_title">참여자 정보</string>
@@ -143,18 +149,18 @@
     <string name="first_vote_calculating_message">투표 결과를 집계하고 있습니다…</string>
     <string name="first_vote_owner_exited_snackbar">방장이 투표 방을 나갔습니다.</string>
     <string name="first_vote_only_owner_snackbar">투표 인원이 너무 적어 투표가 종료되었습니다.</string>
-    <!--  SelectTemplateDialog  -->
-    <string name="select_template_dialog_title">투표가 시작되었습니다!</string>
-    <string name="select_template_dialog_body">음식을 터치하여 호불호를 선택할 수 있습니다.\n좋아한다고 투표한 멤버당 1점이 추가되며\n싫어한다고 투표한 멤버당 5점이 감점됩니다.\n\n템플릿을 골라 빠르게 투표해보세요!</string>
-    <string name="select_template_dialog_hint_text">템플릿을 선택해주세요</string>
-    <string name="select_template_dialog_no_template_text">템플릿이 없습니다.</string>
-    <string name="select_template_dialog_dismiss_button">건너뛰기</string>
-    <string name="select_template_dialog_confirm_button">적용</string>
-    <!--  VoteExitDialog  -->
-    <string name="vote_exit_dialog_title">투표를 종료하시겠습니까?</string>
-    <string name="vote_exit_dialog_body">방을 나갈 경우 무효표 처리되며, 다시 참여할 수 없습니다.</string>
-    <string name="vote_exit_dialog_dismiss_button">취소</string>
-    <string name="vote_exit_dialog_confirm_button">나가기</string>
+    <!--  InformationDialog  -->
+    <string name="fv_information_dialog_title">투표가 시작되었습니다!</string>
+    <string name="fv_information_dialog_body">음식을 터치하여 호불호를 선택할 수 있습니다.\n좋아한다고 투표한 멤버당 1점이 추가되며\n싫어한다고 투표한 멤버당 5점이 감점됩니다.\n\n템플릿을 골라 빠르게 투표해보세요!</string>
+    <string name="fv_information_dialog_hint_text">템플릿을 선택해주세요</string>
+    <string name="fv_information_dialog_placeholder">템플릿이 없습니다.</string>
+    <string name="fv_information_dialog_skip_button">건너뛰기</string>
+    <string name="fv_information_dialog_apply_button">적용</string>
+    <!--  ExitDialog  -->
+    <string name="fv_exit_dialog_title">투표를 종료하시겠습니까?</string>
+    <string name="fv_exit_dialog_body">방을 나갈 경우 무효표 처리되며, 다시 참여할 수 없습니다.\n방장이 나갈 경우 투표가 종료됩니다.</string>
+    <string name="fv_exit_dialog_cancel_button">취소</string>
+    <string name="fv_exit_dialog_exit_button">나가기</string>
 
     <!-- SecondVoteScreen -->
     <string name="second_vote_title">2차 투표</string>
@@ -164,6 +170,11 @@
     <string name="second_vote_waiting_body">현재 %d명이 투표 완료했습니다!</string>
     <string name="second_vote_re_vote_button">다시 투표하기</string>
     <string name="second_vote_calculating_message">투표 결과를 집계하고 있습니다…</string>
+    <!--  ExitDialog  -->
+    <string name="sv_exit_dialog_title">투표를 종료하시겠습니까?</string>
+    <string name="sv_exit_dialog_body">방을 나갈 경우 무효표 처리되며, 다시 참여할 수 없습니다.\n방장이 나갈 경우 투표가 종료됩니다.</string>
+    <string name="sv_exit_dialog_cancel_button">취소</string>
+    <string name="sv_exit_dialog_exit_button">나가기</string>
 
     <!-- VoteResultScreen -->
     <string name="vote_result_loading">투표 결과를 집계하고 있습니다…</string>

@@ -40,16 +40,17 @@ import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.UserUIModel
-import com.jwd.lunchvote.presentation.screen.vote.second.SecondVoteContract.SecondVoteDialog
+import com.jwd.lunchvote.presentation.screen.vote.second.SecondVoteContract.ExitDialogEvent
 import com.jwd.lunchvote.presentation.screen.vote.second.SecondVoteContract.SecondVoteEvent
 import com.jwd.lunchvote.presentation.screen.vote.second.SecondVoteContract.SecondVoteSideEffect
 import com.jwd.lunchvote.presentation.screen.vote.second.SecondVoteContract.SecondVoteState
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
+import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.HorizontalProgressBar
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
-import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
+import com.jwd.lunchvote.presentation.widget.LunchVoteModal
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.MemberProgress
 import com.jwd.lunchvote.presentation.widget.Screen
@@ -69,7 +70,6 @@ fun SecondVoteRoute(
   context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
-  val dialog by viewModel.dialogState.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
@@ -85,12 +85,8 @@ fun SecondVoteRoute(
 
   LaunchedEffect(Unit) { viewModel.sendEvent(SecondVoteEvent.ScreenInitialize) }
 
-  when (dialog) {
-    is SecondVoteDialog.ExitDialog -> ExitDialog(
-      onDismissRequest = { viewModel.sendEvent(SecondVoteEvent.OnClickCancelButtonInExitDialog) },
-      onConfirmation = { viewModel.sendEvent(SecondVoteEvent.OnClickConfirmButtonInExitDialog) }
-    )
-    null -> Unit
+  state.exitDialogState?.let {
+    ExitDialog(onEvent = viewModel::sendEvent)
   }
 
   if (state.calculating) LoadingScreen(message = stringResource(R.string.second_vote_calculating_message))
@@ -305,26 +301,34 @@ private fun SecondVoteWaitingScreen(
 @Composable
 private fun ExitDialog(
   modifier: Modifier = Modifier,
-  onDismissRequest: () -> Unit = {},
-  onConfirmation: () -> Unit = {}
+  onEvent: (ExitDialogEvent) -> Unit = {}
 ) {
-  LunchVoteDialog(
-    title = stringResource(R.string.vote_exit_dialog_title),
-    dismissText = stringResource(R.string.vote_exit_dialog_dismiss_button),
-    onDismissRequest = onDismissRequest,
-    confirmText = stringResource(R.string.vote_exit_dialog_confirm_button),
-    onConfirmation = onConfirmation,
+  LunchVoteModal(
+    title = stringResource(R.string.sv_exit_dialog_title),
+    onDismissRequest = { onEvent(ExitDialogEvent.OnClickCancelButton) },
     modifier = modifier,
     icon = {
       Icon(
-        Icons.Rounded.Warning,
-        contentDescription = null,
-        modifier = Modifier.size(28.dp)
+        imageVector = Icons.Rounded.Warning,
+        contentDescription = "Warning"
+      )
+    },
+    iconColor = MaterialTheme.colorScheme.error,
+    body = stringResource(R.string.sv_exit_dialog_body),
+    buttons = {
+      DialogButton(
+        text = stringResource(R.string.sv_exit_dialog_cancel_button),
+        onClick = { onEvent(ExitDialogEvent.OnClickCancelButton) },
+        color = MaterialTheme.colorScheme.onSurface,
+        isDismiss = true
+      )
+      DialogButton(
+        text = stringResource(R.string.sv_exit_dialog_exit_button),
+        onClick = { onEvent(ExitDialogEvent.OnClickExitButton) },
+        color = MaterialTheme.colorScheme.error
       )
     }
-  ) {
-    Text(text = stringResource(R.string.vote_exit_dialog_body))
-  }
+  )
 }
 
 @Preview
