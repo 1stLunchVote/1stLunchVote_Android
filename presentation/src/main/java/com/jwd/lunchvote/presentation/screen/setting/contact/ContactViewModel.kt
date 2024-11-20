@@ -2,7 +2,6 @@ package com.jwd.lunchvote.presentation.screen.setting.contact
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.viewModelScope
 import com.jwd.lunchvote.domain.repository.ContactRepository
 import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.presentation.mapper.asUI
@@ -15,10 +14,6 @@ import com.jwd.lunchvote.presentation.screen.setting.contact.ContactContract.Del
 import com.jwd.lunchvote.presentation.screen.setting.contact.ContactContract.DeleteDialogState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import kr.co.inbody.config.error.RouteError
 import javax.inject.Inject
 

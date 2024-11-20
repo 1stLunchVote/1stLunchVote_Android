@@ -40,7 +40,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.UserUIModel
 import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.DeleteDialogEvent
-import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.*
+import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.NameDialogEvent
+import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.ProfileEvent
+import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.ProfileImageDialogEvent
+import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.ProfileSideEffect
+import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.ProfileState
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.DialogButton

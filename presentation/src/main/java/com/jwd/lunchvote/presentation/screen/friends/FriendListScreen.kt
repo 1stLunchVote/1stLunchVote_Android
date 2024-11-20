@@ -41,7 +41,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.UserUIModel
-import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.*
+import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendListEvent
+import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendListSideEffect
+import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendListState
+import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.RequestDialogEvent
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect

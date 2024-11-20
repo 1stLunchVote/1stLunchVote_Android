@@ -2,7 +2,6 @@ package com.jwd.lunchvote.presentation.screen.template.edit_template
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.viewModelScope
 import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.repository.TemplateRepository
 import com.jwd.lunchvote.presentation.R
@@ -12,13 +11,16 @@ import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
-import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.*
+import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.DeleteDialogEvent
+import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.DeleteDialogState
+import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.EditTemplateEvent
+import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.EditTemplateReduce
+import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.EditTemplateSideEffect
+import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.EditTemplateState
+import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.SaveDialogEvent
+import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.SaveDialogState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import kr.co.inbody.config.error.RouteError
 import javax.inject.Inject
 

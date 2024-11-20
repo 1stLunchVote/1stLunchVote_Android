@@ -32,7 +32,6 @@ import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.FirstV
 import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.InformationDialogEvent
 import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.InformationDialogReduce
 import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.InformationDialogState
-import com.jwd.lunchvote.presentation.screen.vote.second.SecondVoteContract.SecondVoteReduce
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
