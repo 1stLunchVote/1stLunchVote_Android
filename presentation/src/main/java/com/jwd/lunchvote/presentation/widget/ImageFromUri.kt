@@ -43,8 +43,8 @@ fun ImageFromUri(
   contentScale: ContentScale = ContentScale.Crop,
   context: Context = LocalContext.current
 ) {
-  if (uri.toString().startsWith("http")) {
-    CoilImage(
+  when {
+    uri.toString().startsWith("http") -> CoilImage(
       imageModel = { uri.toString() },
       modifier = modifier,
       imageOptions = ImageOptions(
@@ -62,22 +62,19 @@ fun ImageFromUri(
         }
       }
     )
-  } else if (uri.toString().startsWith("content")) {
-    Image(
+    uri.toString().startsWith("content") -> Image(
       bitmap = ImageBitmapFactory.createBitmapFromUri(context, uri).asImageBitmap(),
       contentDescription = "Image",
       modifier = modifier,
       contentScale = contentScale
     )
-  } else if (File(uri.toString()).exists()) {
-    Image(
+    File(uri.toString()).exists() -> Image(
       bitmap = BitmapFactory.decodeFile(uri.toString()).asImageBitmap(),
       contentDescription = "Image",
       modifier = modifier,
       contentScale = contentScale
     )
-  } else {
-    Box(
+    else -> Box(
       modifier = modifier.background(MaterialTheme.colorScheme.background),
       contentAlignment = Alignment.Center
     ) {
@@ -99,7 +96,9 @@ fun ImageWithUploadButton(
   size: Dp = 160.dp,
   onError: () -> Unit = {},
 ) {
-  val albumLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { imageUri: Uri? ->
+  val albumLauncher = rememberLauncherForActivityResult(
+    contract = ActivityResultContracts.GetContent()
+  ) { imageUri: Uri? ->
     if (imageUri != null) onImageChange(imageUri)
     else onError()
   }
@@ -126,7 +125,7 @@ fun ImageWithUploadButton(
     ) {
       Icon(
         Icons.Rounded.Edit,
-        contentDescription = null,
+        contentDescription = "Edit",
         modifier = Modifier.size(28.dp)
       )
     }
