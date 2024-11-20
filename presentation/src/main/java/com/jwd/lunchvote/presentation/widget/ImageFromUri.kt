@@ -6,12 +6,14 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonColors
@@ -25,6 +27,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.jwd.lunchvote.presentation.R
@@ -37,6 +40,7 @@ import java.io.File
 fun ImageFromUri(
   uri: Uri,
   modifier: Modifier = Modifier,
+  contentScale: ContentScale = ContentScale.Crop,
   context: Context = LocalContext.current
 ) {
   if (uri.toString().startsWith("http")) {
@@ -44,32 +48,44 @@ fun ImageFromUri(
       imageModel = { uri.toString() },
       modifier = modifier,
       imageOptions = ImageOptions(
-        contentScale = ContentScale.Crop
+        contentScale = contentScale
       ),
-      previewPlaceholder = R.drawable.ic_food_image_temp
+      loading = {
+        Box(
+          modifier = Modifier.background(MaterialTheme.colorScheme.background),
+          contentAlignment = Alignment.Center
+        ) {
+          CircularProgressIndicator(
+            color = MaterialTheme.colorScheme.outlineVariant,
+            strokeWidth = 2.dp,
+          )
+        }
+      }
     )
   } else if (uri.toString().startsWith("content")) {
     Image(
       bitmap = ImageBitmapFactory.createBitmapFromUri(context, uri).asImageBitmap(),
-      contentDescription = "Profile Image",
+      contentDescription = "Image",
       modifier = modifier,
-      contentScale = ContentScale.Crop
+      contentScale = contentScale
     )
   } else if (File(uri.toString()).exists()) {
     Image(
       bitmap = BitmapFactory.decodeFile(uri.toString()).asImageBitmap(),
-      contentDescription = null,
+      contentDescription = "Image",
       modifier = modifier,
-      contentScale = ContentScale.Crop
+      contentScale = contentScale
     )
   } else {
     Box(
-      modifier = modifier,
+      modifier = modifier.background(MaterialTheme.colorScheme.background),
       contentAlignment = Alignment.Center
     ) {
       Text(
-        text = stringResource(R.string.p_profile_image_dialog_no_image),
-        color = MaterialTheme.colorScheme.outline
+        text = stringResource(R.string.image_placeholder),
+        color = MaterialTheme.colorScheme.outline,
+        textAlign = TextAlign.Center,
+        style = MaterialTheme.typography.labelMedium
       )
     }
   }
@@ -95,7 +111,7 @@ fun ImageWithUploadButton(
     ImageFromUri(
       uri = uri,
       modifier = Modifier
-        .size(160.dp)
+        .size(size)
         .clip(CircleShape)
         .border(2.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape)
     )

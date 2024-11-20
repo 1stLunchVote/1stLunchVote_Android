@@ -270,7 +270,6 @@
     <!-- ProfileImageDialog -->
     <string name="p_profile_image_dialog_title">프로필 이미지 편집</string>
     <string name="p_profile_image_dialog_body">프로필 이미지를 업로드해주세요.</string>
-    <string name="p_profile_image_dialog_no_image">이미지 없음</string>
     <string name="p_profile_image_dialog_image_load_error">이미지를 불러오는데 실패했습니다.</string>
     <string name="p_profile_image_dialog_cancel_button">취소</string>
     <string name="p_profile_image_dialog_save_button">저장</string>
@@ -309,4 +308,5 @@
     <string name="hyphen">-</string>
     <string name="minus">-</string>
     <string name="plus">+</string>
+    <string name="image_placeholder">이미지\n없음</string>
 </resources>

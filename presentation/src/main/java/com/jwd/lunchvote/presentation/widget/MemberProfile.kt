@@ -24,12 +24,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
-import com.jwd.lunchvote.presentation.R
+import androidx.core.net.toUri
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.conditional
 import com.jwd.lunchvote.presentation.util.outerShadow
-import com.skydoves.landscapist.coil.CoilImage
 
 @Composable
 fun MemberProfile(
@@ -58,10 +57,9 @@ fun MemberProfile(
       .border(2.dp, borderColor, CircleShape)
       .clickable { onClick(member) }
   ) {
-    CoilImage(
-      imageModel = { member.userProfile },
-      modifier = Modifier.fillMaxSize(),
-      previewPlaceholder = R.drawable.ic_food_image_temp
+    ImageFromUri(
+      uri = member.userProfile.toUri(),
+      modifier = Modifier.fillMaxSize()
     )
   }
 }
@@ -132,7 +130,7 @@ private fun Preview() {
         )
       ) {}
       EmptyProfile()
-      InviteProfile() { }
+      InviteProfile { }
     }
   }
 }

@@ -20,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.FoodUIModel
@@ -29,8 +30,6 @@ import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.util.conditional
 import com.jwd.lunchvote.presentation.util.innerShadow
 import com.jwd.lunchvote.presentation.util.outerShadow
-import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.coil.CoilImage
 
 @Composable
 fun FoodItem(
@@ -86,16 +85,13 @@ private fun FoodImage(
       }
       .conditional(status == FoodItem.Status.DISLIKE) { alpha(0.5f) },
   ) {
-    CoilImage(
-      imageModel = { imageUrl },
+    ImageFromUri(
+      uri = imageUrl.toUri(),
       modifier = Modifier
         .size(size)
         .clip(MaterialTheme.shapes.medium)
         .border(2.dp, color, MaterialTheme.shapes.medium),
-      imageOptions = ImageOptions(
-        contentScale = ContentScale.Crop
-      ),
-      previewPlaceholder = R.drawable.ic_food_image_temp
+      contentScale = ContentScale.Crop
     )
     if (status == FoodItem.Status.DISLIKE) {
       Image(
@@ -123,17 +119,20 @@ private fun Preview() {
       FoodItem(foodItem = FoodItem(
         food = FoodUIModel(
           name = "햄버거"
-        ), status = FoodItem.Status.DEFAULT
+        ),
+        status = FoodItem.Status.DEFAULT
       ), onClick = {})
       FoodItem(foodItem = FoodItem(
         food = FoodUIModel(
           name = "햄버거"
-        ), status = FoodItem.Status.LIKE
+        ),
+        status = FoodItem.Status.LIKE
       ), onClick = {})
       FoodItem(foodItem = FoodItem(
         food = FoodUIModel(
           name = "햄버거"
-        ), status = FoodItem.Status.DISLIKE
+        ),
+        status = FoodItem.Status.DISLIKE
       ), onClick = {})
     }
   }
