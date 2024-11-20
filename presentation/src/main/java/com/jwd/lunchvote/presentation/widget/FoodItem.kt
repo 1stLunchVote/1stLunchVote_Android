@@ -27,7 +27,8 @@ import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.theme.colorSuccess
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.util.conditional
-import com.jwd.lunchvote.presentation.util.glow
+import com.jwd.lunchvote.presentation.util.innerShadow
+import com.jwd.lunchvote.presentation.util.outerShadow
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 
@@ -70,8 +71,18 @@ private fun FoodImage(
 
   Box(
     modifier = modifier
-      .conditional(status == FoodItem.Status.LIKE){
-        glow(MaterialTheme.colorScheme.secondary, size.div(2), 16.dp)
+      .conditional(status == FoodItem.Status.LIKE) {
+        outerShadow(
+          color = MaterialTheme.colorScheme.secondary,
+          shape = MaterialTheme.shapes.medium,
+          offsetY = 0.dp,
+          blur = 8.dp
+        ).innerShadow(
+          color = MaterialTheme.colorScheme.secondary,
+          shape = MaterialTheme.shapes.medium,
+          offsetY = 0.dp,
+          blur = 8.dp
+        )
       }
       .conditional(status == FoodItem.Status.DISLIKE) { alpha(0.5f) },
   ) {
@@ -103,7 +114,7 @@ private fun FoodImage(
 
 @Preview(showBackground = true)
 @Composable
-private fun FoodItemDefaultPreview() {
+private fun Preview() {
   LunchVoteTheme {
     Row(
       modifier = Modifier.padding(8.dp),

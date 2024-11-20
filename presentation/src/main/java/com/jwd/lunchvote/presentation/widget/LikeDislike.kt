@@ -19,7 +19,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
-import com.jwd.lunchvote.presentation.util.glow
+import com.jwd.lunchvote.presentation.util.outerShadow
 
 @Composable
 fun LikeDislike(
@@ -57,7 +57,12 @@ private fun Like(
     Box(
       modifier = Modifier
         .size(12.dp)
-        .glow(MaterialTheme.colorScheme.onSecondary, 12.dp)
+        .outerShadow(
+          color = MaterialTheme.colorScheme.onSecondary,
+          shape = CircleShape,
+          offsetY = 0.dp,
+          blur = 8.dp
+        )
         .border(2.dp, MaterialTheme.colorScheme.onSecondary, CircleShape)
         .background(MaterialTheme.colorScheme.secondary, CircleShape)
     )

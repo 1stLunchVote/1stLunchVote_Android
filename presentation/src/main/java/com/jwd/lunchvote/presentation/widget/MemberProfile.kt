@@ -28,7 +28,7 @@ import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.conditional
-import com.jwd.lunchvote.presentation.util.glow
+import com.jwd.lunchvote.presentation.util.outerShadow
 import com.skydoves.landscapist.coil.CoilImage
 
 @Composable
@@ -47,7 +47,12 @@ fun MemberProfile(
     modifier = modifier
       .size(48.dp)
       .conditional(member.type == MemberUIModel.Type.READY || member.type == MemberUIModel.Type.OWNER) {
-        glow(MaterialTheme.colorScheme.primary, 48.dp)
+        outerShadow(
+          color = MaterialTheme.colorScheme.primary,
+          shape = CircleShape,
+          offsetY = 0.dp,
+          blur = 8.dp
+        )
       }
       .clip(CircleShape)
       .border(2.dp, borderColor, CircleShape)
@@ -82,8 +87,7 @@ fun EmptyProfile(
       .size(48.dp)
       .drawBehind {
         drawCircle(
-          color = color,
-          style = stroke
+          color = color, style = stroke
         )
       }
   )
