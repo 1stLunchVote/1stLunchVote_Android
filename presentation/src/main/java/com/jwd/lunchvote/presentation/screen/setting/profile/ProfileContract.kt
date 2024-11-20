@@ -85,10 +85,4 @@ class ProfileContract {
     data object OnClickCancelButton : DeleteDialogEvent
     data object OnClickDeleteButton : DeleteDialogEvent
   }
-
-  companion object {
-    const val EDIT_PROFILE_IMAGE_DIALOG = "edit_profile_image_dialog"
-    const val EDIT_NAME_DIALOG = "edit_name_dialog"
-    const val DELETE_USER_CONFIRM_DIALOG = "delete_user_confirm_dialog"
-  }
 }

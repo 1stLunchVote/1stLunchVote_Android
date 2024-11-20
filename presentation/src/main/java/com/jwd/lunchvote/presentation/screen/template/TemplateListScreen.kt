@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,14 +34,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
+import com.jwd.lunchvote.presentation.screen.template.TemplateListContract.AddDialogEvent
 import com.jwd.lunchvote.presentation.screen.template.TemplateListContract.TemplateListEvent
 import com.jwd.lunchvote.presentation.screen.template.TemplateListContract.TemplateListSideEffect
 import com.jwd.lunchvote.presentation.screen.template.TemplateListContract.TemplateListState
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
+import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
-import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
+import com.jwd.lunchvote.presentation.widget.LunchVoteModal
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
@@ -59,7 +63,6 @@ fun TemplateListRoute(
 ){
   val state by viewModel.viewState.collectAsStateWithLifecycle()
   val loading by viewModel.isLoading.collectAsStateWithLifecycle()
-  val dialog by viewModel.dialogState.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect){
     viewModel.sideEffect.collectLatest {
@@ -67,24 +70,20 @@ fun TemplateListRoute(
         is TemplateListSideEffect.PopBackStack -> popBackStack()
         is TemplateListSideEffect.NavigateToAddTemplate -> navigateToAddTemplate(it.templateName)
         is TemplateListSideEffect.NavigateToEditTemplate -> navigateToEditTemplate(it.templateId)
-        is TemplateListSideEffect.OpenAddDialog -> viewModel.setDialogState(TemplateListContract.ADD_DIALOG)
-        is TemplateListSideEffect.CloseDialog -> viewModel.setDialogState("")
         is TemplateListSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }
 
-  when(dialog) {
-    TemplateListContract.ADD_DIALOG -> AddDialog(
-      templateName = state.templateName ?: "",
+  LaunchedEffect(Unit) { viewModel.sendEvent(TemplateListEvent.ScreenInitialize) }
+
+  state.addDialogState?.let { dialogState ->
+    AddDialog(
+      templateName = dialogState.templateName,
       modifier = modifier,
-      onTemplateNameChange = { viewModel.sendEvent(TemplateListEvent.OnTemplateNameChange(it)) },
-      onDismissRequest = { viewModel.sendEvent(TemplateListEvent.OnClickDismissButtonAddDialog) },
-      onConfirmation = { viewModel.sendEvent(TemplateListEvent.OnClickConfirmButtonAddDialog) }
+      onEvent = viewModel::sendEvent
     )
   }
-
-  LaunchedEffect(Unit) { viewModel.sendEvent(TemplateListEvent.ScreenInitialize) }
 
   if (loading) LoadingScreen()
   else TemplateListScreen(
@@ -206,40 +205,46 @@ private fun TemplateListButton(
 private fun AddDialog(
   templateName: String,
   modifier: Modifier = Modifier,
-  onTemplateNameChange: (String) -> Unit = {},
-  onDismissRequest: () -> Unit = {},
-  onConfirmation: () -> Unit = {}
+  onEvent: (AddDialogEvent) -> Unit = {}
 ) {
-  LunchVoteDialog(
-    title = stringResource(R.string.template_list_add_dialog_title),
-    dismissText = stringResource(R.string.template_list_add_dialog_dismiss_button),
-    onDismissRequest = onDismissRequest,
-    confirmText = stringResource(R.string.template_list_add_dialog_confirm_button),
-    onConfirmation = onConfirmation,
+  LunchVoteModal(
+    title = stringResource(R.string.tl_add_dialog_title),
+    onDismissRequest = { onEvent(AddDialogEvent.OnClickCancelButton) },
     modifier = modifier,
-    confirmEnabled = templateName.isNotBlank()
-  ) {
-    LunchVoteTextField(
-      text = templateName,
-      hintText = stringResource(R.string.template_list_add_dialog_hint_text),
-      onTextChange = onTemplateNameChange,
-    )
-  }
+    icon = {
+      Image(
+        imageVector = Icons.Rounded.Add,
+        contentDescription = "Add"
+      )
+    },
+    iconColor = MaterialTheme.colorScheme.secondary,
+    body = stringResource(R.string.tl_add_dialog_body),
+    closable = true,
+    content = {
+      LunchVoteTextField(
+        text = templateName,
+        hintText = stringResource(R.string.tl_add_dialog_hint_text),
+        onTextChange = { onEvent(AddDialogEvent.OnTemplateNameChange(it)) },
+      )
+    },
+    buttons = {
+      DialogButton(
+        text = stringResource(R.string.tl_add_dialog_dismiss_button),
+        onClick = { onEvent(AddDialogEvent.OnClickCancelButton) },
+        isDismiss = true
+      )
+      DialogButton(
+        text = stringResource(R.string.tl_add_dialog_confirm_button),
+        onClick = { onEvent(AddDialogEvent.OnClickAddButton) },
+        enabled = templateName.isNotBlank()
+      )
+    }
+  )
 }
 
 @Preview
 @Composable
-private fun Preview1() {
-  ScreenPreview {
-    TemplateListScreen(
-      TemplateListState()
-    )
-  }
-}
-
-@Preview
-@Composable
-private fun Preview2() {
+private fun Default() {
   ScreenPreview {
     TemplateListScreen(
       TemplateListState(
@@ -258,6 +263,16 @@ private fun Preview2() {
           )
         )
       )
+    )
+  }
+}
+
+@Preview
+@Composable
+private fun NoTemplate() {
+  ScreenPreview {
+    TemplateListScreen(
+      TemplateListState()
     )
   }
 }

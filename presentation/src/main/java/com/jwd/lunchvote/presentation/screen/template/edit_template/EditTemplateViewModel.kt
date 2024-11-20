@@ -12,10 +12,7 @@ import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
-import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.EditTemplateEvent
-import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.EditTemplateReduce
-import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.EditTemplateSideEffect
-import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.EditTemplateState
+import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.*
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -53,14 +50,25 @@ class EditTemplateViewModel @Inject constructor(
       is EditTemplateEvent.OnClickBackButton -> sendSideEffect(EditTemplateSideEffect.PopBackStack)
       is EditTemplateEvent.OnSearchKeywordChange -> updateState(EditTemplateReduce.UpdateSearchKeyword(event.searchKeyword))
       is EditTemplateEvent.OnClickFoodItem -> updateState(EditTemplateReduce.UpdateFoodStatus(event.foodItem))
-      is EditTemplateEvent.OnClickSaveButton -> sendSideEffect(EditTemplateSideEffect.OpenConfirmDialog)
-      is EditTemplateEvent.OnClickDeleteButton -> sendSideEffect(EditTemplateSideEffect.OpenDeleteDialog)
+      is EditTemplateEvent.OnClickSaveButton -> updateState(EditTemplateReduce.UpdateSaveDialogState(SaveDialogState))
+      is EditTemplateEvent.OnClickDeleteButton -> updateState(EditTemplateReduce.UpdateDeleteDialogState(DeleteDialogState))
 
-      // DialogEvent
-      is EditTemplateEvent.OnClickCancelButtonConfirmDialog -> sendSideEffect(EditTemplateSideEffect.CloseDialog)
-      is EditTemplateEvent.OnClickConfirmButtonConfirmDialog -> launch { save() }
-      is EditTemplateEvent.OnClickCancelButtonDeleteDialog -> sendSideEffect(EditTemplateSideEffect.CloseDialog)
-      is EditTemplateEvent.OnClickDeleteButtonDeleteDialog -> launch { delete() }
+      is SaveDialogEvent -> handleSaveDialogEvents(event)
+      is DeleteDialogEvent -> handleDeleteDialogEvents(event)
+    }
+  }
+
+  private fun handleSaveDialogEvents(event: SaveDialogEvent) {
+    when(event) {
+      is SaveDialogEvent.OnClickCancelButton -> updateState(EditTemplateReduce.UpdateSaveDialogState(null))
+      is SaveDialogEvent.OnClickSaveButton -> launch { save() }
+    }
+  }
+
+  private fun handleDeleteDialogEvents(event: DeleteDialogEvent) {
+    when(event) {
+      is DeleteDialogEvent.OnClickCancelButton -> updateState(EditTemplateReduce.UpdateDeleteDialogState(null))
+      is DeleteDialogEvent.OnClickDeleteButton -> launch { delete() }
     }
   }
 
@@ -72,6 +80,8 @@ class EditTemplateViewModel @Inject constructor(
       is EditTemplateReduce.UpdateFoodStatus -> state.copy(
         foodItemList = state.foodItemList.map { if (it == reduce.foodItem) it.nextStatus() else it }
       )
+      is EditTemplateReduce.UpdateSaveDialogState -> state.copy(saveDialogState = reduce.saveDialogState)
+      is EditTemplateReduce.UpdateDeleteDialogState -> state.copy(deleteDialogState = reduce.deleteDialogState)
     }
   }
 
@@ -97,7 +107,8 @@ class EditTemplateViewModel @Inject constructor(
   }
 
   private suspend fun save() {
-    sendSideEffect(EditTemplateSideEffect.CloseDialog)
+    currentState.saveDialogState ?: return
+    updateState(EditTemplateReduce.UpdateSaveDialogState(null))
 
     val likedFoodsId = currentState.foodItemList.filter { it.status == FoodItem.Status.LIKE }.map { it.food.id }
     val dislikedFoodsId = currentState.foodItemList.filter { it.status == FoodItem.Status.DISLIKE }.map { it.food.id }
@@ -115,7 +126,8 @@ class EditTemplateViewModel @Inject constructor(
   }
 
   private suspend fun delete() {
-    sendSideEffect(EditTemplateSideEffect.CloseDialog)
+    currentState.deleteDialogState ?: return
+    updateState(EditTemplateReduce.UpdateSaveDialogState(null))
 
     templateRepository.deleteTemplateById(currentState.template.id)
 

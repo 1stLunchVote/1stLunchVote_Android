@@ -5,21 +5,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -28,15 +26,18 @@ import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
+import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.DeleteDialogEvent
 import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.EditTemplateEvent
 import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.EditTemplateSideEffect
 import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.EditTemplateState
+import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.SaveDialogEvent
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
+import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.FAB
 import com.jwd.lunchvote.presentation.widget.FoodGrid
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
-import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
+import com.jwd.lunchvote.presentation.widget.LunchVoteModal
 import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
@@ -54,32 +55,24 @@ fun EditTemplateRoute(
 ){
   val state by viewModel.viewState.collectAsStateWithLifecycle()
   val loading by viewModel.isLoading.collectAsStateWithLifecycle()
-  val dialog by viewModel.dialogState.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
       when(it){
         is EditTemplateSideEffect.PopBackStack -> popBackStack()
-        is EditTemplateSideEffect.OpenDeleteDialog -> viewModel.setDialogState(EditTemplateContract.DELETE_DIALOG)
-        is EditTemplateSideEffect.OpenConfirmDialog -> viewModel.setDialogState(EditTemplateContract.CONFIRM_DIALOG)
-        is EditTemplateSideEffect.CloseDialog -> viewModel.setDialogState("")
         is EditTemplateSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }
 
-  when(dialog) {
-    EditTemplateContract.CONFIRM_DIALOG -> ConfirmDialog(
-      onDismissRequest = { viewModel.sendEvent(EditTemplateEvent.OnClickCancelButtonConfirmDialog) },
-      onConfirmation = { viewModel.sendEvent(EditTemplateEvent.OnClickConfirmButtonConfirmDialog) }
-    )
-    EditTemplateContract.DELETE_DIALOG -> DeleteDialog(
-      onDismissRequest = { viewModel.sendEvent(EditTemplateEvent.OnClickCancelButtonDeleteDialog) },
-      onConfirmation = { viewModel.sendEvent(EditTemplateEvent.OnClickDeleteButtonDeleteDialog) }
-    )
-  }
-
   LaunchedEffect(Unit) { viewModel.sendEvent(EditTemplateEvent.ScreenInitialize) }
+
+  state.saveDialogState?.let {
+    SaveDialog(onEvent = viewModel::sendEvent)
+  }
+  state.deleteDialogState?.let {
+    DeleteDialog(onEvent = viewModel::sendEvent)
+  }
 
   if (loading) LoadingScreen()
   else EditTemplateScreen(
@@ -151,30 +144,26 @@ private fun EditTemplateScreen(
 }
 
 @Composable
-private fun ConfirmDialog(
+private fun SaveDialog(
   modifier: Modifier = Modifier,
-  onDismissRequest: () -> Unit = {},
-  onConfirmation: () -> Unit = {}
+  onEvent: (SaveDialogEvent) -> Unit = {}
 ) {
-  LunchVoteDialog(
-    title = stringResource(R.string.edit_template_confirm_title),
-    dismissText = stringResource(R.string.edit_template_confirm_cancel_button),
-    onDismissRequest = onDismissRequest,
-    confirmText = stringResource(R.string.edit_template_confirm_confirm_button),
-    onConfirmation = onConfirmation,
+  LunchVoteModal(
+    title = stringResource(R.string.et_save_dialog_title),
+    onDismissRequest = { onEvent(SaveDialogEvent.OnClickCancelButton) },
     modifier = modifier,
-    icon = {
-      Icon(
-        Icons.Outlined.Edit,
-        contentDescription = null,
-        modifier = Modifier.size(28.dp)
+    iconColor = MaterialTheme.colorScheme.secondary,
+    body = stringResource(R.string.et_save_dialog_body),
+    closable = false,
+    buttons = {
+      DialogButton(
+        text = stringResource(R.string.et_save_dialog_cancel_button),
+        onClick = { onEvent(SaveDialogEvent.OnClickCancelButton) },
+        isDismiss = true
       )
-    },
-    content = {
-      Text(
-        stringResource(R.string.edit_template_confirm_content),
-        modifier = Modifier.fillMaxWidth(),
-        textAlign = TextAlign.Center
+      DialogButton(
+        text = stringResource(R.string.et_save_dialog_save_button),
+        onClick = { onEvent(SaveDialogEvent.OnClickSaveButton) }
       )
     }
   )
@@ -183,28 +172,32 @@ private fun ConfirmDialog(
 @Composable
 private fun DeleteDialog(
   modifier: Modifier = Modifier,
-  onDismissRequest: () -> Unit = {},
-  onConfirmation: () -> Unit = {}
+  onEvent: (DeleteDialogEvent) -> Unit = {}
 ) {
-  LunchVoteDialog(
-    title = stringResource(R.string.edit_template_delete_title),
-    dismissText = stringResource(R.string.edit_template_delete_cancel_button),
-    onDismissRequest = onDismissRequest,
-    confirmText = stringResource(R.string.edit_template_delete_confirm_button),
-    onConfirmation = onConfirmation,
+  LunchVoteModal(
+    title = stringResource(R.string.et_delete_dialog_title),
+    onDismissRequest = { onEvent(DeleteDialogEvent.OnClickCancelButton) },
     modifier = modifier,
     icon = {
       Icon(
-        Icons.Outlined.Delete,
-        contentDescription = null,
-        modifier = Modifier.size(28.dp)
+        Icons.Rounded.Delete,
+        contentDescription = "Delete"
       )
     },
-    content = {
-      Text(
-        stringResource(R.string.edit_template_delete_content),
-        modifier = Modifier.fillMaxWidth(),
-        textAlign = TextAlign.Center
+    iconColor = MaterialTheme.colorScheme.error,
+    body = stringResource(R.string.et_delete_dialog_body),
+    closable = false,
+    buttons = {
+      DialogButton(
+        text = stringResource(R.string.c_delete_dialog_cancel_button),
+        onClick = { onEvent(DeleteDialogEvent.OnClickCancelButton) },
+        isDismiss = true,
+        color = MaterialTheme.colorScheme.onSurface
+      )
+      DialogButton(
+        text = stringResource(R.string.c_delete_dialog_delete_button),
+        onClick = { onEvent(DeleteDialogEvent.OnClickDeleteButton) },
+        color = MaterialTheme.colorScheme.error
       )
     }
   )
@@ -212,7 +205,7 @@ private fun DeleteDialog(
 
 @Preview
 @Composable
-private fun Preview() {
+private fun Default() {
   ScreenPreview {
     EditTemplateScreen(
       state = EditTemplateState(
@@ -231,9 +224,9 @@ private fun Preview() {
 
 @Preview
 @Composable
-private fun ConfirmDialogPreview() {
+private fun SaveDialogPreview() {
   LunchVoteTheme {
-    ConfirmDialog()
+    SaveDialog()
   }
 }
 
