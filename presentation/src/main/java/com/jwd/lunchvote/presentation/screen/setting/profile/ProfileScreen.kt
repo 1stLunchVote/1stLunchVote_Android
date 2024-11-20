@@ -50,14 +50,13 @@ import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.Dialog
 import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.Gap
+import com.jwd.lunchvote.presentation.widget.ImageFromUri
 import com.jwd.lunchvote.presentation.widget.ImageWithUploadButton
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.TextField
 import com.jwd.lunchvote.presentation.widget.TopBar
-import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.coil.CoilImage
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -186,16 +185,12 @@ private fun ProfileTicket(
       horizontalAlignment = Alignment.CenterHorizontally
     ) {
       Gap(height = 24.dp)
-      CoilImage(
-        imageModel = { profileImage },
+      ImageFromUri(
+        uri = profileImage.toUri(),
         modifier = Modifier
           .size(100.dp)
           .clip(CircleShape)
-          .border(2.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape),
-        imageOptions = ImageOptions(
-          contentScale = ContentScale.Crop
-        ),
-        previewPlaceholder = R.drawable.ic_food_image_temp
+          .border(2.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape)
       )
       Gap(height = 16.dp)
       Row(

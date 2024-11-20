@@ -43,6 +43,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.BuildConfig
@@ -59,12 +60,12 @@ import com.jwd.lunchvote.presentation.util.conditional
 import com.jwd.lunchvote.presentation.widget.Dialog
 import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.Gap
+import com.jwd.lunchvote.presentation.widget.ImageFromUri
 import com.jwd.lunchvote.presentation.widget.ImageWithUploadButton
 import com.jwd.lunchvote.presentation.widget.LunchVoteIcon
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.TextField
-import com.skydoves.landscapist.coil.CoilImage
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -199,13 +200,12 @@ private fun FoodTrendChart(
           )
         }
       } else {
-        CoilImage(
-          imageModel = { foodTrend.imageUrl },
+        ImageFromUri(
+          uri = foodTrend.imageUrl.toUri(),
           modifier = Modifier
             .size(160.dp)
             .clip(CircleShape)
-            .border(4.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape),
-          previewPlaceholder = R.drawable.ic_food_image_temp
+            .border(4.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape)
         )
       }
     }

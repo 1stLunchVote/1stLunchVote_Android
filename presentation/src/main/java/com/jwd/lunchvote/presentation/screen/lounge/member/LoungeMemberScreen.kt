@@ -21,12 +21,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
@@ -41,12 +41,11 @@ import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.Dialog
 import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.Gap
+import com.jwd.lunchvote.presentation.widget.ImageFromUri
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.TopBar
-import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.coil.CoilImage
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -104,16 +103,12 @@ private fun LoungeMemberScreen(
       horizontalArrangement = Arrangement.spacedBy(32.dp),
       verticalAlignment = Alignment.CenterVertically
     ) {
-      CoilImage(
-        imageModel = { state.user.profileImage },
+      ImageFromUri(
+        uri = state.user.profileImage.toUri(),
         modifier = Modifier
           .size(96.dp)
           .clip(CircleShape)
-          .border(2.dp, MaterialTheme.colorScheme.outline, CircleShape),
-        imageOptions = ImageOptions(
-          contentScale = ContentScale.Crop
-        ),
-        previewPlaceholder = R.drawable.ic_food_image_temp
+          .border(2.dp, MaterialTheme.colorScheme.outline, CircleShape)
       )
       Column(
         modifier = Modifier.weight(1f),

@@ -28,12 +28,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
@@ -50,13 +50,12 @@ import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.widget.Dialog
 import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.HorizontalProgressBar
+import com.jwd.lunchvote.presentation.widget.ImageFromUri
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.MemberProgress
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.TopBar
-import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.coil.CoilImage
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -225,13 +224,9 @@ private fun SecondVoteTile(
       .clickableWithoutEffect(onClick),
     verticalAlignment = Alignment.CenterVertically
   ) {
-    CoilImage(
-      imageModel = { food.imageUrl },
-      modifier = Modifier.size(80.dp),
-      imageOptions = ImageOptions(
-        contentScale = ContentScale.Crop
-      ),
-      previewPlaceholder = R.drawable.ic_food_image_temp
+    ImageFromUri(
+      uri = food.imageUrl.toUri(),
+      modifier = Modifier.size(80.dp)
     )
     VerticalDivider(
       color = MaterialTheme.colorScheme.outline
