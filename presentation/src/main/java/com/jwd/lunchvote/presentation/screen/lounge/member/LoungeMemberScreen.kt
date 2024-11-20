@@ -71,7 +71,7 @@ fun LoungeMemberRoute(
   }
 
   state.exileDialogState?.let {
-    ExileConfirmDialog(onEvent = viewModel::sendEvent)
+    ExileDialog(onEvent = viewModel::sendEvent)
   }
 
   LaunchedEffect(Unit) { viewModel.sendEvent(LoungeMemberEvent.ScreenInitialize) }
@@ -146,7 +146,7 @@ private fun LoungeMemberScreen(
 }
 
 @Composable
-private fun ExileConfirmDialog(
+private fun ExileDialog(
   modifier: Modifier = Modifier,
   onEvent: (ExileDialogEvent) -> Unit = {}
 ) {
@@ -203,6 +203,6 @@ private fun Preview() {
 @Composable
 private fun ExileDialogPreview() {
   LunchVoteTheme {
-    ExileConfirmDialog()
+    ExileDialog()
   }
 }
