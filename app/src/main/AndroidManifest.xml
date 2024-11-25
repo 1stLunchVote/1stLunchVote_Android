@@ -33,8 +33,9 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:host="lunchvote.page.link"
-                    android:scheme="https" />
+                <data android:host="@string/firebase_dynamic_link_host"
+                    android:scheme="https"
+                    android:pathPrefix="@string/firebase_dynamic_link_path_prefix_email_verification"/>
             </intent-filter>
         </activity>
 

@@ -57,7 +57,7 @@ fun ImageFromUri(
         ) {
           CircularProgressIndicator(
             color = MaterialTheme.colorScheme.outlineVariant,
-            strokeWidth = 2.dp,
+            strokeWidth = 2.dp
           )
         }
       }
