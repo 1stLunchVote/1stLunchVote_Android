@@ -5,7 +5,9 @@ import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.provider.MediaStore
+import java.io.File
 
 @Suppress("DEPRECATION")
 object ImageBitmapFactory {
@@ -16,4 +18,16 @@ object ImageBitmapFactory {
       val source = ImageDecoder.createSource(context.contentResolver, uri)
       ImageDecoder.decodeBitmap(source)
     }
+
+  fun createByteArrayFromUri(context: Context, uri: Uri, fileName: String): ByteArray {
+    val imageBitmap = ImageBitmapFactory.createBitmapFromUri(context, uri)
+    val directory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "images")
+      .apply { if (!exists()) mkdirs() }
+    val file = File(directory, "$fileName.jpg").apply {
+      outputStream().use { outputStream ->
+        imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+      }
+    }
+    return file.readBytes()
+  }
 }

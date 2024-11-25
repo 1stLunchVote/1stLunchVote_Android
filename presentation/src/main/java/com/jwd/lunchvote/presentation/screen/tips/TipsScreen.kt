@@ -31,9 +31,9 @@ import com.jwd.lunchvote.presentation.screen.tips.TipsContract.TipsEvent
 import com.jwd.lunchvote.presentation.screen.tips.TipsContract.TipsSideEffect
 import com.jwd.lunchvote.presentation.screen.tips.TipsContract.TipsState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
-import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import com.jwd.lunchvote.presentation.widget.TopBar
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -72,7 +72,7 @@ private fun TipsScreen(
   Screen(
     modifier = modifier,
     topAppBar = {
-      LunchVoteTopBar(
+      TopBar(
         title = "게임 방법",
         popBackStack = { onEvent(TipsEvent.OnClickBackButton) }
       )

@@ -2,10 +2,8 @@ package com.jwd.lunchvote.presentation.screen.vote.second
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.entity.Lounge
 import com.jwd.lunchvote.domain.entity.Member
 import com.jwd.lunchvote.domain.repository.BallotRepository
@@ -19,12 +17,14 @@ import com.jwd.lunchvote.domain.usecase.CalculateSecondVote
 import com.jwd.lunchvote.domain.usecase.ExitLounge
 import com.jwd.lunchvote.domain.usecase.FinishVote
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.SecondBallotUIModel
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
-import com.jwd.lunchvote.presentation.screen.vote.second.SecondVoteContract.SecondVoteDialog
+import com.jwd.lunchvote.presentation.screen.vote.second.SecondVoteContract.ExitDialogEvent
+import com.jwd.lunchvote.presentation.screen.vote.second.SecondVoteContract.ExitDialogState
 import com.jwd.lunchvote.presentation.screen.vote.second.SecondVoteContract.SecondVoteEvent
 import com.jwd.lunchvote.presentation.screen.vote.second.SecondVoteContract.SecondVoteReduce
 import com.jwd.lunchvote.presentation.screen.vote.second.SecondVoteContract.SecondVoteSideEffect
@@ -32,11 +32,7 @@ import com.jwd.lunchvote.presentation.screen.vote.second.SecondVoteContract.Seco
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import kr.co.inbody.config.error.LoungeError
 import kr.co.inbody.config.error.MemberError
 import kr.co.inbody.config.error.RouteError
@@ -64,14 +60,6 @@ class SecondVoteViewModel @Inject constructor(
   private val loungeId: String =
     savedStateHandle[LunchVoteNavRoute.SecondVote.arguments.first().name] ?: throw RouteError.NoArguments
 
-  private val _dialogState = MutableStateFlow<SecondVoteDialog?>(null)
-  val dialogState: StateFlow<SecondVoteDialog?> = _dialogState.asStateFlow()
-  private fun setDialogState(dialogState: SecondVoteDialog?) {
-    viewModelScope.launch {
-      _dialogState.emit(dialogState)
-    }
-  }
-
   private val userId: String
     get() = Firebase.auth.currentUser?.uid ?: throw UserError.NoSession
 
@@ -85,7 +73,7 @@ class SecondVoteViewModel @Inject constructor(
     when (event) {
       is SecondVoteEvent.ScreenInitialize -> launch { initialize() }
 
-      is SecondVoteEvent.OnClickBackButton -> setDialogState(SecondVoteDialog.ExitDialog)
+      is SecondVoteEvent.OnClickBackButton -> updateState(SecondVoteReduce.UpdateExitDialogState(ExitDialogState))
       is SecondVoteEvent.OnClickFood -> {
         if (currentState.selectedFood == event.food) {
           updateState(SecondVoteReduce.UpdateSelectedFood(null))
@@ -97,12 +85,16 @@ class SecondVoteViewModel @Inject constructor(
       is SecondVoteEvent.OnClickReVoteButton -> launch(false) { reVote() }
       is SecondVoteEvent.OnVoteFinish -> launch { submitVote() }
 
-      // DialogEvents
-      is SecondVoteEvent.OnClickCancelButtonInExitDialog -> setDialogState(null)
-      is SecondVoteEvent.OnClickConfirmButtonInExitDialog -> launch { exitVote() }
+      is ExitDialogEvent -> handleExitDialogEvents(event)
     }
   }
 
+  private fun handleExitDialogEvents(event: ExitDialogEvent) {
+    when (event) {
+      is ExitDialogEvent.OnClickCancelButton -> updateState(SecondVoteReduce.UpdateExitDialogState(null))
+      is ExitDialogEvent.OnClickExitButton -> launch { exitVote() }
+    }
+  }
 
   override fun reduceState(state: SecondVoteState, reduce: SecondVoteReduce): SecondVoteState {
     return when (reduce) {
@@ -113,6 +105,7 @@ class SecondVoteViewModel @Inject constructor(
       is SecondVoteReduce.UpdateSelectedFood -> state.copy(selectedFood = reduce.food)
       is SecondVoteReduce.UpdateFinished -> state.copy(finished = reduce.finished)
       is SecondVoteReduce.UpdateCalculating -> state.copy(calculating = reduce.calculating)
+      is SecondVoteReduce.UpdateExitDialogState -> state.copy(exitDialogState = reduce.exitDialogState)
     }
   }
 
@@ -198,6 +191,9 @@ class SecondVoteViewModel @Inject constructor(
   }
 
   private suspend fun exitVote() {
+    currentState.exitDialogState ?: return
+    updateState(SecondVoteReduce.UpdateExitDialogState(null))
+
     loungeStatusFlow.cancel()
     memberListFlow.cancel()
 

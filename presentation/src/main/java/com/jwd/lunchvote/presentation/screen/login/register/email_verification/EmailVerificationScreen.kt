@@ -3,7 +3,6 @@ package com.jwd.lunchvote.presentation.screen.login.register.email_verification
 import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -14,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,6 +24,7 @@ import com.jwd.lunchvote.presentation.screen.login.register.email_verification.E
 import com.jwd.lunchvote.presentation.screen.login.register.email_verification.EmailVerificationContract.EmailVerificationSideEffect
 import com.jwd.lunchvote.presentation.screen.login.register.email_verification.EmailVerificationContract.EmailVerificationState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
+import com.jwd.lunchvote.presentation.widget.CheckIcon
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.Screen
@@ -65,9 +64,7 @@ private fun EmailVerificationScreen(
   onEvent: (EmailVerificationEvent) -> Unit = {}
 ) {
   Screen(
-    modifier = modifier
-      .fillMaxSize()
-      .padding(horizontal = 24.dp)
+    modifier = modifier.padding(horizontal = 24.dp)
   ) {
     Gap()
     Text(
@@ -98,14 +95,13 @@ private fun EmailVerificationScreen(
           hintText = stringResource(R.string.email_verification_email_hint),
           modifier = Modifier.fillMaxWidth(),
           enabled = state.emailSent.not(),
-          isError = state.email.isNotEmpty() && isValid.not()
-        )
-        Text(
-          text = stringResource(R.string.email_verification_email_format_error),
-          modifier = Modifier.padding(horizontal = 8.dp)
-            .alpha(if (state.email.isNotEmpty() && isValid.not()) 1f else 0f),
-          color = MaterialTheme.colorScheme.error,
-          style = MaterialTheme.typography.labelMedium
+          isError = if (state.email.isEmpty()) null else state.email.isNotEmpty() && isValid.not(),
+          errorMessage = stringResource(R.string.email_verification_email_format_error),
+          trailingIcon = {
+            if (state.emailSent) {
+              CheckIcon()
+            }
+          }
         )
       }
       if (state.emailSent.not()) {
@@ -132,7 +128,17 @@ private fun EmailVerificationScreen(
 
 @Preview
 @Composable
-private fun Preview1() {
+private fun Default() {
+  ScreenPreview {
+    EmailVerificationScreen(
+      EmailVerificationState()
+    )
+  }
+}
+
+@Preview
+@Composable
+private fun ValidEmail() {
   ScreenPreview {
     EmailVerificationScreen(
       EmailVerificationState(
@@ -144,7 +150,19 @@ private fun Preview1() {
 
 @Preview
 @Composable
-private fun Preview2() {
+private fun InvalidEmail() {
+  ScreenPreview {
+    EmailVerificationScreen(
+      EmailVerificationState(
+        email = "email"
+      )
+    )
+  }
+}
+
+@Preview
+@Composable
+private fun EmailSent() {
   ScreenPreview {
     EmailVerificationScreen(
       EmailVerificationState(

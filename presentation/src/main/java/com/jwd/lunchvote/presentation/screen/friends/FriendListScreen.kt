@@ -2,7 +2,6 @@ package com.jwd.lunchvote.presentation.screen.friends
 
 import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,8 +11,9 @@ import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Notifications
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -44,16 +44,18 @@ import com.jwd.lunchvote.presentation.model.UserUIModel
 import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendListEvent
 import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendListSideEffect
 import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendListState
+import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.RequestDialogEvent
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
+import com.jwd.lunchvote.presentation.widget.Dialog
+import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.LazyColumn
-import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
-import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
-import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.MemberProfile
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import com.jwd.lunchvote.presentation.widget.TextField
+import com.jwd.lunchvote.presentation.widget.TopBar
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -69,7 +71,6 @@ fun FriendListRoute(
 ){
   val state by viewModel.viewState.collectAsStateWithLifecycle()
   val loading by viewModel.isLoading.collectAsStateWithLifecycle()
-  val dialog by viewModel.dialogState.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect){
     viewModel.sideEffect.collectLatest {
@@ -77,8 +78,6 @@ fun FriendListRoute(
         is FriendListSideEffect.PopBackStack -> popBackStack()
         is FriendListSideEffect.NavigateToFriendRequest -> navigateToFriendRequest()
         is FriendListSideEffect.NavigateToLounge -> navigateToLounge(it.loungeId)
-        is FriendListSideEffect.OpenRequestDialog -> viewModel.setDialogState(FriendListContract.REQUEST_DIALOG)
-        is FriendListSideEffect.CloseDialog -> viewModel.setDialogState("")
         is FriendListSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
@@ -86,15 +85,11 @@ fun FriendListRoute(
 
   LaunchedEffect(Unit) { viewModel.sendEvent(FriendListEvent.ScreenInitialize) }
 
-  when (dialog) {
-    FriendListContract.REQUEST_DIALOG -> {
-      RequestDialog(
-        friendName = state.friendName ?: "",
-        onDismissRequest = { viewModel.sendEvent(FriendListEvent.OnClickCancelButtonRequestDialog) },
-        onFriendNameChange = { viewModel.sendEvent(FriendListEvent.OnFriendNameChange(it)) },
-        onConfirmation = { viewModel.sendEvent(FriendListEvent.OnClickConfirmButtonRequestDialog) }
-      )
-    }
+  state.requestDialogState?.let { dialogState ->
+    RequestDialog(
+      friendName = dialogState.friendName,
+      onEvent = viewModel::sendEvent
+    )
   }
 
   FriendListScreen(
@@ -116,7 +111,7 @@ private fun FriendListScreen(
   Screen(
     modifier = modifier,
     topAppBar = {
-      LunchVoteTopBar(
+      TopBar(
         title = stringResource(R.string.friend_list_title),
         popBackStack = { onEvent(FriendListEvent.OnClickBackButton) },
         actions = {
@@ -131,73 +126,68 @@ private fun FriendListScreen(
         }
       )
     },
-    scrollable = false
-  ) {
-    Box(
-      modifier = Modifier.fillMaxSize()
-    ) {
-      LazyColumn(
-        onRefresh = { onEvent(FriendListEvent.ScreenInitialize) },
-        modifier = Modifier.fillMaxSize(),
-        isRefreshing = loading,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-      ) {
-        friendItemGroup(
-          titleId = R.string.friend_list_lounge_group_title,
-          friendList = state.joinedFriendList
-        ) { friend ->
-          FriendItem(
-            friend = friend,
-            modifier = Modifier.fillMaxWidth(),
-            online = true,
-            onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id)) },
-            onClickJoinButton = { onEvent(FriendListEvent.OnClickJoinButton(friend.id)) }
-          )
-        }
-        friendItemGroup(
-          titleId = R.string.friend_list_online_group_title,
-          friendList = state.onlineFriendList
-        ) { friend ->
-          FriendItem(
-            friend = friend,
-            modifier = Modifier.fillMaxWidth(),
-            online = true,
-            onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id)) }
-          )
-        }
-        friendItemGroup(
-          titleId = R.string.friend_list_offline_group_title,
-          friendList = state.offlineFriendList
-        ) { friend ->
-          FriendItem(
-            friend = friend,
-            modifier = Modifier.fillMaxWidth(),
-            online = false,
-            onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id)) },
-          )
-        }
-        item {
-          Text(
-            text = stringResource(R.string.friend_list_tooltip),
-            modifier = Modifier.padding(top = 16.dp),
-            color = MaterialTheme.colorScheme.outlineVariant,
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.labelMedium
-          )
-        }
-      }
+    actions = {
       FloatingActionButton(
         onClick = { onEvent(FriendListEvent.OnClickRequestButton) },
-        modifier = Modifier
-          .align(Alignment.BottomEnd)
-          .padding(end = 32.dp, bottom = 48.dp),
         containerColor = MaterialTheme.colorScheme.primary,
         contentColor = MaterialTheme.colorScheme.onPrimary,
       ) {
         Icon(
-          imageVector = Icons.Outlined.Add,
+          imageVector = Icons.Rounded.Add,
           contentDescription = "add friend"
+        )
+      }
+    },
+    scrollable = false
+  ) {
+    LazyColumn(
+      onRefresh = { onEvent(FriendListEvent.ScreenInitialize) },
+      modifier = Modifier.fillMaxSize(),
+      isRefreshing = loading,
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+      friendItemGroup(
+        titleId = R.string.friend_list_lounge_group_title,
+        friendList = state.joinedFriendList
+      ) { friend ->
+        FriendItem(
+          friend = friend,
+          modifier = Modifier.fillMaxWidth(),
+          online = true,
+          onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id)) },
+          onClickJoinButton = { onEvent(FriendListEvent.OnClickJoinButton(friend.id)) }
+        )
+      }
+      friendItemGroup(
+        titleId = R.string.friend_list_online_group_title,
+        friendList = state.onlineFriendList
+      ) { friend ->
+        FriendItem(
+          friend = friend,
+          modifier = Modifier.fillMaxWidth(),
+          online = true,
+          onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id)) }
+        )
+      }
+      friendItemGroup(
+        titleId = R.string.friend_list_offline_group_title,
+        friendList = state.offlineFriendList
+      ) { friend ->
+        FriendItem(
+          friend = friend,
+          modifier = Modifier.fillMaxWidth(),
+          online = false,
+          onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id)) },
+        )
+      }
+      item {
+        Text(
+          text = stringResource(R.string.friend_list_tooltip),
+          modifier = Modifier.padding(top = 16.dp),
+          color = MaterialTheme.colorScheme.outlineVariant,
+          textAlign = TextAlign.Center,
+          style = MaterialTheme.typography.labelMedium
         )
       }
     }
@@ -298,25 +288,41 @@ private fun FriendItem(
 private fun RequestDialog(
   friendName: String,
   modifier: Modifier = Modifier,
-  onDismissRequest: () -> Unit = {},
-  onFriendNameChange: (String) -> Unit = {},
-  onConfirmation: () -> Unit = {},
+  onEvent: (RequestDialogEvent) -> Unit = {}
 ) {
-  LunchVoteDialog(
-    title = stringResource(R.string.friend_list_request_dialog_title),
-    dismissText = stringResource(R.string.friend_list_request_dialog_dismiss_text),
-    onDismissRequest = onDismissRequest,
-    confirmText = stringResource(R.string.friend_list_request_dialog_confirm_text),
-    onConfirmation = onConfirmation,
+  Dialog(
+    title = stringResource(R.string.fl_request_dialog_title),
+    onDismissRequest = { onEvent(RequestDialogEvent.OnClickCancelButton) },
     modifier = modifier,
-    confirmEnabled = friendName.isNotBlank()
-  ) {
-    LunchVoteTextField(
-      text = friendName,
-      onTextChange = onFriendNameChange,
-      hintText = stringResource(R.string.friend_list_request_dialog_hint_text)
-    )
-  }
+    icon = {
+      Icon(
+        imageVector = Icons.Rounded.Person,
+        contentDescription = "friend request"
+      )
+    },
+    body = stringResource(R.string.fl_request_dialog_body),
+    content = {
+      TextField(
+        text = friendName,
+        onTextChange = { onEvent(RequestDialogEvent.OnFriendNameChange(it)) },
+        hintText = stringResource(R.string.fl_request_dialog_hint_text)
+      )
+    },
+    buttons = {
+      DialogButton(
+        text = stringResource(R.string.fl_request_dialog_cancel_text),
+        onClick = { onEvent(RequestDialogEvent.OnClickCancelButton) },
+        modifier = Modifier.weight(1f),
+        isDismiss = true
+      )
+      DialogButton(
+        text = stringResource(R.string.fl_request_dialog_request_text),
+        onClick = { onEvent(RequestDialogEvent.OnClickRequestButton) },
+        modifier = Modifier.weight(1f),
+        enabled = friendName.isNotBlank()
+      )
+    }
+  )
 }
 
 @Preview

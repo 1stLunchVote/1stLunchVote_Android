@@ -24,11 +24,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
-import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
-import com.jwd.lunchvote.presentation.R
+import androidx.core.net.toUri
 import com.jwd.lunchvote.presentation.model.MemberUIModel
-import com.jwd.lunchvote.presentation.util.glow
-import com.skydoves.landscapist.coil.CoilImage
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
+import com.jwd.lunchvote.presentation.util.conditional
+import com.jwd.lunchvote.presentation.util.outerShadow
 
 @Composable
 fun MemberProfile(
@@ -45,19 +45,21 @@ fun MemberProfile(
   Box(
     modifier = modifier
       .size(48.dp)
-      .let {
-        if (member.type == MemberUIModel.Type.READY || member.type == MemberUIModel.Type.OWNER) {
-          it.glow(MaterialTheme.colorScheme.primary, 24.dp)
-        } else it
+      .conditional(member.type == MemberUIModel.Type.READY || member.type == MemberUIModel.Type.OWNER) {
+        outerShadow(
+          color = MaterialTheme.colorScheme.primary,
+          shape = CircleShape,
+          offsetY = 0.dp,
+          blur = 8.dp
+        )
       }
       .clip(CircleShape)
       .border(2.dp, borderColor, CircleShape)
       .clickable { onClick(member) }
   ) {
-    CoilImage(
-      imageModel = { member.userProfile },
-      modifier = Modifier.fillMaxSize(),
-      previewPlaceholder = R.drawable.ic_food_image_temp
+    ImageFromUri(
+      uri = member.userProfile.toUri(),
+      modifier = Modifier.fillMaxSize()
     )
   }
 }
@@ -83,8 +85,7 @@ fun EmptyProfile(
       .size(48.dp)
       .drawBehind {
         drawCircle(
-          color = color,
-          style = stroke
+          color = color, style = stroke
         )
       }
   )
@@ -117,7 +118,8 @@ fun InviteProfile(
 private fun Preview() {
   LunchVoteTheme {
     Row(
-      modifier = Modifier.padding(24.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)
+      modifier = Modifier.padding(24.dp),
+      horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
       MemberProfile(
         member = MemberUIModel()
@@ -128,7 +130,7 @@ private fun Preview() {
         )
       ) {}
       EmptyProfile()
-      InviteProfile() { }
+      InviteProfile { }
     }
   }
 }

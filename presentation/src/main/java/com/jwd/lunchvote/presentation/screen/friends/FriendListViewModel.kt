@@ -2,27 +2,24 @@ package com.jwd.lunchvote.presentation.screen.friends
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.FriendRepository
-import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.domain.repository.UserStatusRepository
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.UserUIModel
 import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendListEvent
 import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendListReduce
 import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendListSideEffect
 import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendListState
+import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.RequestDialogEvent
+import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.RequestDialogReduce
+import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.RequestDialogState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import kr.co.inbody.config.error.UserError
 import java.time.ZonedDateTime
 import javax.inject.Inject
@@ -32,19 +29,10 @@ class FriendListViewModel @Inject constructor(
   private val userRepository: UserRepository,
   private val friendRepository: FriendRepository,
   private val userStatusRepository: UserStatusRepository,
-  private val loungeRepository: LoungeRepository,
   savedStateHandle: SavedStateHandle
 ): BaseStateViewModel<FriendListState, FriendListEvent, FriendListReduce, FriendListSideEffect>(savedStateHandle){
   override fun createInitialState(savedState: Parcelable?): FriendListState {
     return savedState as? FriendListState ?: FriendListState()
-  }
-
-  private val _dialogState = MutableStateFlow("")
-  val dialogState: StateFlow<String> = _dialogState.asStateFlow()
-  fun setDialogState(dialogState: String) {
-    viewModelScope.launch {
-      _dialogState.emit(dialogState)
-    }
   }
 
   private val userId: String
@@ -58,12 +46,17 @@ class FriendListViewModel @Inject constructor(
       is FriendListEvent.OnClickFriendRequestButton -> sendSideEffect(FriendListSideEffect.NavigateToFriendRequest)
       is FriendListEvent.OnClickJoinButton -> launch { joinLounge(event.friendId) }
       is FriendListEvent.OnClickDeleteFriendButton -> launch { deleteFriend(event.friendId) }
-      is FriendListEvent.OnClickRequestButton -> sendSideEffect(FriendListSideEffect.OpenRequestDialog)
+      is FriendListEvent.OnClickRequestButton -> updateState(FriendListReduce.UpdateRequestDialogState(RequestDialogState()))
 
-      // DialogEvents
-      is FriendListEvent.OnFriendNameChange -> updateState(FriendListReduce.UpdateFriendName(event.friendName))
-      is FriendListEvent.OnClickCancelButtonRequestDialog -> sendSideEffect(FriendListSideEffect.CloseDialog)
-      is FriendListEvent.OnClickConfirmButtonRequestDialog -> launch { sendRequest() }
+      is RequestDialogEvent -> handleRequestDialogEvents(event)
+    }
+  }
+
+  private fun handleRequestDialogEvents(event: RequestDialogEvent) {
+    when(event) {
+      is RequestDialogEvent.OnFriendNameChange -> updateState(RequestDialogReduce.UpdateFriendName(event.friendName))
+      is RequestDialogEvent.OnClickCancelButton -> updateState(FriendListReduce.UpdateRequestDialogState(null))
+      is RequestDialogEvent.OnClickRequestButton -> launch { sendRequest() }
     }
   }
 
@@ -72,7 +65,15 @@ class FriendListViewModel @Inject constructor(
       is FriendListReduce.UpdateJoinedFriendList -> state.copy(joinedFriendList = reduce.joinedFriendList)
       is FriendListReduce.UpdateOnlineFriendList -> state.copy(onlineFriendList = reduce.onlineFriendList)
       is FriendListReduce.UpdateOfflineFriendList -> state.copy(offlineFriendList = reduce.offlineFriendList)
-      is FriendListReduce.UpdateFriendName -> state.copy(friendName = reduce.friendName)
+      is FriendListReduce.UpdateRequestDialogState -> state.copy(requestDialogState = reduce.requestDialogState)
+
+      is RequestDialogReduce -> state.copy(requestDialogState = reduceRequestDialogState(state.requestDialogState, reduce))
+    }
+  }
+
+  private fun reduceRequestDialogState(state: RequestDialogState?, reduce: RequestDialogReduce): RequestDialogState? {
+    return when(reduce) {
+      is RequestDialogReduce.UpdateFriendName -> state?.copy(friendName = reduce.friendName)
     }
   }
 
@@ -121,19 +122,16 @@ class FriendListViewModel @Inject constructor(
   }
 
   private suspend fun sendRequest() {
-    val friendName = currentState.friendName ?: return
-
-    sendSideEffect(FriendListSideEffect.CloseDialog)
-
-    updateState(FriendListReduce.UpdateFriendName(null))
+    val dialogState = currentState.requestDialogState ?: return
+    updateState(FriendListReduce.UpdateRequestDialogState(null))
 
     val user = userRepository.getUserById(userId).asUI()
-    if (friendName == user.name) {
+    if (dialogState.friendName == user.name) {
       sendSideEffect(FriendListSideEffect.ShowSnackbar(UiText.StringResource(R.string.friend_list_self_snackbar)))
       return
     }
 
-    val friend = userRepository.getUserByName(friendName).asUI()
+    val friend = userRepository.getUserByName(dialogState.friendName).asUI()
     if (friend in (currentState.onlineFriendList + currentState.offlineFriendList)) {
       sendSideEffect(FriendListSideEffect.ShowSnackbar(UiText.StringResource(R.string.friend_list_already_friend_snackbar)))
       return

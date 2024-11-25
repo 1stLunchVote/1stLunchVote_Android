@@ -1,14 +1,10 @@
 package com.jwd.lunchvote.presentation.screen.home
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.os.Environment
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.LoungeRepository
 import com.jwd.lunchvote.domain.repository.UserStatusRepository
 import com.jwd.lunchvote.domain.usecase.CreateFood
@@ -16,6 +12,7 @@ import com.jwd.lunchvote.domain.usecase.ExitLounge
 import com.jwd.lunchvote.domain.usecase.GetFoodTrend
 import com.jwd.lunchvote.presentation.BuildConfig
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.FoodUIModel
@@ -23,16 +20,17 @@ import com.jwd.lunchvote.presentation.screen.home.HomeContract.HomeEvent
 import com.jwd.lunchvote.presentation.screen.home.HomeContract.HomeReduce
 import com.jwd.lunchvote.presentation.screen.home.HomeContract.HomeSideEffect
 import com.jwd.lunchvote.presentation.screen.home.HomeContract.HomeState
+import com.jwd.lunchvote.presentation.screen.home.HomeContract.JoinDialogEvent
+import com.jwd.lunchvote.presentation.screen.home.HomeContract.JoinDialogReduce
+import com.jwd.lunchvote.presentation.screen.home.HomeContract.JoinDialogState
+import com.jwd.lunchvote.presentation.screen.home.HomeContract.SecretDialogEvent
+import com.jwd.lunchvote.presentation.screen.home.HomeContract.SecretDialogReduce
+import com.jwd.lunchvote.presentation.screen.home.HomeContract.SecretDialogState
 import com.jwd.lunchvote.presentation.util.ImageBitmapFactory
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import kr.co.inbody.config.error.LoungeError
 import kr.co.inbody.config.error.UserError
-import java.io.File
 import java.util.UUID
 import javax.inject.Inject
 
@@ -44,17 +42,9 @@ class HomeViewModel @Inject constructor(
   private val exitLounge: ExitLounge,
   private val createFood: CreateFood,
   savedStateHandle: SavedStateHandle
-): BaseStateViewModel<HomeState, HomeEvent, HomeReduce, HomeSideEffect>(savedStateHandle){
+): BaseStateViewModel<HomeState, HomeEvent, HomeReduce, HomeSideEffect>(savedStateHandle) {
   override fun createInitialState(savedState: Parcelable?): HomeState {
     return savedState as? HomeState ?: HomeState()
-  }
-
-  private val _dialogState = MutableStateFlow("")
-  val dialogState: StateFlow<String> = _dialogState.asStateFlow()
-  fun setDialogState(dialogState: String) {
-    viewModelScope.launch {
-      _dialogState.emit(dialogState)
-    }
   }
 
   private val userId: String
@@ -64,32 +54,34 @@ class HomeViewModel @Inject constructor(
     when(event) {
       is HomeEvent.ScreenInitialize -> launch { initialize() }
 
-      is HomeEvent.OnClickLoungeButton -> sendSideEffect(HomeSideEffect.NavigateToLounge(currentState.loungeId))
-      is HomeEvent.OnClickJoinLoungeButton -> sendSideEffect(HomeSideEffect.OpenJoinDialog)
+      is HomeEvent.OnClickLoungeButton -> sendSideEffect(HomeSideEffect.NavigateToLounge(null))
+      is HomeEvent.OnClickJoinLoungeButton -> updateState(HomeReduce.UpdateJoinDialogState(JoinDialogState()))
       is HomeEvent.OnClickTemplateButton -> sendSideEffect(HomeSideEffect.NavigateToTemplateList)
       is HomeEvent.OnClickFriendButton -> sendSideEffect(HomeSideEffect.NavigateToFriendList)
       is HomeEvent.OnClickSettingButton -> sendSideEffect(HomeSideEffect.NavigateToSetting)
       is HomeEvent.OnClickTipsButton -> sendSideEffect(HomeSideEffect.NavigateToTips)
+      is HomeEvent.OnLongPressIcon -> updateState(HomeReduce.UpdateSecretDialogState(SecretDialogState()))
 
-      // DialogEvent
-      is HomeEvent.OnLoungeIdChange -> updateState(HomeReduce.UpdateLoungeId(event.loungeId))
-      is HomeEvent.OnClickCancelButtonJoinDialog -> {
-        updateState(HomeReduce.UpdateLoungeId(null))
-        sendSideEffect(HomeSideEffect.CloseDialog)
-      }
-      is HomeEvent.OnClickConfirmButtonJoinDialog -> launch { checkLoungeExist() }
+      is JoinDialogEvent -> handleJoinDialogEvents(event)
+      is SecretDialogEvent -> handleSecretDialogEvents(event)
+    }
+  }
 
-      // Only for Debug
-      is HomeEvent.OnClickSecretButton -> sendSideEffect(HomeSideEffect.OpenSecretDialog)
-      is HomeEvent.OnFoodNameChangeOfSecretDialog -> updateState(HomeReduce.UpdateFoodName(event.foodName))
-      is HomeEvent.OnFoodImageChangeOfSecretDialog -> updateState(HomeReduce.UpdateFoodImageUri(event.foodImageUri))
-      is HomeEvent.OnImageLoadErrorOfSecretDialog -> sendSideEffect(HomeSideEffect.ShowSnackbar(UiText.StringResource(R.string.profile_edit_profile_image_dialog_image_load_error)))
-      is HomeEvent.OnClickCancelButtonOfSecretDialog -> {
-        sendSideEffect(HomeSideEffect.CloseDialog)
-        updateState(HomeReduce.UpdateFoodName(null))
-        updateState(HomeReduce.UpdateFoodImageUri(null))
-      }
-      is HomeEvent.OnClickUploadButtonOfSecretDialog -> launch { uploadFood(event.context) }
+  private fun handleJoinDialogEvents(event: JoinDialogEvent) {
+    when(event) {
+      is JoinDialogEvent.OnLoungeIdChange -> updateState(JoinDialogReduce.UpdateLoungeId(event.loungeId))
+      is JoinDialogEvent.OnClickCancelButton -> updateState(HomeReduce.UpdateJoinDialogState(null))
+      is JoinDialogEvent.OnClickJoinButton -> launch { checkLoungeExist() }
+    }
+  }
+
+  private fun handleSecretDialogEvents(event: SecretDialogEvent) {
+    when(event) {
+      is SecretDialogEvent.OnFoodNameChange -> updateState(SecretDialogReduce.UpdateFoodName(event.foodName))
+      is SecretDialogEvent.OnFoodImageChange -> updateState(SecretDialogReduce.UpdateFoodImageUri(event.foodImageUri))
+      is SecretDialogEvent.OnImageLoadError -> sendSideEffect(HomeSideEffect.ShowSnackbar(UiText.StringResource(R.string.p_profile_image_dialog_image_load_error)))
+      is SecretDialogEvent.OnClickCancelButton -> updateState(HomeReduce.UpdateSecretDialogState(null))
+      is SecretDialogEvent.OnClickUploadButton -> launch { uploadFood(event.context) }
     }
   }
 
@@ -97,11 +89,24 @@ class HomeViewModel @Inject constructor(
     return when(reduce) {
       is HomeReduce.UpdateFoodTrend -> state.copy(foodTrend = reduce.foodTrend)
       is HomeReduce.UpdateFoodTrendRatio -> state.copy(foodTrendRatio = reduce.foodTrendRatio)
-      is HomeReduce.UpdateLoungeId -> state.copy(loungeId = reduce.loungeId)
+      is HomeReduce.UpdateJoinDialogState -> state.copy(joinDialogState = reduce.joinDialogState)
+      is HomeReduce.UpdateSecretDialogState -> state.copy(secretDialogState = reduce.secretDialogState)
 
-      // Only for Debug
-      is HomeReduce.UpdateFoodName -> state.copy(foodName = reduce.foodName)
-      is HomeReduce.UpdateFoodImageUri -> state.copy(foodImageUri = reduce.foodImageUri)
+      is JoinDialogReduce -> state.copy(joinDialogState = reduceJoinDialogState(state.joinDialogState, reduce))
+      is SecretDialogReduce -> state.copy(secretDialogState = reduceSecretDialogState(state.secretDialogState, reduce))
+    }
+  }
+
+  private fun reduceJoinDialogState(state: JoinDialogState?, reduce: JoinDialogReduce): JoinDialogState? {
+    return when(reduce) {
+      is JoinDialogReduce.UpdateLoungeId -> state?.copy(loungeId = reduce.loungeId)
+    }
+  }
+
+  private fun reduceSecretDialogState(state: SecretDialogState?, reduce: SecretDialogReduce): SecretDialogState? {
+    return when(reduce) {
+      is SecretDialogReduce.UpdateFoodName -> state?.copy(foodName = reduce.foodName)
+      is SecretDialogReduce.UpdateFoodImageUri -> state?.copy(foodImageUri = reduce.foodImageUri)
     }
   }
 
@@ -120,41 +125,29 @@ class HomeViewModel @Inject constructor(
   }
 
   private suspend fun checkLoungeExist() {
-    sendSideEffect(HomeSideEffect.CloseDialog)
+    val dialogState = currentState.joinDialogState ?: return
+    updateState(HomeReduce.UpdateJoinDialogState(null))
 
-    val loungeId = currentState.loungeId ?: return
-    updateState(HomeReduce.UpdateLoungeId(null))
-
+    val loungeId = dialogState.loungeId
     val isAvailable = loungeRepository.checkLoungeExistById(loungeId)
 
     if (isAvailable) sendSideEffect(HomeSideEffect.NavigateToLounge(loungeId))
     else throw LoungeError.NoLounge
   }
 
-  // Only for Debug
   private suspend fun uploadFood(context: Context) {
+    val dialogState = currentState.secretDialogState ?: return
+    updateState(HomeReduce.UpdateSecretDialogState(null))
+
+    // Only for Debug
     if (BuildConfig.DEBUG) {
-      sendSideEffect(HomeSideEffect.CloseDialog)
-
-      val imageBitmap = ImageBitmapFactory.createBitmapFromUri(context, currentState.foodImageUri ?: return)
-      val directory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "images")
-        .apply { if (!exists()) mkdirs() }
-      val file = File(directory, "${currentState.foodName}.jpg").apply {
-        outputStream().use { outputStream ->
-          imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-        }
-      }
-
-      val imageByteArray = file.readBytes()
       val food = FoodUIModel(
         id = UUID.randomUUID().toString(),
-        name = currentState.foodName ?: return
+        name = dialogState.foodName
       )
 
+      val imageByteArray = ImageBitmapFactory.createByteArrayFromUri(context, dialogState.foodImageUri, dialogState.foodName)
       createFood(food.asDomain(), imageByteArray)
-
-      updateState(HomeReduce.UpdateFoodName(null))
-      updateState(HomeReduce.UpdateFoodImageUri(null))
     }
   }
 }

@@ -4,8 +4,8 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.ContactRepository
+import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.model.ContactUIModel
 import com.jwd.lunchvote.presentation.screen.setting.contact.add_contact.AddContactContract.AddContactEvent

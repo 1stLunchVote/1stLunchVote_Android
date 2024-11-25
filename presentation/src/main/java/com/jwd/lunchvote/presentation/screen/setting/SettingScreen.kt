@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -16,6 +15,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,14 +34,13 @@ import com.jwd.lunchvote.presentation.screen.setting.SettingContract.SettingEven
 import com.jwd.lunchvote.presentation.screen.setting.SettingContract.SettingSideEffect
 import com.jwd.lunchvote.presentation.screen.setting.SettingContract.SettingState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
-import com.jwd.lunchvote.presentation.util.UiText
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
-import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
+import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import com.jwd.lunchvote.presentation.widget.TopBar
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
-import timber.log.Timber
 
 @Composable
 fun SettingRoute(
@@ -94,7 +93,7 @@ private fun SettingScreen(
   Screen(
     modifier = modifier,
     topAppBar = {
-      LunchVoteTopBar(
+      TopBar(
         title = stringResource(R.string.setting_title),
         navIconVisible = true,
         popBackStack = { onEvent(SettingEvent.OnClickBackButton) }
@@ -140,22 +139,18 @@ private fun SettingScreen(
         )
       }
     }
-    Box(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 16.dp),
-      contentAlignment = Alignment.Center
+    Gap(minHeight = 32.dp)
+    TextButton(
+      onClick = { onEvent(SettingEvent.OnClickLogoutButton) },
+      modifier = Modifier.align(Alignment.CenterHorizontally)
     ) {
       Text(
         text = stringResource(R.string.setting_logout),
-        modifier = Modifier
-          .clickableWithoutEffect(onClick = { onEvent(SettingEvent.OnClickLogoutButton) })
-          .padding(horizontal = 12.dp, vertical = 8.dp),
-        style = MaterialTheme.typography.titleMedium,
         color = MaterialTheme.colorScheme.error,
         textDecoration = TextDecoration.Underline
       )
     }
+    Gap(height = 24.dp)
   }
 }
 

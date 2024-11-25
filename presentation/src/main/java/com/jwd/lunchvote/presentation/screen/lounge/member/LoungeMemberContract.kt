@@ -12,7 +12,9 @@ class LoungeMemberContract {
   data class LoungeMemberState(
     val me: MemberUIModel = MemberUIModel(),
     val member: MemberUIModel = MemberUIModel(),
-    val user: UserUIModel = UserUIModel()
+    val user: UserUIModel = UserUIModel(),
+
+    val exileDialogState: ExileDialogState? = null
   ) : ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this
   }
@@ -21,26 +23,27 @@ class LoungeMemberContract {
     data object ScreenInitialize : LoungeMemberEvent
     data object OnClickBackButton : LoungeMemberEvent
     data object OnClickExileButton : LoungeMemberEvent
-
-    // DialogEvents
-    data object OnClickCancelButtonExileConfirmDialog : LoungeMemberEvent
-    data object OnClickConfirmButtonExileConfirmDialog : LoungeMemberEvent
   }
 
   sealed interface LoungeMemberReduce : ViewModelContract.Reduce {
     data class UpdateMe(val me: MemberUIModel) : LoungeMemberReduce
     data class UpdateMember(val member: MemberUIModel) : LoungeMemberReduce
     data class UpdateUser(val user: UserUIModel) : LoungeMemberReduce
+    data class UpdateExileDialogState(val exileDialogState: ExileDialogState?) : LoungeMemberReduce
   }
 
   sealed interface LoungeMemberSideEffect : ViewModelContract.SideEffect {
     data object PopBackStack : LoungeMemberSideEffect
-    data object OpenExileConfirmDialog : LoungeMemberSideEffect
-    data object CloseDialog : LoungeMemberSideEffect
     data class ShowSnackbar(val message: UiText) : LoungeMemberSideEffect
   }
 
-  companion object {
-    const val EXILE_CONFIRM_DIALOG = "exile_confirm_dialog"
+  @Parcelize
+  data object ExileDialogState : ViewModelContract.State, Parcelable {
+    override fun toParcelable(): Parcelable = this
+  }
+
+  sealed interface ExileDialogEvent : LoungeMemberEvent {
+    data object OnClickCancelButton : ExileDialogEvent
+    data object OnClickExileButton : ExileDialogEvent
   }
 }

@@ -2,65 +2,61 @@ package com.jwd.lunchvote.presentation.screen.vote.first
 
 import android.content.Context
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Warning
-import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.FoodItem.Status.DISLIKE
 import com.jwd.lunchvote.presentation.model.FoodItem.Status.LIKE
+import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
-import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.FirstVoteDialog
+import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.ExitDialogEvent
 import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.FirstVoteEvent
 import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.FirstVoteSideEffect
 import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.FirstVoteState
+import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.InformationDialogEvent
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
-import com.jwd.lunchvote.presentation.widget.FoodItem
-import com.jwd.lunchvote.presentation.widget.Gap
+import com.jwd.lunchvote.presentation.widget.Dialog
+import com.jwd.lunchvote.presentation.widget.DialogButton
+import com.jwd.lunchvote.presentation.widget.DropDownMenu
+import com.jwd.lunchvote.presentation.widget.FAB
+import com.jwd.lunchvote.presentation.widget.FoodGrid
 import com.jwd.lunchvote.presentation.widget.HorizontalProgressBar
 import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
-import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
-import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
-import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
+import com.jwd.lunchvote.presentation.widget.LunchVoteIcon
 import com.jwd.lunchvote.presentation.widget.MemberProgress
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
-import com.jwd.lunchvote.presentation.widget.SearchIcon
+import com.jwd.lunchvote.presentation.widget.TopBar
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -74,7 +70,6 @@ fun FirstVoteRoute(
   context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
-  val dialog by viewModel.dialogState.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
@@ -90,19 +85,15 @@ fun FirstVoteRoute(
 
   LaunchedEffect(Unit) { viewModel.sendEvent(FirstVoteEvent.ScreenInitialize) }
 
-  when (dialog) {
-    is FirstVoteDialog.ExitDialog -> ExitDialog(
-      onDismissRequest = { viewModel.sendEvent(FirstVoteEvent.OnClickCancelButtonInExitDialog) },
-      onConfirmation = { viewModel.sendEvent(FirstVoteEvent.OnClickConfirmButtonInExitDialog) }
+  state.informationDialogState?.let { dialogState ->
+    InformationDialog(
+      templateList = dialogState.templateList,
+      template = dialogState.selectedTemplate,
+      onEvent = viewModel::sendEvent
     )
-    is FirstVoteDialog.SelectTemplateDialog -> SelectTemplateDialog(
-      templateList = (dialog as FirstVoteDialog.SelectTemplateDialog).templateList,
-      template = state.template,
-      onDismissRequest = { viewModel.sendEvent(FirstVoteEvent.OnClickCancelButtonInSelectTemplateDialog) },
-      onTemplateChange = { viewModel.sendEvent(FirstVoteEvent.OnTemplateChangeInSelectTemplateDialog(it)) },
-      onConfirmation = { viewModel.sendEvent(FirstVoteEvent.OnClickApplyButtonInSelectTemplateDialog) }
-    )
-    null -> Unit
+  }
+  state.exitDialogState?.let {
+    ExitDialog(onEvent = viewModel::sendEvent)
   }
 
   if (state.calculating) LoadingScreen(message = stringResource(R.string.first_vote_calculating_message))
@@ -120,9 +111,11 @@ private fun FirstVoteScreen(
   onEvent: (FirstVoteEvent) -> Unit = {}
 ) {
   Screen(
-    modifier = modifier,
+    modifier = modifier
+      .padding(horizontal = 24.dp)
+      .padding(top = 16.dp),
     topAppBar = {
-      LunchVoteTopBar(
+      TopBar(
         title = stringResource(R.string.first_vote_title),
         navIconVisible = false
       )
@@ -136,68 +129,76 @@ private fun FirstVoteScreen(
         }
       }
     },
+    actions = {
+      if (state.finished) {
+        FAB(
+          text = stringResource(R.string.first_vote_re_vote_button),
+          onClick = { onEvent(FirstVoteEvent.OnClickFinishButton) }
+        )
+      } else {
+        if (state.foodItemList.count { it.status == LIKE } >= (state.lounge.minLikeFoods ?: 0)
+          && state.foodItemList.count { it.status == DISLIKE } >= (state.lounge.minDislikeFoods ?: 0)) {
+          FAB(
+            text = stringResource(R.string.first_vote_finish_button),
+            onClick = { onEvent(FirstVoteEvent.OnClickFinishButton) }
+          )
+        }
+      }
+    },
     scrollable = false
   ) {
-    if (state.finished) FirstVoteWaitingScreen(state = state, onEvent = onEvent)
-    else FirstVotingScreen(state = state, onEvent = onEvent)
-  }
-}
-
-@Composable
-private fun FirstVotingScreen(
-  state: FirstVoteState,
-  modifier: Modifier = Modifier,
-  onEvent: (FirstVoteEvent) -> Unit = {}
-) {
-  Column(
-    modifier = modifier
-      .fillMaxSize()
-      .padding(start = 32.dp, top = 16.dp, end = 32.dp, bottom = 24.dp),
-    verticalArrangement = Arrangement.spacedBy(16.dp)
-  ) {
-    FirstVoteInformationRow(
-      like = state.foodItemList.count { it.status == LIKE },
-      dislike = state.foodItemList.count { it.status == DISLIKE },
-      memberList = state.memberList,
-      modifier = Modifier.fillMaxWidth()
-    )
-    LunchVoteTextField(
-      text = state.searchKeyword,
-      onTextChange = { onEvent(FirstVoteEvent.OnSearchKeywordChange(it)) },
-      hintText = stringResource(R.string.first_vote_hint_text),
-      modifier = Modifier.fillMaxWidth(),
-      leadingIcon = { SearchIcon() }
-    )
-    LazyVerticalGrid(
-      columns = GridCells.Fixed(3),
-      modifier = Modifier
-        .fillMaxWidth()
-        .weight(1f),
-      verticalArrangement = Arrangement.spacedBy(8.dp),
-      horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-      val filteredFoodList = state.foodItemList.filter { it.food.name.contains(state.searchKeyword) }
-
-      items(filteredFoodList) { foodItem ->
-        FoodItem(
-          foodItem = foodItem,
-          onClick = { onEvent(FirstVoteEvent.OnClickFoodItem(foodItem)) }
+    if (state.finished) {
+      Column(
+        modifier = Modifier
+          .fillMaxWidth()
+          .weight(1f),
+        verticalArrangement = Arrangement.spacedBy(40.dp, alignment = Alignment.CenterVertically),
+        horizontalAlignment = Alignment.CenterHorizontally
+      ) {
+        Text(
+          text = stringResource(R.string.first_vote_waiting_title),
+          style = MaterialTheme.typography.titleLarge
+        )
+        MemberProgress(state.memberList.map { it.status })
+        Text(
+          text = stringResource(R.string.first_vote_waiting_body, state.memberList.count { it.status == MemberUIModel.Status.VOTED }),
+          style = MaterialTheme.typography.bodyMedium
+        )
+      }
+    } else {
+      Box(
+        modifier = Modifier
+          .fillMaxWidth()
+          .weight(1f)
+      ) {
+        InformationRow(
+          like = state.foodItemList.count { it.status == LIKE },
+          dislike = state.foodItemList.count { it.status == DISLIKE },
+          memberList = state.memberList,
+          modifier = Modifier
+            .fillMaxWidth()
+            .shadow(8.dp, MaterialTheme.shapes.small)
+            .clip(MaterialTheme.shapes.small)
+            .background(MaterialTheme.colorScheme.background)
+            .border(2.dp, MaterialTheme.colorScheme.outlineVariant, MaterialTheme.shapes.small)
+            .padding(horizontal = 20.dp, vertical = 16.dp)
+            .zIndex(1f),
+        )
+        FoodGrid(
+          searchKeyword = state.searchKeyword,
+          filteredFoodList = state.foodItemList.filter { it.food.name.contains(state.searchKeyword) },
+          onSearchKeywordChange = { onEvent(FirstVoteEvent.OnSearchKeywordChange(it)) },
+          onClickFoodItem = { onEvent(FirstVoteEvent.OnClickFoodItem(it)) },
+          topPadding = 72.dp,
+          bottomPadding = 104.dp
         )
       }
     }
-    Button(
-      onClick = { onEvent(FirstVoteEvent.OnClickFinishButton) },
-      modifier = Modifier.align(Alignment.CenterHorizontally),
-      enabled = state.foodItemList.count { it.status == LIKE } >= (state.lounge.minLikeFoods ?: 0)
-        && state.foodItemList.count { it.status == DISLIKE } >= (state.lounge.minDislikeFoods ?: 0)
-    ) {
-      Text(text = stringResource(R.string.first_vote_finish_button))
-    }
   }
 }
 
 @Composable
-private fun FirstVoteInformationRow(
+private fun InformationRow(
   like: Int,
   dislike: Int,
   memberList: List<MemberUIModel>,
@@ -214,140 +215,81 @@ private fun FirstVoteInformationRow(
 }
 
 @Composable
-private fun FirstVoteWaitingScreen(
-  state: FirstVoteState,
-  modifier: Modifier = Modifier,
-  onEvent: (FirstVoteEvent) -> Unit = {}
-) {
-  Column(
-    modifier = modifier
-      .fillMaxSize()
-      .padding(24.dp),
-    verticalArrangement = Arrangement.spacedBy(40.dp),
-    horizontalAlignment = Alignment.CenterHorizontally
-  ) {
-    Column(
-      modifier = Modifier
-        .fillMaxWidth()
-        .weight(1f),
-      verticalArrangement = Arrangement.spacedBy(40.dp, alignment = Alignment.CenterVertically),
-      horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-      Text(
-        text = stringResource(R.string.first_vote_waiting_title),
-        style = MaterialTheme.typography.titleLarge
-      )
-      MemberProgress(state.memberList.map { it.status })
-      Text(
-        text = stringResource(R.string.first_vote_waiting_body, state.memberList.count { it.status == MemberUIModel.Status.VOTED }),
-        style = MaterialTheme.typography.bodyMedium
-      )
-    }
-    Button(
-      onClick = { onEvent(FirstVoteEvent.OnClickReVoteButton) },
-      modifier = Modifier.align(Alignment.CenterHorizontally)
-    ) {
-      Text(text = stringResource(R.string.first_vote_re_vote_button))
-    }
-  }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun SelectTemplateDialog(
+private fun InformationDialog(
   templateList: List<TemplateUIModel>,
   template: TemplateUIModel?,
   modifier: Modifier = Modifier,
-  onDismissRequest: () -> Unit = {},
-  onTemplateChange: (TemplateUIModel) -> Unit = {},
-  onConfirmation: () -> Unit = {}
+  onEvent: (InformationDialogEvent) -> Unit = {}
 ) {
-  LunchVoteDialog(
-    title = stringResource(R.string.select_template_dialog_title),
-    dismissText = stringResource(R.string.select_template_dialog_dismiss_button),
-    onDismissRequest = onDismissRequest,
-    confirmText = stringResource(R.string.select_template_dialog_confirm_button),
-    onConfirmation = onConfirmation,
-    confirmEnabled = template != null,
-    modifier = modifier
-  ) {
-    Text(text = stringResource(R.string.select_template_dialog_body))
-    Gap(height = 16.dp)
-
-    var expended by remember { mutableStateOf(false) }
-    ExposedDropdownMenuBox(
-      expanded = expended,
-      onExpandedChange = { expended = it },
-    ) {
-      if (templateList.isEmpty()) {
-        OutlinedTextField(
-          value = stringResource(R.string.select_template_dialog_no_template_text),
-          onValueChange = { },
-          modifier = Modifier
-            .fillMaxWidth()
-            .menuAnchor(),
-          readOnly = true,
-          trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expended) },
-          singleLine = true
-        )
-      } else {
-        OutlinedTextField(
-          value = template?.name ?: stringResource(R.string.select_template_dialog_hint_text),
-          onValueChange = { },
-          modifier = Modifier
-            .fillMaxWidth()
-            .menuAnchor(),
-          readOnly = true,
-          trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expended) },
-          singleLine = true
-        )
-        ExposedDropdownMenu(
-          expanded = expended,
-          onDismissRequest = { expended = false }
-        ) {
-          templateList.forEach { template ->
-            DropdownMenuItem(
-              text = { Text(text = template.name) },
-              onClick = {
-                onTemplateChange(template)
-                expended = false
-              }
-            )
-          }
-        }
-      }
+  Dialog(
+    title = stringResource(R.string.fv_information_dialog_title),
+    onDismissRequest = { onEvent(InformationDialogEvent.OnClickSkipButton) },
+    modifier = modifier,
+    icon = { LunchVoteIcon() },
+    body = stringResource(R.string.fv_information_dialog_body),
+    canDismiss = false,
+    content = {
+      DropDownMenu(
+        list = templateList,
+        selected = template,
+        onItemSelected = { onEvent(InformationDialogEvent.OnTemplateSelected(it)) },
+        getItemName = { it.name },
+        hintText = stringResource(R.string.fv_information_dialog_hint_text),
+        modifier = Modifier.fillMaxWidth(),
+        placeholder = stringResource(R.string.fv_information_dialog_placeholder)
+      )
+    },
+    buttons = {
+      DialogButton(
+        text = stringResource(R.string.fv_information_dialog_skip_button),
+        onClick = { onEvent(InformationDialogEvent.OnClickSkipButton) },
+        isDismiss = true
+      )
+      DialogButton(
+        text = stringResource(R.string.fv_information_dialog_apply_button),
+        onClick = { onEvent(InformationDialogEvent.OnClickApplyButton) },
+        enabled = template != null
+      )
     }
-  }
+  )
 }
 
 @Composable
 private fun ExitDialog(
   modifier: Modifier = Modifier,
-  onDismissRequest: () -> Unit = {},
-  onConfirmation: () -> Unit = {}
+  onEvent: (ExitDialogEvent) -> Unit = {}
 ) {
-  LunchVoteDialog(
-    title = stringResource(R.string.vote_exit_dialog_title),
-    dismissText = stringResource(R.string.vote_exit_dialog_dismiss_button),
-    onDismissRequest = onDismissRequest,
-    confirmText = stringResource(R.string.vote_exit_dialog_confirm_button),
-    onConfirmation = onConfirmation,
+  Dialog(
+    title = stringResource(R.string.fv_exit_dialog_title),
+    onDismissRequest = { onEvent(ExitDialogEvent.OnClickCancelButton) },
     modifier = modifier,
     icon = {
       Icon(
-        Icons.Rounded.Warning,
-        contentDescription = null,
-        modifier = Modifier.size(28.dp)
+        imageVector = Icons.Rounded.Warning,
+        contentDescription = "Warning"
+      )
+    },
+    iconColor = MaterialTheme.colorScheme.error,
+    body = stringResource(R.string.fv_exit_dialog_body),
+    buttons = {
+      DialogButton(
+        text = stringResource(R.string.fv_exit_dialog_cancel_button),
+        onClick = { onEvent(ExitDialogEvent.OnClickCancelButton) },
+        color = MaterialTheme.colorScheme.onSurface,
+        isDismiss = true
+      )
+      DialogButton(
+        text = stringResource(R.string.fv_exit_dialog_exit_button),
+        onClick = { onEvent(ExitDialogEvent.OnClickExitButton) },
+        color = MaterialTheme.colorScheme.error
       )
     }
-  ) {
-    Text(text = stringResource(R.string.vote_exit_dialog_body))
-  }
+  )
 }
 
 @Preview
 @Composable
-private fun Preview1() {
+private fun Default() {
   ScreenPreview {
     FirstVoteScreen(
       FirstVoteState(
@@ -358,7 +300,13 @@ private fun Preview1() {
           MemberUIModel(status = MemberUIModel.Status.VOTING),
           MemberUIModel(status = MemberUIModel.Status.VOTED),
           MemberUIModel(status = MemberUIModel.Status.VOTING)
-        )
+        ),
+        foodItemList = List(32) {
+          FoodItem(
+            food = FoodUIModel(name = "${it}번째 음식"),
+            status = if (it % 2 == 0) FoodItem.Status.DISLIKE else FoodItem.Status.LIKE
+          )
+        }
       )
     )
   }
@@ -366,7 +314,7 @@ private fun Preview1() {
 
 @Preview
 @Composable
-private fun Preview2() {
+private fun FinishVote() {
   ScreenPreview {
     FirstVoteScreen(
       FirstVoteState(
@@ -386,14 +334,15 @@ private fun Preview2() {
 
 @Preview
 @Composable
-private fun SelectTemplateDialogPreview() {
+private fun InformationDialogPreview() {
   LunchVoteTheme {
-    SelectTemplateDialog(
+    InformationDialog(
       templateList = listOf(
         TemplateUIModel(name = "템플릿1"),
         TemplateUIModel(name = "템플릿2"),
         TemplateUIModel(name = "템플릿3")
-      ), template = null
+      ),
+      template = TemplateUIModel(name = "템플릿1")
     )
   }
 }

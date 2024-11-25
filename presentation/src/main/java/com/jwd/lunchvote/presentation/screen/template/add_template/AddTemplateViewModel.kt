@@ -4,10 +4,10 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.repository.FoodRepository
 import com.jwd.lunchvote.domain.repository.TemplateRepository
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.FoodItem

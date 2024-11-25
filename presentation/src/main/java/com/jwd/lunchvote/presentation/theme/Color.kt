@@ -8,7 +8,7 @@ val colorPrimary = Color(0xFFEB5530)
 val colorOnPrimary = Color.White
 val colorPrimaryContainer = Color(0xFFFFCCBC)
 val colorOnPrimaryContainer = Color(0xFF3C0800)
-val colorSecondary = Color(0xFFF44336)
+val colorSecondary = Color(0xFF4AA96C)
 val colorOnSecondary = Color.White
 val colorSecondaryContainer = Color(0xFFFFCDD2)
 val colorOnSecondaryContainer = Color(0xFF400F0F)
@@ -49,5 +49,5 @@ fun lunchVoteColorScheme() = MaterialTheme.colorScheme.copy(
     surface = colorBackground,
     onSurface = colorOnBackground,
     outline = colorOutline,
-    outlineVariant = colorOutlineVariant
+    outlineVariant = colorOutlineVariant,
 )

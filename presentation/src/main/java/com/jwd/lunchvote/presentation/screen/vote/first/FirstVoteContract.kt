@@ -21,7 +21,8 @@ class FirstVoteContract {
     val finished: Boolean = false,
     val calculating: Boolean = false,
 
-    val template: TemplateUIModel? = null
+    val informationDialogState: InformationDialogState? = null,
+    val exitDialogState: ExitDialogState? = null
   ) : ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this
   }
@@ -35,13 +36,6 @@ class FirstVoteContract {
     data object OnClickFinishButton : FirstVoteEvent
     data object OnClickReVoteButton : FirstVoteEvent
     data object OnVoteFinish : FirstVoteEvent
-
-    // DialogEvents
-    data object OnClickCancelButtonInSelectTemplateDialog : FirstVoteEvent
-    data class OnTemplateChangeInSelectTemplateDialog(val template: TemplateUIModel) : FirstVoteEvent
-    data object OnClickApplyButtonInSelectTemplateDialog : FirstVoteEvent
-    data object OnClickCancelButtonInExitDialog : FirstVoteEvent
-    data object OnClickConfirmButtonInExitDialog : FirstVoteEvent
   }
 
   sealed interface FirstVoteReduce : ViewModelContract.Reduce {
@@ -54,7 +48,8 @@ class FirstVoteContract {
     data class UpdateFinished(val finished: Boolean) : FirstVoteReduce
     data class UpdateCalculating(val calculating: Boolean) : FirstVoteReduce
 
-    data class UpdateTemplate(val template: TemplateUIModel?) : FirstVoteReduce
+    data class UpdateInformationDialogState(val informationDialogState: InformationDialogState?) : FirstVoteReduce
+    data class UpdateExitDialogState(val exitDialogState: ExitDialogState?) : FirstVoteReduce
   }
 
   sealed interface FirstVoteSideEffect : ViewModelContract.SideEffect {
@@ -63,8 +58,32 @@ class FirstVoteContract {
     data class ShowSnackbar(val message: UiText) : FirstVoteSideEffect
   }
 
-  sealed interface FirstVoteDialog {
-    data object ExitDialog : FirstVoteDialog
-    data class SelectTemplateDialog(val templateList: List<TemplateUIModel>) : FirstVoteDialog
+  @Parcelize
+  data class InformationDialogState(
+    val templateList: List<TemplateUIModel> = emptyList(),
+    val selectedTemplate: TemplateUIModel? = null
+  ) : ViewModelContract.State, Parcelable {
+    override fun toParcelable(): Parcelable = this
+  }
+
+  sealed interface InformationDialogEvent : FirstVoteEvent {
+    data class OnTemplateSelected(val template: TemplateUIModel) : InformationDialogEvent
+    data object OnClickSkipButton : InformationDialogEvent
+    data object OnClickApplyButton : InformationDialogEvent
+  }
+
+  sealed interface InformationDialogReduce : FirstVoteReduce {
+    data class UpdateTemplateList(val templateList: List<TemplateUIModel>) : InformationDialogReduce
+    data class UpdateSelectedTemplate(val selectedTemplate: TemplateUIModel) : InformationDialogReduce
+  }
+
+  @Parcelize
+  data object ExitDialogState : ViewModelContract.State, Parcelable {
+    override fun toParcelable(): Parcelable = this
+  }
+
+  sealed interface ExitDialogEvent : FirstVoteEvent {
+    data object OnClickCancelButton : ExitDialogEvent
+    data object OnClickExitButton : ExitDialogEvent
   }
 }

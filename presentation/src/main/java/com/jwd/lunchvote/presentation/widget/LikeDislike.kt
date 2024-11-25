@@ -1,27 +1,25 @@
 package com.jwd.lunchvote.presentation.widget
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jwd.lunchvote.presentation.util.circleShadow
-import com.jwd.lunchvote.presentation.R
-import com.jwd.lunchvote.presentation.theme.colorOnSuccess
-import com.jwd.lunchvote.presentation.theme.colorSuccess
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
+import com.jwd.lunchvote.presentation.util.outerShadow
 
 @Composable
 fun LikeDislike(
@@ -33,8 +31,14 @@ fun LikeDislike(
     modifier = modifier,
     horizontalArrangement = Arrangement.spacedBy(8.dp)
   ) {
-    Like(like)
-    Dislike(dislike)
+    Like(
+      amount = like,
+      modifier = Modifier.height(20.dp)
+    )
+    Dislike(
+      amount = dislike,
+      modifier = Modifier.height(20.dp)
+    )
   }
 }
 
@@ -45,25 +49,28 @@ private fun Like(
 ) {
   Row(
     modifier = modifier
-      .height(20.dp)
-      .background(colorSuccess, MaterialTheme.shapes.extraLarge),
+      .background(MaterialTheme.colorScheme.secondary, MaterialTheme.shapes.extraLarge)
+      .padding(horizontal = 6.dp),
+    horizontalArrangement = Arrangement.spacedBy(4.dp),
     verticalAlignment = Alignment.CenterVertically
   ) {
-    Spacer(Modifier.width(4.dp))
-    Image(
-      painterResource(R.drawable.ic_like),
-      null,
+    Box(
       modifier = Modifier
-        .size(10.dp)
-        .circleShadow(colorOnSuccess, blurRadius = 6.dp)
+        .size(12.dp)
+        .outerShadow(
+          color = MaterialTheme.colorScheme.onSecondary,
+          shape = CircleShape,
+          offsetY = 0.dp,
+          blur = 8.dp
+        )
+        .border(2.dp, MaterialTheme.colorScheme.onSecondary, CircleShape)
+        .background(MaterialTheme.colorScheme.secondary, CircleShape)
     )
-    Spacer(Modifier.width(4.dp))
     Text(
-      "$amount".padStart(2, '0'),
+      text = "$amount".padStart(2, '0'),
       style = MaterialTheme.typography.labelLarge,
-      color = colorOnSuccess
+      color = MaterialTheme.colorScheme.onSecondary
     )
-    Spacer(Modifier.width(4.dp))
   }
 }
 
@@ -74,28 +81,36 @@ private fun Dislike(
 ) {
   Row(
     modifier = modifier
-      .height(20.dp)
-      .background(MaterialTheme.colorScheme.error, MaterialTheme.shapes.extraLarge),
+      .background(MaterialTheme.colorScheme.error, MaterialTheme.shapes.extraLarge)
+      .padding(horizontal = 6.dp),
+    horizontalArrangement = Arrangement.spacedBy(4.dp),
     verticalAlignment = Alignment.CenterVertically
   ) {
-    Spacer(Modifier.width(4.dp))
-    Image(
-      painterResource(R.drawable.ic_dislike),
-      null,
-      modifier = Modifier.size(12.dp)
-    )
-    Spacer(Modifier.width(4.dp))
+    Box(
+      modifier = Modifier
+        .size(12.dp)
+        .background(MaterialTheme.colorScheme.errorContainer, CircleShape)
+    ) {
+      HorizontalDivider(
+        color = MaterialTheme.colorScheme.error,
+        thickness = 2.dp,
+        modifier = Modifier
+          .align(Alignment.Center)
+          .rotate(45f)
+      )
+    }
     Text(
-      "$amount".padStart(2, '0'),
+      text = "$amount".padStart(2, '0'),
       style = MaterialTheme.typography.labelLarge,
-      color = colorOnSuccess
+      color = MaterialTheme.colorScheme.onError
     )
-    Spacer(Modifier.width(4.dp))
   }
 }
 
 @Preview
 @Composable
 private fun LikeDislikePreview() {
-  LikeDislike(0, 0)
+  LunchVoteTheme {
+    LikeDislike(0, 0)
+  }
 }

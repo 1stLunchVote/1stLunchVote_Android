@@ -2,10 +2,7 @@ package com.jwd.lunchvote.presentation.screen.vote.result
 
 import android.content.Context
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
@@ -16,13 +13,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
@@ -32,12 +29,11 @@ import com.jwd.lunchvote.presentation.screen.vote.result.VoteResultContract.Vote
 import com.jwd.lunchvote.presentation.screen.vote.result.VoteResultContract.VoteResultState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.Gap
+import com.jwd.lunchvote.presentation.widget.ImageFromUri
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
-import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
-import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.coil.CoilImage
+import com.jwd.lunchvote.presentation.widget.TopBar
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -81,41 +77,37 @@ private fun VoteResultScreen(
   Screen(
     modifier = modifier,
     topAppBar = {
-      LunchVoteTopBar(
+      TopBar(
         title = stringResource(R.string.vote_result_title),
         navIconVisible = false
       )
     }
   ) {
-    Column(
-      modifier = Modifier.fillMaxSize(),
-      verticalArrangement = Arrangement.Center,
-      horizontalAlignment = Alignment.CenterHorizontally
+    Gap()
+    Text(
+      text = stringResource(R.string.vote_result_header),
+      style = MaterialTheme.typography.bodyLarge
+    )
+    Gap(height = 8.dp)
+    VoteResultImage(
+      foodImageUri = state.food.imageUrl,
+      voteRatio = state.voteRatio,
+      modifier = Modifier.size(156.dp)
+    )
+    Gap(height = 48.dp)
+    Text(
+      text = state.food.name,
+      style = MaterialTheme.typography.headlineSmall
+    )
+    Gap(height = 80.dp)
+    Button(
+      onClick = { onEvent(VoteResultEvent.OnClickHomeButton) }
     ) {
       Text(
-        text = stringResource(R.string.vote_result_header),
-        style = MaterialTheme.typography.bodyLarge
+        text = stringResource(R.string.vote_result_home_button)
       )
-      Gap(height = 8.dp)
-      VoteResultImage(
-        foodImageUri = state.food.imageUrl,
-        voteRatio = state.voteRatio,
-        modifier = Modifier.size(156.dp)
-      )
-      Gap(height = 48.dp)
-      Text(
-        text = state.food.name,
-        style = MaterialTheme.typography.headlineSmall
-      )
-      Gap(height = 80.dp)
-      Button(
-        onClick = { onEvent(VoteResultEvent.OnClickHomeButton) }
-      ) {
-        Text(
-          text = stringResource(R.string.vote_result_home_button)
-        )
-      }
     }
+    Gap()
   }
 }
 
@@ -129,13 +121,9 @@ private fun VoteResultImage(
     modifier = modifier,
     contentAlignment = Alignment.Center
   ) {
-    CoilImage(
-      imageModel = { foodImageUri },
-      modifier = Modifier.size(156.dp),
-      imageOptions = ImageOptions(
-        contentScale = ContentScale.Crop
-      ),
-      previewPlaceholder = R.drawable.ic_food_image_temp
+    ImageFromUri(
+      uri = foodImageUri.toUri(),
+      modifier = Modifier.size(156.dp)
     )
     Box(
       modifier = modifier.offset(x = 72.dp, y = 72.dp),

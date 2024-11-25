@@ -1,26 +1,15 @@
 package com.jwd.lunchvote.presentation.screen.template.add_template
 
 import android.content.Context
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,14 +23,13 @@ import com.jwd.lunchvote.presentation.screen.template.add_template.AddTemplateCo
 import com.jwd.lunchvote.presentation.screen.template.add_template.AddTemplateContract.AddTemplateSideEffect
 import com.jwd.lunchvote.presentation.screen.template.add_template.AddTemplateContract.AddTemplateState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
-import com.jwd.lunchvote.presentation.widget.FoodItem
-import com.jwd.lunchvote.presentation.widget.LikeDislike
+import com.jwd.lunchvote.presentation.widget.FAB
+import com.jwd.lunchvote.presentation.widget.FoodGrid
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
-import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
-import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
-import com.jwd.lunchvote.presentation.widget.SearchIcon
+import com.jwd.lunchvote.presentation.widget.TemplateTitle
+import com.jwd.lunchvote.presentation.widget.TopBar
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -82,84 +70,46 @@ private fun AddTemplateScreen(
   onEvent: (AddTemplateEvent) -> Unit = {},
 ) {
   Screen(
-    modifier = modifier,
+    modifier = modifier
+      .padding(horizontal = 24.dp)
+      .padding(top = 8.dp),
     topAppBar = {
-      LunchVoteTopBar(
+      TopBar(
         title = stringResource(R.string.add_template_title),
         popBackStack = { onEvent(AddTemplateEvent.OnClickBackButton) }
       )
     },
+    actions = {
+      if (state.foodItemList.any { it.status != FoodItem.Status.DEFAULT }) {
+        FAB(
+          text = stringResource(R.string.add_template_add_button),
+          onClick = { onEvent(AddTemplateEvent.OnClickAddButton) }
+        )
+      }
+    },
     scrollable = false
   ) {
-    Column(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 24.dp)
-        .padding(top = 16.dp, bottom = 24.dp),
-      verticalArrangement = Arrangement.spacedBy(16.dp)
+    Box(
+      modifier = Modifier.fillMaxSize()
     ) {
+      val gridState = rememberLazyGridState()
       TemplateTitle(
         name = state.name,
         like = state.foodItemList.count { it.status == FoodItem.Status.LIKE },
         dislike = state.foodItemList.count { it.status == FoodItem.Status.DISLIKE },
-        modifier = Modifier.fillMaxWidth()
-      )
-      LunchVoteTextField(
-        text = state.searchKeyword,
-        onTextChange = { onEvent(AddTemplateEvent.OnSearchKeywordChange(it)) },
-        hintText = stringResource(R.string.add_template_hint_text),
         modifier = Modifier.fillMaxWidth(),
-        leadingIcon = { SearchIcon() }
+        gridState = gridState
       )
-      LazyVerticalGrid(
-        columns = GridCells.Fixed(3),
-        modifier = Modifier
-          .fillMaxWidth()
-          .weight(1f),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-      ) {
-        val filteredFoodList = state.foodItemList.filter { it.food.name.contains(state.searchKeyword) }
-
-        items(filteredFoodList) { foodItem ->
-          FoodItem(
-            foodItem = foodItem,
-            onClick = { onEvent(AddTemplateEvent.OnClickFoodItem(foodItem)) }
-          )
-        }
-      }
-      Button(
-        onClick = { onEvent(AddTemplateEvent.OnClickAddButton) },
-        modifier = Modifier.align(CenterHorizontally),
-        enabled = state.foodItemList.any { it.status != FoodItem.Status.DEFAULT }
-      ) {
-        Text(text = stringResource(R.string.add_template_add_button))
-      }
+      FoodGrid(
+        searchKeyword = state.searchKeyword,
+        filteredFoodList = state.foodItemList.filter { it.food.name.contains(state.searchKeyword) },
+        onSearchKeywordChange = { onEvent(AddTemplateEvent.OnSearchKeywordChange(it)) },
+        onClickFoodItem = { onEvent(AddTemplateEvent.OnClickFoodItem(it)) },
+        gridState = gridState,
+        topPadding = 104.dp,
+        bottomPadding = 104.dp
+      )
     }
-  }
-}
-
-@Composable
-private fun TemplateTitle(
-  name: String,
-  like: Int,
-  dislike: Int,
-  modifier: Modifier = Modifier
-) {
-  Column(
-    modifier = modifier
-      .clip(MaterialTheme.shapes.small)
-      .background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.small)
-      .border(BorderStroke(2.dp, MaterialTheme.colorScheme.outlineVariant), MaterialTheme.shapes.small)
-      .padding(vertical = 20.dp),
-    verticalArrangement = Arrangement.spacedBy(8.dp),
-    horizontalAlignment = CenterHorizontally
-  ) {
-    Text(
-      text = name,
-      style = MaterialTheme.typography.bodyLarge
-    )
-    LikeDislike(like, dislike)
   }
 }
 
@@ -170,9 +120,10 @@ private fun Preview() {
     AddTemplateScreen(
       AddTemplateState(
         name = "학생회 회식 대표 메뉴",
-        foodItemList = List(10) {
+        foodItemList = List(32) {
           FoodItem(
-            food = FoodUIModel(name = "${it}번째 음식")
+            food = FoodUIModel(name = "${it}번째 음식"),
+            status = FoodItem.Status.LIKE
           )
         }
       )

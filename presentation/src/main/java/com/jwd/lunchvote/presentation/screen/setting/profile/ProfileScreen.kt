@@ -1,10 +1,7 @@
 package com.jwd.lunchvote.presentation.screen.setting.profile
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,13 +14,10 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.rounded.Build
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -33,12 +27,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,24 +39,26 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.UserUIModel
+import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.DeleteDialogEvent
+import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.NameDialogEvent
 import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.ProfileEvent
+import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.ProfileImageDialogEvent
 import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.ProfileSideEffect
 import com.jwd.lunchvote.presentation.screen.setting.profile.ProfileContract.ProfileState
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
-import com.jwd.lunchvote.presentation.util.ImageBitmapFactory
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
+import com.jwd.lunchvote.presentation.widget.Dialog
+import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.Gap
+import com.jwd.lunchvote.presentation.widget.ImageFromUri
+import com.jwd.lunchvote.presentation.widget.ImageWithUploadButton
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
-import com.jwd.lunchvote.presentation.widget.LunchVoteDialog
-import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
-import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
-import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.coil.CoilImage
+import com.jwd.lunchvote.presentation.widget.TextField
+import com.jwd.lunchvote.presentation.widget.TopBar
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
-import java.io.File
 
 @Composable
 fun ProfileRoute(
@@ -76,50 +70,35 @@ fun ProfileRoute(
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
   val loading by viewModel.isLoading.collectAsStateWithLifecycle()
-  val dialog by viewModel.dialogState.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
       when(it) {
         is ProfileSideEffect.PopBackStack -> popBackStack()
-        is ProfileSideEffect.OpenEditProfileImageDialog -> viewModel.setDialogState(ProfileContract.EDIT_PROFILE_IMAGE_DIALOG)
-        is ProfileSideEffect.OpenEditNameDialog -> viewModel.setDialogState(ProfileContract.EDIT_NAME_DIALOG)
-        is ProfileSideEffect.OpenDeleteUserConfirmDialog -> viewModel.setDialogState(ProfileContract.DELETE_USER_CONFIRM_DIALOG)
-        is ProfileSideEffect.CloseDialog -> viewModel.setDialogState("")
         is ProfileSideEffect.NavigateToLogin -> navigateToLogin()
         is ProfileSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
       }
     }
   }
 
-  when (dialog) {
-    ProfileContract.EDIT_PROFILE_IMAGE_DIALOG -> {
-      EditProfileImageDialog(
-        profileImageUri = state.profileImageUri,
-        onDismissRequest = { viewModel.sendEvent(ProfileEvent.OnClickCancelButtonEditProfileImageDialog) },
-        onProfileImageChange = { viewModel.sendEvent(ProfileEvent.OnProfileImageChangeEditProfileImageDialog(it)) },
-        onImageError = { viewModel.sendEvent(ProfileEvent.OnImageLoadErrorEditProfileImageDialog) },
-        onConfirmation = { viewModel.sendEvent(ProfileEvent.OnClickSaveButtonEditProfileImageDialog(context)) }
-      )
-    }
-    ProfileContract.EDIT_NAME_DIALOG -> {
-      EditNameDialog(
-        initialName = state.user.name,
-        name = state.name,
-        onDismissRequest = { viewModel.sendEvent(ProfileEvent.OnClickCancelButtonEditNameDialog) },
-        onNameChange = { viewModel.sendEvent(ProfileEvent.OnNameChangeEditNameDialog(it)) },
-        onConfirmation = { viewModel.sendEvent(ProfileEvent.OnClickSaveButtonEditNameDialog) }
-      )
-    }
-    ProfileContract.DELETE_USER_CONFIRM_DIALOG -> {
-      DeleteUserConfirmDialog(
-        onDismissRequest = { viewModel.sendEvent(ProfileEvent.OnClickCancelButtonDeleteUserConfirmDialog) },
-        onConfirmation = { viewModel.sendEvent(ProfileEvent.OnClickConfirmButtonDeleteUserConfirmDialog) }
-      )
-    }
+  LaunchedEffect(Unit) { viewModel.sendEvent(ProfileEvent.ScreenInitialize) }
+
+  state.profileImageDialogState?.let { dialogState ->
+    ProfileImageDialog(
+      profileImageUri = dialogState.profileImageUri,
+      onEvent = viewModel::sendEvent
+    )
+  }
+  state.nameDialogState?.let { dialogState ->
+    NameDialog(
+      name = dialogState.name,
+      onEvent = viewModel::sendEvent
+    )
+  }
+  state.deleteDialogState?.let{
+    DeleteDialog(onEvent = viewModel::sendEvent)
   }
 
-  LaunchedEffect(Unit) { viewModel.sendEvent(ProfileEvent.ScreenInitialize) }
 
   if (loading) LoadingScreen()
   else ProfileScreen(
@@ -135,9 +114,9 @@ private fun ProfileScreen(
   onEvent: (ProfileEvent) -> Unit = {}
 ) {
   Screen(
-    modifier = modifier,
+    modifier = modifier.padding(24.dp),
     topAppBar = {
-      LunchVoteTopBar(
+      TopBar(
         title = stringResource(R.string.profile_title),
         popBackStack = { onEvent(ProfileEvent.OnClickBackButton) }
       )
@@ -148,9 +127,7 @@ private fun ProfileScreen(
       profileImage = state.user.profileImage,
       name = state.user.name,
       email = state.user.email,
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(24.dp)
+      modifier = Modifier.fillMaxWidth()
     )
     Row(
       modifier = Modifier.fillMaxWidth(),
@@ -175,7 +152,8 @@ private fun ProfileScreen(
     }
     Gap(minHeight = 32.dp)
     TextButton(
-      onClick = { onEvent(ProfileEvent.OnClickDeleteUserButton) }
+      onClick = { onEvent(ProfileEvent.OnClickDeleteUserButton) },
+      modifier = Modifier.align(Alignment.CenterHorizontally)
     ) {
       Text(
         text = stringResource(R.string.profile_delete_user),
@@ -183,7 +161,6 @@ private fun ProfileScreen(
         textDecoration = TextDecoration.Underline
       )
     }
-    Gap(height = 32.dp)
   }
 }
 
@@ -208,16 +185,12 @@ private fun ProfileTicket(
       horizontalAlignment = Alignment.CenterHorizontally
     ) {
       Gap(height = 24.dp)
-      CoilImage(
-        imageModel = { profileImage },
+      ImageFromUri(
+        uri = profileImage.toUri(),
         modifier = Modifier
           .size(100.dp)
           .clip(CircleShape)
-          .border(2.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape),
-        imageOptions = ImageOptions(
-          contentScale = ContentScale.Crop
-        ),
-        previewPlaceholder = R.drawable.ic_food_image_temp
+          .border(2.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape)
       )
       Gap(height = 16.dp)
       Row(
@@ -287,153 +260,123 @@ private fun ProfileTicket(
 }
 
 @Composable
-private fun EditProfileImageDialog(
+private fun ProfileImageDialog(
   profileImageUri: Uri,
   modifier: Modifier = Modifier,
-  onDismissRequest: () -> Unit = {},
-  onProfileImageChange: (Uri) -> Unit = {},
-  onImageError: () -> Unit = {},
-  onConfirmation: () -> Unit = {},
+  onEvent: (ProfileImageDialogEvent) -> Unit = {},
   context: Context = LocalContext.current
 ) {
-  val albumLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { imageUri: Uri? ->
-    if (imageUri != null) onProfileImageChange(imageUri)
-    else onImageError()
-  }
-
-  @Composable
-  fun ImageFromUri(
-    uri: Uri,
-    modifier: Modifier = Modifier
-  ) {
-    if (uri.toString().startsWith("http"))
-      CoilImage(
-        imageModel = { profileImageUri.toString() },
-        modifier = modifier,
-        imageOptions = ImageOptions(
-          contentScale = ContentScale.Crop
-        ),
-        previewPlaceholder = R.drawable.ic_food_image_temp
-      )
-    else if (uri.toString().startsWith("content"))
-      Image(
-        bitmap = ImageBitmapFactory.createBitmapFromUri(context, uri).asImageBitmap(),
-        contentDescription = "Profile Image",
-        modifier = modifier,
-        contentScale = ContentScale.Crop
-      )
-    else if (File(uri.toString()).exists())
-      Image(
-        bitmap = BitmapFactory.decodeFile(uri.toString()).asImageBitmap(),
-        contentDescription = null,
-        modifier = modifier,
-        contentScale = ContentScale.Crop
-      )
-    else
-      Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
-      ) {
-        Text(
-          text = stringResource(R.string.profile_edit_profile_image_dialog_no_image),
-          color = MaterialTheme.colorScheme.outline
-        )
-      }
-  }
-
-  LunchVoteDialog(
-    title = stringResource(R.string.profile_edit_profile_image_dialog_title),
-    dismissText = stringResource(R.string.profile_edit_profile_image_dialog_cancel_button),
-    onDismissRequest = onDismissRequest,
-    confirmText = stringResource(R.string.profile_edit_profile_image_dialog_save_button),
-    onConfirmation = onConfirmation,
-    modifier = modifier
-  ) {
-    Box(
-      modifier = Modifier
-        .size(160.dp)
-        .align(Alignment.CenterHorizontally),
-      contentAlignment = Alignment.BottomEnd
-    ) {
-      ImageFromUri(
-        uri = profileImageUri,
-        modifier = Modifier
-          .size(160.dp)
-          .clip(CircleShape)
-          .border(2.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape)
-      )
-      IconButton(
-        onClick = { albumLauncher.launch("image/*") },
-        colors = IconButtonColors(
-          contentColor = MaterialTheme.colorScheme.onPrimary,
-          containerColor = MaterialTheme.colorScheme.primary,
-          disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-          disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-        )
-      ) {
-        Icon(
-          Icons.Outlined.Edit,
-          contentDescription = null,
-          modifier = Modifier.size(28.dp)
-        )
-      }
-    }
-  }
-}
-
-@Composable
-private fun EditNameDialog(
-  initialName: String,
-  name: String,
-  modifier: Modifier = Modifier,
-  onDismissRequest: () -> Unit = {},
-  onNameChange: (String) -> Unit = {},
-  onConfirmation: () -> Unit = {}
-) {
-  LunchVoteDialog(
-    title = stringResource(R.string.profile_edit_name_dialog_title),
-    dismissText = stringResource(R.string.profile_edit_name_dialog_cancel_button),
-    onDismissRequest = onDismissRequest,
-    confirmText = stringResource(R.string.profile_edit_name_dialog_save_button),
-    onConfirmation = onConfirmation,
-    modifier = modifier,
-    confirmEnabled = (name.isEmpty() || name == initialName).not()
-  ) {
-    LunchVoteTextField(
-      text = name,
-      onTextChange = onNameChange,
-      hintText = stringResource(R.string.profile_edit_name_dialog_hint_text),
-      modifier = Modifier.fillMaxWidth(),
-      isError = name.isEmpty() || name == initialName
-    )
-  }
-}
-
-@Composable
-private fun DeleteUserConfirmDialog(
-  modifier: Modifier = Modifier,
-  onDismissRequest: () -> Unit = {},
-  onConfirmation: () -> Unit = {}
-) {
-  LunchVoteDialog(
-    title = stringResource(R.string.profile_delete_user_confirm_dialog_title),
-    dismissText = stringResource(R.string.profile_delete_user_confirm_dialog_cancel_button),
-    onDismissRequest = onDismissRequest,
-    confirmText = stringResource(R.string.profile_delete_user_confirm_dialog_confirm_button),
-    onConfirmation = onConfirmation,
+  Dialog(
+    title = stringResource(R.string.p_profile_image_dialog_title),
+    onDismissRequest = { onEvent(ProfileImageDialogEvent.OnClickCancelButton) },
     modifier = modifier,
     icon = {
       Icon(
-        Icons.Outlined.Delete,
-        contentDescription = null,
-        modifier = Modifier.size(28.dp)
+        Icons.Rounded.Build,
+        contentDescription = "Build"
       )
     },
+    iconColor = MaterialTheme.colorScheme.tertiary,
+    body = stringResource(R.string.p_profile_image_dialog_body),
+    closable = false,
     content = {
-      Text(
-        text = stringResource(R.string.profile_delete_user_confirm_dialog_body),
+      Box(
         modifier = Modifier.fillMaxWidth(),
-        textAlign = TextAlign.Center
+        contentAlignment = Alignment.Center
+      ) {
+        ImageWithUploadButton(
+          uri = profileImageUri,
+          onImageChange = { onEvent(ProfileImageDialogEvent.OnProfileImageChange(it)) },
+          onError = { onEvent(ProfileImageDialogEvent.OnImageLoadError) }
+        )
+      }
+    },
+    buttons = {
+      DialogButton(
+        text = stringResource(R.string.p_profile_image_dialog_cancel_button),
+        onClick = { onEvent(ProfileImageDialogEvent.OnClickCancelButton) },
+        isDismiss = true
+      )
+      DialogButton(
+        text = stringResource(R.string.p_profile_image_dialog_save_button),
+        onClick = { onEvent(ProfileImageDialogEvent.OnClickSaveButton(context)) }
+      )
+    }
+  )
+}
+
+@Composable
+private fun NameDialog(
+  name: String,
+  modifier: Modifier = Modifier,
+  onEvent: (NameDialogEvent) -> Unit = {}
+) {
+  Dialog(
+    title = stringResource(R.string.p_name_dialog_title),
+    onDismissRequest = { onEvent(NameDialogEvent.OnClickCancelButton) },
+    modifier = modifier,
+    icon = {
+      Icon(
+        Icons.Rounded.Build,
+        contentDescription = "Build"
+      )
+    },
+    iconColor = MaterialTheme.colorScheme.tertiary,
+    body = stringResource(R.string.p_name_dialog_body),
+    closable = false,
+    content = {
+      TextField(
+        text = name,
+        onTextChange = { onEvent(NameDialogEvent.OnNameChange(it)) },
+        hintText = stringResource(R.string.p_name_dialog_hint_text),
+        modifier = Modifier.fillMaxWidth(),
+        isError = name.isEmpty()
+      )
+    },
+    buttons = {
+      DialogButton(
+        text = stringResource(R.string.p_name_dialog_cancel_button),
+        onClick = { onEvent(NameDialogEvent.OnClickCancelButton) },
+        isDismiss = true
+      )
+      DialogButton(
+        text = stringResource(R.string.p_name_dialog_save_button),
+        onClick = { onEvent(NameDialogEvent.OnClickSaveButton) },
+        enabled = name.isNotEmpty()
+      )
+    }
+  )
+}
+
+@Composable
+private fun DeleteDialog(
+  modifier: Modifier = Modifier,
+  onEvent: (ProfileContract.DeleteDialogEvent) -> Unit = {}
+) {
+  Dialog(
+    title = stringResource(R.string.p_delete_dialog_title),
+    onDismissRequest = { onEvent(DeleteDialogEvent.OnClickCancelButton) },
+    modifier = modifier,
+    icon = {
+      Icon(
+        Icons.Rounded.Delete,
+        contentDescription = "Delete"
+      )
+    },
+    iconColor = MaterialTheme.colorScheme.error,
+    body = stringResource(R.string.c_delete_dialog_body),
+    closable = false,
+    buttons = {
+      DialogButton(
+        text = stringResource(R.string.p_delete_dialog_cancel_button),
+        onClick = { onEvent(DeleteDialogEvent.OnClickCancelButton) },
+        isDismiss = true,
+        color = MaterialTheme.colorScheme.onSurface
+      )
+      DialogButton(
+        text = stringResource(R.string.p_delete_dialog_delete_button),
+        onClick = { onEvent(DeleteDialogEvent.OnClickDeleteButton) },
+        color = MaterialTheme.colorScheme.error
       )
     }
   )
@@ -456,9 +399,9 @@ private fun Preview() {
 
 @Preview
 @Composable
-private fun EditProfileImageDialogPreview() {
+private fun ProfileImageDialogPreview() {
   LunchVoteTheme {
-    EditProfileImageDialog(
+    ProfileImageDialog(
       profileImageUri = "".toUri()
     )
   }
@@ -466,18 +409,18 @@ private fun EditProfileImageDialogPreview() {
 
 @Preview
 @Composable
-private fun EditNameDialogPreview() {
+private fun NameDialogPreview() {
   LunchVoteTheme {
-    EditNameDialog(
-      initialName = "김태우존잘", name = ""
+    NameDialog(
+      name = "김태우존잘"
     )
   }
 }
 
 @Preview
 @Composable
-private fun DeleteUserConfirmDialogPreview() {
+private fun DeleteDialogPreview() {
   LunchVoteTheme {
-    DeleteUserConfirmDialog()
+    DeleteDialog()
   }
 }

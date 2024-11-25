@@ -18,7 +18,9 @@ class SecondVoteContract {
     val foodList: List<FoodUIModel> = emptyList(),
     val selectedFood: FoodUIModel? = null,
     val finished: Boolean = false,
-    val calculating: Boolean = false
+    val calculating: Boolean = false,
+
+    val exitDialogState: ExitDialogState? = null
   ) : ViewModelContract.State, Parcelable {
     override fun toParcelable(): Parcelable = this
   }
@@ -31,10 +33,6 @@ class SecondVoteContract {
     data object OnClickFinishButton : SecondVoteEvent
     data object OnClickReVoteButton : SecondVoteEvent
     data object OnVoteFinish : SecondVoteEvent
-
-    // DialogEvents
-    data object OnClickCancelButtonInExitDialog : SecondVoteEvent
-    data object OnClickConfirmButtonInExitDialog : SecondVoteEvent
   }
 
   sealed interface SecondVoteReduce : ViewModelContract.Reduce {
@@ -45,6 +43,7 @@ class SecondVoteContract {
     data class UpdateSelectedFood(val food: FoodUIModel?) : SecondVoteReduce
     data class UpdateFinished(val finished: Boolean) : SecondVoteReduce
     data class UpdateCalculating(val calculating: Boolean) : SecondVoteReduce
+    data class UpdateExitDialogState(val exitDialogState: ExitDialogState?) : SecondVoteReduce
   }
 
   sealed interface SecondVoteSideEffect : ViewModelContract.SideEffect {
@@ -53,7 +52,13 @@ class SecondVoteContract {
     data class ShowSnackbar(val message: UiText) : SecondVoteSideEffect
   }
 
-  sealed interface SecondVoteDialog {
-    data object ExitDialog : SecondVoteDialog
+  @Parcelize
+  data object ExitDialogState : ViewModelContract.State, Parcelable {
+    override fun toParcelable(): Parcelable = this
+  }
+
+  sealed interface ExitDialogEvent : SecondVoteEvent {
+    data object OnClickCancelButton : ExitDialogEvent
+    data object OnClickExitButton : ExitDialogEvent
   }
 }

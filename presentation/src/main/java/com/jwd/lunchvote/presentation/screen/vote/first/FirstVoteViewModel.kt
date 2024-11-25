@@ -2,10 +2,8 @@ package com.jwd.lunchvote.presentation.screen.vote.first
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.domain.entity.Lounge
 import com.jwd.lunchvote.domain.repository.BallotRepository
 import com.jwd.lunchvote.domain.repository.FoodRepository
@@ -18,26 +16,26 @@ import com.jwd.lunchvote.domain.usecase.CalculateFirstVote
 import com.jwd.lunchvote.domain.usecase.ExitLounge
 import com.jwd.lunchvote.domain.usecase.StartSecondVote
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.presentation.mapper.asDomain
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.FirstBallotUIModel
 import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.MemberUIModel
-import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.navigation.LunchVoteNavRoute
-import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.FirstVoteDialog
+import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.ExitDialogEvent
+import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.ExitDialogState
 import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.FirstVoteEvent
 import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.FirstVoteReduce
 import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.FirstVoteSideEffect
 import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.FirstVoteState
+import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.InformationDialogEvent
+import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.InformationDialogReduce
+import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.InformationDialogState
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import kr.co.inbody.config.error.LoungeError
 import kr.co.inbody.config.error.MemberError
 import kr.co.inbody.config.error.RouteError
@@ -65,14 +63,6 @@ class FirstVoteViewModel @Inject constructor(
   private val loungeId: String =
     savedStateHandle[LunchVoteNavRoute.FirstVote.arguments.first().name] ?: throw RouteError.NoArguments
 
-  private val _dialogState = MutableStateFlow<FirstVoteDialog?>(null)
-  val dialogState: StateFlow<FirstVoteDialog?> = _dialogState.asStateFlow()
-  private fun setDialogState(dialogState: FirstVoteDialog?) {
-    viewModelScope.launch {
-      _dialogState.emit(dialogState)
-    }
-  }
-
   private val userId: String
     get() = Firebase.auth.currentUser?.uid ?: throw UserError.NoSession
 
@@ -86,19 +76,30 @@ class FirstVoteViewModel @Inject constructor(
     when(event) {
       is FirstVoteEvent.ScreenInitialize -> launch { initialize() }
 
-      is FirstVoteEvent.OnClickBackButton -> setDialogState(FirstVoteDialog.ExitDialog)
+      is FirstVoteEvent.OnClickBackButton -> updateState(FirstVoteReduce.UpdateExitDialogState(ExitDialogState))
       is FirstVoteEvent.OnSearchKeywordChange -> updateState(FirstVoteReduce.UpdateSearchKeyword(event.searchKeyword))
       is FirstVoteEvent.OnClickFoodItem -> updateState(FirstVoteReduce.UpdateFoodStatus(event.foodItem))
       is FirstVoteEvent.OnClickFinishButton -> launch(false) { finishVote() }
       is FirstVoteEvent.OnClickReVoteButton -> launch(false) { reVote() }
       is FirstVoteEvent.OnVoteFinish -> launch { submitVote() }
 
-      // DialogEvents
-      is FirstVoteEvent.OnClickCancelButtonInSelectTemplateDialog -> setDialogState(null)
-      is FirstVoteEvent.OnTemplateChangeInSelectTemplateDialog -> updateState(FirstVoteReduce.UpdateTemplate(event.template))
-      is FirstVoteEvent.OnClickApplyButtonInSelectTemplateDialog -> launch { selectTemplate(currentState.template) }
-      is FirstVoteEvent.OnClickCancelButtonInExitDialog -> setDialogState(null)
-      is FirstVoteEvent.OnClickConfirmButtonInExitDialog -> launch { exitVote() }
+      is InformationDialogEvent -> handleInformationDialogEvents(event)
+      is ExitDialogEvent -> handleExitDialogEvents(event)
+    }
+  }
+
+  private fun handleInformationDialogEvents(event: InformationDialogEvent) {
+    when(event) {
+      is InformationDialogEvent.OnTemplateSelected -> updateState(InformationDialogReduce.UpdateSelectedTemplate(event.template))
+      is InformationDialogEvent.OnClickSkipButton -> updateState(FirstVoteReduce.UpdateInformationDialogState(null))
+      is InformationDialogEvent.OnClickApplyButton -> launch { selectTemplate() }
+    }
+  }
+
+  private fun handleExitDialogEvents(event: ExitDialogEvent) {
+    when(event) {
+      is ExitDialogEvent.OnClickCancelButton -> updateState(FirstVoteReduce.UpdateExitDialogState(null))
+      is ExitDialogEvent.OnClickExitButton -> launch { exitVote() }
     }
   }
 
@@ -114,8 +115,17 @@ class FirstVoteViewModel @Inject constructor(
       )
       is FirstVoteReduce.UpdateFinished -> state.copy(finished = reduce.finished)
       is FirstVoteReduce.UpdateCalculating -> state.copy(calculating = reduce.calculating)
+      is FirstVoteReduce.UpdateInformationDialogState -> state.copy(informationDialogState = reduce.informationDialogState)
+      is FirstVoteReduce.UpdateExitDialogState -> state.copy(exitDialogState = reduce.exitDialogState)
 
-      is FirstVoteReduce.UpdateTemplate -> state.copy(template = reduce.template)
+      is InformationDialogReduce -> state.copy(informationDialogState = reduceInformationDialogState(state.informationDialogState, reduce))
+    }
+  }
+
+  private fun reduceInformationDialogState(state: InformationDialogState?, reduce: InformationDialogReduce): InformationDialogState? {
+    return when(reduce) {
+      is InformationDialogReduce.UpdateTemplateList -> state?.copy(templateList = reduce.templateList)
+      is InformationDialogReduce.UpdateSelectedTemplate -> state?.copy(selectedTemplate = reduce.selectedTemplate)
     }
   }
 
@@ -133,14 +143,13 @@ class FirstVoteViewModel @Inject constructor(
     loungeStatusFlow = launch { collectLoungeStatus(lounge.id) }
     memberListFlow = launch { collectMemberList(lounge.id) }
 
-    val foodItemList = foodRepository.getAllFood().map { food ->
-      FoodItem(food = food.asUI())
-    }
-    updateState(FirstVoteReduce.UpdateFoodItemList(foodItemList))
-
     val templateList = templateRepository.getTemplateList(userId).map { it.asUI() }
 
-    setDialogState(FirstVoteDialog.SelectTemplateDialog(templateList))
+    updateState(FirstVoteReduce.UpdateInformationDialogState(InformationDialogState()))
+    updateState(InformationDialogReduce.UpdateTemplateList(templateList))
+
+    val foodItemList = foodRepository.getAllFood().map { food -> FoodItem(food = food.asUI()) }
+    updateState(FirstVoteReduce.UpdateFoodItemList(foodItemList))
   }
 
   private suspend fun collectLoungeStatus(loungeId: String) {
@@ -173,8 +182,11 @@ class FirstVoteViewModel @Inject constructor(
     }
   }
 
-  private suspend fun selectTemplate(template: TemplateUIModel?) {
-    if (template != null) {
+  private suspend fun selectTemplate() {
+    val dialogState = currentState.informationDialogState ?: return
+    updateState(FirstVoteReduce.UpdateInformationDialogState(null))
+
+    dialogState.selectedTemplate?.let { template ->
       val foodItemList = foodRepository.getAllFood().map { food ->
         FoodItem(
           food = food.asUI(),
@@ -187,8 +199,6 @@ class FirstVoteViewModel @Inject constructor(
       }
 
       updateState(FirstVoteReduce.UpdateFoodItemList(foodItemList))
-
-      setDialogState(null)
     }
   }
 
@@ -228,6 +238,9 @@ class FirstVoteViewModel @Inject constructor(
   }
 
   private suspend fun exitVote() {
+    currentState.exitDialogState ?: return
+    updateState(FirstVoteReduce.UpdateExitDialogState(null))
+
     loungeStatusFlow.cancel()
     memberListFlow.cancel()
 

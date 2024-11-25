@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -18,18 +17,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,9 +40,8 @@ import com.jwd.lunchvote.presentation.util.loginWithGoogleCredential
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.KakaoLoginButton
 import com.jwd.lunchvote.presentation.widget.LoginButtonSize
+import com.jwd.lunchvote.presentation.widget.LunchVotePasswordField
 import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
-import com.jwd.lunchvote.presentation.widget.PasswordInvisibleIcon
-import com.jwd.lunchvote.presentation.widget.PasswordVisibleIcon
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.kakao.sdk.common.model.ClientError
@@ -123,7 +115,7 @@ private fun LoginScreen(
   onEvent: (LoginEvent) -> Unit = {}
 ) {
   Screen(
-    modifier = modifier,
+    modifier = modifier.padding(start = 24.dp, top = 24.dp, bottom = 32.dp, end = 24.dp),
     topAppBar = {
       Image(
         painterResource(R.drawable.bg_login_title),
@@ -134,36 +126,29 @@ private fun LoginScreen(
       )
     }
   ) {
-    Column(
+    LoginFields(
+      email = state.email,
+      password = state.password,
+      onEmailChange = { onEvent(LoginEvent.OnEmailChange(it)) },
+      onPasswordChange = { onEvent(LoginEvent.OnPasswordChange(it)) },
+      onClickEmailLoginButton = { onEvent(LoginEvent.OnClickEmailLoginButton) },
+      loading = loading,
+      modifier = Modifier.fillMaxWidth()
+    )
+    Gap(height = 8.dp)
+    RegisterRow(
+      onClickRegisterButton = { onEvent(LoginEvent.OnClickRegisterButton) },
+      loading = loading,
+      modifier = Modifier.fillMaxWidth()
+    )
+    Gap(minHeight = 64.dp)
+    SocialLoginButtons(
+      onClickKakaoLoginButton = { onEvent(LoginEvent.OnClickKakaoLoginButton) },
+      loading = loading,
       modifier = Modifier
-        .fillMaxSize()
-        .padding(horizontal = 24.dp)
-        .padding(top = 24.dp, bottom = 32.dp)
-    ) {
-      LoginFields(
-        email = state.email,
-        password = state.password,
-        onEmailChange = { onEvent(LoginEvent.OnEmailChange(it)) },
-        onPasswordChange = { onEvent(LoginEvent.OnPasswordChange(it)) },
-        onClickEmailLoginButton = { onEvent(LoginEvent.OnClickEmailLoginButton) },
-        loading = loading,
-        modifier = Modifier.fillMaxWidth()
-      )
-      Gap(height = 8.dp)
-      RegisterRow(
-        onClickRegisterButton = { onEvent(LoginEvent.OnClickRegisterButton) },
-        loading = loading,
-        modifier = Modifier.fillMaxWidth()
-      )
-      Gap(minHeight = 64.dp)
-      SocialLoginButtons(
-        onClickKakaoLoginButton = { onEvent(LoginEvent.OnClickKakaoLoginButton) },
-        loading = loading,
-        modifier = Modifier
-          .height(IntrinsicSize.Max)
-          .fillMaxWidth()
-      )
-    }
+        .height(IntrinsicSize.Max)
+        .fillMaxWidth()
+    )
   }
 }
 
@@ -182,43 +167,30 @@ private fun LoginFields(
     verticalArrangement = Arrangement.spacedBy(8.dp)
   ) {
     val isValid = EmailConfig.REGEX.matches(email)
-    var isVisible by remember { mutableStateOf(false) }
 
-    LunchVoteTextField(
-      text = email,
-      onTextChange = onEmailChange,
-      hintText = stringResource(R.string.login_email_hint),
+    Column(
       modifier = Modifier.fillMaxWidth(),
-      enabled = loading.not(),
-      keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
-    )
-    LunchVoteTextField(
-      text = password,
-      onTextChange = onPasswordChange,
-      hintText = stringResource(R.string.login_password_hint),
-      modifier = Modifier.fillMaxWidth(),
-      enabled = loading.not(),
-      trailingIcon = {
-        if (password.isNotEmpty()) {
-          if (isVisible) PasswordInvisibleIcon(
-            onClick = { isVisible = false }
-          ) else PasswordVisibleIcon(
-            onClick = { isVisible = true }
-          )
-        }
-      },
-      keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-      visualTransformation = if (isVisible) VisualTransformation.None
-      else PasswordVisualTransformation()
-    )
-    Text(
-      text = stringResource(R.string.login_email_format_error),
-      modifier = Modifier
-        .padding(horizontal = 8.dp)
-        .alpha(if (email.isNotEmpty() && isValid.not()) 1f else 0f),
-      color = MaterialTheme.colorScheme.error,
-      style = MaterialTheme.typography.labelMedium
-    )
+      verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+      LunchVoteTextField(
+        text = email,
+        onTextChange = onEmailChange,
+        hintText = stringResource(R.string.login_email_hint),
+        modifier = Modifier.fillMaxWidth(),
+        enabled = loading.not(),
+        isError = email.isNotEmpty() && isValid.not(),
+        errorMessage = stringResource(R.string.login_email_format_error),
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+      )
+      LunchVotePasswordField(
+        text = password,
+        onTextChange = onPasswordChange,
+        hintText = stringResource(R.string.login_password_hint),
+        modifier = Modifier.fillMaxWidth(),
+        enabled = loading.not(),
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+      )
+    }
     Button(
       onClick = onClickEmailLoginButton,
       modifier = Modifier.fillMaxWidth(),
@@ -287,7 +259,7 @@ private fun SocialLoginButtons(
 
 @Preview
 @Composable
-private fun Preview1() {
+private fun Default() {
   ScreenPreview {
     LoginScreen(
       LoginState()
@@ -297,7 +269,7 @@ private fun Preview1() {
 
 @Preview
 @Composable
-private fun Preview2() {
+private fun InvalidEmail() {
   ScreenPreview {
     LoginScreen(
       LoginState(
@@ -309,7 +281,7 @@ private fun Preview2() {
 
 @Preview
 @Composable
-private fun Preview3() {
+private fun Valid() {
   ScreenPreview {
     LoginScreen(
       LoginState(
@@ -322,7 +294,7 @@ private fun Preview3() {
 
 @Preview
 @Composable
-private fun Preview4() {
+private fun Loading() {
   ScreenPreview {
     LoginScreen(
       LoginState(

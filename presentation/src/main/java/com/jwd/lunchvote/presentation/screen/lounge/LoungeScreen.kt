@@ -19,13 +19,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
+import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -60,20 +60,22 @@ import com.jwd.lunchvote.presentation.model.ChatUIModel
 import com.jwd.lunchvote.presentation.model.ChatUIModel.Type.SYSTEM
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.UserUIModel
-import com.jwd.lunchvote.presentation.screen.lounge.LoungeContract.Companion.VOTE_EXIT_DIALOG
+import com.jwd.lunchvote.presentation.screen.lounge.LoungeContract.ExitDialogEvent
 import com.jwd.lunchvote.presentation.screen.lounge.LoungeContract.LoungeEvent
 import com.jwd.lunchvote.presentation.screen.lounge.LoungeContract.LoungeSideEffect
 import com.jwd.lunchvote.presentation.screen.lounge.LoungeContract.LoungeState
+import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.ChatBubble
+import com.jwd.lunchvote.presentation.widget.Dialog
+import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.EmptyProfile
 import com.jwd.lunchvote.presentation.widget.InviteProfile
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
-import com.jwd.lunchvote.presentation.widget.LunchVoteTopBar
 import com.jwd.lunchvote.presentation.widget.MemberProfile
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
-import com.jwd.lunchvote.presentation.widget.VoteExitDialog
+import com.jwd.lunchvote.presentation.widget.TopBar
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -91,7 +93,6 @@ fun LoungeRoute(
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
   val loading by viewModel.isLoading.collectAsStateWithLifecycle()
-  val dialog by viewModel.dialogState.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
@@ -100,8 +101,6 @@ fun LoungeRoute(
         is LoungeSideEffect.NavigateToLoungeSetting -> navigateToLoungeSetting(it.loungeId)
         is LoungeSideEffect.NavigateToMember -> navigateToMember(it.userId, it.loungeId)
         is LoungeSideEffect.NavigateToVote -> navigateToFirstVote(it.loungeId)
-        is LoungeSideEffect.OpenVoteExitDialog -> viewModel.openDialog(VOTE_EXIT_DIALOG)
-        is LoungeSideEffect.CloseDialog -> viewModel.openDialog("")
         is LoungeSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
         is LoungeSideEffect.CopyToClipboard -> clipboardManager.setText(AnnotatedString(it.loungeId))
       }
@@ -110,11 +109,10 @@ fun LoungeRoute(
 
   BackHandler { viewModel.sendEvent(LoungeEvent.OnClickBackButton) }
 
-  when (dialog) {
-    VOTE_EXIT_DIALOG -> VoteExitDialog(
+  state.exitDialogState?.let {
+    ExitDialog(
       isOwner = state.isOwner,
-      onDismissRequest = { viewModel.sendEvent(LoungeEvent.OnClickCancelButtonVoteExitDialog) },
-      onConfirmation = { viewModel.sendEvent(LoungeEvent.OnClickConfirmButtonVoteExitDialog) }
+      onEvent = viewModel::sendEvent
     )
   }
 
@@ -135,9 +133,9 @@ private fun LoungeScreen(
   onEvent: (LoungeEvent) -> Unit = {}
 ) {
   Screen(
-    modifier = modifier,
+    modifier = modifier.padding(horizontal = 24.dp),
     topAppBar = {
-      LunchVoteTopBar(
+      TopBar(
         title = stringResource(R.string.lounge_topbar_title),
         popBackStack = { onEvent(LoungeEvent.OnClickBackButton) },
         actions = {
@@ -145,11 +143,21 @@ private fun LoungeScreen(
             onClick = { onEvent(LoungeEvent.OnClickSettingButton) }
           ) {
             Icon(
-              Icons.Outlined.Settings,
+              Icons.Rounded.Settings,
               contentDescription = "Settings"
             )
           }
         }
+      )
+    },
+    bottomAppBar = {
+      LoungeBottomBar(
+        text = state.text,
+        isOwner = state.isOwner,
+        modifier = Modifier.fillMaxWidth(),
+        onTextChange = { onEvent(LoungeEvent.OnTextChange(it)) },
+        onClickSendChatButton = { onEvent(LoungeEvent.OnClickSendChatButton) },
+        onClickActionButton = { onEvent(LoungeEvent.OnClickActionButton) }
       )
     },
     scrollable = false
@@ -170,14 +178,6 @@ private fun LoungeScreen(
         .weight(1f),
       onClickMember = { onEvent(LoungeEvent.OnClickMember(it)) }
     )
-    LoungeBottomBar(
-      text = state.text,
-      isOwner = state.isOwner,
-      modifier = Modifier.fillMaxWidth(),
-      onTextChange = { onEvent(LoungeEvent.OnTextChange(it)) },
-      onClickSendChatButton = { onEvent(LoungeEvent.OnClickSendChatButton) },
-      onClickActionButton = { onEvent(LoungeEvent.OnClickActionButton) }
-    )
   }
 }
 
@@ -190,7 +190,7 @@ private fun MemberRow(
   modifier: Modifier = Modifier
 ) {
   Row(
-    modifier = modifier.padding(start = 32.dp, top = 16.dp, end = 32.dp, bottom = 8.dp),
+    modifier = modifier.padding(top = 16.dp, bottom = 8.dp),
     horizontalArrangement = Arrangement.SpaceBetween
   ) {
     memberList.forEach { member ->
@@ -221,7 +221,7 @@ private fun ChatList(
   val lazyListState = rememberLazyListState()
 
   LazyColumn(
-    modifier = modifier.padding(24.dp),
+    modifier = modifier.padding(vertical = 24.dp),
     state = lazyListState,
     verticalArrangement = Arrangement.Top,
     horizontalAlignment = Alignment.CenterHorizontally,
@@ -355,6 +355,41 @@ private fun ChatTextField(
   }
 }
 
+@Composable
+private fun ExitDialog(
+  isOwner: Boolean,
+  modifier: Modifier = Modifier,
+  onEvent: (ExitDialogEvent) -> Unit = {}
+) {
+  Dialog(
+    title = stringResource(R.string.l_exit_dialog_title),
+    onDismissRequest = { onEvent(ExitDialogEvent.OnClickCancelButton) },
+    modifier = modifier,
+    icon = {
+      Icon(
+        imageVector = Icons.Rounded.Warning,
+        contentDescription = "Warning"
+      )
+    },
+    iconColor = MaterialTheme.colorScheme.error,
+    body = if (isOwner) stringResource(R.string.l_exit_dialog_body_owner)
+      else stringResource(R.string.l_exit_dialog_body_not_owner),
+    buttons = {
+      DialogButton(
+        text = stringResource(R.string.l_exit_dialog_cancel_button),
+        onClick = { onEvent(ExitDialogEvent.OnClickCancelButton) },
+        color = MaterialTheme.colorScheme.onSurface,
+        isDismiss = true
+      )
+      DialogButton(
+        text = stringResource(R.string.l_exit_dialog_exit_button),
+        onClick = { onEvent(ExitDialogEvent.OnClickExitButton) },
+        color = MaterialTheme.colorScheme.error
+      )
+    }
+  )
+}
+
 @Preview
 @Composable
 private fun Preview() {
@@ -415,6 +450,26 @@ private fun Preview() {
             .asUI()
         )
       )
+    )
+  }
+}
+
+@Preview
+@Composable
+private fun ExitDialogOwnerPreview() {
+  LunchVoteTheme {
+    ExitDialog(
+      isOwner = true
+    )
+  }
+}
+
+@Preview
+@Composable
+private fun ExitDialogMemberPreview() {
+  LunchVoteTheme {
+    ExitDialog(
+      isOwner = false
     )
   }
 }

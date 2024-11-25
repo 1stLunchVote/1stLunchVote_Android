@@ -1,7 +1,6 @@
 package com.jwd.lunchvote.presentation.screen.login.register.nickname
 
 import android.content.Context
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -24,9 +23,9 @@ import com.jwd.lunchvote.presentation.screen.login.register.nickname.NicknameCon
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
-import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import com.jwd.lunchvote.presentation.widget.TextField
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -65,9 +64,7 @@ private fun NicknameScreen(
   onEvent: (NicknameEvent) -> Unit = {}
 ) {
   Screen(
-    modifier = modifier
-      .fillMaxSize()
-      .padding(horizontal = 24.dp)
+    modifier = modifier.padding(horizontal = 24.dp)
   ) {
     Gap()
     Text(
@@ -82,7 +79,7 @@ private fun NicknameScreen(
       style = MaterialTheme.typography.bodyLarge
     )
     Gap(height = 64.dp)
-    LunchVoteTextField(
+    TextField(
       text = state.nickname,
       onTextChange = { onEvent(NicknameEvent.OnNicknameChange(it)) },
       hintText = stringResource(R.string.nickname_nickname_hint),
