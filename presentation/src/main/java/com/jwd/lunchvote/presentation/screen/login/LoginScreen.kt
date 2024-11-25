@@ -40,10 +40,10 @@ import com.jwd.lunchvote.presentation.util.loginWithGoogleCredential
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.KakaoLoginButton
 import com.jwd.lunchvote.presentation.widget.LoginButtonSize
-import com.jwd.lunchvote.presentation.widget.LunchVotePasswordField
-import com.jwd.lunchvote.presentation.widget.LunchVoteTextField
+import com.jwd.lunchvote.presentation.widget.PasswordField
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import com.jwd.lunchvote.presentation.widget.TextField
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
@@ -172,7 +172,7 @@ private fun LoginFields(
       modifier = Modifier.fillMaxWidth(),
       verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-      LunchVoteTextField(
+      TextField(
         text = email,
         onTextChange = onEmailChange,
         hintText = stringResource(R.string.login_email_hint),
@@ -182,7 +182,7 @@ private fun LoginFields(
         errorMessage = stringResource(R.string.login_email_format_error),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
       )
-      LunchVotePasswordField(
+      PasswordField(
         text = password,
         onTextChange = onPasswordChange,
         hintText = stringResource(R.string.login_password_hint),

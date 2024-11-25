@@ -98,7 +98,7 @@ private fun AddContactScreen(
       modifier = Modifier
         .fillMaxWidth()
         .weight(1f),
-      maxLines = Int.MAX_VALUE
+      singleLine = false
     )
     Gap(height = 16.dp)
     Button(

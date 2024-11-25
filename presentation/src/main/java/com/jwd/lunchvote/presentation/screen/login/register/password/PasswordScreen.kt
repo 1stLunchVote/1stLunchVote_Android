@@ -24,7 +24,7 @@ import com.jwd.lunchvote.presentation.screen.login.register.password.PasswordCon
 import com.jwd.lunchvote.presentation.screen.login.register.password.PasswordContract.PasswordState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.Gap
-import com.jwd.lunchvote.presentation.widget.LunchVotePasswordField
+import com.jwd.lunchvote.presentation.widget.PasswordField
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import kotlinx.coroutines.channels.Channel
@@ -100,7 +100,7 @@ private fun PasswordScreen(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(4.dp)
       ) {
-        LunchVotePasswordField(
+        PasswordField(
           text = state.password,
           onTextChange = { onEvent(PasswordEvent.OnPasswordChange(it)) },
           hintText = stringResource(R.string.password_password_hint),
@@ -108,7 +108,7 @@ private fun PasswordScreen(
           isError = if (state.password.isEmpty()) null else formatError,
           errorMessage = stringResource(R.string.password_password_format_error),
         )
-        LunchVotePasswordField(
+        PasswordField(
           text = state.passwordConfirm,
           onTextChange = { onEvent(PasswordEvent.OnPasswordConfirmChange(it)) },
           hintText = stringResource(R.string.password_password_confirm_hint),

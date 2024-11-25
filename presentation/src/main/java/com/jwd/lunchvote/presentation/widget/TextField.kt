@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicTextField
@@ -19,7 +20,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,16 +57,14 @@ fun TextField(
   leadingIcon: @Composable (() -> Unit)? = null,
   trailingIcon: @Composable (() -> Unit)? = null,
   visualTransformation: VisualTransformation = VisualTransformation.None,
-  keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-  maxLines: Int = 1,
+  singleLine: Boolean = true,
+  keyboardOptions: KeyboardOptions = if (singleLine) KeyboardOptions(imeAction = ImeAction.Done) else KeyboardOptions.Default,
+  maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
   focusManager: FocusManager = LocalFocusManager.current,
   keyboardController: SoftwareKeyboardController? = LocalSoftwareKeyboardController.current,
   isFocused: Boolean = false
 ) {
   var focused by remember { mutableStateOf(isFocused) }
-  LaunchedEffect(isFocused) {
-    focused = enabled && isFocused
-  }
 
   val color = when (isError) {
     null -> MaterialTheme.colorScheme.primary
@@ -82,17 +80,23 @@ fun TextField(
     readOnly = readOnly,
     textStyle = MaterialTheme.typography.bodyMedium,
     visualTransformation = visualTransformation,
-    singleLine = maxLines == 1,
+    singleLine = singleLine,
     maxLines = maxLines,
     keyboardOptions = keyboardOptions,
     keyboardActions = KeyboardActions(
       onDone = {
-        if (keyboardOptions.imeAction == ImeAction.Next) {
-          KeyboardActions.Default.onNext
-        } else {
-          KeyboardActions.Default.onDone
-          focusManager.clearFocus()
-          keyboardController?.hide()
+        when (keyboardOptions.imeAction) {
+          ImeAction.Next -> {
+            KeyboardActions.Default.onNext
+          }
+          ImeAction.Done -> {
+            KeyboardActions.Default.onDone
+            focusManager.clearFocus()
+            keyboardController?.hide()
+          }
+          else -> {
+            KeyboardOptions.Default
+          }
         }
       }
     )
@@ -125,13 +129,13 @@ fun TextField(
         }
         .padding(16.dp),
       horizontalArrangement = Arrangement.spacedBy(8.dp),
-      verticalAlignment = Alignment.CenterVertically
+      verticalAlignment = Alignment.Top
     ) {
       leadingIcon?.invoke()
       Box(
         modifier = Modifier
           .weight(1f)
-          .height(20.dp),
+          .heightIn(min = 20.dp),
         contentAlignment = Alignment.CenterStart
       ) {
         innerTextField()
@@ -152,7 +156,7 @@ fun TextField(
 }
 
 @Composable
-fun LunchVoteTextField(
+fun TextField(
   text: String,
   onTextChange: (String) -> Unit,
   hintText: String,
@@ -165,7 +169,8 @@ fun LunchVoteTextField(
   trailingIcon: @Composable (() -> Unit)? = null,
   visualTransformation: VisualTransformation = VisualTransformation.None,
   keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-  maxLines: Int = 1,
+  singleLine: Boolean = true,
+  maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
   focusManager: FocusManager = LocalFocusManager.current,
   keyboardController: SoftwareKeyboardController? = LocalSoftwareKeyboardController.current,
   isFocused: Boolean = false
@@ -204,7 +209,7 @@ fun LunchVoteTextField(
 }
 
 @Composable
-fun LunchVotePasswordField(
+fun PasswordField(
   text: String,
   onTextChange: (String) -> Unit,
   hintText: String,
@@ -219,12 +224,9 @@ fun LunchVotePasswordField(
   isFocused: Boolean = false,
   isVisible: Boolean = false
 ) {
-  var visible by remember { mutableStateOf(isFocused) }
-  LaunchedEffect(isFocused) {
-    visible = enabled && isVisible
-  }
+  var visible by remember { mutableStateOf(isVisible) }
 
-  LunchVoteTextField(
+  TextField(
     text = text,
     onTextChange = onTextChange,
     hintText = hintText,
@@ -242,7 +244,7 @@ fun LunchVotePasswordField(
         )
       }
     },
-    visualTransformation = if (isVisible) VisualTransformation.None else PasswordVisualTransformation(),
+    visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
     keyboardOptions = keyboardOptions,
     focusManager = focusManager,
     keyboardController = keyboardController,
@@ -500,39 +502,91 @@ private fun Preview() {
       Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
       ) {
-        LunchVotePasswordField(
+        PasswordField(
           text = "Password",
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f),
           isVisible = true
         )
-        LunchVotePasswordField(
+        PasswordField(
           text = "",
           onTextChange = {},
           hintText = "Blank",
           modifier = Modifier.weight(1f)
         )
-        LunchVotePasswordField(
+        PasswordField(
           text = "",
           onTextChange = {},
           hintText = "Focused",
           modifier = Modifier.weight(1f),
           isFocused = true
         )
-        LunchVotePasswordField(
+        PasswordField(
           text = "Typed",
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f),
           isFocused = true
         )
-        LunchVotePasswordField(
+        PasswordField(
           text = "Disabled",
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f),
           enabled = false
+        )
+      }
+      Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+      ) {
+        TextField(
+          text = "Multiline",
+          onTextChange = {},
+          hintText = "",
+          modifier = Modifier
+            .weight(1f)
+            .height(300.dp),
+          singleLine = false
+        )
+        TextField(
+          text = "",
+          onTextChange = {},
+          hintText = "Blank",
+          modifier = Modifier
+            .weight(1f)
+            .height(300.dp),
+          singleLine = false
+        )
+        TextField(
+          text = "",
+          onTextChange = {},
+          hintText = "Focused",
+          modifier = Modifier
+            .weight(1f)
+            .height(300.dp),
+          singleLine = false,
+          isFocused = true
+        )
+        TextField(
+          text = "Typed",
+          onTextChange = {},
+          hintText = "",
+          modifier = Modifier
+            .weight(1f)
+            .height(300.dp),
+          singleLine = false,
+          isFocused = true
+        )
+        TextField(
+          text = "Disabled",
+          onTextChange = {},
+          hintText = "",
+          modifier = Modifier
+            .weight(1f)
+            .height(300.dp),
+          enabled = false,
+          singleLine = false
         )
       }
     }
