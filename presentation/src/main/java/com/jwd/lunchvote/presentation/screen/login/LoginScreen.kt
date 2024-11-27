@@ -170,7 +170,7 @@ private fun LoginFields(
 
     Column(
       modifier = Modifier.fillMaxWidth(),
-      verticalArrangement = Arrangement.spacedBy(4.dp)
+      verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
       TextField(
         text = email,
@@ -219,9 +219,7 @@ private fun RegisterRow(
     Text(
       text = stringResource(R.string.login_register_button),
       modifier = Modifier
-        .clickableWithoutEffect(
-          enabled = loading.not(), onClick = onClickRegisterButton
-        )
+        .clickableWithoutEffect(loading.not()) { onClickRegisterButton() }
         .padding(start = 8.dp, top = 12.dp, bottom = 12.dp, end = 0.dp),
       color = MaterialTheme.colorScheme.primary,
       style = MaterialTheme.typography.bodyLarge.copy(

@@ -69,6 +69,7 @@ dependencies {
   implementation(libs.bundles.compose)
 
   implementation(libs.bundles.coil)
+  implementation(libs.balloon)
 
   implementation(libs.kakao)
 

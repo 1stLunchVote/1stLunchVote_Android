@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
@@ -27,11 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -54,14 +49,13 @@ fun TextField(
   enabled: Boolean = true,
   readOnly: Boolean = false,
   isError: Boolean? = null,
+  errorMessage: String? = null,
   leadingIcon: @Composable (() -> Unit)? = null,
   trailingIcon: @Composable (() -> Unit)? = null,
-  visualTransformation: VisualTransformation = VisualTransformation.None,
   singleLine: Boolean = true,
-  keyboardOptions: KeyboardOptions = if (singleLine) KeyboardOptions(imeAction = ImeAction.Done) else KeyboardOptions.Default,
   maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
-  focusManager: FocusManager = LocalFocusManager.current,
-  keyboardController: SoftwareKeyboardController? = LocalSoftwareKeyboardController.current,
+  keyboardOptions: KeyboardOptions = if (singleLine) KeyboardOptions(imeAction = ImeAction.Done) else KeyboardOptions.Default,
+  visualTransformation: VisualTransformation = VisualTransformation.None,
   isFocused: Boolean = false
 ) {
   var focused by remember { mutableStateOf(isFocused) }
@@ -72,138 +66,73 @@ fun TextField(
     true -> MaterialTheme.colorScheme.error
   }
 
-  BasicTextField(
-    value = text,
-    onValueChange = onTextChange,
-    modifier = modifier.onFocusChanged { focused = it.isFocused },
-    enabled = enabled,
-    readOnly = readOnly,
-    textStyle = MaterialTheme.typography.bodyMedium,
-    visualTransformation = visualTransformation,
-    singleLine = singleLine,
-    maxLines = maxLines,
-    keyboardOptions = keyboardOptions,
-    keyboardActions = KeyboardActions(
-      onDone = {
-        when (keyboardOptions.imeAction) {
-          ImeAction.Next -> {
-            KeyboardActions.Default.onNext
-          }
-          ImeAction.Done -> {
-            KeyboardActions.Default.onDone
-            focusManager.clearFocus()
-            keyboardController?.hide()
-          }
-          else -> {
-            KeyboardOptions.Default
-          }
-        }
-      }
-    )
-  ) { innerTextField ->
-    Row(
-      modifier = modifier
-        .conditional(focused, modifierIf = {
-          outerShadow(
-            color = color,
-            shape = MaterialTheme.shapes.small,
-            offsetY = 0.dp,
-            blur = 4.dp,
-          )
-        }, modifierElse = {
-          innerShadow(
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.32f),
-            shape = MaterialTheme.shapes.small,
-            offsetY = 2.dp,
-            blur = 2.dp
-          )
-        })
-        .background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.small)
-        .conditional(text.isNotEmpty() || focused, modifierIf = {
-          border(1.dp, color, MaterialTheme.shapes.small)
-        }, modifierElse = {
-          background(MaterialTheme.colorScheme.onBackground.copy(0.1f), MaterialTheme.shapes.small)
-        })
-        .conditional(enabled.not()) {
-          alpha(0.32f)
-        }
-        .padding(16.dp),
-      horizontalArrangement = Arrangement.spacedBy(8.dp),
-      verticalAlignment = Alignment.Top
-    ) {
-      leadingIcon?.invoke()
-      Box(
-        modifier = Modifier
-          .weight(1f)
-          .heightIn(min = 20.dp),
-        contentAlignment = Alignment.CenterStart
-      ) {
-        innerTextField()
-        if (hintText.isNotEmpty() && text.isEmpty()) {
-          Text(
-            text = hintText,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-            style = MaterialTheme.typography.bodyMedium
-          )
-        }
-      }
-      if (isError == true) {
-        ErrorIcon()
-      }
-      trailingIcon?.invoke()
-    }
-  }
-}
-
-@Composable
-fun TextField(
-  text: String,
-  onTextChange: (String) -> Unit,
-  hintText: String,
-  modifier: Modifier = Modifier,
-  enabled: Boolean = true,
-  readOnly: Boolean = false,
-  isError: Boolean? = null,
-  errorMessage: String? = null,
-  leadingIcon: @Composable (() -> Unit)? = null,
-  trailingIcon: @Composable (() -> Unit)? = null,
-  visualTransformation: VisualTransformation = VisualTransformation.None,
-  keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-  singleLine: Boolean = true,
-  maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
-  focusManager: FocusManager = LocalFocusManager.current,
-  keyboardController: SoftwareKeyboardController? = LocalSoftwareKeyboardController.current,
-  isFocused: Boolean = false
-) {
-  Column(
+  TooltipBox(
+    text = errorMessage ?: ".",
+    visible = isError == true && errorMessage.isNullOrEmpty().not() && focused,
     modifier = modifier,
-    verticalArrangement = Arrangement.spacedBy(4.dp)
+    color = MaterialTheme.colorScheme.error
   ) {
-    TextField(
-      text = text,
-      onTextChange = onTextChange,
-      hintText = hintText,
+    BasicTextField(
+      value = text,
+      onValueChange = onTextChange,
+      modifier = modifier.onFocusChanged { focused = it.isFocused },
       enabled = enabled,
       readOnly = readOnly,
-      isError = isError,
-      leadingIcon = leadingIcon,
-      trailingIcon = trailingIcon,
-      visualTransformation = visualTransformation,
+      textStyle = MaterialTheme.typography.bodyMedium,
       keyboardOptions = keyboardOptions,
+      singleLine = singleLine,
       maxLines = maxLines,
-      focusManager = focusManager,
-      keyboardController = keyboardController,
-      isFocused = isFocused
-    )
-    errorMessage?.let { message ->
-      Text(
-        text = message,
-        modifier = Modifier
-          .padding(horizontal = 8.dp)
-          .conditional(isError == null || isError == false) { alpha(0f) },
-        color = MaterialTheme.colorScheme.error,
-        style = MaterialTheme.typography.labelMedium
-      )
+      visualTransformation = visualTransformation
+    ) { innerTextField ->
+      Row(
+        modifier = modifier
+          .conditional(focused, modifierIf = {
+            outerShadow(
+              color = color,
+              shape = MaterialTheme.shapes.small,
+              offsetY = 0.dp,
+              blur = 4.dp
+            )
+          }, modifierElse = {
+            innerShadow(
+              color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.32f),
+              shape = MaterialTheme.shapes.small,
+              offsetY = 2.dp,
+              blur = 2.dp
+            )
+          })
+          .background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.small)
+          .conditional(text.isNotEmpty() || focused, modifierIf = {
+            border(1.dp, color, MaterialTheme.shapes.small)
+          }, modifierElse = {
+            background(MaterialTheme.colorScheme.onBackground.copy(0.1f), MaterialTheme.shapes.small)
+          })
+          .conditional(enabled.not()) { alpha(0.32f) }
+          .padding(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.Top
+      ) {
+        leadingIcon?.invoke()
+        Box(
+          modifier = Modifier
+            .weight(1f)
+            .heightIn(min = 20.dp),
+          contentAlignment = Alignment.CenterStart
+        ) {
+          innerTextField()
+          if (hintText.isNotEmpty() && text.isEmpty()) {
+            Text(
+              text = hintText,
+              color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+              style = MaterialTheme.typography.bodyMedium
+            )
+          }
+        }
+        if (isError == true) {
+          ErrorIcon()
+        }
+        trailingIcon?.invoke()
+      }
     }
   }
 }
@@ -219,8 +148,6 @@ fun PasswordField(
   isError: Boolean? = null,
   errorMessage: String? = null,
   keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-  focusManager: FocusManager = LocalFocusManager.current,
-  keyboardController: SoftwareKeyboardController? = LocalSoftwareKeyboardController.current,
   isFocused: Boolean = false,
   isVisible: Boolean = false
 ) {
@@ -237,17 +164,12 @@ fun PasswordField(
     errorMessage = errorMessage,
     trailingIcon = {
       if (text.isNotEmpty()) {
-        if (visible) PasswordInvisibleIcon(
-          onClick = { visible = false }
-        ) else PasswordVisibleIcon(
-          onClick = { visible = true }
-        )
+        if (visible) PasswordVisibleIcon { visible = false }
+        else PasswordInvisibleIcon { visible = true }
       }
     },
     visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
     keyboardOptions = keyboardOptions,
-    focusManager = focusManager,
-    keyboardController = keyboardController,
     isFocused = isFocused
   )
 }
@@ -289,8 +211,8 @@ fun SearchIcon(
 
 @Composable
 fun PasswordVisibleIcon(
-  onClick: () -> Unit,
-  modifier: Modifier = Modifier
+  modifier: Modifier = Modifier,
+  onClick: () -> Unit
 ) {
   Icon(
     painter = painterResource(R.drawable.ic_password_visible),
@@ -303,8 +225,8 @@ fun PasswordVisibleIcon(
 
 @Composable
 fun PasswordInvisibleIcon(
-  onClick: () -> Unit,
-  modifier: Modifier = Modifier
+  modifier: Modifier = Modifier,
+  onClick: () -> Unit
 ) {
   Icon(
     painter = painterResource(R.drawable.ic_password_invisible),
@@ -320,23 +242,16 @@ fun PasswordInvisibleIcon(
 private fun Preview() {
   LunchVoteTheme {
     Column(
-      modifier = Modifier.padding(16.dp),
-      verticalArrangement = Arrangement.spacedBy(8.dp)
+      modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
       Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
       ) {
         TextField(
-          text = "Active",
-          onTextChange = {},
-          hintText = "",
-          modifier = Modifier.weight(1f)
+          text = "Active", onTextChange = {}, hintText = "", modifier = Modifier.weight(1f)
         )
         TextField(
-          text = "",
-          onTextChange = {},
-          hintText = "Blank",
-          modifier = Modifier.weight(1f)
+          text = "", onTextChange = {}, hintText = "Blank", modifier = Modifier.weight(1f)
         )
         TextField(
           text = "",
@@ -393,8 +308,7 @@ private fun Preview() {
           isError = false,
           isFocused = true
         )
-        TextField(
-          text = "Disabled",
+        TextField(text = "Disabled",
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f),
@@ -402,8 +316,7 @@ private fun Preview() {
           enabled = false,
           trailingIcon = {
             CheckIcon()
-          }
-        )
+          })
       }
       Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -413,14 +326,16 @@ private fun Preview() {
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f),
-          isError = true
+          isError = true,
+          errorMessage = "Error"
         )
         TextField(
           text = "",
           onTextChange = {},
           hintText = "Blank",
           modifier = Modifier.weight(1f),
-          isError = true
+          isError = true,
+          errorMessage = "Error"
         )
         TextField(
           text = "",
@@ -428,6 +343,7 @@ private fun Preview() {
           hintText = "Focused",
           modifier = Modifier.weight(1f),
           isError = true,
+          errorMessage = "Error",
           isFocused = true
         )
         TextField(
@@ -436,6 +352,7 @@ private fun Preview() {
           hintText = "",
           modifier = Modifier.weight(1f),
           isError = true,
+          errorMessage = "Error",
           isFocused = true
         )
         TextField(
@@ -444,32 +361,28 @@ private fun Preview() {
           hintText = "",
           modifier = Modifier.weight(1f),
           isError = true,
+          errorMessage = "Error",
           enabled = false
         )
       }
       Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
       ) {
-        TextField(
-          text = "Search",
+        TextField(text = "Search",
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f),
           leadingIcon = {
             SearchIcon()
-          }
-        )
-        TextField(
-          text = "",
+          })
+        TextField(text = "",
           onTextChange = {},
           hintText = "Blank",
           modifier = Modifier.weight(1f),
           leadingIcon = {
             SearchIcon()
-          }
-        )
-        TextField(
-          text = "",
+          })
+        TextField(text = "",
           onTextChange = {},
           hintText = "Focused",
           modifier = Modifier.weight(1f),
@@ -478,8 +391,7 @@ private fun Preview() {
           },
           isFocused = true
         )
-        TextField(
-          text = "Typed",
+        TextField(text = "Typed",
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f),
@@ -488,16 +400,14 @@ private fun Preview() {
           },
           isFocused = true
         )
-        TextField(
-          text = "Disabled",
+        TextField(text = "Disabled",
           onTextChange = {},
           hintText = "",
           modifier = Modifier.weight(1f),
           enabled = false,
           leadingIcon = {
             SearchIcon()
-          }
-        )
+          })
       }
       Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -510,10 +420,7 @@ private fun Preview() {
           isVisible = true
         )
         PasswordField(
-          text = "",
-          onTextChange = {},
-          hintText = "Blank",
-          modifier = Modifier.weight(1f)
+          text = "", onTextChange = {}, hintText = "Blank", modifier = Modifier.weight(1f)
         )
         PasswordField(
           text = "",
