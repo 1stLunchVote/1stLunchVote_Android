@@ -81,29 +81,24 @@ private fun EmailVerificationScreen(
     Gap(height = 64.dp)
     Column(
       modifier = Modifier.fillMaxWidth(),
-      verticalArrangement = Arrangement.spacedBy(8.dp)
+      verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
       val isValid = EmailConfig.REGEX.matches(state.email)
 
-      Column(
+      TextField(
+        text = state.email,
+        onTextChange = { onEvent(EmailVerificationEvent.OnEmailChange(it)) },
+        hintText = stringResource(R.string.email_verification_email_hint),
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
-      ) {
-        TextField(
-          text = state.email,
-          onTextChange = { onEvent(EmailVerificationEvent.OnEmailChange(it)) },
-          hintText = stringResource(R.string.email_verification_email_hint),
-          modifier = Modifier.fillMaxWidth(),
-          enabled = state.emailSent.not(),
-          isError = if (state.email.isEmpty()) null else state.email.isNotEmpty() && isValid.not(),
-          errorMessage = stringResource(R.string.email_verification_email_format_error),
-          trailingIcon = {
-            if (state.emailSent) {
-              CheckIcon()
-            }
+        enabled = state.emailSent.not(),
+        isError = if (state.email.isEmpty()) null else state.email.isNotEmpty() && isValid.not(),
+        errorMessage = stringResource(R.string.email_verification_email_format_error),
+        trailingIcon = {
+          if (state.emailSent) {
+            CheckIcon()
           }
-        )
-      }
+        }
+      )
       if (state.emailSent.not()) {
         Button(
           onClick = { onEvent(EmailVerificationEvent.OnClickSendButton) },

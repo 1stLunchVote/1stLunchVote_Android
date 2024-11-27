@@ -164,7 +164,7 @@ private fun LoginFields(
 ) {
   Column(
     modifier = modifier,
-    verticalArrangement = Arrangement.spacedBy(8.dp)
+    verticalArrangement = Arrangement.spacedBy(20.dp)
   ) {
     val isValid = EmailConfig.REGEX.matches(email)
 

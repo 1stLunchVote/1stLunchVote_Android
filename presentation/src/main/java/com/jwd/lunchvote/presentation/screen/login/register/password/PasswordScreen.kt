@@ -94,11 +94,11 @@ private fun PasswordScreen(
     Gap(height = 64.dp)
     Column(
       modifier = Modifier.fillMaxWidth(),
-      verticalArrangement = Arrangement.spacedBy(8.dp)
+      verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
       Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp)
       ) {
         PasswordField(
           text = state.password,

@@ -1,6 +1,8 @@
 package com.jwd.lunchvote.presentation.screen.login.register.nickname
 
 import android.content.Context
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -79,19 +81,23 @@ private fun NicknameScreen(
       style = MaterialTheme.typography.bodyLarge
     )
     Gap(height = 64.dp)
-    TextField(
-      text = state.nickname,
-      onTextChange = { onEvent(NicknameEvent.OnNicknameChange(it)) },
-      hintText = stringResource(R.string.nickname_nickname_hint),
-      modifier = Modifier.fillMaxWidth()
-    )
-    Gap(height = 20.dp)
-    Button(
-      onClick = { onEvent(NicknameEvent.OnClickNextButton) },
+    Column(
       modifier = Modifier.fillMaxWidth(),
-      enabled = state.nickname.isNotEmpty()
+      verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-      Text(text = stringResource(R.string.nickname_next_button))
+      TextField(
+        text = state.nickname,
+        onTextChange = { onEvent(NicknameEvent.OnNicknameChange(it)) },
+        hintText = stringResource(R.string.nickname_nickname_hint),
+        modifier = Modifier.fillMaxWidth()
+      )
+      Button(
+        onClick = { onEvent(NicknameEvent.OnClickNextButton) },
+        modifier = Modifier.fillMaxWidth(),
+        enabled = state.nickname.isNotEmpty()
+      ) {
+        Text(text = stringResource(R.string.nickname_next_button))
+      }
     }
     Gap()
     Gap()
