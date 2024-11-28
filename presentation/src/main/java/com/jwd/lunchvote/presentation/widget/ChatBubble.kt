@@ -124,7 +124,7 @@ fun ChatBubble(
                   .padding(bottom = 4.dp)
                   .alpha(if (isSameTimeWithNext) 0f else 1f),
                 color = MaterialTheme.colorScheme.outline,
-                style = MaterialTheme.typography.labelMedium
+                style = MaterialTheme.typography.labelSmall
               )
               MessageBubble(
                 message = chat.message,
@@ -158,7 +158,7 @@ private fun MessageBubble(
   ) {
     Text(
       text = message,
-      style = MaterialTheme.typography.titleMedium,
+      style = MaterialTheme.typography.titleSmall,
       modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp)
     )
   }

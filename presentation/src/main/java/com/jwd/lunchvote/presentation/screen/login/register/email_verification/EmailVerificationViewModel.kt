@@ -63,14 +63,17 @@ class EmailVerificationViewModel @Inject constructor(
   }
 
   private fun sendEmail() {
+    setLoading(true)
     Firebase.auth.sendSignInLinkToEmail(currentState.email, actionCodeSettings)
       .addOnCompleteListener { task ->
         if (task.isSuccessful) {
           setEmail(currentState.email)
 
+          setLoading(false)
           sendSideEffect(EmailVerificationSideEffect.ShowSnackbar(UiText.StringResource(R.string.email_verification_email_send_snackbar)))
           updateState(EmailVerificationReduce.UpdateEmailSent(true))
         } else {
+          setLoading(false)
           sendSideEffect(EmailVerificationSideEffect.ShowSnackbar(UiText.StringResource(R.string.email_verification_email_send_error_snackbar)))
         }
       }

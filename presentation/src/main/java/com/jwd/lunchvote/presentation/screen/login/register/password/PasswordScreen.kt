@@ -24,6 +24,7 @@ import com.jwd.lunchvote.presentation.screen.login.register.password.PasswordCon
 import com.jwd.lunchvote.presentation.screen.login.register.password.PasswordContract.PasswordState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.Gap
+import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.PasswordField
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
@@ -40,6 +41,7 @@ fun PasswordRoute(
   context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
+  val loading by viewModel.isLoading.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
@@ -53,7 +55,8 @@ fun PasswordRoute(
 
   LaunchedEffect(Unit) { viewModel.sendEvent(PasswordEvent.ScreenInitialize) }
 
-  PasswordScreen(
+  if (loading) LoadingScreen()
+  else PasswordScreen(
     state = state,
     modifier = modifier,
     onEvent = viewModel::sendEvent

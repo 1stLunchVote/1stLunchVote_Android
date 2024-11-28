@@ -3,6 +3,7 @@ package com.jwd.lunchvote.presentation.screen.lounge
 import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,9 +25,14 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Send
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
+import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Warning
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,15 +43,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeAction.Companion.Send
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -66,6 +79,7 @@ import com.jwd.lunchvote.presentation.screen.lounge.LoungeContract.LoungeSideEff
 import com.jwd.lunchvote.presentation.screen.lounge.LoungeContract.LoungeState
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
+import com.jwd.lunchvote.presentation.util.conditional
 import com.jwd.lunchvote.presentation.widget.ChatBubble
 import com.jwd.lunchvote.presentation.widget.Dialog
 import com.jwd.lunchvote.presentation.widget.DialogButton
@@ -133,7 +147,7 @@ private fun LoungeScreen(
   onEvent: (LoungeEvent) -> Unit = {}
 ) {
   Screen(
-    modifier = modifier.padding(horizontal = 24.dp),
+    modifier = modifier.padding(start = 24.dp, bottom = 24.dp, end = 24.dp),
     topAppBar = {
       TopBar(
         title = stringResource(R.string.lounge_topbar_title),
@@ -148,16 +162,6 @@ private fun LoungeScreen(
             )
           }
         }
-      )
-    },
-    bottomAppBar = {
-      LoungeBottomBar(
-        text = state.text,
-        isOwner = state.isOwner,
-        modifier = Modifier.fillMaxWidth(),
-        onTextChange = { onEvent(LoungeEvent.OnTextChange(it)) },
-        onClickSendChatButton = { onEvent(LoungeEvent.OnClickSendChatButton) },
-        onClickActionButton = { onEvent(LoungeEvent.OnClickActionButton) }
       )
     },
     scrollable = false
@@ -177,6 +181,14 @@ private fun LoungeScreen(
         .fillMaxWidth()
         .weight(1f),
       onClickMember = { onEvent(LoungeEvent.OnClickMember(it)) }
+    )
+    LoungeBottomBar(
+      text = state.text,
+      isOwner = state.isOwner,
+      isReady = state.memberList.find { it.userId == state.user.id }?.type == MemberUIModel.Type.READY,
+      onTextChange = { onEvent(LoungeEvent.OnTextChange(it)) },
+      onClickSendChatButton = { onEvent(LoungeEvent.OnClickSendChatButton) },
+      onClickActionButton = { onEvent(LoungeEvent.OnClickActionButton) }
     )
   }
 }
@@ -221,7 +233,7 @@ private fun ChatList(
   val lazyListState = rememberLazyListState()
 
   LazyColumn(
-    modifier = modifier.padding(vertical = 24.dp),
+    modifier = modifier.padding(vertical = 8.dp),
     state = lazyListState,
     verticalArrangement = Arrangement.Top,
     horizontalAlignment = Alignment.CenterHorizontally,
@@ -249,44 +261,96 @@ private fun ChatList(
 private fun LoungeBottomBar(
   text: String,
   isOwner: Boolean,
+  isReady: Boolean,
   modifier: Modifier = Modifier,
   onTextChange: (String) -> Unit,
   onClickSendChatButton: () -> Unit,
   onClickActionButton: () -> Unit,
 ) {
-  Column(
-    modifier = modifier
+  Row(
+    modifier = modifier.fillMaxWidth(),
+    horizontalArrangement = Arrangement.spacedBy(8.dp),
+    verticalAlignment = Alignment.CenterVertically
   ) {
-    HorizontalDivider(
-      thickness = 2.dp,
-      color = MaterialTheme.colorScheme.onBackground
-    )
-    Row(
+    Button(
+      onClick = onClickActionButton,
       modifier = Modifier
-        .fillMaxWidth()
-        .padding(16.dp),
-      horizontalArrangement = Arrangement.spacedBy(8.dp),
-      verticalAlignment = Alignment.Top
+        .size(44.dp)
+        .conditional(isReady.not()) { alpha(0.64f) },
+      shape = MaterialTheme.shapes.small,
+      contentPadding = PaddingValues(6.dp)
     ) {
-      OutlinedButton(
-        onClick = onClickActionButton,
-        modifier = Modifier.height(48.dp),
-        border = BorderStroke(2.dp, MaterialTheme.colorScheme.onBackground),
-        contentPadding = PaddingValues(horizontal = 16.dp)
-      ) {
-        Text(
-          text = if (isOwner) stringResource(R.string.lounge_start_button) else stringResource(R.string.lounge_ready_button),
-          color = MaterialTheme.colorScheme.onBackground
+      if (isOwner) {
+        Icon(
+          imageVector = Icons.Rounded.PlayArrow,
+          contentDescription = "Play"
+        )
+      } else {
+        Icon(
+          imageVector = Icons.Rounded.Check,
+          contentDescription = "Ready"
         )
       }
-      ChatTextField(
-        text = text,
-        onTextChange = onTextChange,
-        onClickSendChatButton = onClickSendChatButton,
+    }
+    LoungeChatField(
+      text = text,
+      modifier = Modifier.fillMaxWidth(),
+      onTextChange = onTextChange,
+      onClickSendChatButton = onClickSendChatButton
+    )
+  }
+}
+
+@Composable
+private fun LoungeChatField(
+  text: String,
+  modifier: Modifier = Modifier,
+  onTextChange: (String) -> Unit,
+  onClickSendChatButton: () -> Unit
+) {
+  BasicTextField(
+    value = text,
+    onValueChange = onTextChange,
+    modifier = modifier,
+    textStyle = MaterialTheme.typography.bodyMedium,
+    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+    keyboardActions = KeyboardActions(onSend = { onClickSendChatButton() }),
+    singleLine = true
+  ) { innerTextField ->
+    Row(
+      modifier = modifier
+        .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.08f), MaterialTheme.shapes.small)
+        .padding(start = 12.dp, top = 6.dp, end = 6.dp, bottom = 6.dp),
+      horizontalArrangement = Arrangement.spacedBy(8.dp),
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      Box(
         modifier = Modifier
-          .heightIn(min = 48.dp)
           .weight(1f)
-      )
+          .height(20.dp),
+        contentAlignment = Alignment.CenterStart
+      ) {
+        innerTextField()
+        if (text.isEmpty()) {
+          Text(
+            text = "메세지 보내기..",
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+            style = MaterialTheme.typography.bodyMedium
+          )
+        }
+      }
+      Button(
+        onClick = onClickSendChatButton,
+        modifier = Modifier.size(32.dp),
+        enabled = text.isNotBlank(),
+        shape = MaterialTheme.shapes.extraSmall,
+        contentPadding = PaddingValues(6.dp),
+      ) {
+        Icon(
+          imageVector = Icons.AutoMirrored.Rounded.Send,
+          contentDescription = "Send"
+        )
+      }
     }
   }
 }

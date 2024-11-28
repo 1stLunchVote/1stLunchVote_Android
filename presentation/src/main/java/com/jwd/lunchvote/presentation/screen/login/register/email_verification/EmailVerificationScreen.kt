@@ -26,6 +26,7 @@ import com.jwd.lunchvote.presentation.screen.login.register.email_verification.E
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.CheckIcon
 import com.jwd.lunchvote.presentation.widget.Gap
+import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.TextField
@@ -41,6 +42,7 @@ fun EmailVerificationRoute(
   context: Context = LocalContext.current
 ) {
   val state by viewModel.viewState.collectAsStateWithLifecycle()
+  val loading by viewModel.isLoading.collectAsStateWithLifecycle()
 
   LaunchedEffect(viewModel.sideEffect) {
     viewModel.sideEffect.collectLatest {
@@ -50,7 +52,8 @@ fun EmailVerificationRoute(
     }
   }
 
-  EmailVerificationScreen(
+  if (loading) LoadingScreen()
+  else EmailVerificationScreen(
     state = state,
     modifier = modifier,
     onEvent = viewModel::sendEvent
