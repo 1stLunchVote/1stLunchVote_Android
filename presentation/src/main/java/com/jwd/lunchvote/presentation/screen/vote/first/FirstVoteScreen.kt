@@ -49,7 +49,7 @@ import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.DropDownMenu
 import com.jwd.lunchvote.presentation.widget.FAB
 import com.jwd.lunchvote.presentation.widget.FoodGrid
-import com.jwd.lunchvote.presentation.widget.HorizontalProgressBar
+import com.jwd.lunchvote.presentation.widget.HorizontalTimer
 import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.LunchVoteIcon
@@ -121,7 +121,7 @@ private fun FirstVoteScreen(
       )
       if (state.lounge.timeLimit != null) {
         key(state.lounge.timeLimit) {
-          HorizontalProgressBar(
+          HorizontalTimer(
             timeLimitSecond = state.lounge.timeLimit,
             modifier = Modifier.fillMaxWidth(),
             onProgressComplete = { onEvent(FirstVoteEvent.OnVoteFinish) }

@@ -49,7 +49,7 @@ import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.widget.Dialog
 import com.jwd.lunchvote.presentation.widget.DialogButton
-import com.jwd.lunchvote.presentation.widget.HorizontalProgressBar
+import com.jwd.lunchvote.presentation.widget.HorizontalTimer
 import com.jwd.lunchvote.presentation.widget.ImageFromUri
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.MemberProgress
@@ -111,7 +111,7 @@ private fun SecondVoteScreen(
       )
       if (state.lounge.timeLimit != null) {
         key(state.lounge.timeLimit) {
-          HorizontalProgressBar(
+          HorizontalTimer(
             timeLimitSecond = state.lounge.timeLimit,
             modifier = Modifier.fillMaxWidth(),
             onProgressComplete = { onEvent(SecondVoteEvent.OnVoteFinish) }

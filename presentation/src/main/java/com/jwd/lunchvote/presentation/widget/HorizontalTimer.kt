@@ -3,8 +3,12 @@ package com.jwd.lunchvote.presentation.widget
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -14,14 +18,19 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontVariation.weight
+import androidx.compose.ui.text.font.FontVariation.width
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
+import com.jwd.lunchvote.presentation.util.conditional
 import kotlinx.coroutines.delay
 
 @Composable
-fun HorizontalProgressBar(
+fun HorizontalTimer(
   timeLimitSecond: Int,
   modifier: Modifier = Modifier,
+  warningRatio: Float = 0.1f,
   onProgressComplete: () -> Unit = {}
 ) {
   var progress by remember { mutableFloatStateOf(0f) }
@@ -39,11 +48,38 @@ fun HorizontalProgressBar(
     }
   }
 
-  LinearProgressIndicator(
-    progress = { progressAnimation },
-    modifier = modifier,
-    trackColor = MaterialTheme.colorScheme.outlineVariant,
-  )
+  Row(
+    modifier = modifier
+  ) {
+    Box(
+      modifier = Modifier
+        .conditional(progressAnimation > 0f,
+          modifierIf = {
+            weight(progressAnimation)
+          }, modifierElse = {
+            width(0.dp)
+          }
+        )
+    )
+    Box(
+      modifier = Modifier
+        .conditional(1f - progressAnimation > warningRatio,
+          modifierIf = {
+            background(MaterialTheme.colorScheme.primary)
+          }, modifierElse = {
+            background(MaterialTheme.colorScheme.error)
+          }
+        )
+        .height(4.dp)
+        .conditional(1f - progressAnimation > 0f,
+          modifierIf = {
+            weight(1f - progressAnimation)
+          }, modifierElse = {
+            width(0.dp)
+          }
+        )
+    )
+  }
 }
 
 @Preview
@@ -51,8 +87,9 @@ fun HorizontalProgressBar(
 private fun Preview() {
   LunchVoteTheme {
     Surface {
-      HorizontalProgressBar(
-        timeLimitSecond = 60, modifier = Modifier.fillMaxWidth()
+      HorizontalTimer(
+        timeLimitSecond = 20,
+        modifier = Modifier.fillMaxWidth()
       )
     }
   }
