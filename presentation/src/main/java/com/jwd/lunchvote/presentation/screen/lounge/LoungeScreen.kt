@@ -2,20 +2,13 @@ package com.jwd.lunchvote.presentation.screen.lounge
 
 import android.content.Context
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,38 +20,26 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Send
 import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.ImeAction.Companion.Send
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -150,7 +131,7 @@ private fun LoungeScreen(
     modifier = modifier.padding(start = 24.dp, bottom = 24.dp, end = 24.dp),
     topAppBar = {
       TopBar(
-        title = stringResource(R.string.lounge_topbar_title),
+        title = stringResource(R.string.lounge_title),
         popBackStack = { onEvent(LoungeEvent.OnClickBackButton) },
         actions = {
           IconButton(
@@ -314,7 +295,7 @@ private fun LoungeChatField(
     modifier = modifier,
     textStyle = MaterialTheme.typography.bodyMedium,
     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
-    keyboardActions = KeyboardActions(onSend = { onClickSendChatButton() }),
+    keyboardActions = KeyboardActions(onSend = { if (text.isNotBlank()) onClickSendChatButton() }),
     singleLine = true
   ) { innerTextField ->
     Row(
@@ -333,7 +314,7 @@ private fun LoungeChatField(
         innerTextField()
         if (text.isEmpty()) {
           Text(
-            text = "메세지 보내기..",
+            text = stringResource(R.string.lounge_chat_field_text),
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
             style = MaterialTheme.typography.bodyMedium
           )
@@ -349,70 +330,6 @@ private fun LoungeChatField(
         Icon(
           imageVector = Icons.AutoMirrored.Rounded.Send,
           contentDescription = "Send"
-        )
-      }
-    }
-  }
-}
-
-@Composable
-private fun ChatTextField(
-  text: String,
-  onTextChange: (String) -> Unit,
-  onClickSendChatButton: () -> Unit,
-  modifier: Modifier = Modifier
-) {
-  val interactionSource = remember { MutableInteractionSource() }
-
-  BasicTextField(
-    value = text,
-    onValueChange = onTextChange,
-    modifier = modifier,
-    textStyle = MaterialTheme.typography.bodyLarge,
-    keyboardOptions = KeyboardOptions(
-      imeAction = Send
-    ),
-    keyboardActions = KeyboardActions(
-      onSend = { onClickSendChatButton() }
-    ),
-    maxLines = 5,
-    interactionSource = interactionSource
-  ) {
-    val isFocus = interactionSource.collectIsFocusedAsState().value
-
-    Row(
-      modifier = Modifier
-        .clip(MaterialTheme.shapes.extraLarge)
-        .border(
-          width = 2.dp,
-          color = if (isFocus) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
-          shape = MaterialTheme.shapes.extraLarge
-        )
-        .padding(start = 24.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
-      horizontalArrangement = Arrangement.spacedBy(8.dp),
-      verticalAlignment = Alignment.Top
-    ) {
-      Box(
-        modifier = Modifier
-          .weight(1f)
-          .align(Alignment.CenterVertically),
-        contentAlignment = Alignment.CenterStart
-      ) {
-        it()
-      }
-      OutlinedIconButton(
-        onClick = onClickSendChatButton,
-        modifier = Modifier.size(32.dp),
-        enabled = text.isNotBlank(),
-        border = BorderStroke(
-          width = 2.dp,
-          color = if (text.isBlank()) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onBackground
-        )
-      ) {
-        Icon(
-          Icons.Rounded.KeyboardArrowUp,
-          contentDescription = "Send",
-          tint = if (text.isBlank()) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onBackground
         )
       }
     }

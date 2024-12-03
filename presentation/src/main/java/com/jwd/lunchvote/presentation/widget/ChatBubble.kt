@@ -33,6 +33,7 @@ import com.jwd.lunchvote.presentation.model.ChatUIModel.Type.DEFAULT
 import com.jwd.lunchvote.presentation.model.ChatUIModel.Type.SYSTEM
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
+import com.jwd.lunchvote.presentation.util.innerShadow
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -70,10 +71,9 @@ fun ChatBubble(
     && chat.createdAt.minute == nextChat.createdAt.minute
 
   val timeFormatter = DateTimeFormatter.ofPattern("a hh:mm", Locale.KOREA)
-  val round = 20.dp
+  val round = 16.dp
 
   when (chat.type) {
-
     DEFAULT -> {
       if (isMine) {
         Row(
@@ -151,15 +151,13 @@ private fun MessageBubble(
   modifier: Modifier = Modifier
 ) {
   Box(
-    modifier = modifier
-      .clip(shape)
-      .border(2.dp, MaterialTheme.colorScheme.onBackground, shape),
+    modifier = modifier.border(1.6.dp, MaterialTheme.colorScheme.onBackground, shape),
     contentAlignment = Alignment.Center
   ) {
     Text(
       text = message,
       style = MaterialTheme.typography.titleSmall,
-      modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp)
+      modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
     )
   }
 }
@@ -214,46 +212,83 @@ private fun ChatBubblePreview() {
 
   LunchVoteTheme {
     Column(
-      modifier = Modifier.fillMaxWidth().padding(24.dp),
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(24.dp),
       verticalArrangement = Arrangement.spacedBy(16.dp),
       horizontalAlignment = Alignment.CenterHorizontally
     ) {
       ChatBubble(
-        chat = chatBuilder.create().build().asUI()
+        chat = chatBuilder
+          .create()
+          .build()
+          .asUI()
       )
       ChatBubble(
-        chat = chatBuilder.setUserId(user2.id).join().build().asUI(), member = member2.asUI()
+        chat = chatBuilder
+          .setUserId(user2.id)
+          .join()
+          .build()
+          .asUI(),
+        member = member2.asUI()
       )
       ChatBubble(
-        chat = chatBuilder.setUserId(user2.id).setMessage("안녕하세요").build().asUI(),
+        chat = chatBuilder
+          .setUserId(user2.id)
+          .setMessage("안녕하세요")
+          .build()
+          .asUI(),
         member = member2.asUI(),
         isMine = false
       )
       ChatBubble(
-        chat = chatBuilder.setUserId(user2.id).join().build().asUI(), member = member2.asUI()
+        chat = chatBuilder
+          .setUserId(user2.id)
+          .join()
+          .build()
+          .asUI(),
+        member = member2.asUI()
       )
       ChatBubble(
-        chat = chatBuilder.setUserId(user3.id)
-          .setMessage("안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요").build().asUI(),
+        chat = chatBuilder
+          .setUserId(user3.id)
+          .setMessage("안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요")
+          .build()
+          .asUI(),
         member = member3.asUI(),
         isMine = false
       )
       ChatBubble(
-        chat = chatBuilder.setUserId(user1.id).setMessage("안녕하세요").build().asUI(),
+        chat = chatBuilder
+          .setUserId(user1.id)
+          .setMessage("안녕하세요")
+          .build()
+          .asUI(),
         member = member1.asUI(),
         isMine = true
       )
       ChatBubble(
-        chat = chatBuilder.setUserId(user1.id)
-          .setMessage("안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요").build().asUI(),
+        chat = chatBuilder
+          .setUserId(user1.id)
+          .setMessage("안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요")
+          .build()
+          .asUI(),
         member = member1.asUI(),
         isMine = true
       )
       ChatBubble(
-        chat = chatBuilder.setUserId(user3.id).exile().build().asUI(), member = member3.asUI()
+        chat = chatBuilder
+          .setUserId(user3.id)
+          .exile()
+          .build()
+          .asUI(),
+        member = member3.asUI()
       )
       ChatBubble(
-        chat = chatBuilder.setMinLikeFoods(5).build().asUI()
+        chat = chatBuilder
+          .setMinLikeFoods(5)
+          .build()
+          .asUI()
       )
     }
   }

@@ -186,14 +186,14 @@ class LoungeViewModel @Inject constructor(
   }
 
   private suspend fun sendChat() {
-    updateState(LoungeReduce.UpdateText(""))
-
     chatRepository.sendChat(
       chat = Chat.Builder(currentState.lounge.id)
         .setUserId(userId)
-        .setMessage(currentState.text)
+        .setMessage(currentState.text.trim())
         .build()
     )
+
+    updateState(LoungeReduce.UpdateText(""))
   }
 
   private suspend fun startVote() {
