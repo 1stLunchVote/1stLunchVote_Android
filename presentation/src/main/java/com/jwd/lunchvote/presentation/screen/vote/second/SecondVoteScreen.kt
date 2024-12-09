@@ -177,7 +177,7 @@ private fun SecondVoteScreen(
             .background(MaterialTheme.colorScheme.background)
             .border(2.dp, MaterialTheme.colorScheme.outlineVariant, MaterialTheme.shapes.small)
             .padding(horizontal = 20.dp, vertical = 16.dp)
-            .zIndex(1f),
+            .zIndex(1f)
         )
         SecondVoteBallot(
           userName = state.user.name,
@@ -253,7 +253,7 @@ private fun SecondVoteTile(
   food: FoodUIModel,
   selected: Boolean,
   modifier: Modifier = Modifier,
-  onClick: () -> Unit = {}
+  onClick: () -> Unit
 ) {
   Row(
     modifier = modifier
