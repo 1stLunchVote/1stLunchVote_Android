@@ -53,6 +53,7 @@ import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.ChatUIModel
 import com.jwd.lunchvote.presentation.model.ChatUIModel.Type.SYSTEM
 import com.jwd.lunchvote.presentation.model.MemberUIModel
+import com.jwd.lunchvote.presentation.model.MemberUIModel.Type.DEFAULT
 import com.jwd.lunchvote.presentation.model.UserUIModel
 import com.jwd.lunchvote.presentation.screen.lounge.LoungeContract.ExitDialogEvent
 import com.jwd.lunchvote.presentation.screen.lounge.LoungeContract.LoungeEvent
@@ -167,6 +168,7 @@ private fun LoungeScreen(
       text = state.text,
       isOwner = state.isOwner,
       isReady = state.memberList.find { it.userId == state.user.id }?.type == MemberUIModel.Type.READY,
+      memberList = state.memberList,
       onTextChange = { onEvent(LoungeEvent.OnTextChange(it)) },
       onClickSendChatButton = { onEvent(LoungeEvent.OnClickSendChatButton) },
       onClickActionButton = { onEvent(LoungeEvent.OnClickActionButton) }
@@ -244,6 +246,7 @@ private fun LoungeBottomBar(
   isOwner: Boolean,
   isReady: Boolean,
   modifier: Modifier = Modifier,
+  memberList: List<MemberUIModel> = emptyList(),
   onTextChange: (String) -> Unit,
   onClickSendChatButton: () -> Unit,
   onClickActionButton: () -> Unit,
@@ -257,7 +260,8 @@ private fun LoungeBottomBar(
       onClick = onClickActionButton,
       modifier = Modifier
         .size(44.dp)
-        .conditional(isReady.not()) { alpha(0.64f) },
+        .conditional(isOwner.not() && isReady.not()) { alpha(0.64f) },
+      enabled = isOwner.not() || (memberList.size > 1 && memberList.any { it.type == DEFAULT }.not()),
       shape = MaterialTheme.shapes.small,
       contentPadding = PaddingValues(6.dp)
     ) {
