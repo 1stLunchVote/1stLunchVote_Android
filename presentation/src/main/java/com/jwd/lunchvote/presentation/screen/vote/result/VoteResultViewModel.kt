@@ -32,6 +32,7 @@ class VoteResultViewModel @Inject constructor(
   override fun handleEvents(event: VoteResultEvent) {
     when (event) {
       is VoteResultEvent.ScreenInitialize -> launch { initialize() }
+      is VoteResultEvent.OnPressRevealBox -> updateState(VoteResultReduce.DecreaseCoverAlpha)
       is VoteResultEvent.OnClickHomeButton -> sendSideEffect(VoteResultSideEffect.NavigateToHome)
     }
   }
@@ -40,6 +41,7 @@ class VoteResultViewModel @Inject constructor(
     return when (reduce) {
       is VoteResultReduce.UpdateFood -> state.copy(food = reduce.food)
       is VoteResultReduce.UpdateVoteRatio -> state.copy(voteRatio = reduce.voteRatio)
+      is VoteResultReduce.DecreaseCoverAlpha -> state.copy(coverAlpha = state.coverAlpha - 0.05f)
     }
   }
 

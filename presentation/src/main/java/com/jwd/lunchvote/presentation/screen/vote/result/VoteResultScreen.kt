@@ -2,7 +2,16 @@ package com.jwd.lunchvote.presentation.screen.vote.result
 
 import android.content.Context
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
@@ -11,8 +20,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -28,6 +45,7 @@ import com.jwd.lunchvote.presentation.screen.vote.result.VoteResultContract.Vote
 import com.jwd.lunchvote.presentation.screen.vote.result.VoteResultContract.VoteResultSideEffect
 import com.jwd.lunchvote.presentation.screen.vote.result.VoteResultContract.VoteResultState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
+import com.jwd.lunchvote.presentation.widget.FAB
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.ImageFromUri
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
@@ -35,6 +53,8 @@ import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.TopBar
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -75,12 +95,20 @@ private fun VoteResultScreen(
   onEvent: (VoteResultEvent) -> Unit = {}
 ) {
   Screen(
-    modifier = modifier,
+    modifier = modifier.fillMaxSize(),
     topAppBar = {
       TopBar(
         title = stringResource(R.string.vote_result_title),
         navIconVisible = false
       )
+    },
+    actions = {
+      if (state.coverAlpha < 0.32f) {
+        FAB(
+          text = stringResource(R.string.vote_result_home_button),
+          onClick = { onEvent(VoteResultEvent.OnClickHomeButton) }
+        )
+      }
     }
   ) {
     Gap()
@@ -88,26 +116,63 @@ private fun VoteResultScreen(
       text = stringResource(R.string.vote_result_header),
       style = MaterialTheme.typography.bodyLarge
     )
-    Gap(height = 8.dp)
-    VoteResultImage(
-      foodImageUri = state.food.imageUrl,
-      voteRatio = state.voteRatio,
-      modifier = Modifier.size(156.dp)
-    )
-    Gap(height = 48.dp)
-    Text(
-      text = state.food.name,
-      style = MaterialTheme.typography.headlineSmall
-    )
-    Gap(height = 80.dp)
-    Button(
-      onClick = { onEvent(VoteResultEvent.OnClickHomeButton) }
+    Gap(height = 16.dp)
+    Box(
+      modifier = Modifier.size(256.dp),
+      contentAlignment = Alignment.Center
     ) {
-      Text(
-        text = stringResource(R.string.vote_result_home_button)
+      Column(
+        modifier = Modifier.matchParentSize(),
+        verticalArrangement = Arrangement.SpaceEvenly,
+        horizontalAlignment = Alignment.CenterHorizontally
+      ) {
+        VoteResultImage(
+          foodImageUri = state.food.imageUrl,
+          voteRatio = state.voteRatio,
+          modifier = Modifier.size(156.dp)
+        )
+        Text(
+          text = state.food.name,
+          style = MaterialTheme.typography.headlineSmall
+        )
+      }
+      VoteResultCover(
+        coverAlpha = state.coverAlpha,
+        modifier = Modifier
+          .matchParentSize()
+          .align(Alignment.TopCenter),
+        onPressRevealBox = { onEvent(VoteResultEvent.OnPressRevealBox) }
       )
     }
     Gap()
+    Gap()
+  }
+}
+
+@Composable
+private fun VoteResultCover(
+  coverAlpha: Float,
+  modifier: Modifier = Modifier,
+  onPressRevealBox: () -> Unit = {}
+) {
+  Box(
+    modifier = modifier
+      .clip(MaterialTheme.shapes.medium)
+      .pointerInput(Unit) {
+        detectDragGestures { _, dragAmount ->
+          if (dragAmount.y > 50 || dragAmount.x > 50) onPressRevealBox()
+        }
+      }
+      .alpha(coverAlpha)
+      .background(MaterialTheme.colorScheme.outlineVariant),
+    contentAlignment = Alignment.Center
+  ) {
+    Text(
+      text = stringResource(R.string.vote_result_cover),
+      modifier = Modifier.alpha(0.32f),
+      textAlign = TextAlign.Center,
+      style = MaterialTheme.typography.titleMedium
+    )
   }
 }
 
@@ -146,7 +211,7 @@ private fun VoteResultImage(
 
 @Preview
 @Composable
-private fun Preview() {
+private fun Default() {
   ScreenPreview {
     VoteResultScreen(
       VoteResultState(
@@ -154,6 +219,22 @@ private fun Preview() {
           name = "햄버거"
         ),
         voteRatio = 0.7f
+      )
+    )
+  }
+}
+
+@Preview
+@Composable
+private fun CoverRevealed() {
+  ScreenPreview {
+    VoteResultScreen(
+      VoteResultState(
+        food = FoodUIModel(
+          name = "햄버거"
+        ),
+        voteRatio = 0.7f,
+        coverAlpha = 0f
       )
     )
   }

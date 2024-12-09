@@ -179,6 +179,7 @@
     <string name="vote_result_loading">투표 결과를 집계하고 있습니다…</string>
     <string name="vote_result_title">투표 결과</string>
     <string name="vote_result_header">오늘의 메뉴는 …</string>
+    <string name="vote_result_cover">문질러서\n결과를 확인하세요!</string>
     <string name="vote_result_badge">%d%%의\n선택!</string>
     <string name="vote_result_home_button">메인 화면으로 돌아가기</string>
 
