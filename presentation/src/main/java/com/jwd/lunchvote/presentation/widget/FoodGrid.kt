@@ -43,7 +43,7 @@ fun FoodGrid(
         text = searchKeyword,
         onTextChange = onSearchKeywordChange,
         hintText = stringResource(R.string.add_template_hint_text),
-        modifier = Modifier.padding(bottom = 8.dp),
+        modifier = Modifier.padding(bottom = 4.dp),
         leadingIcon = { SearchIcon() }
       )
     }

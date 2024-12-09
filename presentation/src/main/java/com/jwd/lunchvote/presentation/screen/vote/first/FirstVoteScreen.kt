@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -133,7 +134,7 @@ private fun FirstVoteScreen(
       if (state.finished) {
         FAB(
           text = stringResource(R.string.first_vote_re_vote_button),
-          onClick = { onEvent(FirstVoteEvent.OnClickFinishButton) }
+          onClick = { onEvent(FirstVoteEvent.OnClickReVoteButton) }
         )
       } else {
         if (state.foodItemList.count { it.status == LIKE } >= (state.lounge.minLikeFoods ?: 0)
@@ -149,9 +150,7 @@ private fun FirstVoteScreen(
   ) {
     if (state.finished) {
       Column(
-        modifier = Modifier
-          .fillMaxWidth()
-          .weight(1f),
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(40.dp, alignment = Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally
       ) {
@@ -167,9 +166,7 @@ private fun FirstVoteScreen(
       }
     } else {
       Box(
-        modifier = Modifier
-          .fillMaxWidth()
-          .weight(1f)
+        modifier = Modifier.fillMaxSize()
       ) {
         InformationRow(
           like = state.foodItemList.count { it.status == LIKE },
