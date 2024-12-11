@@ -40,7 +40,6 @@ import java.io.File
 fun ImageFromUri(
   uri: Uri,
   modifier: Modifier = Modifier,
-  contentScale: ContentScale = ContentScale.Crop,
   context: Context = LocalContext.current
 ) {
   when {
@@ -48,7 +47,7 @@ fun ImageFromUri(
       imageModel = { uri.toString() },
       modifier = modifier,
       imageOptions = ImageOptions(
-        contentScale = contentScale
+        contentScale = ContentScale.Crop
       ),
       loading = {
         Box(
@@ -65,14 +64,13 @@ fun ImageFromUri(
     uri.toString().startsWith("content") -> Image(
       bitmap = ImageBitmapFactory.createBitmapFromUri(context, uri).asImageBitmap(),
       contentDescription = "Image",
-      modifier = modifier,
-      contentScale = contentScale
+      modifier = modifier
     )
     File(uri.toString()).exists() -> Image(
       bitmap = BitmapFactory.decodeFile(uri.toString()).asImageBitmap(),
       contentDescription = "Image",
       modifier = modifier,
-      contentScale = contentScale
+      contentScale = ContentScale.Crop
     )
     else -> Box(
       modifier = modifier.background(MaterialTheme.colorScheme.background),

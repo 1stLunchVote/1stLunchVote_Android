@@ -3,12 +3,15 @@ package com.jwd.lunchvote.presentation.widget
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Text
@@ -46,7 +49,7 @@ fun <T>DropDownMenu(
         onTextChange = {},
         hintText = placeholder,
         enabled = false,
-        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expended) }
+        trailingIcon = { Icon(Icons.Rounded.Close, null, Modifier.size(20.dp)) }
       )
     } else {
       TextField(
@@ -55,7 +58,7 @@ fun <T>DropDownMenu(
         hintText = hintText,
         modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),
         readOnly = true,
-        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expended) }
+        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expended, Modifier.size(20.dp)) }
       )
       ExposedDropdownMenu(
         expanded = expended,
@@ -77,7 +80,7 @@ fun <T>DropDownMenu(
   }
 }
 
-@Preview(widthDp = 768, showBackground = true)
+@Preview(showBackground = true)
 @Composable
 private fun Preview() {
   LunchVoteTheme {
@@ -85,36 +88,28 @@ private fun Preview() {
       modifier = Modifier.padding(16.dp),
       verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-      Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-      ) {
-        DropDownMenu(
-          list = emptyList(),
-          selected = null,
-          onItemSelected = {},
-          getItemName = { it },
-          hintText = "아이템을 선택해주세요.",
-          modifier = Modifier.weight(1f),
-          placeholder = "아이템이 없습니다."
-        )
-        DropDownMenu(
-          list = listOf("Item 1", "Item 2", "Item 3"),
-          selected = null,
-          onItemSelected = {},
-          getItemName = { it },
-          hintText = "아이템을 선택해주세요.",
-          modifier = Modifier.weight(1f)
-        )
-        DropDownMenu(
-          list = listOf("Item 1", "Item 2", "Item 3"),
-          selected = "Item 1",
-          onItemSelected = {},
-          getItemName = { it },
-          hintText = "아이템을 선택해주세요.",
-          modifier = Modifier.weight(1f)
-        )
-      }
-
+      DropDownMenu(
+        list = emptyList(),
+        selected = null,
+        onItemSelected = {},
+        getItemName = { it },
+        hintText = "아이템을 선택해주세요.",
+        placeholder = "아이템이 없습니다."
+      )
+      DropDownMenu(
+        list = listOf("Item 1", "Item 2", "Item 3"),
+        selected = null,
+        onItemSelected = {},
+        getItemName = { it },
+        hintText = "아이템을 선택해주세요."
+      )
+      DropDownMenu(
+        list = List(5) { "아이템 $it" },
+        selected = "아이템 1",
+        onItemSelected = {},
+        getItemName = { it },
+        hintText = "아이템을 선택해주세요."
+      )
     }
   }
 }

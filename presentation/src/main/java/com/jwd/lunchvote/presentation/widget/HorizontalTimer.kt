@@ -18,8 +18,6 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontVariation.weight
-import androidx.compose.ui.text.font.FontVariation.width
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
@@ -37,7 +35,7 @@ fun HorizontalTimer(
   val progressAnimation by animateFloatAsState(
     targetValue = progress,
     animationSpec = tween(durationMillis = 1000, easing = LinearEasing),
-    label = "Vote Progress Animation",
+    label = "Timer Progress Animation",
   )
 
   LaunchedEffect(Unit) {
@@ -48,36 +46,28 @@ fun HorizontalTimer(
     }
   }
 
-  Row(
-    modifier = modifier
-  ) {
+  Row(modifier) {
     Box(
       modifier = Modifier
-        .conditional(progressAnimation > 0f,
-          modifierIf = {
-            weight(progressAnimation)
-          }, modifierElse = {
-            width(0.dp)
-          }
-        )
+        .conditional(progressAnimation > 0f, modifierIf = {
+          weight(progressAnimation)
+        }, modifierElse = {
+          width(0.dp)
+        })
     )
     Box(
       modifier = Modifier
-        .conditional(1f - progressAnimation > warningRatio,
-          modifierIf = {
-            background(MaterialTheme.colorScheme.primary)
-          }, modifierElse = {
-            background(MaterialTheme.colorScheme.error)
-          }
-        )
+        .conditional(1f - progressAnimation > warningRatio, modifierIf = {
+          background(MaterialTheme.colorScheme.primary)
+        }, modifierElse = {
+          background(MaterialTheme.colorScheme.error)
+        })
         .height(4.dp)
-        .conditional(1f - progressAnimation > 0f,
-          modifierIf = {
-            weight(1f - progressAnimation)
-          }, modifierElse = {
-            width(0.dp)
-          }
-        )
+        .conditional(1f - progressAnimation > 0f, modifierIf = {
+          weight(1f - progressAnimation)
+        }, modifierElse = {
+          width(0.dp)
+        })
     )
   }
 }
@@ -88,7 +78,7 @@ private fun Preview() {
   LunchVoteTheme {
     Surface {
       HorizontalTimer(
-        timeLimitSecond = 20,
+        timeLimitSecond = 3,
         modifier = Modifier.fillMaxWidth()
       )
     }

@@ -32,10 +32,8 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
-import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.FoodItem.Status.DISLIKE
 import com.jwd.lunchvote.presentation.model.FoodItem.Status.LIKE
-import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.screen.vote.first.FirstVoteContract.ExitDialogEvent
@@ -50,6 +48,7 @@ import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.DropDownMenu
 import com.jwd.lunchvote.presentation.widget.FAB
 import com.jwd.lunchvote.presentation.widget.FoodGrid
+import com.jwd.lunchvote.presentation.widget.FoodGridDefaults
 import com.jwd.lunchvote.presentation.widget.HorizontalTimer
 import com.jwd.lunchvote.presentation.widget.LikeDislike
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
@@ -186,8 +185,7 @@ private fun FirstVoteScreen(
           filteredFoodList = state.foodItemList.filter { it.food.name.contains(state.searchKeyword) },
           onSearchKeywordChange = { onEvent(FirstVoteEvent.OnSearchKeywordChange(it)) },
           onClickFoodItem = { onEvent(FirstVoteEvent.OnClickFoodItem(it)) },
-          topPadding = 72.dp,
-          bottomPadding = 104.dp
+          bottomPadding = FoodGridDefaults.bottomPadding(true)
         )
       }
     }
@@ -298,12 +296,7 @@ private fun Default() {
           MemberUIModel(status = MemberUIModel.Status.VOTED),
           MemberUIModel(status = MemberUIModel.Status.VOTING)
         ),
-        foodItemList = List(32) {
-          FoodItem(
-            food = FoodUIModel(name = "${it}번째 음식"),
-            status = if (it % 2 == 0) FoodItem.Status.DISLIKE else FoodItem.Status.LIKE
-          )
-        }
+        foodItemList = FoodGridDefaults.DummyFoodList
       )
     )
   }

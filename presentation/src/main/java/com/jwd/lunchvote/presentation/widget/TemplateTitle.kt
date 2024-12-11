@@ -4,15 +4,13 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -32,8 +30,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.jwd.lunchvote.presentation.model.FoodItem
-import com.jwd.lunchvote.presentation.model.FoodUIModel
 
 @Composable
 internal fun TemplateTitle(
@@ -101,8 +97,8 @@ internal fun TemplateTitle(
 @Preview
 private fun Preview() {
   ScreenPreview {
-    Screen(
-      scrollable = false
+    Box(
+      modifier = Modifier.padding(24.dp)
     ) {
       val gridState = rememberLazyGridState()
       TemplateTitle(
@@ -112,25 +108,14 @@ private fun Preview() {
         modifier = Modifier.fillMaxWidth(),
         gridState = gridState
       )
-      Gap(height = 8.dp)
-      LazyVerticalGrid(
-        columns = GridCells.Adaptive(100.dp),
-        modifier = Modifier.fillMaxWidth(),
-        state = gridState
-      ) {
-        items(List(32) {
-          FoodItem(
-            food = FoodUIModel(name = "${it}번째 음식"),
-            status = FoodItem.Status.LIKE
-          )
-        }) { foodItem ->
-          FoodItem(
-            foodItem = foodItem,
-            size = 100.dp,
-            onClick = {}
-          )
-        }
-      }
+      FoodGrid(
+        searchKeyword = "",
+        filteredFoodList = FoodGridDefaults.DummyFoodList,
+        onSearchKeywordChange = {},
+        onClickFoodItem = {},
+        gridState = gridState,
+        topPadding = FoodGridDefaults.topPadding(true)
+      )
     }
   }
 }

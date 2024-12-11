@@ -109,7 +109,7 @@ private fun Dislike(
 
 @Preview
 @Composable
-private fun LikeDislikePreview() {
+private fun Preview() {
   LunchVoteTheme {
     LikeDislike(0, 0)
   }

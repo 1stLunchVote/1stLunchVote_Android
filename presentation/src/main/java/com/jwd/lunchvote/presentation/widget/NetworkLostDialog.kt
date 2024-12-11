@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.jwd.lunchvote.presentation.R
-import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 
 @Composable
 fun NetworkLostDialog(
@@ -42,7 +41,8 @@ fun NetworkLostDialog(
 @Preview
 @Composable
 private fun Preview() {
-  LunchVoteTheme {
+  ScreenPreview {
     NetworkLostDialog()
+    Screen {}
   }
 }

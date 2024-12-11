@@ -18,13 +18,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodItem
-import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.screen.template.add_template.AddTemplateContract.AddTemplateEvent
 import com.jwd.lunchvote.presentation.screen.template.add_template.AddTemplateContract.AddTemplateSideEffect
 import com.jwd.lunchvote.presentation.screen.template.add_template.AddTemplateContract.AddTemplateState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
 import com.jwd.lunchvote.presentation.widget.FAB
 import com.jwd.lunchvote.presentation.widget.FoodGrid
+import com.jwd.lunchvote.presentation.widget.FoodGridDefaults
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
@@ -106,8 +106,8 @@ private fun AddTemplateScreen(
         onSearchKeywordChange = { onEvent(AddTemplateEvent.OnSearchKeywordChange(it)) },
         onClickFoodItem = { onEvent(AddTemplateEvent.OnClickFoodItem(it)) },
         gridState = gridState,
-        topPadding = 104.dp,
-        bottomPadding = 104.dp
+        topPadding = FoodGridDefaults.topPadding(true),
+        bottomPadding = FoodGridDefaults.bottomPadding(true)
       )
     }
   }
@@ -120,12 +120,7 @@ private fun Preview() {
     AddTemplateScreen(
       AddTemplateState(
         name = "학생회 회식 대표 메뉴",
-        foodItemList = List(32) {
-          FoodItem(
-            food = FoodUIModel(name = "${it}번째 음식"),
-            status = FoodItem.Status.LIKE
-          )
-        }
+        foodItemList = FoodGridDefaults.DummyFoodList
       )
     )
   }

@@ -34,7 +34,7 @@ import com.jwd.lunchvote.presentation.util.outerShadow
 fun MemberProfile(
   member: MemberUIModel,
   modifier: Modifier = Modifier,
-  onClick: (MemberUIModel) -> Unit,
+  onClick: (MemberUIModel) -> Unit = {},
 ) {
   val borderColor = when (member.type) {
     MemberUIModel.Type.READY -> MaterialTheme.colorScheme.primary
@@ -85,7 +85,8 @@ fun EmptyProfile(
       .size(48.dp)
       .drawBehind {
         drawCircle(
-          color = color, style = stroke
+          color = color,
+          style = stroke
         )
       }
   )
@@ -101,7 +102,7 @@ fun InviteProfile(
       .size(48.dp)
       .clip(CircleShape)
       .border(2.dp, MaterialTheme.colorScheme.outline, CircleShape)
-      .clickable { onClick() },
+      .clickable(onClick = onClick),
     contentAlignment = Alignment.Center
   ) {
     Icon(
@@ -118,17 +119,17 @@ fun InviteProfile(
 private fun Preview() {
   LunchVoteTheme {
     Row(
-      modifier = Modifier.padding(24.dp),
+      modifier = Modifier.padding(8.dp),
       horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
       MemberProfile(
         member = MemberUIModel()
-      ) {}
+      )
       MemberProfile(
         member = MemberUIModel(
           type = MemberUIModel.Type.READY
         )
-      ) {}
+      )
       EmptyProfile()
       InviteProfile { }
     }

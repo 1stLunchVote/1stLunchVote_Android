@@ -13,8 +13,8 @@ import androidx.compose.ui.Modifier
 internal fun Modifier.conditional(
   c: Boolean,
   modifierIf: @Composable Modifier.() -> Modifier,
-  modifierElse: @Composable Modifier.() -> Modifier = { this },
-): Modifier = if (c) modifierIf() else modifierElse()
+  modifierElse: @Composable Modifier.() -> Modifier
+): Modifier = if (c) this.modifierIf() else this.modifierElse()
 
 /**
  * 조건부 Modifier
@@ -24,5 +24,5 @@ internal fun Modifier.conditional(
 @Composable
 internal fun Modifier.conditional(
   c: Boolean,
-  modifierIf: @Composable Modifier.() -> Modifier,
-): Modifier = if (c) modifierIf() else this
+  modifierIf: @Composable Modifier.() -> Modifier
+): Modifier = if (c) this.modifierIf() else this

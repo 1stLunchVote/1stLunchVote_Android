@@ -27,14 +27,14 @@ fun FoodGrid(
   onClickFoodItem: (FoodItem) -> Unit,
   modifier: Modifier = Modifier,
   gridState: LazyGridState = rememberLazyGridState(),
-  topPadding: Dp = 0.dp,
-  bottomPadding: Dp = 24.dp
+  topPadding: Dp = FoodGridDefaults.topPadding(),
+  bottomPadding: Dp = FoodGridDefaults.bottomPadding()
 ) {
   LazyVerticalGrid(
     columns = GridCells.Fixed(3),
     modifier = modifier.fillMaxWidth(),
     state = gridState,
-    contentPadding = PaddingValues(top = topPadding, start = 8.dp, end = 8.dp, bottom = bottomPadding),
+    contentPadding = PaddingValues(top = topPadding, bottom = bottomPadding),
     verticalArrangement = Arrangement.spacedBy(12.dp),
     horizontalArrangement = Arrangement.SpaceBetween
   ) {
@@ -57,15 +57,35 @@ fun FoodGrid(
   }
 }
 
+object FoodGridDefaults {
+
+  fun topPadding(titleExpended: Boolean = false) = if (titleExpended) 120.dp else 72.dp
+  fun bottomPadding(buttonExists: Boolean = false) = if (buttonExists) 104.dp else 0.dp
+
+  val ZeroPadding = 0.dp
+
+  val DummyFoodList = List(32) {
+    FoodItem(
+      food = FoodItemDefaults.dummyFood(it),
+      status = if (it % 4 == 0) FoodItem.Status.LIKE
+        else if (it % 5 == 0) FoodItem.Status.DISLIKE
+        else FoodItem.Status.DEFAULT
+    )
+  }
+}
+
 @Preview
 @Composable
 private fun Preview() {
   ScreenPreview {
     FoodGrid(
-      searchKeyword = "치킨",
-      filteredFoodList = List(32) { FoodItem() },
+      searchKeyword = "",
+      filteredFoodList = FoodGridDefaults.DummyFoodList,
       onSearchKeywordChange = {},
-      onClickFoodItem = {}
+      onClickFoodItem = {},
+      modifier = Modifier.padding(24.dp),
+      topPadding = FoodGridDefaults.ZeroPadding,
+      bottomPadding = FoodGridDefaults.ZeroPadding
     )
   }
 }

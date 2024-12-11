@@ -23,7 +23,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodItem
-import com.jwd.lunchvote.presentation.model.FoodUIModel
 import com.jwd.lunchvote.presentation.model.TemplateUIModel
 import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.DeleteDialogEvent
 import com.jwd.lunchvote.presentation.screen.template.edit_template.EditTemplateContract.EditTemplateEvent
@@ -36,6 +35,7 @@ import com.jwd.lunchvote.presentation.widget.Dialog
 import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.FAB
 import com.jwd.lunchvote.presentation.widget.FoodGrid
+import com.jwd.lunchvote.presentation.widget.FoodGridDefaults
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
@@ -135,8 +135,8 @@ private fun EditTemplateScreen(
         onSearchKeywordChange = { onEvent(EditTemplateEvent.OnSearchKeywordChange(it)) },
         onClickFoodItem = { onEvent(EditTemplateEvent.OnClickFoodItem(it)) },
         gridState = gridState,
-        topPadding = 104.dp,
-        bottomPadding = 104.dp
+        topPadding = FoodGridDefaults.topPadding(true),
+        bottomPadding = FoodGridDefaults.bottomPadding(true)
       )
     }
   }
@@ -208,11 +208,7 @@ private fun Default() {
   ScreenPreview {
     EditTemplateScreen(
       state = EditTemplateState(
-        foodItemList = List(10) {
-          FoodItem(
-            food = FoodUIModel(name = "${it}번째 음식")
-          )
-        },
+        foodItemList = FoodGridDefaults.DummyFoodList,
         template = TemplateUIModel(
           name = "스트레스 받을 때(매운 음식)"
         )

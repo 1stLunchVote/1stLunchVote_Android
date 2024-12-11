@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -203,20 +204,29 @@ fun RowScope.DialogButton(
 private fun Preview() {
   ScreenPreview {
     Dialog(
-      title = "Blog post published",
+      title = "게시물 삭제",
       onDismissRequest = {},
-      body = "This blog post has been published. Team members will be able to edit this post.",
+      body = "정말 삭제하시겠습니까?\n삭제할 경우 되돌릴 수 없습니다.",
+      icon = {
+        Icon(
+          imageVector = Icons.Rounded.Delete,
+          contentDescription = "Delete"
+        )
+      },
+      iconColor = MaterialTheme.colorScheme.error
     ) {
       DialogButton(
-        text = "Cancel",
+        text = "취소",
         onClick = {},
         modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.error,
         isDismiss = true
       )
       DialogButton(
-        text = "Confirm",
+        text = "확인",
         onClick = {},
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.error
       )
     }
     Screen {}

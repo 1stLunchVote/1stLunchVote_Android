@@ -33,7 +33,6 @@ import com.jwd.lunchvote.presentation.model.ChatUIModel.Type.DEFAULT
 import com.jwd.lunchvote.presentation.model.ChatUIModel.Type.SYSTEM
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
-import com.jwd.lunchvote.presentation.util.innerShadow
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
