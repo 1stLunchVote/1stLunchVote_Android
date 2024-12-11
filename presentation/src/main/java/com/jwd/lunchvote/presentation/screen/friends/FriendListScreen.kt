@@ -130,7 +130,7 @@ private fun FriendListScreen(
       FloatingActionButton(
         onClick = { onEvent(FriendListEvent.OnClickRequestButton) },
         containerColor = MaterialTheme.colorScheme.primary,
-        contentColor = MaterialTheme.colorScheme.onPrimary,
+        contentColor = MaterialTheme.colorScheme.onPrimary
       ) {
         Icon(
           imageVector = Icons.Rounded.Add,

@@ -21,13 +21,11 @@ import androidx.compose.ui.unit.Dp
 /**
  * 플리커 애니메이션을 적용하는 Modifier
  *
- * @param modifier Modifier
  * @param durationMillis 애니메이션 지속 시간
  * @param delayMillis 애니메이션 반복 딜레이
  */
 @Composable
 internal fun Modifier.animateFlicker(
-  modifier: Modifier = Modifier,
   durationMillis: Int = 240,
   delayMillis: Int = 120,
 ): Modifier {
@@ -46,7 +44,7 @@ internal fun Modifier.animateFlicker(
     label = "flicker"
   )
 
-  return this.then(modifier.alpha(alpha))
+  return this.alpha(alpha)
 }
 
 

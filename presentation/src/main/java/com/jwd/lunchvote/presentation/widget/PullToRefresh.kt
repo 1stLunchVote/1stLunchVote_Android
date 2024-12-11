@@ -10,11 +10,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -98,8 +100,9 @@ private fun LunchVoteRefreshIndicator(
     modifier = modifier.pullToRefreshIndicator(
       state = state,
       isRefreshing = isRefreshing,
-      containerColor = MaterialTheme.colorScheme.primaryContainer,
+      containerColor = MaterialTheme.colorScheme.surface,
       threshold = threshold,
+      elevation = 8.dp
     ),
     contentAlignment = Alignment.Center
   ) {
@@ -127,8 +130,12 @@ private fun Preview() {
       LazyColumn(onRefresh = {}) {
         items(10) {
           Text(
-            text = "하이!", modifier = Modifier.fillMaxSize()
+            text = "하이!",
+            modifier = Modifier
+              .fillMaxSize()
+              .height(48.dp)
           )
+          HorizontalDivider()
         }
       }
     }
