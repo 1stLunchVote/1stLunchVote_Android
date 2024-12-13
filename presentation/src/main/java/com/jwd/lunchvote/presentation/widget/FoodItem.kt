@@ -30,7 +30,7 @@ import com.jwd.lunchvote.presentation.util.outerShadow
 import com.jwd.lunchvote.presentation.widget.FoodItemDefaults.dummyFood
 
 @Composable
-fun FoodItem(
+internal fun FoodItem(
   foodItem: FoodItem,
   modifier: Modifier = Modifier,
   onClick: () -> Unit = {}
@@ -95,7 +95,7 @@ private fun FoodImage(
   }
 }
 
-object FoodItemDefaults {
+internal object FoodItemDefaults {
 
   fun dummyFood(index: Int) = FoodUIModel(
     name = "${index}번 음식"

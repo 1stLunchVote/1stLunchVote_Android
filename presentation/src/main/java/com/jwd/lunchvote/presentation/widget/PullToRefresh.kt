@@ -40,7 +40,7 @@ import com.jwd.lunchvote.presentation.util.animateFlicker
  * @param onRefresh pull-to-refresh가 실행될 때 호출되는 콜백
  */
 @Composable
-fun LazyColumn(
+internal fun LazyColumn(
   onRefresh: () -> Unit,
   modifier: Modifier = Modifier,
   isRefreshing: Boolean = false,

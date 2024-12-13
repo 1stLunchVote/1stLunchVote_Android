@@ -37,7 +37,7 @@ import com.jwd.lunchvote.presentation.util.animatePopUp
 import com.jwd.lunchvote.presentation.util.outerShadow
 
 @Composable
-fun Dialog(
+internal fun Dialog(
   title: String,
   onDismissRequest: () -> Unit,
   modifier: Modifier = Modifier,
@@ -161,7 +161,7 @@ private fun DialogIcon(
 }
 
 @Composable
-fun RowScope.DialogButton(
+internal fun RowScope.DialogButton(
   text: String,
   onClick: () -> Unit,
   modifier: Modifier = Modifier,

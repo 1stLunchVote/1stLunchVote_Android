@@ -21,7 +21,7 @@ import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.conditional
 
 @Composable
-fun Screen(
+internal fun Screen(
   modifier: Modifier = Modifier,
   topAppBar: @Composable (ColumnScope.() -> Unit)? = null,
   bottomAppBar: @Composable (ColumnScope.() -> Unit)? = null,
@@ -70,7 +70,7 @@ fun Screen(
 }
 
 @Composable
-fun ScreenPreview(
+internal fun ScreenPreview(
   content: @Composable () -> Unit
 ) {
   LunchVoteTheme {

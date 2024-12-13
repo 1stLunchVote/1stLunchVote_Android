@@ -31,7 +31,7 @@ import com.jwd.lunchvote.presentation.util.conditional
 import com.jwd.lunchvote.presentation.util.outerShadow
 
 @Composable
-fun MemberProfile(
+internal fun MemberProfile(
   member: MemberUIModel,
   modifier: Modifier = Modifier,
   onClick: (MemberUIModel) -> Unit = {},
@@ -65,7 +65,7 @@ fun MemberProfile(
 }
 
 @Composable
-fun EmptyProfile(
+internal fun EmptyProfile(
   modifier: Modifier = Modifier,
   density: Density = LocalDensity.current
 ) {
@@ -93,7 +93,7 @@ fun EmptyProfile(
 }
 
 @Composable
-fun InviteProfile(
+internal fun InviteProfile(
   modifier: Modifier = Modifier,
   onClick: () -> Unit
 ) {

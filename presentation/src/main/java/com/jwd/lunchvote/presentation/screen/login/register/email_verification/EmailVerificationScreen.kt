@@ -24,12 +24,12 @@ import com.jwd.lunchvote.presentation.screen.login.register.email_verification.E
 import com.jwd.lunchvote.presentation.screen.login.register.email_verification.EmailVerificationContract.EmailVerificationSideEffect
 import com.jwd.lunchvote.presentation.screen.login.register.email_verification.EmailVerificationContract.EmailVerificationState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
-import com.jwd.lunchvote.presentation.widget.CheckIcon
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.LoadingScreen
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.TextField
+import com.jwd.lunchvote.presentation.widget.TextFieldIconDefaults
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kr.co.inbody.config.config.EmailConfig
@@ -97,7 +97,7 @@ private fun EmailVerificationScreen(
         errorMessage = stringResource(R.string.email_verification_email_format_error),
         trailingIcon = {
           if (state.emailSent) {
-            CheckIcon()
+            TextFieldIconDefaults.CheckIcon()
           }
         }
       )

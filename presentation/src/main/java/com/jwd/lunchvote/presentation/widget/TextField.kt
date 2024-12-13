@@ -39,9 +39,14 @@ import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.util.conditional
 import com.jwd.lunchvote.presentation.util.innerShadow
 import com.jwd.lunchvote.presentation.util.outerShadow
+import com.jwd.lunchvote.presentation.widget.TextFieldIconDefaults.CheckIcon
+import com.jwd.lunchvote.presentation.widget.TextFieldIconDefaults.ErrorIcon
+import com.jwd.lunchvote.presentation.widget.TextFieldIconDefaults.PasswordInvisibleIcon
+import com.jwd.lunchvote.presentation.widget.TextFieldIconDefaults.PasswordVisibleIcon
+import com.jwd.lunchvote.presentation.widget.TextFieldIconDefaults.SearchIcon
 
 @Composable
-fun TextField(
+internal fun TextField(
   text: String,
   onTextChange: (String) -> Unit,
   hintText: String,
@@ -138,7 +143,7 @@ fun TextField(
 }
 
 @Composable
-fun PasswordField(
+internal fun PasswordField(
   text: String,
   onTextChange: (String) -> Unit,
   hintText: String,
@@ -174,67 +179,70 @@ fun PasswordField(
   )
 }
 
-@Composable
-fun CheckIcon(
-  modifier: Modifier = Modifier
-) {
-  Icon(
-    imageVector = Icons.Rounded.Check,
-    contentDescription = "search",
-    modifier = modifier.size(20.dp),
-    tint = MaterialTheme.colorScheme.secondary
-  )
-}
+internal object TextFieldIconDefaults {
 
-@Composable
-fun ErrorIcon(
-  modifier: Modifier = Modifier
-) {
-  Icon(
-    imageVector = Icons.Rounded.Warning,
-    contentDescription = "error",
-    modifier = modifier.size(20.dp),
-    tint = MaterialTheme.colorScheme.error
-  )
-}
+  @Composable
+  fun CheckIcon(
+    modifier: Modifier = Modifier
+  ) {
+    Icon(
+      imageVector = Icons.Rounded.Check,
+      contentDescription = "search",
+      modifier = modifier.size(20.dp),
+      tint = MaterialTheme.colorScheme.secondary
+    )
+  }
 
-@Composable
-fun SearchIcon(
-  modifier: Modifier = Modifier
-) {
-  Icon(
-    painter = painterResource(R.drawable.ic_search),
-    contentDescription = "search",
-    modifier = modifier.size(20.dp)
-  )
-}
+  @Composable
+  fun ErrorIcon(
+    modifier: Modifier = Modifier
+  ) {
+    Icon(
+      imageVector = Icons.Rounded.Warning,
+      contentDescription = "error",
+      modifier = modifier.size(20.dp),
+      tint = MaterialTheme.colorScheme.error
+    )
+  }
 
-@Composable
-fun PasswordVisibleIcon(
-  modifier: Modifier = Modifier,
-  onClick: () -> Unit
-) {
-  Icon(
-    painter = painterResource(R.drawable.ic_password_visible),
-    contentDescription = "password visible",
-    modifier = modifier
-      .size(20.dp)
-      .clickableWithoutEffect(onClick)
-  )
-}
+  @Composable
+  fun SearchIcon(
+    modifier: Modifier = Modifier
+  ) {
+    Icon(
+      painter = painterResource(R.drawable.ic_search),
+      contentDescription = "search",
+      modifier = modifier.size(20.dp)
+    )
+  }
 
-@Composable
-fun PasswordInvisibleIcon(
-  modifier: Modifier = Modifier,
-  onClick: () -> Unit
-) {
-  Icon(
-    painter = painterResource(R.drawable.ic_password_invisible),
-    contentDescription = "password invisible",
-    modifier = modifier
-      .size(20.dp)
-      .clickableWithoutEffect(onClick)
-  )
+  @Composable
+  fun PasswordVisibleIcon(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+  ) {
+    Icon(
+      painter = painterResource(R.drawable.ic_password_visible),
+      contentDescription = "password visible",
+      modifier = modifier
+        .size(20.dp)
+        .clickableWithoutEffect(onClick)
+    )
+  }
+
+  @Composable
+  internal fun PasswordInvisibleIcon(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+  ) {
+    Icon(
+      painter = painterResource(R.drawable.ic_password_invisible),
+      contentDescription = "password invisible",
+      modifier = modifier
+        .size(20.dp)
+        .clickableWithoutEffect(onClick)
+    )
+  }
 }
 
 @Preview(widthDp = 1024, showBackground = true)

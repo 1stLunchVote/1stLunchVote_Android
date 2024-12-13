@@ -25,7 +25,7 @@ import com.jwd.lunchvote.presentation.util.conditional
 import kotlinx.coroutines.delay
 
 @Composable
-fun HorizontalTimer(
+internal fun HorizontalTimer(
   timeLimitSecond: Int,
   modifier: Modifier = Modifier,
   warningRatio: Float = 0.1f,

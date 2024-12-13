@@ -18,9 +18,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodItem
+import com.jwd.lunchvote.presentation.widget.TextFieldIconDefaults.SearchIcon
 
 @Composable
-fun FoodGrid(
+internal fun FoodGrid(
   searchKeyword: String,
   filteredFoodList: List<FoodItem>,
   onSearchKeywordChange: (String) -> Unit,
@@ -57,7 +58,7 @@ fun FoodGrid(
   }
 }
 
-object FoodGridDefaults {
+internal object FoodGridDefaults {
 
   fun topPadding(titleExpended: Boolean = false) = if (titleExpended) 120.dp else 72.dp
   fun bottomPadding(buttonExists: Boolean = false) = if (buttonExists) 104.dp else 0.dp

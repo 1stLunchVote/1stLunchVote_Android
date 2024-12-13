@@ -11,7 +11,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.jwd.lunchvote.presentation.R
 
 @Composable
-fun NetworkLostDialog(
+internal fun NetworkLostDialog(
   modifier: Modifier = Modifier,
   onClickQuitButton: () -> Unit = {}
 ) {

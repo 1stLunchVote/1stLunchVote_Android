@@ -32,7 +32,7 @@ import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 
 @Composable
-fun KakaoLoginButton(
+internal fun KakaoLoginButton(
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
   enabled: Boolean = true,
@@ -76,7 +76,7 @@ fun KakaoLoginButton(
 }
 
 @Composable
-fun GoogleLoginButton(
+internal fun GoogleLoginButton(
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
   enabled: Boolean = true,
@@ -126,7 +126,7 @@ fun GoogleLoginButton(
   }
 }
 
-enum class LoginButtonSize(val scale: Float) {
+internal enum class LoginButtonSize(val scale: Float) {
   Small(1f),
   Medium(1.5f),
   Big(2f)
@@ -137,6 +137,7 @@ enum class LoginButtonSize(val scale: Float) {
 private fun KakaoLoginButtonPreview() {
   LunchVoteTheme {
     Column(
+      modifier = Modifier.padding(8.dp),
       verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
       KakaoLoginButton(
@@ -157,6 +158,7 @@ private fun KakaoLoginButtonPreview() {
 private fun GoogleLoginButtonPreview() {
   LunchVoteTheme {
     Column(
+      modifier = Modifier.padding(8.dp),
       verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
       GoogleLoginButton(

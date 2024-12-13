@@ -37,7 +37,7 @@ import com.skydoves.landscapist.coil.CoilImage
 import java.io.File
 
 @Composable
-fun ImageFromUri(
+internal fun ImageFromUri(
   uri: Uri,
   modifier: Modifier = Modifier,
   context: Context = LocalContext.current
@@ -87,7 +87,7 @@ fun ImageFromUri(
 }
 
 @Composable
-fun ImageWithUploadButton(
+internal fun ImageWithUploadButton(
   uri: Uri,
   onImageChange: (Uri) -> Unit,
   modifier: Modifier = Modifier,

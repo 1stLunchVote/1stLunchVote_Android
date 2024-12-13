@@ -48,7 +48,7 @@ import java.util.Locale
  * @param onClickMember: 멤버 사진을 클릭했을 때 호출되는 콜백
  */
 @Composable
-fun ChatBubble(
+internal fun ChatBubble(
   chat: ChatUIModel,
   modifier: Modifier = Modifier,
   isMine: Boolean = false,
@@ -199,7 +199,7 @@ private fun SystemMessage(
 
 @Preview(showBackground = true)
 @Composable
-private fun ChatBubblePreview() {
+private fun Preview() {
   val user1 = User("", "", "김철수", "", 0L, 0L)
   val user2 = User("", "", "김영희김영희김영희김영희김영희김영희김영희", "", 0L, 0L)
   val user3 = User("", "", "김영수", "", 0L, 0L)

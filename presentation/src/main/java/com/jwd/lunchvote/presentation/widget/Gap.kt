@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ColumnScope.Gap(
+internal fun ColumnScope.Gap(
   modifier: Modifier = Modifier,
   height: Dp = 0.dp,
   minHeight: Dp = height,
@@ -21,7 +21,7 @@ fun ColumnScope.Gap(
 }
 
 @Composable
-fun RowScope.Gap(
+internal fun RowScope.Gap(
   modifier: Modifier = Modifier,
   width: Dp = 0.dp,
   minWidth: Dp = 0.dp,

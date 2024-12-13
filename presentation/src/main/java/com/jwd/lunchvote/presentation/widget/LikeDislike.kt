@@ -22,7 +22,7 @@ import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.outerShadow
 
 @Composable
-fun LikeDislike(
+internal fun LikeDislike(
   like: Int,
   dislike: Int,
   modifier: Modifier = Modifier

@@ -13,9 +13,9 @@ import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.toPath
 import kotlin.math.max
 
-fun RoundedPolygon.getBounds() = calculateBounds().let { Rect(it[0], it[1], it[2], it[3]) }
+internal fun RoundedPolygon.getBounds() = calculateBounds().let { Rect(it[0], it[1], it[2], it[3]) }
 
-class RoundedPolygonShape(
+internal class RoundedPolygonShape(
   private val polygon: RoundedPolygon,
   private var matrix: Matrix = Matrix()
 ) : Shape {

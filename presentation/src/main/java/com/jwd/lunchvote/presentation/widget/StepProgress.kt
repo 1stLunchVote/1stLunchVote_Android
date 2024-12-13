@@ -18,7 +18,7 @@ import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.outerShadow
 
 @Composable
-fun MemberProgress(
+internal fun MemberProgress(
   memberStatusList: List<MemberUIModel.Status>,
   modifier: Modifier = Modifier
 ) {
@@ -70,7 +70,7 @@ private fun StepProgress(
 private fun StepProgressPreview() {
   LunchVoteTheme {
     Row(
-      modifier = Modifier.padding(16.dp),
+      modifier = Modifier.padding(8.dp),
       horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
       StepProgress(true)

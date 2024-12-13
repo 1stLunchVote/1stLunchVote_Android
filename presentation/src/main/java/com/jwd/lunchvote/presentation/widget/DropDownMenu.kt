@@ -27,7 +27,7 @@ import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun <T>DropDownMenu(
+internal fun <T>DropDownMenu(
   list: List<T>,
   selected: T?,
   onItemSelected: (T) -> Unit,

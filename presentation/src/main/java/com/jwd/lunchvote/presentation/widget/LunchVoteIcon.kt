@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import com.jwd.lunchvote.presentation.R
 
 @Composable
-fun LunchVoteIcon(
+internal fun LunchVoteIcon(
   modifier: Modifier = Modifier,
   size: Dp = 24.dp
 ) {

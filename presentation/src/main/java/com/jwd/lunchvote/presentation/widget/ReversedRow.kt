@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.LayoutDirection
  *우측에 배치되는 Composable의 크기를 고정할 수 있다.
  **/
 @Composable
-fun ReversedRow(
+internal fun ReversedRow(
   modifier: Modifier = Modifier,
   horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
   verticalAlignment: Alignment.Vertical = Alignment.Top,
