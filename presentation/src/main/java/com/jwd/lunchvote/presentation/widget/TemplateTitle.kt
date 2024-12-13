@@ -71,8 +71,7 @@ internal fun TemplateTitle(
         modifier = Modifier.fillMaxWidth(),
         textAlign = TextAlign.Center,
         overflow = TextOverflow.Ellipsis,
-        maxLines = 1,
-        style = MaterialTheme.typography.titleMedium
+        maxLines = 1
       )
       LikeDislike(like, dislike)
     }
@@ -85,8 +84,7 @@ internal fun TemplateTitle(
         text = name,
         modifier = Modifier.weight(1f),
         overflow = TextOverflow.Ellipsis,
-        maxLines = 1,
-        style = MaterialTheme.typography.bodyLarge
+        maxLines = 1
       )
       LikeDislike(like, dislike)
     }

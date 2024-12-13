@@ -134,7 +134,6 @@ private fun SettingScreen(
         )
         Text(
           text = state.appVersion ?: stringResource(R.string.setting_app_version_failed),
-          style = MaterialTheme.typography.bodyLarge,
           color = MaterialTheme.colorScheme.outline
         )
       }

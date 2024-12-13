@@ -165,8 +165,7 @@ private fun TemplateListItem(
       verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
       Text(
-        text = template.name,
-        style = MaterialTheme.typography.bodyLarge
+        text = template.name
       )
       LikeDislike(
         like = template.likedFoodIds.size,

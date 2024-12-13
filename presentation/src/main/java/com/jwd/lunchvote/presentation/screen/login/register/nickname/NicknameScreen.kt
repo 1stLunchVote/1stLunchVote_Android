@@ -77,8 +77,7 @@ private fun NicknameScreen(
     Gap(height = 32.dp)
     Text(
       text = stringResource(R.string.nickname_description),
-      modifier = Modifier.fillMaxWidth(),
-      style = MaterialTheme.typography.bodyLarge
+      modifier = Modifier.fillMaxWidth()
     )
     Gap(height = 64.dp)
     Column(

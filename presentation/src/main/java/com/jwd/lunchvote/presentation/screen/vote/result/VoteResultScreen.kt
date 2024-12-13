@@ -101,8 +101,7 @@ private fun VoteResultScreen(
   ) {
     Gap()
     Text(
-      text = stringResource(R.string.vote_result_header),
-      style = MaterialTheme.typography.bodyLarge
+      text = stringResource(R.string.vote_result_header)
     )
     Gap(height = 16.dp)
     Box(

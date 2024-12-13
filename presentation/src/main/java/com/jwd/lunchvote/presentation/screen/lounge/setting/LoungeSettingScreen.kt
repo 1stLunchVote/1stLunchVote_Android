@@ -254,8 +254,7 @@ private fun SettingItem(
       }
       Text(
         text = if (enabled) value else stringResource(R.string.hyphen),
-        color = MaterialTheme.colorScheme.outline,
-        style = MaterialTheme.typography.bodyLarge
+        color = MaterialTheme.colorScheme.outline
       )
     }
     if (enabled.not()) {
@@ -323,8 +322,7 @@ private fun TimeLimitDialog(
               }
             ),
             modifier = Modifier.weight(1f),
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.bodyLarge
+            textAlign = TextAlign.Center
           )
           FilledIconButton(
             onClick = { onEvent(TimeLimitDialogEvent.OnClickIncreaseButton) },
@@ -403,8 +401,7 @@ private fun MaxMembersDialog(
         Text(
           text = stringResource(R.string.lounge_setting_max_members_body, maxMembers),
           modifier = Modifier.weight(1f),
-          textAlign = TextAlign.Center,
-          style = MaterialTheme.typography.bodyLarge
+          textAlign = TextAlign.Center
         )
         FilledIconButton(
           onClick = { onEvent(MaxMembersDialogEvent.OnClickIncreaseButton) },
@@ -473,8 +470,7 @@ private fun SecondVoteCandidatesDialog(
         Text(
           text = stringResource(R.string.lounge_setting_second_vote_candidates_body, secondVoteCandidates),
           modifier = Modifier.weight(1f),
-          textAlign = TextAlign.Center,
-          style = MaterialTheme.typography.bodyLarge
+          textAlign = TextAlign.Center
         )
         FilledIconButton(
           onClick = { onEvent(SecondVoteCandidatesDialogEvent.OnClickIncreaseButton) },
@@ -543,8 +539,7 @@ private fun MinLikeFoodsDialog(
         Text(
           text = stringResource(R.string.lounge_setting_min_like_foods_body, minLikeFoods),
           modifier = Modifier.weight(1f),
-          textAlign = TextAlign.Center,
-          style = MaterialTheme.typography.bodyLarge
+          textAlign = TextAlign.Center
         )
         FilledIconButton(
           onClick = { onEvent(MinLikeFoodsDialogEvent.OnClickIncreaseButton) },
@@ -613,8 +608,7 @@ private fun MinDislikeFoodsDialog(
         Text(
           text = stringResource(R.string.lounge_setting_min_dislike_foods_body, minDislikeFoods),
           modifier = Modifier.weight(1f),
-          textAlign = TextAlign.Center,
-          style = MaterialTheme.typography.bodyLarge
+          textAlign = TextAlign.Center
         )
         FilledIconButton(
           onClick = { onEvent(MinDislikeFoodsDialogEvent.OnClickIncreaseButton) },

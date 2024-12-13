@@ -213,8 +213,7 @@ private fun RegisterRow(
     verticalAlignment = Alignment.CenterVertically
   ) {
     Text(
-      text = stringResource(R.string.login_register_guide),
-      style = MaterialTheme.typography.bodyLarge
+      text = stringResource(R.string.login_register_guide)
     )
     Text(
       text = stringResource(R.string.login_register_button),
@@ -222,9 +221,7 @@ private fun RegisterRow(
         .clickableWithoutEffect(loading.not()) { onClickRegisterButton() }
         .padding(start = 8.dp, top = 12.dp, bottom = 12.dp, end = 0.dp),
       color = MaterialTheme.colorScheme.primary,
-      style = MaterialTheme.typography.bodyLarge.copy(
-        textDecoration = TextDecoration.Underline
-      )
+      textDecoration = TextDecoration.Underline
     )
   }
 }
