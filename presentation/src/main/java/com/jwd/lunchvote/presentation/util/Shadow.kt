@@ -51,6 +51,7 @@ internal fun Modifier.outerShadow(
 
   drawIntoCanvas { canvas ->
     canvas.save()
+    canvas.translate(-spread.toPx() / 2, -spread.toPx() / 2)
     canvas.translate(offsetX.toPx(), offsetY.toPx())
     canvas.drawOutline(shadowOutline, paint)
     canvas.restore()

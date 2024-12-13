@@ -72,7 +72,7 @@ internal fun TemplateTitle(
         textAlign = TextAlign.Center,
         overflow = TextOverflow.Ellipsis,
         maxLines = 1,
-        style = MaterialTheme.typography.bodyLarge
+        style = MaterialTheme.typography.titleMedium
       )
       LikeDislike(like, dislike)
     }
