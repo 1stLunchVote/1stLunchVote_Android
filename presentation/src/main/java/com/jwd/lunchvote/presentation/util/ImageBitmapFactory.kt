@@ -10,7 +10,7 @@ import android.provider.MediaStore
 import java.io.File
 
 @Suppress("DEPRECATION")
-object ImageBitmapFactory {
+internal object ImageBitmapFactory {
   fun createBitmapFromUri(context: Context,  uri: Uri): Bitmap =
     if (Build.VERSION.SDK_INT < 29) {
       MediaStore.Images.Media.getBitmap(context.contentResolver, uri)

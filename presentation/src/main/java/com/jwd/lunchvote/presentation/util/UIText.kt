@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import kr.co.inbody.config.error.UnknownError
 
-sealed class UiText{
+internal sealed class UiText{
   data class DynamicString(val value: String) : UiText()
   class StringResource(
     @StringRes val resId: Int,
