@@ -8,8 +8,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -32,7 +35,10 @@ import com.jwd.lunchvote.presentation.model.UserUIModel
 import com.jwd.lunchvote.presentation.screen.friends.request.FriendRequestContract.FriendRequestEvent
 import com.jwd.lunchvote.presentation.screen.friends.request.FriendRequestContract.FriendRequestSideEffect
 import com.jwd.lunchvote.presentation.screen.friends.request.FriendRequestContract.FriendRequestState
+import com.jwd.lunchvote.presentation.screen.friends.request.FriendRequestContract.RejectDialogEvent
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
+import com.jwd.lunchvote.presentation.widget.Dialog
+import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.LazyColumn
 import com.jwd.lunchvote.presentation.widget.MemberProfile
 import com.jwd.lunchvote.presentation.widget.Screen
@@ -64,6 +70,13 @@ fun FriendRequestRoute(
   }
 
   LaunchedEffect(Unit) { viewModel.sendEvent(FriendRequestEvent.ScreenInitialize) }
+
+  state.rejectDialogState?.let { dialogState ->
+    RejectDialog(
+      friendName = dialogState.friendName,
+      onEvent = viewModel::sendEvent
+    )
+  }
 
   FriendRequestScreen(
     state = state,
@@ -117,8 +130,8 @@ private fun FriendRequestScreen(
           FriendRequestItem(
             request = request,
             friend = friend,
-            onClickAcceptButton = { onEvent(FriendRequestEvent.OnClickAcceptRequestButton(request)) },
-            onClickRejectButton = { onEvent(FriendRequestEvent.OnClickRejectRequestButton(request)) }
+            onClickAcceptButton = { onEvent(FriendRequestEvent.OnClickAcceptRequestButton(request.id)) },
+            onClickRejectButton = { onEvent(FriendRequestEvent.OnClickRejectRequestButton(request.id, friend.name)) }
           )
         }
       }
@@ -181,6 +194,41 @@ private fun FriendRequestItem(
   }
 }
 
+@Composable
+private fun RejectDialog(
+  friendName: String,
+  modifier: Modifier = Modifier,
+  onEvent: (RejectDialogEvent) -> Unit = {}
+) {
+  Dialog(
+    title = stringResource(R.string.fr_reject_dialog_title),
+    onDismissRequest = { onEvent(RejectDialogEvent.OnClickCancelButton) },
+    modifier = modifier,
+    icon = {
+      Icon(
+        Icons.Rounded.Delete,
+        contentDescription = "Delete"
+      )
+    },
+    iconColor = MaterialTheme.colorScheme.error,
+    body = stringResource(R.string.fr_reject_dialog_body, friendName),
+    closable = false,
+    buttons = {
+      DialogButton(
+        text = stringResource(R.string.fr_reject_dialog_cancel_button),
+        onClick = { onEvent(RejectDialogEvent.OnClickCancelButton) },
+        isDismiss = true,
+        color = MaterialTheme.colorScheme.onSurface
+      )
+      DialogButton(
+        text = stringResource(R.string.fr_reject_dialog_reject_button),
+        onClick = { onEvent(RejectDialogEvent.OnClickRejectButton) },
+        color = MaterialTheme.colorScheme.error
+      )
+    }
+  )
+}
+
 @Preview
 @Composable
 private fun Preview() {
@@ -206,6 +254,16 @@ private fun Preview() {
           )
         )
       )
+    )
+  }
+}
+
+@Preview
+@Composable
+private fun RejectDialogPreview() {
+  ScreenPreview {
+    RejectDialog(
+      friendName = "김철수"
     )
   }
 }

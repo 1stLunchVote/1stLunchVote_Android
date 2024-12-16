@@ -9,10 +9,7 @@ import com.jwd.lunchvote.domain.repository.UserRepository
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.presentation.mapper.asUI
-import com.jwd.lunchvote.presentation.screen.friends.request.FriendRequestContract.FriendRequestEvent
-import com.jwd.lunchvote.presentation.screen.friends.request.FriendRequestContract.FriendRequestReduce
-import com.jwd.lunchvote.presentation.screen.friends.request.FriendRequestContract.FriendRequestSideEffect
-import com.jwd.lunchvote.presentation.screen.friends.request.FriendRequestContract.FriendRequestState
+import com.jwd.lunchvote.presentation.screen.friends.request.FriendRequestContract.*
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kr.co.inbody.config.error.UserError
@@ -36,14 +33,24 @@ class FriendRequestViewModel @Inject constructor(
       is FriendRequestEvent.ScreenInitialize -> launch { initialize() }
 
       is FriendRequestEvent.OnClickBackButton -> sendSideEffect(FriendRequestSideEffect.PopBackStack)
-      is FriendRequestEvent.OnClickAcceptRequestButton -> launch { acceptFriend(event.friend.id) }
-      is FriendRequestEvent.OnClickRejectRequestButton -> launch { rejectFriend(event.friend.id) }
+      is FriendRequestEvent.OnClickAcceptRequestButton -> launch { acceptFriend(event.requestId) }
+      is FriendRequestEvent.OnClickRejectRequestButton -> updateState(FriendRequestReduce.UpdateRejectDialogState(RejectDialogState(event.requestId, event.friendName)))
+
+      is RejectDialogEvent -> handleRejectDialogEvents(event)
+    }
+  }
+
+  private fun handleRejectDialogEvents(event: RejectDialogEvent) {
+    when(event) {
+      is RejectDialogEvent.OnClickCancelButton -> updateState(FriendRequestReduce.UpdateRejectDialogState(null))
+      is RejectDialogEvent.OnClickRejectButton -> launch { rejectFriend() }
     }
   }
 
   override fun reduceState(state: FriendRequestState, reduce: FriendRequestReduce): FriendRequestState {
     return when(reduce) {
       is FriendRequestReduce.UpdateRequestSenderMap -> state.copy(requestSenderMap = reduce.requestSenderMap)
+      is FriendRequestReduce.UpdateRejectDialogState -> state.copy(rejectDialogState = reduce.rejectDialogState)
     }
   }
 
@@ -61,13 +68,16 @@ class FriendRequestViewModel @Inject constructor(
     updateState(FriendRequestReduce.UpdateRequestSenderMap(requestSenderMap))
   }
 
-  private suspend fun acceptFriend(friendId: String) {
-    friendRepository.acceptFriend(friendId)
+  private suspend fun acceptFriend(requestId: String) {
+    friendRepository.acceptFriend(requestId)
     initialize()
   }
 
-  private suspend fun rejectFriend(friendId: String) {
-    friendRepository.rejectFriend(friendId)
+  private suspend fun rejectFriend() {
+    val dialogState = currentState.rejectDialogState ?: return
+    updateState(FriendRequestReduce.UpdateRejectDialogState(null))
+
+    friendRepository.rejectFriend(dialogState.requestId)
     initialize()
   }
 }

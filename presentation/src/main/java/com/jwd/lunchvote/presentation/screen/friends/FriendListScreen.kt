@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Badge
@@ -44,6 +45,7 @@ import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.UserUIModel
 import com.jwd.lunchvote.presentation.modifier.clickableWithoutEffect
+import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.DeleteDialogEvent
 import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendListEvent
 import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendListSideEffect
 import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendListState
@@ -89,6 +91,12 @@ fun FriendListRoute(
 
   state.requestDialogState?.let { dialogState ->
     RequestDialog(
+      friendName = dialogState.friendName,
+      onEvent = viewModel::sendEvent
+    )
+  }
+  state.deleteDialogState?.let { dialogState ->
+    DeleteDialog(
       friendName = dialogState.friendName,
       onEvent = viewModel::sendEvent
     )
@@ -161,7 +169,7 @@ private fun FriendListScreen(
           friend = friend,
           modifier = Modifier.fillMaxWidth(),
           online = true,
-          onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id)) },
+          onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id, friend.name)) },
           onClickJoinButton = { onEvent(FriendListEvent.OnClickJoinButton(friend.id)) }
         )
       }
@@ -173,7 +181,7 @@ private fun FriendListScreen(
           friend = friend,
           modifier = Modifier.fillMaxWidth(),
           online = true,
-          onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id)) }
+          onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id, friend.name)) }
         )
       }
       friendItemGroup(
@@ -184,7 +192,7 @@ private fun FriendListScreen(
           friend = friend,
           modifier = Modifier.fillMaxWidth(),
           online = false,
-          onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id)) },
+          onClickDeleteFriendButton = { onEvent(FriendListEvent.OnClickDeleteFriendButton(friend.id, friend.name)) },
         )
       }
       item {
@@ -331,6 +339,41 @@ private fun RequestDialog(
   )
 }
 
+@Composable
+private fun DeleteDialog(
+  friendName: String,
+  modifier: Modifier = Modifier,
+  onEvent: (DeleteDialogEvent) -> Unit = {}
+) {
+  Dialog(
+    title = stringResource(R.string.fl_delete_dialog_title),
+    onDismissRequest = { onEvent(DeleteDialogEvent.OnClickCancelButton) },
+    modifier = modifier,
+    icon = {
+      Icon(
+        Icons.Rounded.Delete,
+        contentDescription = "Delete"
+      )
+    },
+    iconColor = MaterialTheme.colorScheme.error,
+    body = stringResource(R.string.fl_delete_dialog_body, friendName),
+    closable = false,
+    buttons = {
+      DialogButton(
+        text = stringResource(R.string.fl_delete_dialog_cancel_button),
+        onClick = { onEvent(DeleteDialogEvent.OnClickCancelButton) },
+        isDismiss = true,
+        color = MaterialTheme.colorScheme.onSurface
+      )
+      DialogButton(
+        text = stringResource(R.string.fl_delete_dialog_delete_button),
+        onClick = { onEvent(DeleteDialogEvent.OnClickDeleteButton) },
+        color = MaterialTheme.colorScheme.error
+      )
+    }
+  )
+}
+
 @Preview
 @Composable
 private fun Preview() {
@@ -362,5 +405,13 @@ private fun Preview() {
 private fun JoinDialogPreview() {
   LunchVoteTheme {
     RequestDialog("닉네임")
+  }
+}
+
+@Preview
+@Composable
+private fun DeleteDialogPreview() {
+  LunchVoteTheme {
+    DeleteDialog("김철수")
   }
 }

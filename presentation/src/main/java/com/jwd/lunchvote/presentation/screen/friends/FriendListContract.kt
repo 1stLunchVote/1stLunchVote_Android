@@ -14,7 +14,8 @@ class FriendListContract {
     val onlineFriendList: List<UserUIModel> = emptyList(),
     val offlineFriendList: List<UserUIModel> = emptyList(),
 
-    val requestDialogState: RequestDialogState? = null
+    val requestDialogState: RequestDialogState? = null,
+    val deleteDialogState: DeleteDialogState? = null
   ) : ViewModelContract.State, Parcelable
 
   sealed interface FriendListEvent : ViewModelContract.Event {
@@ -22,8 +23,8 @@ class FriendListContract {
 
     data object OnClickBackButton : FriendListEvent
     data object OnClickFriendRequestButton : FriendListEvent
-    data class OnClickJoinButton (val friendId: String) : FriendListEvent
-    data class OnClickDeleteFriendButton(val friendId: String) : FriendListEvent
+    data class OnClickJoinButton (val requestId: String) : FriendListEvent
+    data class OnClickDeleteFriendButton(val requestId: String, val friendName: String) : FriendListEvent
     data object OnClickRequestButton : FriendListEvent
   }
 
@@ -33,6 +34,7 @@ class FriendListContract {
     data class UpdateOnlineFriendList(val onlineFriendList: List<UserUIModel>) : FriendListReduce
     data class UpdateOfflineFriendList(val offlineFriendList: List<UserUIModel>) : FriendListReduce
     data class UpdateRequestDialogState(val requestDialogState: RequestDialogState?) : FriendListReduce
+    data class UpdateDeleteDialogState(val deleteDialogState: DeleteDialogState?) : FriendListReduce
   }
 
   sealed interface FriendListSideEffect : ViewModelContract.SideEffect {
@@ -45,9 +47,7 @@ class FriendListContract {
   @Parcelize
   data class RequestDialogState(
     val friendName: String = ""
-  ) : ViewModelContract.State, Parcelable {
-    override fun toParcelable(): Parcelable = this
-  }
+  ) : ViewModelContract.State, Parcelable
 
   sealed interface RequestDialogEvent : FriendListEvent {
     data class OnFriendNameChange(val friendName: String) : RequestDialogEvent
@@ -57,5 +57,16 @@ class FriendListContract {
 
   sealed interface RequestDialogReduce : FriendListReduce {
     data class UpdateFriendName(val friendName: String) : RequestDialogReduce
+  }
+
+  @Parcelize
+  data class DeleteDialogState(
+    val requestId: String = "",
+    val friendName: String = ""
+  ) : ViewModelContract.State, Parcelable
+
+  sealed interface DeleteDialogEvent : FriendListEvent {
+    data object OnClickCancelButton : DeleteDialogEvent
+    data object OnClickDeleteButton : DeleteDialogEvent
   }
 }

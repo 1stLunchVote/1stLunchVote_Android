@@ -11,13 +11,7 @@ import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.base.BaseStateViewModel
 import com.jwd.lunchvote.presentation.mapper.asUI
 import com.jwd.lunchvote.presentation.model.UserUIModel
-import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendListEvent
-import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendListReduce
-import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendListSideEffect
-import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendListState
-import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.RequestDialogEvent
-import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.RequestDialogReduce
-import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.RequestDialogState
+import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.*
 import com.jwd.lunchvote.presentation.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kr.co.inbody.config.error.UserError
@@ -44,11 +38,12 @@ class FriendListViewModel @Inject constructor(
 
       is FriendListEvent.OnClickBackButton -> sendSideEffect(FriendListSideEffect.PopBackStack)
       is FriendListEvent.OnClickFriendRequestButton -> sendSideEffect(FriendListSideEffect.NavigateToFriendRequest)
-      is FriendListEvent.OnClickJoinButton -> launch { joinLounge(event.friendId) }
-      is FriendListEvent.OnClickDeleteFriendButton -> launch { deleteFriend(event.friendId) }
+      is FriendListEvent.OnClickJoinButton -> launch { joinLounge(event.requestId) }
+      is FriendListEvent.OnClickDeleteFriendButton -> updateState(FriendListReduce.UpdateDeleteDialogState(DeleteDialogState(event.requestId, event.friendName)))
       is FriendListEvent.OnClickRequestButton -> updateState(FriendListReduce.UpdateRequestDialogState(RequestDialogState()))
 
       is RequestDialogEvent -> handleRequestDialogEvents(event)
+      is DeleteDialogEvent -> handleDeleteDialogEvents(event)
     }
   }
 
@@ -60,6 +55,13 @@ class FriendListViewModel @Inject constructor(
     }
   }
 
+  private fun handleDeleteDialogEvents(event: DeleteDialogEvent) {
+    when(event) {
+      is DeleteDialogEvent.OnClickCancelButton -> updateState(FriendListReduce.UpdateDeleteDialogState(null))
+      is DeleteDialogEvent.OnClickDeleteButton -> launch { deleteFriend() }
+    }
+  }
+
   override fun reduceState(state: FriendListState, reduce: FriendListReduce): FriendListState {
     return when(reduce) {
       is FriendListReduce.UpdateHasRequest -> state.copy(hasRequest = reduce.hasRequest)
@@ -67,6 +69,7 @@ class FriendListViewModel @Inject constructor(
       is FriendListReduce.UpdateOnlineFriendList -> state.copy(onlineFriendList = reduce.onlineFriendList)
       is FriendListReduce.UpdateOfflineFriendList -> state.copy(offlineFriendList = reduce.offlineFriendList)
       is FriendListReduce.UpdateRequestDialogState -> state.copy(requestDialogState = reduce.requestDialogState)
+      is FriendListReduce.UpdateDeleteDialogState -> state.copy(deleteDialogState = reduce.deleteDialogState)
 
       is RequestDialogReduce -> state.copy(requestDialogState = reduceRequestDialogState(state.requestDialogState, reduce))
     }
@@ -113,14 +116,17 @@ class FriendListViewModel @Inject constructor(
     updateState(FriendListReduce.UpdateOfflineFriendList(offlineFriendList))
   }
 
-  private suspend fun joinLounge(friendId: String) {
-    val loungeId = userStatusRepository.getUserStatus(friendId)?.loungeId ?: return
+  private suspend fun joinLounge(requestId: String) {
+    val loungeId = userStatusRepository.getUserStatus(requestId)?.loungeId ?: return
 
     sendSideEffect(FriendListSideEffect.NavigateToLounge(loungeId))
   }
 
-  private suspend fun deleteFriend(friendId: String) {
-    friendRepository.deleteFriend(userId, friendId)
+  private suspend fun deleteFriend() {
+    val dialogState = currentState.deleteDialogState ?: return
+    updateState(FriendListReduce.UpdateDeleteDialogState(null))
+
+    friendRepository.deleteFriend(userId, dialogState.requestId)
 
     sendSideEffect(FriendListSideEffect.ShowSnackbar(UiText.StringResource(R.string.friend_list_delete_friend_snackbar)))
     initialize()
