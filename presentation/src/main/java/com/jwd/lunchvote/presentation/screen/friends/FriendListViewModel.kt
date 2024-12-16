@@ -62,6 +62,7 @@ class FriendListViewModel @Inject constructor(
 
   override fun reduceState(state: FriendListState, reduce: FriendListReduce): FriendListState {
     return when(reduce) {
+      is FriendListReduce.UpdateHasRequest -> state.copy(hasRequest = reduce.hasRequest)
       is FriendListReduce.UpdateJoinedFriendList -> state.copy(joinedFriendList = reduce.joinedFriendList)
       is FriendListReduce.UpdateOnlineFriendList -> state.copy(onlineFriendList = reduce.onlineFriendList)
       is FriendListReduce.UpdateOfflineFriendList -> state.copy(offlineFriendList = reduce.offlineFriendList)
@@ -85,6 +86,10 @@ class FriendListViewModel @Inject constructor(
   }
 
   private suspend fun initialize() {
+    val hasRequest = friendRepository.getReceivedFriendRequests(userId).isNotEmpty()
+
+    updateState(FriendListReduce.UpdateHasRequest(hasRequest))
+
     val joinedFriendList = mutableListOf<UserUIModel>()
     val onlineFriendList = mutableListOf<UserUIModel>()
     val offlineFriendList = mutableListOf<UserUIModel>()

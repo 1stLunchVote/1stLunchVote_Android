@@ -50,7 +50,7 @@ import com.jwd.lunchvote.presentation.screen.vote.second.SecondVoteContract.Seco
 import com.jwd.lunchvote.presentation.screen.vote.second.SecondVoteContract.SecondVoteState
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
-import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
+import com.jwd.lunchvote.presentation.modifier.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.widget.Dialog
 import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.FAB

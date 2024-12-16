@@ -31,8 +31,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.jwd.lunchvote.presentation.modifier.animateFlicker
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
-import com.jwd.lunchvote.presentation.util.animateFlicker
 
 /**
  * pull-to-refresh 기능이 추가된 LazyColumn

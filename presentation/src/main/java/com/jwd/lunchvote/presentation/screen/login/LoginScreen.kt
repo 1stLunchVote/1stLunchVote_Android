@@ -34,7 +34,7 @@ import com.jwd.lunchvote.presentation.screen.login.LoginContract.LoginEvent
 import com.jwd.lunchvote.presentation.screen.login.LoginContract.LoginSideEffect
 import com.jwd.lunchvote.presentation.screen.login.LoginContract.LoginState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
-import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
+import com.jwd.lunchvote.presentation.modifier.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.util.login
 import com.jwd.lunchvote.presentation.util.loginWithGoogleCredential
 import com.jwd.lunchvote.presentation.widget.Gap

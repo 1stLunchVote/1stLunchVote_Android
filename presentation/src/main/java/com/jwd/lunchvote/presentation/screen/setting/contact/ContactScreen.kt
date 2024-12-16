@@ -34,7 +34,7 @@ import com.jwd.lunchvote.presentation.screen.setting.contact.ContactContract.Con
 import com.jwd.lunchvote.presentation.screen.setting.contact.ContactContract.DeleteDialogEvent
 import com.jwd.lunchvote.presentation.util.INITIAL_DATE_TIME
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
-import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
+import com.jwd.lunchvote.presentation.modifier.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.widget.Dialog
 import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.Gap

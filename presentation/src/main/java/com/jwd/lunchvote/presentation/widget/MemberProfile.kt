@@ -26,9 +26,9 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.jwd.lunchvote.presentation.model.MemberUIModel
+import com.jwd.lunchvote.presentation.modifier.conditional
+import com.jwd.lunchvote.presentation.modifier.outerShadow
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
-import com.jwd.lunchvote.presentation.util.conditional
-import com.jwd.lunchvote.presentation.util.outerShadow
 
 @Composable
 internal fun MemberProfile(
@@ -59,7 +59,7 @@ internal fun MemberProfile(
   ) {
     ImageFromUri(
       uri = member.userProfile.toUri(),
-      modifier = Modifier.fillMaxSize()
+      modifier = Modifier.matchParentSize()
     )
   }
 }

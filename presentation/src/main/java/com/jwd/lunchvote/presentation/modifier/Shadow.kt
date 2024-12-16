@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.presentation.util
+package com.jwd.lunchvote.presentation.modifier
 
 import android.graphics.BlurMaskFilter
 import android.graphics.PorterDuff

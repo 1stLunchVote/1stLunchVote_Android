@@ -34,7 +34,7 @@ import com.jwd.lunchvote.presentation.screen.setting.SettingContract.SettingEven
 import com.jwd.lunchvote.presentation.screen.setting.SettingContract.SettingSideEffect
 import com.jwd.lunchvote.presentation.screen.setting.SettingContract.SettingState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
-import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
+import com.jwd.lunchvote.presentation.modifier.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview

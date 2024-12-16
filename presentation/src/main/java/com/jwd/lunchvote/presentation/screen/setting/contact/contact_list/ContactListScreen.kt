@@ -32,7 +32,7 @@ import com.jwd.lunchvote.presentation.screen.setting.contact.contact_list.Contac
 import com.jwd.lunchvote.presentation.screen.setting.contact.contact_list.ContactListContract.ContactListSideEffect
 import com.jwd.lunchvote.presentation.screen.setting.contact.contact_list.ContactListContract.ContactListState
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
-import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
+import com.jwd.lunchvote.presentation.modifier.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
 import com.jwd.lunchvote.presentation.widget.TopBar

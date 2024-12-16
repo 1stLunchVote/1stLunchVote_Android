@@ -56,7 +56,7 @@ import com.jwd.lunchvote.presentation.screen.home.HomeContract.JoinDialogEvent
 import com.jwd.lunchvote.presentation.screen.home.HomeContract.SecretDialogEvent
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
-import com.jwd.lunchvote.presentation.util.conditional
+import com.jwd.lunchvote.presentation.modifier.conditional
 import com.jwd.lunchvote.presentation.widget.Dialog
 import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.Gap

@@ -22,11 +22,11 @@ import androidx.core.net.toUri
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodItem
 import com.jwd.lunchvote.presentation.model.FoodUIModel
+import com.jwd.lunchvote.presentation.modifier.clickableWithoutEffect
+import com.jwd.lunchvote.presentation.modifier.conditional
+import com.jwd.lunchvote.presentation.modifier.innerShadow
+import com.jwd.lunchvote.presentation.modifier.outerShadow
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
-import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
-import com.jwd.lunchvote.presentation.util.conditional
-import com.jwd.lunchvote.presentation.util.innerShadow
-import com.jwd.lunchvote.presentation.util.outerShadow
 import com.jwd.lunchvote.presentation.widget.FoodItemDefaults.dummyFood
 
 @Composable

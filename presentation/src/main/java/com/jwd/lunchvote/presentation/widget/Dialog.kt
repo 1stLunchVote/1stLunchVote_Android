@@ -33,8 +33,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.jwd.lunchvote.presentation.util.animatePopUp
-import com.jwd.lunchvote.presentation.util.outerShadow
+import com.jwd.lunchvote.presentation.modifier.animatePopUp
+import com.jwd.lunchvote.presentation.modifier.outerShadow
 
 @Composable
 internal fun Dialog(

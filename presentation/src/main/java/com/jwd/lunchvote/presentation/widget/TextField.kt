@@ -34,11 +34,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jwd.lunchvote.presentation.R
+import com.jwd.lunchvote.presentation.modifier.clickableWithoutEffect
+import com.jwd.lunchvote.presentation.modifier.conditional
+import com.jwd.lunchvote.presentation.modifier.innerShadow
+import com.jwd.lunchvote.presentation.modifier.outerShadow
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
-import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
-import com.jwd.lunchvote.presentation.util.conditional
-import com.jwd.lunchvote.presentation.util.innerShadow
-import com.jwd.lunchvote.presentation.util.outerShadow
 import com.jwd.lunchvote.presentation.widget.TextFieldIconDefaults.CheckIcon
 import com.jwd.lunchvote.presentation.widget.TextFieldIconDefaults.ErrorIcon
 import com.jwd.lunchvote.presentation.widget.TextFieldIconDefaults.PasswordInvisibleIcon

@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-internal object Connection {
+object Connection {
   private var connectivityManager: ConnectivityManager? = null
   private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main)
 

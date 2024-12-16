@@ -14,6 +14,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -41,13 +43,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.MemberUIModel
 import com.jwd.lunchvote.presentation.model.UserUIModel
+import com.jwd.lunchvote.presentation.modifier.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendListEvent
 import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendListSideEffect
 import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.FriendListState
 import com.jwd.lunchvote.presentation.screen.friends.FriendListContract.RequestDialogEvent
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
-import com.jwd.lunchvote.presentation.util.clickableWithoutEffect
 import com.jwd.lunchvote.presentation.widget.Dialog
 import com.jwd.lunchvote.presentation.widget.DialogButton
 import com.jwd.lunchvote.presentation.widget.LazyColumn
@@ -118,10 +120,14 @@ private fun FriendListScreen(
           IconButton(
             onClick = { onEvent(FriendListEvent.OnClickFriendRequestButton) }
           ) {
-            Icon(
-              Icons.Rounded.Notifications,
-              contentDescription = "friend request"
-            )
+            BadgedBox(
+              badge = { if (state.hasRequest) Badge() }
+            ) {
+              Icon(
+                Icons.Rounded.Notifications,
+                contentDescription = "friend request"
+              )
+            }
           }
         }
       )
@@ -331,9 +337,19 @@ private fun Preview() {
   ScreenPreview {
     FriendListScreen(
       FriendListState(
-        onlineFriendList = List(5) {
+        joinedFriendList = List(1) {
           UserUIModel(
-            name = "친구 $it"
+            name = "투표 중인 친구"
+          )
+        },
+        onlineFriendList = List(2) {
+          UserUIModel(
+            name = "접속 중인 친구 $it"
+          )
+        },
+        offlineFriendList = List(3) {
+          UserUIModel(
+            name = "미접속 친구 $it"
           )
         }
       )

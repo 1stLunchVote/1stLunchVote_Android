@@ -9,6 +9,7 @@ import kotlinx.parcelize.Parcelize
 class FriendListContract {
   @Parcelize
   data class FriendListState(
+    val hasRequest: Boolean = false,
     val joinedFriendList: List<UserUIModel> = emptyList(),
     val onlineFriendList: List<UserUIModel> = emptyList(),
     val offlineFriendList: List<UserUIModel> = emptyList(),
@@ -27,6 +28,7 @@ class FriendListContract {
   }
 
   sealed interface FriendListReduce : ViewModelContract.Reduce {
+    data class UpdateHasRequest(val hasRequest: Boolean) : FriendListReduce
     data class UpdateJoinedFriendList(val joinedFriendList: List<UserUIModel>) : FriendListReduce
     data class UpdateOnlineFriendList(val onlineFriendList: List<UserUIModel>) : FriendListReduce
     data class UpdateOfflineFriendList(val offlineFriendList: List<UserUIModel>) : FriendListReduce

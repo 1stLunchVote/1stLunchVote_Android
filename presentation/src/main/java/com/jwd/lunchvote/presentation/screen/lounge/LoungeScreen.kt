@@ -61,7 +61,7 @@ import com.jwd.lunchvote.presentation.screen.lounge.LoungeContract.LoungeSideEff
 import com.jwd.lunchvote.presentation.screen.lounge.LoungeContract.LoungeState
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
-import com.jwd.lunchvote.presentation.util.conditional
+import com.jwd.lunchvote.presentation.modifier.conditional
 import com.jwd.lunchvote.presentation.widget.ChatBubble
 import com.jwd.lunchvote.presentation.widget.Dialog
 import com.jwd.lunchvote.presentation.widget.DialogButton

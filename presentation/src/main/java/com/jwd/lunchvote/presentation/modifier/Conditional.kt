@@ -1,4 +1,4 @@
-package com.jwd.lunchvote.presentation.util
+package com.jwd.lunchvote.presentation.modifier
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
