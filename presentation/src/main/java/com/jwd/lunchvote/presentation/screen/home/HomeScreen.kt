@@ -49,25 +49,28 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jwd.lunchvote.presentation.BuildConfig
 import com.jwd.lunchvote.presentation.R
 import com.jwd.lunchvote.presentation.model.FoodUIModel
+import com.jwd.lunchvote.presentation.modifier.conditional
 import com.jwd.lunchvote.presentation.screen.home.HomeContract.HomeEvent
 import com.jwd.lunchvote.presentation.screen.home.HomeContract.HomeSideEffect
 import com.jwd.lunchvote.presentation.screen.home.HomeContract.HomeState
 import com.jwd.lunchvote.presentation.screen.home.HomeContract.JoinDialogEvent
+import com.jwd.lunchvote.presentation.screen.home.HomeContract.JoinDialogState
 import com.jwd.lunchvote.presentation.screen.home.HomeContract.SecretDialogEvent
+import com.jwd.lunchvote.presentation.screen.home.HomeContract.SecretDialogState
 import com.jwd.lunchvote.presentation.theme.LunchVoteTheme
 import com.jwd.lunchvote.presentation.util.LocalSnackbarChannel
-import com.jwd.lunchvote.presentation.modifier.conditional
 import com.jwd.lunchvote.presentation.widget.Dialog
 import com.jwd.lunchvote.presentation.widget.DialogButton
+import com.jwd.lunchvote.presentation.util.Dialogs
 import com.jwd.lunchvote.presentation.widget.Gap
 import com.jwd.lunchvote.presentation.widget.ImageFromUri
 import com.jwd.lunchvote.presentation.widget.ImageWithUploadButton
 import com.jwd.lunchvote.presentation.widget.LunchVoteIcon
 import com.jwd.lunchvote.presentation.widget.Screen
 import com.jwd.lunchvote.presentation.widget.ScreenPreview
+import com.jwd.lunchvote.presentation.util.SideEffectHandler
 import com.jwd.lunchvote.presentation.widget.TextField
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun HomeRoute(
@@ -83,38 +86,23 @@ fun HomeRoute(
 ){
   val state by viewModel.viewState.collectAsStateWithLifecycle()
 
-  LaunchedEffect(viewModel.sideEffect){
-    viewModel.sideEffect.collectLatest {
-      when(it){
-        is HomeSideEffect.NavigateToLounge -> navigateToLounge(it.loungeId)
-        is HomeSideEffect.NavigateToTemplateList -> navigateToTemplateList()
-        is HomeSideEffect.NavigateToFriendList -> navigateToFriendList()
-        is HomeSideEffect.NavigateToSetting -> navigateToSetting()
-        is HomeSideEffect.NavigateToTips -> navigateToTips()
-        is HomeSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
-      }
+  Dialogs(state) {
+    JoinDialog(joinDialogState, viewModel::sendEvent)
+    SecretDialog(secretDialogState, viewModel::sendEvent)
+  }
+
+  SideEffectHandler(viewModel.sideEffect) {
+    when(it){
+      is HomeSideEffect.NavigateToLounge -> navigateToLounge(it.loungeId)
+      is HomeSideEffect.NavigateToTemplateList -> navigateToTemplateList()
+      is HomeSideEffect.NavigateToFriendList -> navigateToFriendList()
+      is HomeSideEffect.NavigateToSetting -> navigateToSetting()
+      is HomeSideEffect.NavigateToTips -> navigateToTips()
+      is HomeSideEffect.ShowSnackbar -> snackbarChannel.send(it.message.asString(context))
     }
   }
 
   LaunchedEffect(Unit) { viewModel.sendEvent(HomeEvent.ScreenInitialize) }
-
-  state.joinDialogState?.let { dialogState ->
-    JoinDialog(
-      loungeId = dialogState.loungeId,
-      onEvent = viewModel::sendEvent
-    )
-  }
-  state.secretDialogState?.let { dialogState ->
-    SecretDialog(
-      foodName = dialogState.foodName,
-      foodImageUri = dialogState.foodImageUri,
-      onDismissRequest = { viewModel.sendEvent(SecretDialogEvent.OnClickCancelButton) },
-      onFoodNameChange = { viewModel.sendEvent(SecretDialogEvent.OnFoodNameChange(it)) },
-      onFoodImageChange = { viewModel.sendEvent(SecretDialogEvent.OnFoodImageChange(it)) },
-      onImageError = { viewModel.sendEvent(SecretDialogEvent.OnImageLoadError) },
-      onConfirmation = { viewModel.sendEvent(SecretDialogEvent.OnClickUploadButton(context)) }
-    )
-  }
 
   HomeScreen(
     state = state,
@@ -155,13 +143,13 @@ private fun HomeScreen(
     )
     Gap(height = 24.dp)
     HomeButtonSet(
-      modifier = Modifier.fillMaxWidth(),
       onClickLoungeButton = { onEvent(HomeEvent.OnClickLoungeButton) },
       onClickJoinLoungeButton = { onEvent(HomeEvent.OnClickJoinLoungeButton) },
       onClickTemplateButton = { onEvent(HomeEvent.OnClickTemplateButton) },
       onClickFriendButton = { onEvent(HomeEvent.OnClickFriendButton) },
       onClickSettingButton = { onEvent(HomeEvent.OnClickSettingButton) },
       onClickTipsButton = { onEvent(HomeEvent.OnClickTipsButton) },
+      modifier = Modifier.fillMaxWidth()
     )
   }
 }
@@ -297,13 +285,13 @@ private fun HomeDivider(
 
 @Composable
 private fun HomeButtonSet(
-  modifier: Modifier = Modifier,
-  onClickLoungeButton: () -> Unit = {},
-  onClickJoinLoungeButton: () -> Unit = {},
-  onClickTemplateButton: () -> Unit = {},
-  onClickFriendButton: () -> Unit = {},
-  onClickSettingButton: () -> Unit = {},
-  onClickTipsButton: () -> Unit = {}
+  onClickLoungeButton: () -> Unit,
+  onClickJoinLoungeButton: () -> Unit,
+  onClickTemplateButton: () -> Unit,
+  onClickFriendButton: () -> Unit,
+  onClickSettingButton: () -> Unit,
+  onClickTipsButton: () -> Unit,
+  modifier: Modifier = Modifier
 ) {
   Column(
     modifier = modifier,
@@ -418,36 +406,36 @@ private fun HomeButtonSet(
 
 @Composable
 private fun JoinDialog(
-  loungeId: String,
-  modifier: Modifier = Modifier,
+  dialogState: JoinDialogState?,
   onEvent: (JoinDialogEvent) -> Unit = {}
 ) {
-  Dialog(
-    title = stringResource(R.string.h_join_dialog_title),
-    onDismissRequest = { onEvent(JoinDialogEvent.OnClickCancelButton) },
-    modifier = modifier,
-    icon = { LunchVoteIcon() },
-    body = stringResource(R.string.h_join_dialog_body),
-    closable = true,
-    content = {
-      TextField(
-        text = loungeId,
-        onTextChange = { onEvent(JoinDialogEvent.OnLoungeIdChange(it)) },
-        hintText = stringResource(R.string.h_join_dialog_hint_text)
-      )
-    },
-    buttons = {
-      DialogButton(
-        text = stringResource(R.string.h_join_dialog_cancel_button),
-        onClick = { onEvent(JoinDialogEvent.OnClickCancelButton) },
-        isDismiss = true
-      )
-      DialogButton(
-        text = stringResource(R.string.h_join_dialog_join_button),
-        onClick = { onEvent(JoinDialogEvent.OnClickJoinButton) }
-      )
-    }
-  )
+  dialogState?.run {
+    Dialog(
+      title = stringResource(R.string.h_join_dialog_title),
+      onDismissRequest = { onEvent(JoinDialogEvent.OnClickCancelButton) },
+      icon = { LunchVoteIcon() },
+      body = stringResource(R.string.h_join_dialog_body),
+      closable = true,
+      content = {
+        TextField(
+          text = loungeId,
+          onTextChange = { onEvent(JoinDialogEvent.OnLoungeIdChange(it)) },
+          hintText = stringResource(R.string.h_join_dialog_hint_text)
+        )
+      },
+      buttons = {
+        DialogButton(
+          text = stringResource(R.string.h_join_dialog_cancel_button),
+          onClick = { onEvent(JoinDialogEvent.OnClickCancelButton) },
+          isDismiss = true
+        )
+        DialogButton(
+          text = stringResource(R.string.h_join_dialog_join_button),
+          onClick = { onEvent(JoinDialogEvent.OnClickJoinButton) }
+        )
+      }
+    )
+  }
 }
 
 @Preview
@@ -469,58 +457,59 @@ private fun Preview() {
 @Composable
 private fun JoinDialogPreview() {
   LunchVoteTheme {
-    JoinDialog("1234")
+    JoinDialog(
+      JoinDialogState(
+        loungeId = "1234"
+      )
+    )
   }
 }
 
 // TODO: Temporary Secret Dialog
 @Composable
 private fun SecretDialog(
-  foodName: String,
-  foodImageUri: Uri,
-  modifier: Modifier = Modifier,
-  onDismissRequest: () -> Unit = {},
-  onFoodNameChange: (String) -> Unit = {},
-  onFoodImageChange: (Uri) -> Unit = {},
-  onImageError: () -> Unit = {},
-  onConfirmation: () -> Unit = {}
+  dialogState: SecretDialogState?,
+  onEvent: (SecretDialogEvent) -> Unit = {}
 ) {
-  Dialog(
-    title = "음식 추가",
-    onDismissRequest = onDismissRequest,
-    modifier = modifier,
-    icon = { LunchVoteIcon() },
-    body = "음식을 추가해주세요. (개발자 전용)",
-    closable = true,
-    content = {
-      Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-      ) {
-        ImageWithUploadButton(
-          uri = foodImageUri,
-          onImageChange = onFoodImageChange,
-          onError = onImageError
+  val context = LocalContext.current
+
+  dialogState?.run {
+    Dialog(
+      title = "음식 추가",
+      onDismissRequest = { onEvent(SecretDialogEvent.OnClickCancelButton) },
+      icon = { LunchVoteIcon() },
+      body = "음식을 추가해주세요. (개발자 전용)",
+      closable = true,
+      content = {
+        Column(
+          verticalArrangement = Arrangement.spacedBy(16.dp),
+          horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+          ImageWithUploadButton(
+            uri = foodImageUri,
+            onImageChange = { onEvent(SecretDialogEvent.OnFoodImageChange(it)) },
+            onError = { onEvent(SecretDialogEvent.OnImageLoadError) }
+          )
+          TextField(
+            text = foodName,
+            onTextChange = { onEvent(SecretDialogEvent.OnFoodNameChange(it)) },
+            hintText = "음식 이름"
+          )
+        }
+      },
+      buttons = {
+        DialogButton(
+          text = "취소",
+          onClick = { onEvent(SecretDialogEvent.OnClickCancelButton) },
+          isDismiss = true
         )
-        TextField(
-          text = foodName,
-          onTextChange = onFoodNameChange,
-          hintText = "음식 이름"
+        DialogButton(
+          text = "추가",
+          onClick = { onEvent(SecretDialogEvent.OnClickUploadButton(context)) }
         )
       }
-    },
-    buttons = {
-      DialogButton(
-        text = "취소",
-        onClick = onDismissRequest,
-        isDismiss = true
-      )
-      DialogButton(
-        text = "추가",
-        onClick = onConfirmation
-      )
-    }
-  )
+    )
+  }
 }
 
 @Preview
@@ -528,8 +517,10 @@ private fun SecretDialog(
 private fun SecretDialogPreview() {
   LunchVoteTheme {
     SecretDialog(
-      foodName = "햄버거",
-      foodImageUri = Uri.EMPTY
+      SecretDialogState(
+        foodName = "햄버거",
+        foodImageUri = Uri.EMPTY
+      )
     )
   }
 }

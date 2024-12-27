@@ -81,41 +81,37 @@ private fun EmailVerificationScreen(
       modifier = Modifier.fillMaxWidth()
     )
     Gap(height = 64.dp)
-    Column(
-      modifier = Modifier.fillMaxWidth(),
-      verticalArrangement = Arrangement.spacedBy(20.dp)
-    ) {
-      val isValid = EmailConfig.REGEX.matches(state.email)
+    val isValid = EmailConfig.REGEX.matches(state.email)
 
-      TextField(
-        text = state.email,
-        onTextChange = { onEvent(EmailVerificationEvent.OnEmailChange(it)) },
-        hintText = stringResource(R.string.email_verification_email_hint),
+    TextField(
+      text = state.email,
+      onTextChange = { onEvent(EmailVerificationEvent.OnEmailChange(it)) },
+      hintText = stringResource(R.string.email_verification_email_hint),
+      modifier = Modifier.fillMaxWidth(),
+      enabled = state.emailSent.not(),
+      isError = if (state.email.isEmpty()) null else state.email.isNotEmpty() && isValid.not(),
+      errorMessage = stringResource(R.string.email_verification_email_format_error),
+      trailingIcon = {
+        if (state.emailSent) {
+          TextFieldIconDefaults.CheckIcon()
+        }
+      }
+    )
+    Gap(height = 20.dp)
+    if (state.emailSent.not()) {
+      Button(
+        onClick = { onEvent(EmailVerificationEvent.OnClickSendButton) },
         modifier = Modifier.fillMaxWidth(),
-        enabled = state.emailSent.not(),
-        isError = if (state.email.isEmpty()) null else state.email.isNotEmpty() && isValid.not(),
-        errorMessage = stringResource(R.string.email_verification_email_format_error),
-        trailingIcon = {
-          if (state.emailSent) {
-            TextFieldIconDefaults.CheckIcon()
-          }
-        }
-      )
-      if (state.emailSent.not()) {
-        Button(
-          onClick = { onEvent(EmailVerificationEvent.OnClickSendButton) },
-          modifier = Modifier.fillMaxWidth(),
-          enabled = state.email.isNotEmpty() && isValid
-        ) {
-          Text(text = stringResource(R.string.email_verification_send_button))
-        }
-      } else {
-        OutlinedButton(
-          onClick = { onEvent(EmailVerificationEvent.OnClickResendButton) },
-          modifier = Modifier.fillMaxWidth()
-        ) {
-          Text(text = stringResource(R.string.email_verification_resend_button))
-        }
+        enabled = state.email.isNotEmpty() && isValid
+      ) {
+        Text(text = stringResource(R.string.email_verification_send_button))
+      }
+    } else {
+      OutlinedButton(
+        onClick = { onEvent(EmailVerificationEvent.OnClickResendButton) },
+        modifier = Modifier.fillMaxWidth()
+      ) {
+        Text(text = stringResource(R.string.email_verification_resend_button))
       }
     }
     Gap()
