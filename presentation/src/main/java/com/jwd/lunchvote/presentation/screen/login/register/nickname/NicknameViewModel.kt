@@ -4,6 +4,7 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.jwd.lunchvote.domain.repository.UserRepository
+import com.jwd.lunchvote.domain.repository.UserStatusRepository
 import com.jwd.lunchvote.domain.usecase.CreateUserWithEmailAndPassword
 import com.jwd.lunchvote.domain.usecase.SignInWithEmailAndPassword
 import com.jwd.lunchvote.presentation.R
@@ -24,6 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 class NicknameViewModel @Inject constructor(
   private val userRepository: UserRepository,
+  private val userStatusRepository: UserStatusRepository,
   private val createUserWithEmailAndPassword: CreateUserWithEmailAndPassword,
   private val signInWithEmailAndPassword: SignInWithEmailAndPassword,
   savedStateHandle: SavedStateHandle
@@ -72,6 +74,8 @@ class NicknameViewModel @Inject constructor(
       name = nickname
     )
     userRepository.createUser(user.asDomain())
+
+    userStatusRepository.setUserOnline(userId)
 
     sendSideEffect(NicknameSideEffect.ShowSnackbar(UiText.StringResource(R.string.nickname_success_snackbar)))
     sendSideEffect(NicknameSideEffect.NavigateToHome)
